@@ -55,22 +55,23 @@
       float d = length(uv - m*0.9);
       float core = smoothstep(0.9, 0.0, d) * 0.5;
 
-      // colour: near-black base, deep violet veins, faint highlights
-      vec3 base = vec3(0.026, 0.020, 0.034);
-      vec3 blue = vec3(0.34, 0.14, 0.66);
-      vec3 hi   = vec3(0.72, 0.55, 0.98);
+      // colour: black ground, violet only as a whisper
+      vec3 base = vec3(0.017, 0.014, 0.022);
+      vec3 vio  = vec3(0.30, 0.12, 0.60);
+      vec3 hi   = vec3(0.62, 0.48, 0.92);
 
-      float veins = smoothstep(0.45, 0.85, f);
-      float glow  = pow(f, 3.0);
+      float veins = smoothstep(0.55, 0.92, f);
+      float glow  = pow(f, 4.0);
 
       vec3 col = base;
-      col += blue * (r.x*0.22 + veins*0.20);
-      col += hi   * glow * 0.10;
-      col += blue * core * (0.6 + r.y*0.4);
+      col += vio * (r.x*0.10 + veins*0.11);
+      col += hi  * glow * 0.05;
+      col += vio * core * (0.26 + r.y*0.18);
 
-      // vignette
-      float vig = smoothstep(1.25, 0.2, length(uv));
-      col *= 0.35 + 0.65*vig;
+      // vignette — anchored on the shorter side so narrow screens stay dark
+      float d2 = length(uv / vec2(max(u_res.x/u_res.y, 1.0), 1.0));
+      float vig = smoothstep(1.05, 0.15, d2);
+      col *= 0.20 + 0.80*vig;
 
       // subtle grain via time-jitter
       col += (hash(gl_FragCoord.xy + t)*0.02 - 0.01);
@@ -108,7 +109,10 @@
   let mouse = [0.5, 0.5], tMouse = [0.5, 0.5];
   addEventListener('mousemove', e => { tMouse = [e.clientX / innerWidth, 1 - e.clientY / innerHeight]; }, { passive: true });
 
-  const DPR = Math.min(devicePixelRatio || 1, 1.6);
+  // Lower resolution on phones — the field is diffuse, so nobody sees the difference,
+  // and it keeps the shader off the battery.
+  const smallScreen = matchMedia('(max-width: 860px)').matches;
+  const DPR = Math.min(devicePixelRatio || 1, smallScreen ? 0.8 : 1.6);
   function resize() {
     const w = Math.floor(innerWidth * DPR), h = Math.floor(innerHeight * DPR);
     canvas.width = w; canvas.height = h;

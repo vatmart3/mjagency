@@ -2,14 +2,14 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Travaux — MJ Agency</title>
 <meta name="description" content="Portfolio MJ Agency — une sélection de marques et d'expériences digitales premium.">
-<meta name="theme-color" content="#060607">
+<meta name="theme-color" content="#050506">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23060607'/%3E%3Ctext x='50' y='68' font-family='Arial' font-weight='700' font-size='54' fill='%23f4f4f2' text-anchor='middle'%3EMJ%3C/text%3E%3C/svg%3E">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23050506'/%3E%3Ctext x='50' y='68' font-family='Arial' font-weight='700' font-size='54' fill='%23f2f2f0' text-anchor='middle'%3EMJ%3C/text%3E%3C/svg%3E">
 <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body>
@@ -18,102 +18,101 @@
 <canvas id="bg-canvas"></canvas>
 
 <header class="nav">
-  <a href="index.html" class="nav__logo"><span class="dot"></span> MJ<span class="dim" style="font-weight:400"> Agency</span></a>
+  <a href="index.html" class="nav__logo"><span class="dot"></span> MJ <em>Agency</em></a>
   <nav class="nav__links">
     <a href="work.html" class="active">Travaux</a>
     <a href="studio.html">Studio</a>
     <a href="contact.html">Contact</a>
   </nav>
   <a href="contact.html" class="nav__cta" data-magnetic="0.3">Prendre RDV <span>↗</span></a>
-  <button class="nav__burger" aria-label="Menu"><span></span><span></span><span></span></button>
+  <button class="nav__burger" aria-label="Ouvrir le menu" aria-expanded="false"><span></span><span></span><span></span></button>
 </header>
 
 <nav class="mobile-menu">
   <a href="work.html"><small>01</small>Travaux</a>
   <a href="studio.html"><small>02</small>Studio</a>
   <a href="contact.html"><small>03</small>Contact</a>
+  <a href="contact.html" class="btn btn--glow mobile-menu__cta">Réserver un appel <span class="arw">↗</span></a>
 </nav>
 
 <main class="wrap">
 
-  <!-- PAGE HEADER -->
-  <section class="container" style="padding-top: clamp(120px, 20vh, 220px); padding-bottom: clamp(40px, 6vw, 70px)">
-    <span class="eyebrow reveal">Portfolio · Sélection 2024 — 2026</span>
-    <h1 class="display mt-m reveal">Travaux</h1>
-    <p class="lead mt-m reveal">Un échantillon. Chaque projet est une conversation entre une marque et son public — rendue nette, mémorable et rare.</p>
-  </section>
-
-  <!-- FILTERS (visual) -->
-  <section class="container" style="padding-bottom: 40px">
-    <div class="flex gap-s reveal" style="flex-wrap:wrap; border-block:1px solid var(--line); padding-block:22px" data-filters>
-      <button class="work-item__tag active-filter" data-filter="all" style="cursor:none">Tout</button>
-      <button class="work-item__tag" data-filter="brand">Marque</button>
-      <button class="work-item__tag" data-filter="web">Web</button>
-      <button class="work-item__tag" data-filter="motion">Motion / 3D</button>
-      <button class="work-item__tag" data-filter="product">Produit</button>
+  <section class="container" style="padding-top:clamp(130px,18vh,200px);padding-bottom:clamp(36px,5vw,60px)">
+    <div class="stack">
+      <span class="eyebrow reveal">Sélection 2023 — 2026</span>
+      <h1 class="display reveal">Travaux</h1>
+      <p class="lead reveal">Chaque projet est une conversation entre une marque et son public — rendue nette, mémorable et rare.</p>
     </div>
   </section>
 
-  <!-- GRID -->
-  <section class="container" style="padding-bottom: clamp(80px,12vh,160px)">
-    <div class="grid-cards reveal" data-grid>
+  <section class="container" style="padding-bottom:36px">
+    <div class="filters reveal">
+      <button class="tag active" data-filter="all">Tout</button>
+      <button class="tag" data-filter="brand">Marque</button>
+      <button class="tag" data-filter="web">Web</button>
+      <button class="tag" data-filter="motion">Motion / 3D</button>
+      <button class="tag" data-filter="product">Produit</button>
+    </div>
+  </section>
+
+  <section class="container" style="padding-bottom:var(--sec)">
+    <div class="grid-cards reveal">
 
       <article class="card col-8" data-cat="brand web">
         <div class="thumb"><div class="ph ph-1"></div></div>
         <div class="card__body">
-          <div><div class="card__meta">Marque · Produit · 2025</div><div class="card__title mt-s">Aurea Finance</div></div>
-          <span class="card__go" data-cursor="Ouvrir">↗</span>
+          <div><div class="card__meta">Marque · Produit — 2025</div><div class="card__title">Aurea Finance</div></div>
+          <span class="card__go">↗</span>
         </div>
       </article>
 
       <article class="card col-4" data-cat="brand">
         <div class="thumb"><div class="ph ph-2"></div></div>
         <div class="card__body">
-          <div><div class="card__meta">DA · Web · 2025</div><div class="card__title mt-s">Noir Atelier</div></div>
-          <span class="card__go" data-cursor="Ouvrir">↗</span>
+          <div><div class="card__meta">DA · Web — 2025</div><div class="card__title">Noir Atelier</div></div>
+          <span class="card__go">↗</span>
         </div>
       </article>
 
       <article class="card col-4" data-cat="motion">
         <div class="thumb"><div class="ph ph-5"></div></div>
         <div class="card__body">
-          <div><div class="card__meta">3D · Motion · 2024</div><div class="card__title mt-s">Lumen Studio</div></div>
-          <span class="card__go" data-cursor="Ouvrir">↗</span>
+          <div><div class="card__meta">3D · Motion — 2024</div><div class="card__title">Lumen Studio</div></div>
+          <span class="card__go">↗</span>
         </div>
       </article>
 
       <article class="card col-8" data-cat="product web">
         <div class="thumb"><div class="ph ph-3"></div></div>
         <div class="card__body">
-          <div><div class="card__meta">E-commerce · Marque · 2024</div><div class="card__title mt-s">Vela Living</div></div>
-          <span class="card__go" data-cursor="Ouvrir">↗</span>
+          <div><div class="card__meta">E-commerce · Marque — 2024</div><div class="card__title">Vela Living</div></div>
+          <span class="card__go">↗</span>
         </div>
       </article>
 
       <article class="card col-6" data-cat="web motion">
         <div class="thumb"><div class="ph ph-6"></div></div>
         <div class="card__body">
-          <div><div class="card__meta">Web · Motion · 2024</div><div class="card__title mt-s">Onyx Wear</div></div>
-          <span class="card__go" data-cursor="Ouvrir">↗</span>
+          <div><div class="card__meta">Web · Motion — 2024</div><div class="card__title">Onyx Wear</div></div>
+          <span class="card__go">↗</span>
         </div>
       </article>
 
       <article class="card col-6" data-cat="brand product">
         <div class="thumb"><div class="ph ph-4"></div></div>
         <div class="card__body">
-          <div><div class="card__meta">Marque · Produit · 2023</div><div class="card__title mt-s">Solène Parfums</div></div>
-          <span class="card__go" data-cursor="Ouvrir">↗</span>
+          <div><div class="card__meta">Marque · Produit — 2023</div><div class="card__title">Solène Parfums</div></div>
+          <span class="card__go">↗</span>
         </div>
       </article>
 
     </div>
   </section>
 
-  <!-- CTA -->
   <section class="container pad-y">
     <div class="cta-band reveal">
-      <span class="eyebrow" style="justify-content:center">Votre projet est le prochain</span>
-      <h2 class="h2 mt-m">On en discute ?</h2>
+      <span class="eyebrow">Votre projet est le prochain</span>
+      <h2 class="h2">On en discute&nbsp;?</h2>
       <a href="contact.html" class="btn btn--glow" data-magnetic="0.3" data-cursor="Réserver">Réserver un appel <span class="arw">↗</span></a>
     </div>
   </section>
@@ -128,35 +127,12 @@
       <p class="dim" style="max-width:32ch">Studio créatif digital. Marques et expériences premium, partout dans le monde.</p>
     </div>
     <div class="footer__col"><h4>Menu</h4><a href="work.html">Travaux</a><a href="studio.html">Studio</a><a href="contact.html">Contact</a></div>
-    <div class="footer__col"><h4>Contact</h4><a href="mailto:hello@mjagency.com">hello@mjagency.com</a><a href="contact.html">Prendre rendez-vous</a><p class="dim">Paris · Remote</p></div>
-    <div class="footer__col"><h4>Social</h4><a href="#" target="_blank" rel="noopener">Instagram</a><a href="#" target="_blank" rel="noopener">Behance</a><a href="#" target="_blank" rel="noopener">LinkedIn</a></div>
+    <div class="footer__col"><h4>Contact</h4><a href="mailto:hello@mjagency.com">hello@mjagency.com</a><p class="dim">Paris · Remote</p></div>
   </div>
-  <div class="footer__bottom"><span>© 2026 MJ Agency. Tous droits réservés.</span><span>Conçu avec intention.</span></div>
+  <div class="footer__bottom"><span>© 2026 MJ Agency</span><span>Conçu avec intention.</span></div>
 </footer>
 
 <script src="assets/js/bg.js"></script>
 <script src="assets/js/main.js"></script>
-<script>
-  // Portfolio filtering
-  (function(){
-    const btns = document.querySelectorAll('[data-filters] button');
-    const cards = document.querySelectorAll('[data-grid] .card');
-    btns.forEach(b => b.addEventListener('click', () => {
-      btns.forEach(x => x.classList.remove('active-filter'));
-      b.classList.add('active-filter');
-      const f = b.getAttribute('data-filter');
-      cards.forEach(c => {
-        const show = f === 'all' || (c.getAttribute('data-cat')||'').includes(f);
-        c.style.transition = 'opacity .4s, transform .4s';
-        c.style.opacity = show ? '1' : '0';
-        c.style.transform = show ? 'none' : 'scale(.96)';
-        c.style.display = show ? '' : 'none';
-      });
-    }));
-  })();
-</script>
-<style>
-  .active-filter { background: var(--ink) !important; color: #000 !important; border-color: transparent !important; }
-</style>
 </body>
 </html>
