@@ -452,6 +452,46 @@ a.work-item:hover::before{transform:scaleY(1)}
   padding-block:24px;border-top:1px solid var(--line);font-size:12px;color:var(--ink-dim);
 }
 
+/* ---------- Zone d'intervention ---------- */
+.zone{display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(24px,4vw,60px)}
+.zone__title{
+  font-family:var(--font-body);font-size:11px;font-weight:600;
+  letter-spacing:.2em;text-transform:uppercase;color:var(--accent-2);
+  padding-bottom:14px;margin-bottom:18px;border-bottom:1px solid var(--line);
+}
+.towns{list-style:none;display:flex;flex-wrap:wrap;gap:8px}
+.towns li{
+  font-size:13px;color:var(--ink-soft);
+  border:1px solid var(--line);border-radius:30px;padding:8px 14px;
+  transition:color .3s,border-color .3s;
+}
+.towns li:hover{color:var(--ink);border-color:var(--line-2)}
+.zone__note{margin-top:20px;font-size:13px;color:var(--ink-dim);line-height:1.6}
+
+/* ---------- Coordonnées (NAP) ---------- */
+.nap{font-style:normal;display:flex;flex-direction:column;gap:6px;margin-bottom:14px}
+.nap__line{color:var(--ink-soft);font-size:14px}
+.nap a{margin-bottom:0}
+
+/* =========================================================
+   DÉCALAGES
+   Tout aligné sur une seule verticale, ça s'endort. Ces classes
+   décrochent certains blocs pour créer du mouvement — en marge,
+   jamais en transform, qui est déjà pris par les animations
+   d'apparition.
+   ========================================================= */
+.shift-r{margin-left:auto;max-width:min(820px,76%)}
+.shift-in{padding-left:clamp(0px,11vw,200px)}
+.narrow{max-width:1080px}
+.split--rev > *:first-child{order:2}
+.split--drop > *:last-child{margin-top:clamp(20px,7vw,110px)}
+
+.stats.stagger .stat:nth-child(even){margin-top:clamp(18px,3.5vw,52px)}
+.zone .zone__col:nth-child(2){margin-top:clamp(20px,4vw,64px)}
+.zone .zone__col:nth-child(3){margin-top:clamp(38px,8vw,124px)}
+.cap-list--stagger .cap:nth-child(even){padding-left:clamp(0px,7vw,130px)}
+.work-list--stagger .work-item:nth-child(even){margin-left:clamp(0px,6vw,110px)}
+
 /* ---------- Utilitaires ---------- */
 .mt-s{margin-top:16px}.mt-m{margin-top:30px}
 .stack{display:flex;flex-direction:column;gap:22px;align-items:flex-start}
@@ -465,7 +505,19 @@ a.work-item:hover::before{transform:scaleY(1)}
   .booking{grid-template-columns:1fr;gap:40px}
   .steps,.stats{grid-template-columns:1fr 1fr;gap:26px}
   .cap{grid-template-columns:1fr;gap:14px}
+  .zone{grid-template-columns:1fr;gap:34px}
   .footer__cols{grid-template-columns:1fr 1fr}
+
+  /* Sur une colonne étroite, les décalages ne créent plus de rythme :
+     ils ne font que rogner la largeur utile. On les neutralise. */
+  .shift-r,.shift-in,.narrow{max-width:none;margin-left:0;padding-left:0}
+  .split--rev > *:first-child{order:0}
+  .split--drop > *:last-child{margin-top:0}
+  .stats.stagger .stat:nth-child(even),
+  .zone .zone__col:nth-child(2),
+  .zone .zone__col:nth-child(3){margin-top:0}
+  .cap-list--stagger .cap:nth-child(even){padding-left:0}
+  .work-list--stagger .work-item:nth-child(even){margin-left:0}
 }
 
 @media (max-width:640px){

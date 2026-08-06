@@ -1,0 +1,5 @@
+# MJ Agency — https://www.mjagency.fr
+User-agent: *
+Allow: /
+
+Sitemap: https://www.mjagency.fr/sitemap.xml

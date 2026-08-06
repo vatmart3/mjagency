@@ -21,7 +21,7 @@
   if (!gl) { fallback(); return; }
 
   const small = matchMedia('(max-width: 860px)').matches;
-  const STEPS = small ? 46 : 76;
+  const STEPS = small ? 40 : 68;
 
   const VERT = 'attribute vec2 p;void main(){gl_Position=vec4(p,0.,1.);}';
 
@@ -41,6 +41,11 @@
     return min(max(q.x, q.y), 0.0) + length(max(q, 0.0));
   }
 
+  float sdBox3(vec3 p, vec3 b){
+    vec3 q = abs(p) - b;
+    return length(max(q, 0.0)) + min(max(q.x, max(q.y, q.z)), 0.0);
+  }
+
   /* Contour rectangulaire, répété le long de z */
   float arches(vec3 p){
     float zi   = mod(p.z, SPACING) - SPACING * 0.5;
@@ -53,6 +58,25 @@
     return length(abs(p.xy) - ROOM);
   }
 
+  /* Repère local d'un poste de travail : abs(x) place le même poste
+     contre les deux murs, le décalage en z l'intercale entre deux arches. */
+  vec3 deskSpace(vec3 p){
+    float zi = mod(p.z - SPACING * 0.5, SPACING) - SPACING * 0.5;
+    return vec3(abs(p.x) - (ROOM.x - 0.54), p.y, zi);
+  }
+
+  /* Plateau + piétements, tracés en contour comme le reste du volume */
+  float desks(vec3 q){
+    float top  = abs(sdBox3(q - vec3(0.0, -0.72, 0.0), vec3(0.46, 0.014, 0.86))) - 0.010;
+    float legs = abs(sdBox3(vec3(q.x, q.y + 1.07, abs(q.z) - 0.78), vec3(0.42, 0.35, 0.018))) - 0.008;
+    return min(top, legs);
+  }
+
+  /* Les écrans : seuls volumes réellement allumés de la scène */
+  float screens(vec3 q){
+    return sdBox3(q - vec3(0.26, -0.47, 0.0), vec3(0.014, 0.19, 0.30));
+  }
+
   void main(){
     vec2 uv = (gl_FragCoord.xy - 0.5 * u_res) / u_res.y;
 
@@ -62,21 +86,27 @@
 
     vec3 violet = vec3(0.42, 0.17, 0.86);
     vec3 pale   = vec3(0.62, 0.50, 0.95);
+    vec3 lit    = vec3(0.52, 0.56, 0.98);   // lueur froide des écrans
 
     vec3 col = vec3(0.0);
     float t  = 0.35;
 
     for (int i = 0; i < ${STEPS}; i++){
       vec3 p = ro + rd * t;
+      vec3 q = deskSpace(p);
 
       float da = arches(p);
       float de = edges(p);
+      float dd = desks(q);
+      float ds = screens(q);
 
       float fog = exp(-t * 0.062);
-      col += violet * exp(-da * 30.0) * 0.040 * fog;   // arches
-      col += pale   * exp(-de * 13.0) * 0.016 * fog;   // arêtes
+      col += violet * exp(-da * 30.0) * 0.038 * fog;   // arches
+      col += pale   * exp(-de * 13.0) * 0.015 * fog;   // arêtes
+      col += pale   * exp(-dd * 28.0) * 0.032 * fog;   // postes de travail
+      col += lit    * exp(-ds *  9.0) * 0.052 * fog;   // écrans allumés
 
-      t += clamp(min(da, de) * 0.75, 0.07, 1.15);
+      t += clamp(min(min(da, de), min(dd, ds)) * 0.72, 0.06, 1.15);
       if (t > 62.0) break;
     }
 

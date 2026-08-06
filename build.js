@@ -40,8 +40,8 @@ function toRouterLinks(html) {
 
 const index = read('index.html');
 
-const nav        = toRouterLinks(slice(index, '<header class="nav">', '</header>', { keepMarkers: true }));
-const mobileMenu = toRouterLinks(slice(index, '<nav class="mobile-menu">', '</nav>', { keepMarkers: true }));
+const nav        = toRouterLinks(slice(index, '<header class="nav"', '</header>', { keepMarkers: true }));
+const mobileMenu = toRouterLinks(slice(index, '<nav class="mobile-menu"', '</nav>', { keepMarkers: true }));
 const loader     = slice(index, '<div class="loader">', '</div>\n</div>', { keepMarkers: true });
 const footer     = toRouterLinks(slice(index, '<footer class="footer container">', '</footer>', { keepMarkers: true }));
 
@@ -72,6 +72,11 @@ ${read('assets/css/style.css')}
 .page{display:none}
 .page.active{display:block}
 </style>
+
+<noscript><style>
+  .reveal,.rs>*{opacity:1!important;transform:none!important}
+  .loader{display:none}
+</style></noscript>
 
 ${loader}
 
