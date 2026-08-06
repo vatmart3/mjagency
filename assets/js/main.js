@@ -185,20 +185,32 @@
       }
     }
 
-    // Sans animation demandée : carte ouverte, texte visible, rien ne bouge.
-    if (reduced) {
-      measure();
-      map.style.clipPath = 'inset(0 0 round 0)';
-      towns.style.opacity = '1';
-      phone.style.opacity = '0';
-      if (hint) hint.style.display = 'none';
-      return;
+    // Sur mobile — et quand l'utilisateur refuse les animations — la
+    // section est une section ordinaire, entièrement mise en page par le
+    // CSS. Le script ne doit alors poser aucun style en ligne, sinon il
+    // écraserait cette mise en page.
+    const statique = () => reduced || matchMedia('(max-width: 860px)').matches;
+
+    function nettoyer() {
+      [map, phone, intro, towns, stage].forEach(el => {
+        if (!el) return;
+        el.style.clipPath = '';
+        el.style.opacity = '';
+        el.style.transform = '';
+        el.style.width = '';
+        el.style.height = '';
+        el.style.display = '';
+      });
+      map.style.removeProperty('--ms');
+      map.style.removeProperty('--tx');
+      map.style.removeProperty('--ty');
     }
 
     let ticking = false;
 
     function apply() {
       ticking = false;
+      if (statique()) return;
       const rect  = sec.getBoundingClientRect();
       const track = sec.offsetHeight - H;
       if (track <= 0) return;
@@ -254,19 +266,25 @@
 
     function tourner() {
       apply();
-      boucle = aLEcran ? requestAnimationFrame(tourner) : null;
+      boucle = (aLEcran && !statique()) ? requestAnimationFrame(tourner) : null;
     }
 
     new IntersectionObserver(entrees => {
       aLEcran = entrees[0].isIntersecting;
-      if (aLEcran && !boucle) tourner();
+      if (aLEcran && !boucle && !statique()) tourner();
     }, { rootMargin: '25% 0px' }).observe(sec);
 
+    function rafraichir() {
+      if (statique()) { nettoyer(); return; }
+      measure();
+      apply();
+      if (aLEcran && !boucle) tourner();
+    }
+
     addEventListener('scroll', onScroll, { passive: true });
-    addEventListener('resize', () => { measure(); apply(); });
-    addEventListener('orientationchange', () => setTimeout(() => { measure(); apply(); }, 250));
-    measure();
-    apply();
+    addEventListener('resize', rafraichir);
+    addEventListener('orientationchange', () => setTimeout(rafraichir, 250));
+    rafraichir();
   })();
 
   /* ---------------- Booking calendar ---------------- */

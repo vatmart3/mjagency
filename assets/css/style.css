@@ -532,9 +532,39 @@ a.work-item:hover::before{transform:scaleY(1)}
   position:absolute;z-index:4;left:50%;bottom:clamp(26px,5vh,48px);transform:translateX(-50%);
   font-size:10px;letter-spacing:.28em;text-transform:uppercase;color:var(--ink-dim);
 }
+/* Sur mobile, pas d'animation : la section redevient une section
+   ordinaire — titre, carte, texte, communes — et défile comme le reste
+   de la page. Les !important sont là pour reprendre la main sur les
+   styles en ligne que le script aurait pu poser avant un changement
+   d'orientation. */
 @media (max-width:860px){
-  .thau{height:260vh}
-  .thau__intro{top:clamp(84px,12vh,120px)}
+  .thau{height:auto}
+  .thau__stage{
+    position:static;height:auto;min-height:0;overflow:visible;
+    display:flex;flex-direction:column;gap:26px;
+    /* La règle de base pose place-items:center ; sans cette remise à
+       plat, les enfants se rétrécissent au lieu de s'étirer et la carte
+       se réduit à quelques pixels. */
+    align-items:stretch;justify-items:stretch;
+    padding-block:var(--sec);
+  }
+  .thau__phone,.thau__hint,.thau__scrim{display:none}
+
+  .thau__intro{
+    order:1;position:static;max-width:none;
+    padding-inline:var(--pad);opacity:1!important;
+  }
+  .thau__map{
+    order:2;position:relative;inset:auto;
+    margin-inline:var(--pad);aspect-ratio:8/5;
+    border:1px solid var(--line);border-radius:14px;overflow:hidden;
+    clip-path:none!important;
+  }
+  .thau__map svg{transform:none!important}
+  .thau__towns{
+    order:3;position:static;padding-inline:var(--pad);
+    opacity:1!important;transform:none!important;
+  }
 }
 
 /* ---------- Questions fréquentes ---------- */
