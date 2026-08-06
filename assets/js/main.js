@@ -156,13 +156,30 @@
 
     let W = 0, H = 0, pw = 0, ph = 0;
 
+    // Sur un grand écran on dessine un téléphone. Sur un téléphone, c'est
+    // inutile — et un peu absurde : l'appareil du visiteur EST le téléphone.
+    // Le masque part donc des bords de l'écran, avec le rayon d'angle d'un
+    // vrai mobile, et s'ouvre jusqu'au plein bord.
+    let surMobile = false, rayonDepart = 26;
+
     function measure() {
       W = stage.clientWidth;
       H = stage.clientHeight;
-      pw = Math.min(300, W * 0.68);
-      ph = Math.min(620, H * 0.72);
-      phone.style.width  = pw + 'px';
-      phone.style.height = ph + 'px';
+      surMobile = (W / H) < 1;
+
+      if (surMobile) {
+        pw = W - 24;
+        ph = H - 24;
+        rayonDepart = 36;
+        phone.style.display = 'none';
+      } else {
+        pw = Math.min(300, W * 0.68);
+        ph = Math.min(620, H * 0.72);
+        rayonDepart = 26;
+        phone.style.display = '';
+        phone.style.width  = pw + 'px';
+        phone.style.height = ph + 'px';
+      }
     }
 
     // Sans animation demandée : carte ouverte, texte visible, rien ne bouge.
@@ -188,7 +205,7 @@
       const zoom = ease(clamp((p - 0.10) / 0.52, 0, 1));
       const cx = (W - pw) / 2 * (1 - zoom);
       const cy = (H - ph) / 2 * (1 - zoom);
-      map.style.clipPath = `inset(${cy}px ${cx}px round ${26 * (1 - zoom)}px)`;
+      map.style.clipPath = `inset(${cy}px ${cx}px round ${rayonDepart * (1 - zoom)}px)`;
 
       // Sète occupe 67,6 % de la largeur et 47,5 % de la hauteur du dessin.
       // Au départ on est zoomé sur elle ; en s'ouvrant, le cadre recule
@@ -196,8 +213,8 @@
       // Un écran portrait ne peut pas contenir une lagune de 19 km : la
       // carte y tient en bande, donc le gros plan de départ doit serrer
       // beaucoup plus fort pour rester lisible dans le téléphone.
-      const narrow = (W / H) < 1;
-      const startS = narrow ? 2.7 : 1.75;
+      const narrow = surMobile;
+      const startS = narrow ? 2.0 : 1.75;
       const endS   = narrow ? 1.10 : 1.0;
       const S  = startS - (startS - endS) * zoom;
       // En portrait, la carte finit en bande : on la remonte pour qu'elle
@@ -210,7 +227,7 @@
       map.style.setProperty('--ty', ty.toFixed(2) + '%');
 
       // 2. le châssis et le titre s'effacent une fois passés
-      phone.style.opacity = String(clamp(1 - (p - 0.26) / 0.20, 0, 1));
+      if (!surMobile) phone.style.opacity = String(clamp(1 - (p - 0.26) / 0.20, 0, 1));
       intro.style.opacity = String(clamp(1 - (p - 0.16) / 0.18, 0, 1));
       if (hint) hint.style.opacity = String(clamp(1 - p / 0.12, 0, 1));
 
@@ -334,18 +351,111 @@
     render();
   })();
 
-  /* ---------------- Booking form (demo) ---------------- */
+  /* =========================================================
+     FORMULAIRE DE RÉSERVATION
+
+     Les demandes partent vers DESTINATAIRE.
+
+     Pour un envoi automatique, il faut une clé Web3Forms :
+       1. aller sur web3forms.com
+       2. saisir vatmart3@gmail.com — la clé arrive par email
+       3. la coller ci-dessous à la place de la valeur actuelle
+     C'est gratuit et sans création de compte.
+
+     Tant que la clé n'est pas renseignée, le formulaire bascule sur
+     l'ouverture du logiciel de messagerie du visiteur, pré-rempli. Ça
+     fonctionne, mais ça demande une action de sa part : la clé reste
+     nettement préférable.
+     ========================================================= */
+  const CLE_WEB3FORMS = 'A_REMPLACER';
+  const DESTINATAIRE  = 'vatmart3@gmail.com';
+
   document.querySelectorAll('form[data-demo]').forEach(form => {
-    form.addEventListener('submit', e => {
-      e.preventDefault();
-      const msg = form.querySelector('.form-msg');
+    const msg = form.querySelector('.form-msg');
+    const btn = form.querySelector('button[type="submit"]');
+    const btnTexte = btn ? btn.innerHTML : '';
+
+    function afficher(texte, etat) {
       if (!msg) return;
+      msg.classList.add('show');
+      msg.classList.toggle('form-msg--erreur', etat === 'erreur');
+      msg.textContent = texte;
+    }
+
+    function champs() {
+      const val = n => (form.querySelector(`[name="${n}"]`) || {}).value || '';
       const date = document.querySelector('[data-sum-date]');
       const time = document.querySelector('[data-sum-time]');
-      msg.classList.add('show');
-      msg.textContent = (!time || time.textContent === '—')
-        ? 'Choisissez une date et un créneau pour confirmer votre rendez-vous.'
-        : `Merci — rendez-vous noté le ${date.textContent} à ${time.textContent}. Nous confirmons par email sous 24 h.`;
+      return {
+        nom: val('name'), email: val('email'), societe: val('company'),
+        budget: val('budget'), message: val('message'),
+        date: date ? date.textContent : '', heure: time ? time.textContent : ''
+      };
+    }
+
+    function corpsTexte(c) {
+      return [
+        `Nom : ${c.nom}`,
+        `Email : ${c.email}`,
+        c.societe ? `Société : ${c.societe}` : null,
+        c.budget ? `Budget : ${c.budget}` : null,
+        `Rendez-vous souhaité : ${c.date} à ${c.heure}`,
+        '',
+        'Projet :',
+        c.message || '(non renseigné)'
+      ].filter(Boolean).join('\n');
+    }
+
+    form.addEventListener('submit', async e => {
+      e.preventDefault();
+
+      // Piège à robots : rempli, c'est un automate.
+      const piege = form.querySelector('[name="site"]');
+      if (piege && piege.value) return;
+
+      const c = champs();
+      if (!c.heure || c.heure === '—') {
+        afficher('Choisissez une date et un créneau avant de confirmer.', 'erreur');
+        return;
+      }
+
+      const sujet = `Demande de rendez-vous — ${c.nom} (${c.date} ${c.heure})`;
+
+      if (CLE_WEB3FORMS === 'A_REMPLACER') {
+        // Repli : on ouvre la messagerie du visiteur, pré-remplie.
+        afficher("Votre logiciel de messagerie va s'ouvrir avec la demande pré-remplie. Il ne reste qu'à l'envoyer.", 'info');
+        location.href = `mailto:${DESTINATAIRE}?subject=${encodeURIComponent(sujet)}&body=${encodeURIComponent(corpsTexte(c))}`;
+        return;
+      }
+
+      if (btn) { btn.disabled = true; btn.textContent = 'Envoi…'; }
+      afficher('Envoi en cours…', 'info');
+
+      try {
+        const rep = await fetch('https://api.web3forms.com/submit', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+          body: JSON.stringify({
+            access_key: CLE_WEB3FORMS,
+            subject: sujet,
+            from_name: 'Site MJ Agency',
+            replyto: c.email,
+            Nom: c.nom, Email: c.email, Société: c.societe,
+            Budget: c.budget, Date: c.date, Heure: c.heure, Projet: c.message
+          })
+        });
+        const data = await rep.json();
+        if (!rep.ok || !data.success) throw new Error(data.message || 'Envoi refusé');
+
+        afficher(`Merci ${c.nom} — votre demande pour le ${c.date} à ${c.heure} est bien partie. Nous confirmons par email sous 24 h.`, 'ok');
+        form.reset();
+      } catch (err) {
+        // On ne prétend jamais que c'est envoyé : on donne une porte de sortie.
+        afficher("L'envoi a échoué. Écrivez-nous directement à " + DESTINATAIRE + " ou appelez le 06 11 71 83 68.", 'erreur');
+        console.warn('Formulaire :', err);
+      } finally {
+        if (btn) { btn.disabled = false; btn.innerHTML = btnTexte; }
+      }
     });
   });
 

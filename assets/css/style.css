@@ -416,6 +416,7 @@ a.work-item:hover::before{transform:scaleY(1)}
   border:1px solid var(--accent);background:rgba(157,91,255,.1);color:var(--accent-2);display:none;
 }
 .form-msg.show{display:block}
+.form-msg--erreur{border-color:#ff6b6b;background:rgba(255,107,107,.10);color:#ffb3b3}
 
 /* ---------- Filtres ---------- */
 .filters{display:flex;gap:10px;flex-wrap:wrap;border-block:1px solid var(--line);padding-block:20px}
@@ -441,7 +442,7 @@ a.work-item:hover::before{transform:scaleY(1)}
 .footer__big a{display:inline-flex;align-items:center;gap:.16em}
 .footer__big .arw{font-size:.34em;color:var(--accent)}
 .footer__cols{
-  display:grid;grid-template-columns:2fr 1fr 1fr;gap:32px;
+  display:grid;grid-template-columns:1.6fr 1fr 1.2fr 1fr;gap:32px;
   margin-top:clamp(44px,6vw,80px);padding-block:40px;border-top:1px solid var(--line);
 }
 .footer__col h4{font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--ink-dim);margin-bottom:16px}
@@ -528,6 +529,19 @@ a.work-item:hover::before{transform:scaleY(1)}
   .thau{height:260vh}
   .thau__intro{top:clamp(84px,12vh,120px)}
 }
+
+/* ---------- Questions fréquentes ---------- */
+.faq{border-top:1px solid var(--line)}
+.faq__item{border-bottom:1px solid var(--line);padding:clamp(24px,3.2vw,38px) 0}
+.faq__q{
+  font-family:var(--font-display);font-weight:400;text-transform:uppercase;
+  font-size:clamp(18px,2.4vw,28px);letter-spacing:-.005em;line-height:1.1;margin-bottom:14px;
+}
+.faq__a{color:var(--ink-soft);max-width:72ch;line-height:1.65}
+
+/* Communes cliquables (maillage entre pages locales) */
+.towns li a{display:block;margin:-8px -14px;padding:8px 14px;color:inherit}
+.towns li:has(a):hover{color:var(--ink);border-color:var(--accent)}
 
 /* ---------- Coordonnées (NAP) ---------- */
 .nap{font-style:normal;display:flex;flex-direction:column;gap:6px;margin-bottom:14px}
