@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Studio — MJ Agency</title>
+<meta name="description" content="MJ Agency — notre approche, notre méthode et notre philosophie du design premium.">
+<meta name="theme-color" content="#060607">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23060607'/%3E%3Ctext x='50' y='68' font-family='Arial' font-weight='700' font-size='54' fill='%23f4f4f2' text-anchor='middle'%3EMJ%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+
+<div class="curtain"></div>
+<canvas id="bg-canvas"></canvas>
+
+<header class="nav">
+  <a href="index.html" class="nav__logo"><span class="dot"></span> MJ<span class="dim" style="font-weight:400"> Agency</span></a>
+  <nav class="nav__links">
+    <a href="work.html">Travaux</a>
+    <a href="studio.html" class="active">Studio</a>
+    <a href="contact.html">Contact</a>
+  </nav>
+  <a href="contact.html" class="nav__cta" data-magnetic="0.3">Prendre RDV <span>↗</span></a>
+  <button class="nav__burger" aria-label="Menu"><span></span><span></span><span></span></button>
+</header>
+
+<nav class="mobile-menu">
+  <a href="work.html"><small>01</small>Travaux</a>
+  <a href="studio.html"><small>02</small>Studio</a>
+  <a href="contact.html"><small>03</small>Contact</a>
+</nav>
+
+<main class="wrap">
+
+  <!-- HEADER -->
+  <section class="container" style="padding-top: clamp(120px, 20vh, 220px); padding-bottom: clamp(40px, 6vw, 70px)">
+    <span class="eyebrow reveal">Le studio</span>
+    <h1 class="display mt-m reveal">Peu de<br>bruit.</h1>
+    <p class="lead mt-m reveal">MJ Agency est un studio créatif indépendant. Une petite équipe, obsédée par la précision, qui préfère faire moins de projets — mais mieux.</p>
+  </section>
+
+  <!-- MANIFESTO SPLIT -->
+  <section class="container pad-y">
+    <div class="split">
+      <div class="figure reveal"><div class="ph ph-2 ph-grid" style="height:100%"></div></div>
+      <div class="reveal">
+        <span class="eyebrow">Manifeste</span>
+        <h2 class="h2 mt-m">Nous croyons<br>au détail.</h2>
+        <p class="lead mt-m">Une marque forte n'est pas la somme de ses effets, mais la cohérence de ses intentions. Nous travaillons la matière — typographie, rythme, mouvement, silence — jusqu'à ce que tout paraisse évident.</p>
+        <p class="lead mt-m dim">Le résultat : des identités qui respirent le premium et des interfaces qui donnent envie de rester.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- STATS -->
+  <section class="container" style="padding-bottom: clamp(40px,7vw,90px)">
+    <div class="stats reveal-stagger">
+      <div class="stat"><div class="stat__num" data-count="60">0<span class="u">+</span></div><div class="stat__label">Projets livrés</div></div>
+      <div class="stat"><div class="stat__num" data-count="14">0<span class="u">+</span></div><div class="stat__label">Pays</div></div>
+      <div class="stat"><div class="stat__num" data-count="5">0<span class="u"></span></div><div class="stat__label">Experts</div></div>
+      <div class="stat"><div class="stat__num" data-count="98">0<span class="u">%</span></div><div class="stat__label">Satisfaction</div></div>
+    </div>
+  </section>
+
+  <!-- PROCESS -->
+  <section class="container pad-y">
+    <div class="sec-head">
+      <div class="reveal"><span class="eyebrow">Comment on travaille</span><h2 class="h2 mt-m">La méthode</h2></div>
+      <p class="lead reveal">Un processus limpide en quatre temps. Transparent, cadré, sans surprise — sauf sur le résultat.</p>
+    </div>
+    <div class="steps reveal-stagger">
+      <div class="step"><div class="step__no">01</div><div class="step__name">Écoute</div><p class="step__desc">On comprend votre marché, vos objectifs et ce qui vous rend unique. Tout part de là.</p></div>
+      <div class="step"><div class="step__no">02</div><div class="step__name">Direction</div><p class="step__desc">On définit une direction claire : territoire, ton, système. Une seule idée forte.</p></div>
+      <div class="step"><div class="step__no">03</div><div class="step__name">Création</div><p class="step__desc">Design, motion, développement. On façonne chaque détail jusqu'à la justesse.</p></div>
+      <div class="step"><div class="step__no">04</div><div class="step__name">Lancement</div><p class="step__desc">On livre, on met en ligne, on accompagne. Prêt à faire de l'effet.</p></div>
+    </div>
+  </section>
+
+  <!-- SERVICES DETAIL -->
+  <section class="container pad-y">
+    <div class="sec-head"><div class="reveal"><span class="eyebrow">Expertise</span><h2 class="h2 mt-m">Services</h2></div></div>
+    <div class="cap-list reveal">
+      <div class="cap"><span class="cap__no">01</span><span class="cap__name">Branding</span><span class="cap__desc">Naming, logo, système d'identité, charte, guidelines. Une marque cohérente sur tous les points de contact.</span></div>
+      <div class="cap"><span class="cap__no">02</span><span class="cap__name">Web & UI</span><span class="cap__desc">Sites vitrines, e-commerce, produits SaaS. Design d'interface premium, prototypé et testé.</span></div>
+      <div class="cap"><span class="cap__no">03</span><span class="cap__name">Motion & 3D</span><span class="cap__desc">Habillage animé, films de marque, rendus 3D et expériences WebGL temps réel.</span></div>
+      <div class="cap"><span class="cap__no">04</span><span class="cap__name">Développement</span><span class="cap__desc">Intégration front-end soignée, performante, animée et accessible. Du pixel au déploiement.</span></div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="container pad-y">
+    <div class="cta-band reveal">
+      <span class="eyebrow" style="justify-content:center">Prêt à commencer ?</span>
+      <h2 class="h2 mt-m">Travaillons<br>ensemble.</h2>
+      <a href="contact.html" class="btn btn--glow" data-magnetic="0.3" data-cursor="Réserver">Réserver un appel <span class="arw">↗</span></a>
+    </div>
+  </section>
+
+</main>
+
+<footer class="footer container">
+  <div class="footer__big reveal"><a href="contact.html" data-cursor="Écrire">Parlons-en <span class="arw">↗</span></a></div>
+  <div class="footer__cols">
+    <div class="footer__col">
+      <a href="index.html" class="nav__logo" style="margin-bottom:16px"><span class="dot"></span> MJ Agency</a>
+      <p class="dim" style="max-width:32ch">Studio créatif digital. Marques et expériences premium, partout dans le monde.</p>
+    </div>
+    <div class="footer__col"><h4>Menu</h4><a href="work.html">Travaux</a><a href="studio.html">Studio</a><a href="contact.html">Contact</a></div>
+    <div class="footer__col"><h4>Contact</h4><a href="mailto:hello@mjagency.com">hello@mjagency.com</a><a href="contact.html">Prendre rendez-vous</a><p class="dim">Paris · Remote</p></div>
+    <div class="footer__col"><h4>Social</h4><a href="#" target="_blank" rel="noopener">Instagram</a><a href="#" target="_blank" rel="noopener">Behance</a><a href="#" target="_blank" rel="noopener">LinkedIn</a></div>
+  </div>
+  <div class="footer__bottom"><span>© 2026 MJ Agency. Tous droits réservés.</span><span>Conçu avec intention.</span></div>
+</footer>
+
+<script src="assets/js/bg.js"></script>
+<script src="assets/js/main.js"></script>
+</body>
+</html>
