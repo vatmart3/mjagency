@@ -393,19 +393,18 @@
 
      Les demandes partent vers DESTINATAIRE.
 
-     Pour un envoi automatique, il faut une clé Web3Forms :
-       1. aller sur web3forms.com
-       2. saisir vatmart3@gmail.com — la clé arrive par email
-       3. la coller ci-dessous à la place de la valeur actuelle
-     C'est gratuit et sans création de compte.
+     La clé Web3Forms ci-dessous est publique par nature : elle circule
+     dans le navigateur du visiteur, donc elle est lisible dans le code
+     source. C'est le fonctionnement prévu du service. La protection
+     repose sur le champ piège plus bas ; en cas de spam, il suffit de
+     régénérer la clé sur web3forms.com ou d'y activer un captcha.
 
-     Tant que la clé n'est pas renseignée, le formulaire bascule sur
-     l'ouverture du logiciel de messagerie du visiteur, pré-rempli. Ça
-     fonctionne, mais ça demande une action de sa part : la clé reste
-     nettement préférable.
+     Si la clé venait à être retirée, le formulaire bascule sur
+     l'ouverture du logiciel de messagerie du visiteur, pré-rempli.
      ========================================================= */
-  const CLE_WEB3FORMS = 'A_REMPLACER';
-  const DESTINATAIRE  = 'vatmart3@gmail.com';
+  const CLE_WEB3FORMS = '2931713f-3b41-44f3-829a-ce10b5f63700';
+  const DESTINATAIRE  = 'vatmart3@gmail.com';          // boîte qui reçoit
+  const CONTACT_PUBLIC = 'mjagency.officiel@gmail.com'; // adresse montrée aux visiteurs
 
   document.querySelectorAll('form[data-demo]').forEach(form => {
     const msg = form.querySelector('.form-msg');
@@ -488,7 +487,7 @@
         form.reset();
       } catch (err) {
         // On ne prétend jamais que c'est envoyé : on donne une porte de sortie.
-        afficher("L'envoi a échoué. Écrivez-nous directement à " + DESTINATAIRE + " ou appelez le 06 11 71 83 68.", 'erreur');
+        afficher("L'envoi a échoué. Écrivez-nous directement à " + CONTACT_PUBLIC + " ou appelez le 06 11 71 83 68.", 'erreur');
         console.warn('Formulaire :', err);
       } finally {
         if (btn) { btn.disabled = false; btn.innerHTML = btnTexte; }
