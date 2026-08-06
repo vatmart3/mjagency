@@ -69,12 +69,17 @@ body{
      Sur l'accueil, le canvas du studio 3D passe par-dessus. */
   background-color:var(--bg);
   background-image:radial-gradient(115% 80% at 50% -15%, rgba(58,28,108,.28), transparent 62%);
-  background-attachment:fixed;
+  background-attachment:scroll;
   background-repeat:no-repeat;
   color:var(--ink);
   font-family:var(--font-body);font-size:16px;line-height:1.5;
-  overflow-x:hidden;
+  /* Surtout pas overflow-x:hidden : ça transforme body en conteneur de
+     défilement et neutralise position:sticky sur Safari iOS — la scène
+     de la carte ne se figeait jamais. clip protège du débordement
+     horizontal sans créer ce conteneur. */
+  overflow-x:clip;
 }
+html{overflow-x:clip}
 /* Curseur custom uniquement sur pointeur fin */
 @media (hover:hover) and (pointer:fine){ body,a,button{cursor:none} }
 
@@ -510,9 +515,11 @@ a.work-item:hover::before{transform:scaleY(1)}
    ========================================================= */
 .thau{position:relative;height:320vh}
 .thau__stage{
-  position:sticky;top:0;height:100svh;overflow:hidden;
+  position:-webkit-sticky;position:sticky;top:0;
+  height:100svh;min-height:100vh;overflow:hidden;
   display:grid;place-items:center;
 }
+@supports (height:100svh){ .thau__stage{min-height:0} }
 .thau__map{
   position:absolute;inset:0;z-index:1;
   /* même teinte que le fond du dessin : en portrait la carte ne remplit
@@ -1597,9 +1604,12 @@ a.work-item:hover::before{transform:scaleY(1)}
       surMobile = (W / H) < 1;
 
       if (surMobile) {
-        pw = W - 24;
-        ph = H - 24;
-        rayonDepart = 36;
+        // Un simple liseré de 12 px ne se verrait pas : on part d'un
+        // cadre nettement en retrait, aux angles d'un écran de mobile,
+        // pour que l'ouverture se lise vraiment.
+        pw = W * 0.86;
+        ph = H * 0.80;
+        rayonDepart = 40;
         phone.style.display = 'none';
       } else {
         pw = Math.min(300, W * 0.68);
@@ -1643,7 +1653,7 @@ a.work-item:hover::before{transform:scaleY(1)}
       // carte y tient en bande, donc le gros plan de départ doit serrer
       // beaucoup plus fort pour rester lisible dans le téléphone.
       const narrow = surMobile;
-      const startS = narrow ? 2.0 : 1.75;
+      const startS = narrow ? 2.6 : 1.75;
       const endS   = narrow ? 1.10 : 1.0;
       const S  = startS - (startS - endS) * zoom;
       // En portrait, la carte finit en bande : on la remonte pour qu'elle
@@ -1673,8 +1683,24 @@ a.work-item:hover::before{transform:scaleY(1)}
       if (!ticking) { ticking = true; requestAnimationFrame(apply); }
     }
 
+    // Pendant l'inertie de défilement, iOS n'émet pas d'événement scroll
+    // de façon régulière. On préfère donc recalculer à chaque image tant
+    // que la section est visible, et ne rien faire le reste du temps.
+    let boucle = null, aLEcran = false;
+
+    function tourner() {
+      apply();
+      boucle = aLEcran ? requestAnimationFrame(tourner) : null;
+    }
+
+    new IntersectionObserver(entrees => {
+      aLEcran = entrees[0].isIntersecting;
+      if (aLEcran && !boucle) tourner();
+    }, { rootMargin: '25% 0px' }).observe(sec);
+
     addEventListener('scroll', onScroll, { passive: true });
     addEventListener('resize', () => { measure(); apply(); });
+    addEventListener('orientationchange', () => setTimeout(() => { measure(); apply(); }, 250));
     measure();
     apply();
   })();

@@ -39,12 +39,17 @@ body{
      Sur l'accueil, le canvas du studio 3D passe par-dessus. */
   background-color:var(--bg);
   background-image:radial-gradient(115% 80% at 50% -15%, rgba(58,28,108,.28), transparent 62%);
-  background-attachment:fixed;
+  background-attachment:scroll;
   background-repeat:no-repeat;
   color:var(--ink);
   font-family:var(--font-body);font-size:16px;line-height:1.5;
-  overflow-x:hidden;
+  /* Surtout pas overflow-x:hidden : ça transforme body en conteneur de
+     défilement et neutralise position:sticky sur Safari iOS — la scène
+     de la carte ne se figeait jamais. clip protège du débordement
+     horizontal sans créer ce conteneur. */
+  overflow-x:clip;
 }
+html{overflow-x:clip}
 /* Curseur custom uniquement sur pointeur fin */
 @media (hover:hover) and (pointer:fine){ body,a,button{cursor:none} }
 
@@ -480,9 +485,11 @@ a.work-item:hover::before{transform:scaleY(1)}
    ========================================================= */
 .thau{position:relative;height:320vh}
 .thau__stage{
-  position:sticky;top:0;height:100svh;overflow:hidden;
+  position:-webkit-sticky;position:sticky;top:0;
+  height:100svh;min-height:100vh;overflow:hidden;
   display:grid;place-items:center;
 }
+@supports (height:100svh){ .thau__stage{min-height:0} }
 .thau__map{
   position:absolute;inset:0;z-index:1;
   /* même teinte que le fond du dessin : en portrait la carte ne remplit

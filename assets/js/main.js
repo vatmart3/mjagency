@@ -168,9 +168,12 @@
       surMobile = (W / H) < 1;
 
       if (surMobile) {
-        pw = W - 24;
-        ph = H - 24;
-        rayonDepart = 36;
+        // Un simple liseré de 12 px ne se verrait pas : on part d'un
+        // cadre nettement en retrait, aux angles d'un écran de mobile,
+        // pour que l'ouverture se lise vraiment.
+        pw = W * 0.86;
+        ph = H * 0.80;
+        rayonDepart = 40;
         phone.style.display = 'none';
       } else {
         pw = Math.min(300, W * 0.68);
@@ -214,7 +217,7 @@
       // carte y tient en bande, donc le gros plan de départ doit serrer
       // beaucoup plus fort pour rester lisible dans le téléphone.
       const narrow = surMobile;
-      const startS = narrow ? 2.0 : 1.75;
+      const startS = narrow ? 2.6 : 1.75;
       const endS   = narrow ? 1.10 : 1.0;
       const S  = startS - (startS - endS) * zoom;
       // En portrait, la carte finit en bande : on la remonte pour qu'elle
@@ -244,8 +247,24 @@
       if (!ticking) { ticking = true; requestAnimationFrame(apply); }
     }
 
+    // Pendant l'inertie de défilement, iOS n'émet pas d'événement scroll
+    // de façon régulière. On préfère donc recalculer à chaque image tant
+    // que la section est visible, et ne rien faire le reste du temps.
+    let boucle = null, aLEcran = false;
+
+    function tourner() {
+      apply();
+      boucle = aLEcran ? requestAnimationFrame(tourner) : null;
+    }
+
+    new IntersectionObserver(entrees => {
+      aLEcran = entrees[0].isIntersecting;
+      if (aLEcran && !boucle) tourner();
+    }, { rootMargin: '25% 0px' }).observe(sec);
+
     addEventListener('scroll', onScroll, { passive: true });
     addEventListener('resize', () => { measure(); apply(); });
+    addEventListener('orientationchange', () => setTimeout(() => { measure(); apply(); }, 250));
     measure();
     apply();
   })();
