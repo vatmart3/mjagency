@@ -55,10 +55,10 @@
       float d = length(uv - m*0.9);
       float core = smoothstep(0.9, 0.0, d) * 0.5;
 
-      // colour: near-black base, cool blue veins, faint highlights
-      vec3 base = vec3(0.020, 0.023, 0.030);
-      vec3 blue = vec3(0.14, 0.26, 0.62);
-      vec3 hi   = vec3(0.55, 0.66, 0.95);
+      // colour: near-black base, deep violet veins, faint highlights
+      vec3 base = vec3(0.026, 0.020, 0.034);
+      vec3 blue = vec3(0.34, 0.14, 0.66);
+      vec3 hi   = vec3(0.72, 0.55, 0.98);
 
       float veins = smoothstep(0.45, 0.85, f);
       float glow  = pow(f, 3.0);
@@ -144,7 +144,7 @@
       x: Math.random() * W, y: Math.random() * H,
       r: 220 + Math.random() * 260,
       dx: (Math.random() - 0.5) * 0.25, dy: (Math.random() - 0.5) * 0.25,
-      c: i % 2 ? '30,52,120' : '18,24,44'
+      c: i % 2 ? '78,40,140' : '30,20,54'
     }));
     (function draw() {
       ctx.fillStyle = '#060607'; ctx.fillRect(0, 0, W, H);
