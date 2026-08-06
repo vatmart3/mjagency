@@ -468,29 +468,71 @@ a.work-item:hover::before{transform:scaleY(1)}
 .towns li:hover{color:var(--ink);border-color:var(--line-2)}
 .zone__note{margin-top:20px;font-size:13px;color:var(--ink-dim);line-height:1.6}
 
+/* =========================================================
+   BASSIN DE THAU — on entre dans le téléphone
+   La section est haute, la scène reste collée : la course du
+   scroll sert de piste de lecture. La carte est en plein cadre
+   dès le départ, découpée à la taille de l'écran du téléphone ;
+   ouvrir ce masque suffit à donner la sensation d'entrer dedans,
+   sans jamais redimensionner quoi que ce soit (donc sans recalcul
+   de mise en page à chaque image).
+   ========================================================= */
+.thau{position:relative;height:320vh}
+.thau__stage{
+  position:sticky;top:0;height:100svh;overflow:hidden;
+  display:grid;place-items:center;
+}
+.thau__map{
+  position:absolute;inset:0;z-index:1;
+  /* même teinte que le fond du dessin : en portrait la carte ne remplit
+     pas la hauteur, et les bandes doivent passer inaperçues */
+  background:#08070d;
+  clip-path:inset(30% 32% round 26px);
+  will-change:clip-path;
+}
+.thau__map svg{
+  position:absolute;inset:0;width:100%;height:100%;
+  transform:translate(var(--tx,0%),var(--ty,0%)) scale(var(--ms,2));
+  transform-origin:center;will-change:transform;
+}
+
+/* Le châssis : un simple contour, il ne sert qu'à cadrer le regard */
+.thau__phone{
+  position:relative;z-index:3;pointer-events:none;
+  border:1px solid var(--line-2);border-radius:34px;
+  box-shadow:0 50px 130px -40px #000, inset 0 0 0 1px rgba(255,255,255,.04);
+}
+.thau__phone::before{
+  content:"";position:absolute;top:12px;left:50%;transform:translateX(-50%);
+  width:74px;height:6px;border-radius:6px;background:rgba(255,255,255,.16);
+}
+.thau__intro{
+  position:absolute;z-index:4;left:var(--pad);top:clamp(90px,14vh,150px);
+  display:flex;flex-direction:column;gap:18px;max-width:min(520px,74vw);
+}
+.thau__towns{
+  position:absolute;z-index:4;inset:auto var(--pad) clamp(40px,7vh,80px) var(--pad);
+  opacity:0;display:flex;flex-direction:column;gap:20px;
+}
+.thau__towns .lead{max-width:44ch;
+  text-shadow:0 2px 24px rgba(5,5,6,.9),0 0 60px rgba(5,5,6,.8)}
+.thau__scrim{
+  position:absolute;inset:0;z-index:2;pointer-events:none;
+  background:linear-gradient(180deg,rgba(5,5,6,.74) 0%,transparent 30%,transparent 44%,rgba(5,5,6,.90) 74%,rgba(5,5,6,.97) 100%);
+}
+.thau__hint{
+  position:absolute;z-index:4;left:50%;bottom:clamp(26px,5vh,48px);transform:translateX(-50%);
+  font-size:10px;letter-spacing:.28em;text-transform:uppercase;color:var(--ink-dim);
+}
+@media (max-width:860px){
+  .thau{height:260vh}
+  .thau__intro{top:clamp(84px,12vh,120px)}
+}
+
 /* ---------- Coordonnées (NAP) ---------- */
 .nap{font-style:normal;display:flex;flex-direction:column;gap:6px;margin-bottom:14px}
 .nap__line{color:var(--ink-soft);font-size:14px}
 .nap a{margin-bottom:0}
-
-/* =========================================================
-   DÉCALAGES
-   Tout aligné sur une seule verticale, ça s'endort. Ces classes
-   décrochent certains blocs pour créer du mouvement — en marge,
-   jamais en transform, qui est déjà pris par les animations
-   d'apparition.
-   ========================================================= */
-.shift-r{margin-left:auto;max-width:min(820px,76%)}
-.shift-in{padding-left:clamp(0px,11vw,200px)}
-.narrow{max-width:1080px}
-.split--rev > *:first-child{order:2}
-.split--drop > *:last-child{margin-top:clamp(20px,7vw,110px)}
-
-.stats.stagger .stat:nth-child(even){margin-top:clamp(18px,3.5vw,52px)}
-.zone .zone__col:nth-child(2){margin-top:clamp(20px,4vw,64px)}
-.zone .zone__col:nth-child(3){margin-top:clamp(38px,8vw,124px)}
-.cap-list--stagger .cap:nth-child(even){padding-left:clamp(0px,7vw,130px)}
-.work-list--stagger .work-item:nth-child(even){margin-left:clamp(0px,6vw,110px)}
 
 /* ---------- Utilitaires ---------- */
 .mt-s{margin-top:16px}.mt-m{margin-top:30px}
@@ -508,16 +550,6 @@ a.work-item:hover::before{transform:scaleY(1)}
   .zone{grid-template-columns:1fr;gap:34px}
   .footer__cols{grid-template-columns:1fr 1fr}
 
-  /* Sur une colonne étroite, les décalages ne créent plus de rythme :
-     ils ne font que rogner la largeur utile. On les neutralise. */
-  .shift-r,.shift-in,.narrow{max-width:none;margin-left:0;padding-left:0}
-  .split--rev > *:first-child{order:0}
-  .split--drop > *:last-child{margin-top:0}
-  .stats.stagger .stat:nth-child(even),
-  .zone .zone__col:nth-child(2),
-  .zone .zone__col:nth-child(3){margin-top:0}
-  .cap-list--stagger .cap:nth-child(even){padding-left:0}
-  .work-list--stagger .work-item:nth-child(even){margin-left:0}
 }
 
 @media (max-width:640px){

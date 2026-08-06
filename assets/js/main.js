@@ -135,6 +135,104 @@
     }));
   }
 
+  /* ---------------- Bassin de Thau : entrée dans la carte ----------------
+     La carte occupe déjà tout l'écran ; seul son masque s'ouvre. On ne
+     touche donc qu'à clip-path et opacity, jamais aux dimensions, pour
+     que le navigateur n'ait aucune mise en page à refaire pendant le
+     défilement. */
+  (function thau() {
+    const sec = document.querySelector('[data-thau]');
+    if (!sec) return;
+
+    const stage = sec.querySelector('.thau__stage');
+    const map   = sec.querySelector('[data-thau-map]');
+    const phone = sec.querySelector('[data-thau-phone]');
+    const intro = sec.querySelector('[data-thau-intro]');
+    const towns = sec.querySelector('[data-thau-towns]');
+    const hint  = sec.querySelector('[data-thau-hint]');
+
+    const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
+    const ease  = t => t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+
+    let W = 0, H = 0, pw = 0, ph = 0;
+
+    function measure() {
+      W = stage.clientWidth;
+      H = stage.clientHeight;
+      pw = Math.min(300, W * 0.68);
+      ph = Math.min(620, H * 0.72);
+      phone.style.width  = pw + 'px';
+      phone.style.height = ph + 'px';
+    }
+
+    // Sans animation demandée : carte ouverte, texte visible, rien ne bouge.
+    if (reduced) {
+      measure();
+      map.style.clipPath = 'inset(0 0 round 0)';
+      towns.style.opacity = '1';
+      phone.style.opacity = '0';
+      if (hint) hint.style.display = 'none';
+      return;
+    }
+
+    let ticking = false;
+
+    function apply() {
+      ticking = false;
+      const rect  = sec.getBoundingClientRect();
+      const track = sec.offsetHeight - H;
+      if (track <= 0) return;
+      const p = clamp(-rect.top / track, 0, 1);
+
+      // 1. le masque s'ouvre jusqu'au plein cadre
+      const zoom = ease(clamp((p - 0.10) / 0.52, 0, 1));
+      const cx = (W - pw) / 2 * (1 - zoom);
+      const cy = (H - ph) / 2 * (1 - zoom);
+      map.style.clipPath = `inset(${cy}px ${cx}px round ${26 * (1 - zoom)}px)`;
+
+      // Sète occupe 67,6 % de la largeur et 47,5 % de la hauteur du dessin.
+      // Au départ on est zoomé sur elle ; en s'ouvrant, le cadre recule
+      // jusqu'à montrer le bassin entier, recentré.
+      // Un écran portrait ne peut pas contenir une lagune de 19 km : la
+      // carte y tient en bande, donc le gros plan de départ doit serrer
+      // beaucoup plus fort pour rester lisible dans le téléphone.
+      const narrow = (W / H) < 1;
+      const startS = narrow ? 2.7 : 1.75;
+      const endS   = narrow ? 1.10 : 1.0;
+      const S  = startS - (startS - endS) * zoom;
+      // En portrait, la carte finit en bande : on la remonte pour qu'elle
+      // ne se retrouve pas derrière la liste des communes.
+      const endY = narrow ? -15 : 0;
+      const tx = -(67.6 - 50) * S * (1 - zoom);
+      const ty = -(47.5 - 50) * S * (1 - zoom) + endY * zoom;
+      map.style.setProperty('--ms', S.toFixed(3));
+      map.style.setProperty('--tx', tx.toFixed(2) + '%');
+      map.style.setProperty('--ty', ty.toFixed(2) + '%');
+
+      // 2. le châssis et le titre s'effacent une fois passés
+      phone.style.opacity = String(clamp(1 - (p - 0.26) / 0.20, 0, 1));
+      intro.style.opacity = String(clamp(1 - (p - 0.16) / 0.18, 0, 1));
+      if (hint) hint.style.opacity = String(clamp(1 - p / 0.12, 0, 1));
+
+      // 3. les communes montent une fois qu'on est dedans
+      const t = clamp((p - 0.62) / 0.18, 0, 1);
+      towns.style.opacity = String(t);
+      towns.style.transform = `translateY(${((1 - t) * 26).toFixed(1)}px)`;
+
+      // 4. fondu de sortie : l'enchaînement vers la suite reste continu
+      stage.style.opacity = String(1 - clamp((p - 0.90) / 0.10, 0, 1) * 0.55);
+    }
+
+    function onScroll() {
+      if (!ticking) { ticking = true; requestAnimationFrame(apply); }
+    }
+
+    addEventListener('scroll', onScroll, { passive: true });
+    addEventListener('resize', () => { measure(); apply(); });
+    measure();
+    apply();
+  })();
+
   /* ---------------- Booking calendar ---------------- */
   (function calendar() {
     const cal = document.querySelector('[data-calendar]');

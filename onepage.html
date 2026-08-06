@@ -498,29 +498,71 @@ a.work-item:hover::before{transform:scaleY(1)}
 .towns li:hover{color:var(--ink);border-color:var(--line-2)}
 .zone__note{margin-top:20px;font-size:13px;color:var(--ink-dim);line-height:1.6}
 
+/* =========================================================
+   BASSIN DE THAU — on entre dans le téléphone
+   La section est haute, la scène reste collée : la course du
+   scroll sert de piste de lecture. La carte est en plein cadre
+   dès le départ, découpée à la taille de l'écran du téléphone ;
+   ouvrir ce masque suffit à donner la sensation d'entrer dedans,
+   sans jamais redimensionner quoi que ce soit (donc sans recalcul
+   de mise en page à chaque image).
+   ========================================================= */
+.thau{position:relative;height:320vh}
+.thau__stage{
+  position:sticky;top:0;height:100svh;overflow:hidden;
+  display:grid;place-items:center;
+}
+.thau__map{
+  position:absolute;inset:0;z-index:1;
+  /* même teinte que le fond du dessin : en portrait la carte ne remplit
+     pas la hauteur, et les bandes doivent passer inaperçues */
+  background:#08070d;
+  clip-path:inset(30% 32% round 26px);
+  will-change:clip-path;
+}
+.thau__map svg{
+  position:absolute;inset:0;width:100%;height:100%;
+  transform:translate(var(--tx,0%),var(--ty,0%)) scale(var(--ms,2));
+  transform-origin:center;will-change:transform;
+}
+
+/* Le châssis : un simple contour, il ne sert qu'à cadrer le regard */
+.thau__phone{
+  position:relative;z-index:3;pointer-events:none;
+  border:1px solid var(--line-2);border-radius:34px;
+  box-shadow:0 50px 130px -40px #000, inset 0 0 0 1px rgba(255,255,255,.04);
+}
+.thau__phone::before{
+  content:"";position:absolute;top:12px;left:50%;transform:translateX(-50%);
+  width:74px;height:6px;border-radius:6px;background:rgba(255,255,255,.16);
+}
+.thau__intro{
+  position:absolute;z-index:4;left:var(--pad);top:clamp(90px,14vh,150px);
+  display:flex;flex-direction:column;gap:18px;max-width:min(520px,74vw);
+}
+.thau__towns{
+  position:absolute;z-index:4;inset:auto var(--pad) clamp(40px,7vh,80px) var(--pad);
+  opacity:0;display:flex;flex-direction:column;gap:20px;
+}
+.thau__towns .lead{max-width:44ch;
+  text-shadow:0 2px 24px rgba(5,5,6,.9),0 0 60px rgba(5,5,6,.8)}
+.thau__scrim{
+  position:absolute;inset:0;z-index:2;pointer-events:none;
+  background:linear-gradient(180deg,rgba(5,5,6,.74) 0%,transparent 30%,transparent 44%,rgba(5,5,6,.90) 74%,rgba(5,5,6,.97) 100%);
+}
+.thau__hint{
+  position:absolute;z-index:4;left:50%;bottom:clamp(26px,5vh,48px);transform:translateX(-50%);
+  font-size:10px;letter-spacing:.28em;text-transform:uppercase;color:var(--ink-dim);
+}
+@media (max-width:860px){
+  .thau{height:260vh}
+  .thau__intro{top:clamp(84px,12vh,120px)}
+}
+
 /* ---------- Coordonnées (NAP) ---------- */
 .nap{font-style:normal;display:flex;flex-direction:column;gap:6px;margin-bottom:14px}
 .nap__line{color:var(--ink-soft);font-size:14px}
 .nap a{margin-bottom:0}
-
-/* =========================================================
-   DÉCALAGES
-   Tout aligné sur une seule verticale, ça s'endort. Ces classes
-   décrochent certains blocs pour créer du mouvement — en marge,
-   jamais en transform, qui est déjà pris par les animations
-   d'apparition.
-   ========================================================= */
-.shift-r{margin-left:auto;max-width:min(820px,76%)}
-.shift-in{padding-left:clamp(0px,11vw,200px)}
-.narrow{max-width:1080px}
-.split--rev > *:first-child{order:2}
-.split--drop > *:last-child{margin-top:clamp(20px,7vw,110px)}
-
-.stats.stagger .stat:nth-child(even){margin-top:clamp(18px,3.5vw,52px)}
-.zone .zone__col:nth-child(2){margin-top:clamp(20px,4vw,64px)}
-.zone .zone__col:nth-child(3){margin-top:clamp(38px,8vw,124px)}
-.cap-list--stagger .cap:nth-child(even){padding-left:clamp(0px,7vw,130px)}
-.work-list--stagger .work-item:nth-child(even){margin-left:clamp(0px,6vw,110px)}
 
 /* ---------- Utilitaires ---------- */
 .mt-s{margin-top:16px}.mt-m{margin-top:30px}
@@ -538,16 +580,6 @@ a.work-item:hover::before{transform:scaleY(1)}
   .zone{grid-template-columns:1fr;gap:34px}
   .footer__cols{grid-template-columns:1fr 1fr}
 
-  /* Sur une colonne étroite, les décalages ne créent plus de rythme :
-     ils ne font que rogner la largeur utile. On les neutralise. */
-  .shift-r,.shift-in,.narrow{max-width:none;margin-left:0;padding-left:0}
-  .split--rev > *:first-child{order:0}
-  .split--drop > *:last-child{margin-top:0}
-  .stats.stagger .stat:nth-child(even),
-  .zone .zone__col:nth-child(2),
-  .zone .zone__col:nth-child(3){margin-top:0}
-  .cap-list--stagger .cap:nth-child(even){padding-left:0}
-  .work-list--stagger .work-item:nth-child(even){margin-left:0}
 }
 
 @media (max-width:640px){
@@ -639,7 +671,7 @@ a.work-item:hover::before{transform:scaleY(1)}
 
   <!-- PREUVE -->
   <section class="container pad-y sep">
-    <div class="stats rs stagger">
+    <div class="stats rs">
       <div class="stat"><div class="stat__num"><span data-count="60">0</span><span class="u">+</span></div><div class="stat__label">Projets livrés</div></div>
       <div class="stat"><div class="stat__num"><span data-count="9">0</span><span class="u"> ans</span></div><div class="stat__label">D'expérience</div></div>
       <div class="stat"><div class="stat__num"><span data-count="30">0</span><span class="u"> j</span></div><div class="stat__label">Délai moyen</div></div>
@@ -649,7 +681,7 @@ a.work-item:hover::before{transform:scaleY(1)}
 
   <!-- INTRO LOCALE -->
   <section class="container pad-y sep">
-    <div class="split split--drop shift-r">
+    <div class="split">
       <div class="reveal">
         <span class="eyebrow">Notre conviction</span>
         <h2 class="h2 mt-m">Une agence web<br>ancrée à Sète.</h2>
@@ -670,7 +702,7 @@ a.work-item:hover::before{transform:scaleY(1)}
       </div>
       <p class="lead reveal">Quatre métiers, un seul studio. Tout ce qu'il faut pour exister en ligne, sans passer par cinq prestataires.</p>
     </div>
-    <div class="cap-list cap-list--stagger reveal">
+    <div class="cap-list reveal">
       <article class="cap">
         <h3 class="cap__name">Création de<br>site internet</h3>
         <p class="cap__desc">Sites vitrines, e-commerce et pages de vente. Rapides, pensés pour le mobile et référencés sur Google dès la mise en ligne.</p>
@@ -699,7 +731,7 @@ a.work-item:hover::before{transform:scaleY(1)}
       </div>
       <a href="#" data-go="work" class="btn reveal" data-magnetic="0.25">Tout voir <span class="arw" aria-hidden="true">↗</span></a>
     </div>
-    <div class="work-list work-list--stagger reveal">
+    <div class="work-list reveal">
       <a href="#" data-go="work" class="work-item" data-ph="ph-1" data-cursor="Ouvrir">
         <span class="work-item__title">Aurea Finance</span>
         <span class="work-item__meta">Marque · Site vitrine — 2025</span>
@@ -719,39 +751,93 @@ a.work-item:hover::before{transform:scaleY(1)}
     </div>
   </section>
 
-  <!-- ZONE D'INTERVENTION -->
-  <section class="container pad-y sep shift-in" id="zone">
-    <div class="sec-head">
-      <div class="sec-head__t reveal">
-        <span class="eyebrow">Zone d'intervention</span>
-        <h2 class="h2">Sète et<br>les alentours</h2>
-      </div>
-      <p class="lead reveal">Basés à Sète, nous travaillons dans tout l'Hérault. Un rendez-vous sur place reste possible partout autour du bassin de Thau.</p>
-    </div>
+  <!-- ZONE D'INTERVENTION — on entre dans la carte -->
+  <section class="thau sep" id="zone" data-thau aria-labelledby="zone-title">
+    <div class="thau__stage">
 
-    <div class="zone reveal">
-      <div class="zone__col">
-        <h3 class="zone__title">Bassin de Thau</h3>
+      <div class="thau__map" data-thau-map aria-hidden="true">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1000" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Carte stylisée du bassin de Thau : Marseillan, Mèze, Bouzigues, Balaruc, Sète et Frontignan">
+        <defs>
+          <linearGradient id="thEtang" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stop-color="#31157010"/><stop offset="0" stop-color="#2c1268"/><stop offset="1" stop-color="#160a34"/>
+          </linearGradient>
+          <linearGradient id="thMer" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#180b38"/><stop offset="1" stop-color="#090414"/>
+          </linearGradient>
+          <radialGradient id="thHalo" cx="0.5" cy="0.5" r="0.5">
+            <stop offset="0" stop-color="#9d5bff" stop-opacity=".5"/><stop offset="1" stop-color="#9d5bff" stop-opacity="0"/>
+          </radialGradient>
+          <pattern id="thGrid" width="64" height="64" patternUnits="userSpaceOnUse">
+            <path d="M64 0H0V64" fill="none" stroke="#fff" stroke-opacity=".045" stroke-width="1"/>
+          </pattern>
+        </defs>
+
+        <rect width="1600" height="1000" fill="#08070d"/>
+        <rect width="1600" height="1000" fill="url(#thGrid)"/>
+
+        <!-- Mer Méditerranée -->
+        <path d="M1600 1000 L1600 300 L1120 470 L985 558 L835 648 L675 738 L515 828 L410 890 L330 950 L330 1000 Z" fill="url(#thMer)"/>
+        <path d="M1600 300 L1120 470 L985 558 L835 648 L675 738 L515 828 L410 890 L330 950"
+              fill="none" stroke="#9d5bff" stroke-opacity=".28" stroke-width="2"/>
+
+        <!-- Étang de Thau -->
+        <path d="M330 745 C430 660 560 555 700 455 C830 370 940 305 1020 280
+                 C1062 268 1096 300 1090 336 C1082 380 1040 402 1000 430
+                 C900 470 760 555 620 640 C520 698 420 730 336 752 Z"
+              fill="url(#thEtang)" stroke="#9d5bff" stroke-opacity=".45" stroke-width="2.5"/>
+
+        <!-- Lido : le cordon de sable entre l'étang et la mer -->
+        <path d="M1085 420 C950 510 800 600 640 690 C560 735 480 780 380 840
+                 L410 890 C515 828 675 738 835 648 C935 590 1050 512 1118 464 Z"
+              fill="#141020" stroke="#fff" stroke-opacity=".10" stroke-width="1.5"/>
+
+        <!-- Canaux de Sète -->
+        <g stroke="#9d5bff" stroke-opacity=".4" stroke-width="3" stroke-linecap="round">
+          <path d="M1072 452 L1104 424"/><path d="M1092 486 L1126 458"/>
+        </g>
+
+        <circle cx="1082" cy="475" r="150" fill="url(#thHalo)"/>
+
+        <!-- Communes -->
+        <g fill="#cbb0ff" font-family="Helvetica, Arial, sans-serif" font-size="18" letter-spacing="1.5">
+          <g><circle cx="360" cy="730" r="5"/><text x="376" y="736" fill="#9d9da4">Marseillan</text></g>
+          <g><circle cx="450" cy="845" r="5"/><text x="466" y="851" fill="#63636b">Marseillan-Plage</text></g>
+          <g><circle cx="700" cy="440" r="5"/><text x="716" y="446" fill="#9d9da4">Mèze</text></g>
+          <g><circle cx="925" cy="315" r="5"/><text x="941" y="321" fill="#9d9da4">Bouzigues</text></g>
+          <g><circle cx="1040" cy="330" r="5"/><text x="1056" y="336" fill="#9d9da4">Balaruc-les-Bains</text></g>
+          <g><circle cx="1326" cy="290" r="5"/><text x="1342" y="296" fill="#9d9da4">Frontignan</text></g>
+        </g>
+
+        <!-- Étiquette de l'étang -->
+        <text x="640" y="560" fill="#cbb0ff" fill-opacity=".55" font-family="Helvetica, Arial, sans-serif"
+              font-size="22" letter-spacing="7" transform="rotate(-32 640 560)">ÉTANG DE THAU</text>
+
+        <!-- Sète, le point d'ancrage -->
+        <circle cx="1082" cy="475" r="17" fill="none" stroke="#9d5bff" stroke-width="2" opacity=".85"/>
+        <circle cx="1082" cy="475" r="8" fill="#9d5bff"/>
+        <text x="1108" y="482" fill="#f2f2f0" font-family="Helvetica, Arial, sans-serif" font-size="26" letter-spacing="2">Sète</text>
+      </svg>
+      </div>
+
+      <div class="thau__scrim" aria-hidden="true"></div>
+
+      <div class="thau__phone" data-thau-phone aria-hidden="true"></div>
+
+      <div class="thau__intro" data-thau-intro>
+        <span class="eyebrow">Zone d'intervention</span>
+        <h2 class="h2" id="zone-title">Sète et<br>les alentours</h2>
+      </div>
+
+      <div class="thau__towns" data-thau-towns>
+        <p class="lead">Basés à Sète, au bord de l'étang de Thau, nous intervenons dans tout l'Hérault. Un rendez-vous sur place reste possible partout autour du bassin.</p>
         <ul class="towns">
-          <li>Sète</li><li>Frontignan</li><li>Balaruc-les-Bains</li>
-          <li>Balaruc-le-Vieux</li><li>Mèze</li><li>Bouzigues</li>
-          <li>Marseillan</li><li>Poussan</li><li>Gigean</li>
+          <li>Sète</li><li>Frontignan</li><li>Balaruc-les-Bains</li><li>Bouzigues</li>
+          <li>Mèze</li><li>Marseillan</li><li>Poussan</li><li>Gigean</li>
+          <li>Agde</li><li>Pézenas</li><li>Montpellier</li><li>Béziers</li>
         </ul>
       </div>
-      <div class="zone__col">
-        <h3 class="zone__title">Littoral &amp; Hérault</h3>
-        <ul class="towns">
-          <li>Agde</li><li>Cap d'Agde</li><li>Vias</li>
-          <li>Villeneuve-lès-Maguelone</li><li>Palavas-les-Flots</li><li>Pézenas</li>
-        </ul>
-      </div>
-      <div class="zone__col">
-        <h3 class="zone__title">Grandes villes</h3>
-        <ul class="towns">
-          <li>Montpellier</li><li>Béziers</li><li>Nîmes</li><li>Narbonne</li>
-        </ul>
-        <p class="zone__note">Ailleurs en France ou à l'étranger&nbsp;? Nous travaillons aussi à distance.</p>
-      </div>
+
+      <span class="thau__hint" data-thau-hint>Scroll</span>
     </div>
   </section>
 
@@ -865,7 +951,7 @@ a.work-item:hover::before{transform:scaleY(1)}
   </section>
 
   <section class="container pad-y sep">
-    <div class="split split--drop">
+    <div class="split">
       <div class="figure reveal"><div class="ph ph-5 ph-grid"></div></div>
       <div class="reveal">
         <span class="eyebrow">Manifeste</span>
@@ -877,7 +963,7 @@ a.work-item:hover::before{transform:scaleY(1)}
   </section>
 
   <section class="container pad-y sep">
-    <div class="stats rs stagger">
+    <div class="stats rs">
       <div class="stat"><div class="stat__num"><span data-count="60">0</span><span class="u">+</span></div><div class="stat__label">Projets livrés</div></div>
       <div class="stat"><div class="stat__num"><span data-count="14">0</span><span class="u">+</span></div><div class="stat__label">Pays</div></div>
       <div class="stat"><div class="stat__num"><span data-count="5">0</span></div><div class="stat__label">Experts</div></div>
@@ -901,14 +987,14 @@ a.work-item:hover::before{transform:scaleY(1)}
     </div>
   </section>
 
-  <section class="container pad-y sep shift-in">
+  <section class="container pad-y sep">
     <div class="sec-head">
       <div class="sec-head__t reveal">
         <span class="eyebrow">Expertise</span>
         <h2 class="h2">Services</h2>
       </div>
     </div>
-    <div class="cap-list cap-list--stagger reveal">
+    <div class="cap-list reveal">
       <div class="cap"><h3 class="cap__name">Branding</h3><span class="cap__desc">Naming, logo, système d'identité, charte, guidelines. Une marque cohérente sur tous les points de contact.</span></div>
       <div class="cap"><h3 class="cap__name">Web &amp; UI</h3><span class="cap__desc">Sites vitrines, e-commerce, produits SaaS. Design d'interface premium, prototypé et testé.</span></div>
       <div class="cap"><h3 class="cap__name">Motion &amp; 3D</h3><span class="cap__desc">Habillage animé, films de marque, rendus 3D et expériences WebGL temps réel.</span></div>
@@ -998,22 +1084,22 @@ a.work-item:hover::before{transform:scaleY(1)}
   </section>
 
   <section class="container pad-y sep">
-    <div class="split split--rev shift-r">
+    <div class="split">
       <div class="reveal">
         <span class="eyebrow">Ou directement</span>
         <h2 class="h2 mt-m">Écrivez-nous.</h2>
       </div>
       <div class="reveal">
-        <a href="mailto:hello@mjagency.fr" class="work-item" data-cursor="Email">
-          <span class="work-item__title" style="font-size:clamp(20px,3vw,32px)">hello@mjagency.fr</span>
+        <a href="mailto:mjagency.officiel@gmail.com" class="work-item" data-cursor="Email">
+          <span class="work-item__title" style="font-size:clamp(20px,3vw,32px)">mjagency.officiel@gmail.com</span>
           <span class="work-item__meta">Email</span>
         </a>
-        <a href="tel:+33467000000" class="work-item" data-cursor="Appeler">
-          <span class="work-item__title" style="font-size:clamp(20px,3vw,32px)">04 67 00 00 00</span>
+        <a href="tel:+33611718368" class="work-item" data-cursor="Appeler">
+          <span class="work-item__title" style="font-size:clamp(20px,3vw,32px)">06 11 71 83 68</span>
           <span class="work-item__meta">Téléphone</span>
         </a>
         <div class="work-item" style="border-bottom:1px solid var(--line)">
-          <span class="work-item__title" style="font-size:clamp(20px,3vw,32px)">1 quai de la Résistance, Sète</span>
+          <span class="work-item__title" style="font-size:clamp(20px,3vw,32px)">Sète, Hérault</span>
           <span class="work-item__meta">34200 · Hérault</span>
         </div>
       </div>
@@ -1045,10 +1131,9 @@ a.work-item:hover::before{transform:scaleY(1)}
     <div class="footer__col">
       <h4>Nous trouver</h4>
       <address class="nap">
-        <span class="nap__line">1 quai de la Résistance</span>
         <span class="nap__line">34200 Sète, Hérault</span>
-        <a href="tel:+33467000000">04 67 00 00 00</a>
-        <a href="mailto:hello@mjagency.fr">hello@mjagency.fr</a>
+        <a href="tel:+33611718368">06 11 71 83 68</a>
+        <a href="mailto:mjagency.officiel@gmail.com">mjagency.officiel@gmail.com</a>
       </address>
       <p class="dim" style="font-size:13px">Lun — Ven · 9 h à 18 h</p>
     </div>
@@ -1453,6 +1538,104 @@ a.work-item:hover::before{transform:scaleY(1)}
       });
     }));
   }
+
+  /* ---------------- Bassin de Thau : entrée dans la carte ----------------
+     La carte occupe déjà tout l'écran ; seul son masque s'ouvre. On ne
+     touche donc qu'à clip-path et opacity, jamais aux dimensions, pour
+     que le navigateur n'ait aucune mise en page à refaire pendant le
+     défilement. */
+  (function thau() {
+    const sec = document.querySelector('[data-thau]');
+    if (!sec) return;
+
+    const stage = sec.querySelector('.thau__stage');
+    const map   = sec.querySelector('[data-thau-map]');
+    const phone = sec.querySelector('[data-thau-phone]');
+    const intro = sec.querySelector('[data-thau-intro]');
+    const towns = sec.querySelector('[data-thau-towns]');
+    const hint  = sec.querySelector('[data-thau-hint]');
+
+    const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
+    const ease  = t => t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+
+    let W = 0, H = 0, pw = 0, ph = 0;
+
+    function measure() {
+      W = stage.clientWidth;
+      H = stage.clientHeight;
+      pw = Math.min(300, W * 0.68);
+      ph = Math.min(620, H * 0.72);
+      phone.style.width  = pw + 'px';
+      phone.style.height = ph + 'px';
+    }
+
+    // Sans animation demandée : carte ouverte, texte visible, rien ne bouge.
+    if (reduced) {
+      measure();
+      map.style.clipPath = 'inset(0 0 round 0)';
+      towns.style.opacity = '1';
+      phone.style.opacity = '0';
+      if (hint) hint.style.display = 'none';
+      return;
+    }
+
+    let ticking = false;
+
+    function apply() {
+      ticking = false;
+      const rect  = sec.getBoundingClientRect();
+      const track = sec.offsetHeight - H;
+      if (track <= 0) return;
+      const p = clamp(-rect.top / track, 0, 1);
+
+      // 1. le masque s'ouvre jusqu'au plein cadre
+      const zoom = ease(clamp((p - 0.10) / 0.52, 0, 1));
+      const cx = (W - pw) / 2 * (1 - zoom);
+      const cy = (H - ph) / 2 * (1 - zoom);
+      map.style.clipPath = `inset(${cy}px ${cx}px round ${26 * (1 - zoom)}px)`;
+
+      // Sète occupe 67,6 % de la largeur et 47,5 % de la hauteur du dessin.
+      // Au départ on est zoomé sur elle ; en s'ouvrant, le cadre recule
+      // jusqu'à montrer le bassin entier, recentré.
+      // Un écran portrait ne peut pas contenir une lagune de 19 km : la
+      // carte y tient en bande, donc le gros plan de départ doit serrer
+      // beaucoup plus fort pour rester lisible dans le téléphone.
+      const narrow = (W / H) < 1;
+      const startS = narrow ? 2.7 : 1.75;
+      const endS   = narrow ? 1.10 : 1.0;
+      const S  = startS - (startS - endS) * zoom;
+      // En portrait, la carte finit en bande : on la remonte pour qu'elle
+      // ne se retrouve pas derrière la liste des communes.
+      const endY = narrow ? -15 : 0;
+      const tx = -(67.6 - 50) * S * (1 - zoom);
+      const ty = -(47.5 - 50) * S * (1 - zoom) + endY * zoom;
+      map.style.setProperty('--ms', S.toFixed(3));
+      map.style.setProperty('--tx', tx.toFixed(2) + '%');
+      map.style.setProperty('--ty', ty.toFixed(2) + '%');
+
+      // 2. le châssis et le titre s'effacent une fois passés
+      phone.style.opacity = String(clamp(1 - (p - 0.26) / 0.20, 0, 1));
+      intro.style.opacity = String(clamp(1 - (p - 0.16) / 0.18, 0, 1));
+      if (hint) hint.style.opacity = String(clamp(1 - p / 0.12, 0, 1));
+
+      // 3. les communes montent une fois qu'on est dedans
+      const t = clamp((p - 0.62) / 0.18, 0, 1);
+      towns.style.opacity = String(t);
+      towns.style.transform = `translateY(${((1 - t) * 26).toFixed(1)}px)`;
+
+      // 4. fondu de sortie : l'enchaînement vers la suite reste continu
+      stage.style.opacity = String(1 - clamp((p - 0.90) / 0.10, 0, 1) * 0.55);
+    }
+
+    function onScroll() {
+      if (!ticking) { ticking = true; requestAnimationFrame(apply); }
+    }
+
+    addEventListener('scroll', onScroll, { passive: true });
+    addEventListener('resize', () => { measure(); apply(); });
+    measure();
+    apply();
+  })();
 
   /* ---------------- Booking calendar ---------------- */
   (function calendar() {

@@ -43,12 +43,11 @@
   "description": "Agence web et studio créatif à Sète : création de sites internet, identité de marque, design d'interface et motion design.",
   "url": "https://www.mjagency.fr/",
   "image": "https://www.mjagency.fr/assets/img/og.png",
-  "email": "hello@mjagency.fr",
-  "telephone": "+33467000000",
+  "email": "mjagency.officiel@gmail.com",
+  "telephone": "+33611718368",
   "priceRange": "€€",
   "address": {
     "@type": "PostalAddress",
-    "streetAddress": "1 quai de la Résistance",
     "addressLocality": "Sète",
     "postalCode": "34200",
     "addressRegion": "Occitanie",
@@ -139,7 +138,7 @@
 
   <!-- PREUVE -->
   <section class="container pad-y sep">
-    <div class="stats rs stagger">
+    <div class="stats rs">
       <div class="stat"><div class="stat__num"><span data-count="60">0</span><span class="u">+</span></div><div class="stat__label">Projets livrés</div></div>
       <div class="stat"><div class="stat__num"><span data-count="9">0</span><span class="u"> ans</span></div><div class="stat__label">D'expérience</div></div>
       <div class="stat"><div class="stat__num"><span data-count="30">0</span><span class="u"> j</span></div><div class="stat__label">Délai moyen</div></div>
@@ -149,7 +148,7 @@
 
   <!-- INTRO LOCALE -->
   <section class="container pad-y sep">
-    <div class="split split--drop shift-r">
+    <div class="split">
       <div class="reveal">
         <span class="eyebrow">Notre conviction</span>
         <h2 class="h2 mt-m">Une agence web<br>ancrée à Sète.</h2>
@@ -170,7 +169,7 @@
       </div>
       <p class="lead reveal">Quatre métiers, un seul studio. Tout ce qu'il faut pour exister en ligne, sans passer par cinq prestataires.</p>
     </div>
-    <div class="cap-list cap-list--stagger reveal">
+    <div class="cap-list reveal">
       <article class="cap">
         <h3 class="cap__name">Création de<br>site internet</h3>
         <p class="cap__desc">Sites vitrines, e-commerce et pages de vente. Rapides, pensés pour le mobile et référencés sur Google dès la mise en ligne.</p>
@@ -199,7 +198,7 @@
       </div>
       <a href="work.html" class="btn reveal" data-magnetic="0.25">Tout voir <span class="arw" aria-hidden="true">↗</span></a>
     </div>
-    <div class="work-list work-list--stagger reveal">
+    <div class="work-list reveal">
       <a href="work.html" class="work-item" data-ph="ph-1" data-cursor="Ouvrir">
         <span class="work-item__title">Aurea Finance</span>
         <span class="work-item__meta">Marque · Site vitrine — 2025</span>
@@ -219,39 +218,93 @@
     </div>
   </section>
 
-  <!-- ZONE D'INTERVENTION -->
-  <section class="container pad-y sep shift-in" id="zone">
-    <div class="sec-head">
-      <div class="sec-head__t reveal">
-        <span class="eyebrow">Zone d'intervention</span>
-        <h2 class="h2">Sète et<br>les alentours</h2>
-      </div>
-      <p class="lead reveal">Basés à Sète, nous travaillons dans tout l'Hérault. Un rendez-vous sur place reste possible partout autour du bassin de Thau.</p>
-    </div>
+  <!-- ZONE D'INTERVENTION — on entre dans la carte -->
+  <section class="thau sep" id="zone" data-thau aria-labelledby="zone-title">
+    <div class="thau__stage">
 
-    <div class="zone reveal">
-      <div class="zone__col">
-        <h3 class="zone__title">Bassin de Thau</h3>
+      <div class="thau__map" data-thau-map aria-hidden="true">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1000" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Carte stylisée du bassin de Thau : Marseillan, Mèze, Bouzigues, Balaruc, Sète et Frontignan">
+        <defs>
+          <linearGradient id="thEtang" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stop-color="#31157010"/><stop offset="0" stop-color="#2c1268"/><stop offset="1" stop-color="#160a34"/>
+          </linearGradient>
+          <linearGradient id="thMer" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#180b38"/><stop offset="1" stop-color="#090414"/>
+          </linearGradient>
+          <radialGradient id="thHalo" cx="0.5" cy="0.5" r="0.5">
+            <stop offset="0" stop-color="#9d5bff" stop-opacity=".5"/><stop offset="1" stop-color="#9d5bff" stop-opacity="0"/>
+          </radialGradient>
+          <pattern id="thGrid" width="64" height="64" patternUnits="userSpaceOnUse">
+            <path d="M64 0H0V64" fill="none" stroke="#fff" stroke-opacity=".045" stroke-width="1"/>
+          </pattern>
+        </defs>
+
+        <rect width="1600" height="1000" fill="#08070d"/>
+        <rect width="1600" height="1000" fill="url(#thGrid)"/>
+
+        <!-- Mer Méditerranée -->
+        <path d="M1600 1000 L1600 300 L1120 470 L985 558 L835 648 L675 738 L515 828 L410 890 L330 950 L330 1000 Z" fill="url(#thMer)"/>
+        <path d="M1600 300 L1120 470 L985 558 L835 648 L675 738 L515 828 L410 890 L330 950"
+              fill="none" stroke="#9d5bff" stroke-opacity=".28" stroke-width="2"/>
+
+        <!-- Étang de Thau -->
+        <path d="M330 745 C430 660 560 555 700 455 C830 370 940 305 1020 280
+                 C1062 268 1096 300 1090 336 C1082 380 1040 402 1000 430
+                 C900 470 760 555 620 640 C520 698 420 730 336 752 Z"
+              fill="url(#thEtang)" stroke="#9d5bff" stroke-opacity=".45" stroke-width="2.5"/>
+
+        <!-- Lido : le cordon de sable entre l'étang et la mer -->
+        <path d="M1085 420 C950 510 800 600 640 690 C560 735 480 780 380 840
+                 L410 890 C515 828 675 738 835 648 C935 590 1050 512 1118 464 Z"
+              fill="#141020" stroke="#fff" stroke-opacity=".10" stroke-width="1.5"/>
+
+        <!-- Canaux de Sète -->
+        <g stroke="#9d5bff" stroke-opacity=".4" stroke-width="3" stroke-linecap="round">
+          <path d="M1072 452 L1104 424"/><path d="M1092 486 L1126 458"/>
+        </g>
+
+        <circle cx="1082" cy="475" r="150" fill="url(#thHalo)"/>
+
+        <!-- Communes -->
+        <g fill="#cbb0ff" font-family="Helvetica, Arial, sans-serif" font-size="18" letter-spacing="1.5">
+          <g><circle cx="360" cy="730" r="5"/><text x="376" y="736" fill="#9d9da4">Marseillan</text></g>
+          <g><circle cx="450" cy="845" r="5"/><text x="466" y="851" fill="#63636b">Marseillan-Plage</text></g>
+          <g><circle cx="700" cy="440" r="5"/><text x="716" y="446" fill="#9d9da4">Mèze</text></g>
+          <g><circle cx="925" cy="315" r="5"/><text x="941" y="321" fill="#9d9da4">Bouzigues</text></g>
+          <g><circle cx="1040" cy="330" r="5"/><text x="1056" y="336" fill="#9d9da4">Balaruc-les-Bains</text></g>
+          <g><circle cx="1326" cy="290" r="5"/><text x="1342" y="296" fill="#9d9da4">Frontignan</text></g>
+        </g>
+
+        <!-- Étiquette de l'étang -->
+        <text x="640" y="560" fill="#cbb0ff" fill-opacity=".55" font-family="Helvetica, Arial, sans-serif"
+              font-size="22" letter-spacing="7" transform="rotate(-32 640 560)">ÉTANG DE THAU</text>
+
+        <!-- Sète, le point d'ancrage -->
+        <circle cx="1082" cy="475" r="17" fill="none" stroke="#9d5bff" stroke-width="2" opacity=".85"/>
+        <circle cx="1082" cy="475" r="8" fill="#9d5bff"/>
+        <text x="1108" y="482" fill="#f2f2f0" font-family="Helvetica, Arial, sans-serif" font-size="26" letter-spacing="2">Sète</text>
+      </svg>
+      </div>
+
+      <div class="thau__scrim" aria-hidden="true"></div>
+
+      <div class="thau__phone" data-thau-phone aria-hidden="true"></div>
+
+      <div class="thau__intro" data-thau-intro>
+        <span class="eyebrow">Zone d'intervention</span>
+        <h2 class="h2" id="zone-title">Sète et<br>les alentours</h2>
+      </div>
+
+      <div class="thau__towns" data-thau-towns>
+        <p class="lead">Basés à Sète, au bord de l'étang de Thau, nous intervenons dans tout l'Hérault. Un rendez-vous sur place reste possible partout autour du bassin.</p>
         <ul class="towns">
-          <li>Sète</li><li>Frontignan</li><li>Balaruc-les-Bains</li>
-          <li>Balaruc-le-Vieux</li><li>Mèze</li><li>Bouzigues</li>
-          <li>Marseillan</li><li>Poussan</li><li>Gigean</li>
+          <li>Sète</li><li>Frontignan</li><li>Balaruc-les-Bains</li><li>Bouzigues</li>
+          <li>Mèze</li><li>Marseillan</li><li>Poussan</li><li>Gigean</li>
+          <li>Agde</li><li>Pézenas</li><li>Montpellier</li><li>Béziers</li>
         </ul>
       </div>
-      <div class="zone__col">
-        <h3 class="zone__title">Littoral &amp; Hérault</h3>
-        <ul class="towns">
-          <li>Agde</li><li>Cap d'Agde</li><li>Vias</li>
-          <li>Villeneuve-lès-Maguelone</li><li>Palavas-les-Flots</li><li>Pézenas</li>
-        </ul>
-      </div>
-      <div class="zone__col">
-        <h3 class="zone__title">Grandes villes</h3>
-        <ul class="towns">
-          <li>Montpellier</li><li>Béziers</li><li>Nîmes</li><li>Narbonne</li>
-        </ul>
-        <p class="zone__note">Ailleurs en France ou à l'étranger&nbsp;? Nous travaillons aussi à distance.</p>
-      </div>
+
+      <span class="thau__hint" data-thau-hint>Scroll</span>
     </div>
   </section>
 
@@ -286,10 +339,9 @@
     <div class="footer__col">
       <h4>Nous trouver</h4>
       <address class="nap">
-        <span class="nap__line">1 quai de la Résistance</span>
         <span class="nap__line">34200 Sète, Hérault</span>
-        <a href="tel:+33467000000">04 67 00 00 00</a>
-        <a href="mailto:hello@mjagency.fr">hello@mjagency.fr</a>
+        <a href="tel:+33611718368">06 11 71 83 68</a>
+        <a href="mailto:mjagency.officiel@gmail.com">mjagency.officiel@gmail.com</a>
       </address>
       <p class="dim" style="font-size:13px">Lun — Ven · 9 h à 18 h</p>
     </div>
