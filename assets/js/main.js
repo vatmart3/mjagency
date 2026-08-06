@@ -260,6 +260,13 @@
     });
   }
 
+  /* Le décor 3D n'appartient qu'à l'accueil — seule page à porter un .hero.
+     Le déduire de la structure évite d'avoir à marquer chaque page à la main. */
+  function syncBackdrop(scope) {
+    const isHome = !!(scope || document).querySelector('.hero');
+    document.body.classList.toggle('studio-3d', isHome);
+  }
+
   function closeMenu() {
     if (!menu || !menu.classList.contains('open')) return;
     menu.classList.remove('open');
@@ -311,6 +318,7 @@
         const page = pages[name];
         page.querySelectorAll('.reveal, .rs').forEach(el => { el.classList.remove('in'); io.observe(el); });
         page.querySelectorAll('[data-count]').forEach(el => countIO.observe(el));
+        syncBackdrop(page);
         revealHero(page);
       });
     });
@@ -330,7 +338,9 @@
   const loader = document.querySelector('.loader');
   function boot() {
     if (loader) setTimeout(() => loader.classList.add('done'), 900);
-    revealHero();
+    const scope = isRouter ? document.querySelector('.page.active') : document;
+    syncBackdrop(scope);
+    revealHero(scope);
   }
   if (document.readyState === 'complete') boot();
   else addEventListener('load', boot);

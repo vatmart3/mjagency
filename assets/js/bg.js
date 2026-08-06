@@ -165,9 +165,15 @@
     if (running) requestAnimationFrame(frame);
   });
 
+  // En build fichier unique le canvas survit au changement de page : tant qu'il
+  // est masqué, on saute le rendu plutôt que de calculer un shader invisible.
+  const visible = () => document.body.classList.contains('studio-3d');
+
   const t0 = performance.now();
   function frame(now){
     if (!running) return;
+    if (!visible()) { requestAnimationFrame(frame); return; }
+
     const time = (now - t0) / 1000;
 
     mouse[0] += (mouseTarget[0] - mouse[0]) * 0.04;
