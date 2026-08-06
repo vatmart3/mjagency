@@ -66,6 +66,7 @@ const out = `<title>MJ Agency — Studio créatif digital</title>
 </script>
 
 <style>
+${read('assets/css/fonts.css')}
 ${read('assets/css/style.css')}
 /* Le build en fichier unique n'affiche qu'une page à la fois */
 .page{display:none}

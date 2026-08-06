@@ -1,165 +1,214 @@
 /* =========================================================
-   MJ AGENCY — WebGL shader background
-   A slow, mysterious dark flow-field with a subtle blue core
-   that drifts toward the pointer. Falls back to canvas noise.
+   MJ AGENCY — Décor WebGL
+   Un volume de studio raymarché : des arches rectangulaires et
+   quatre arêtes lumineuses fuient vers un point de lumière.
+   Le scroll pousse la caméra dans la profondeur — on entre
+   littéralement dans l'espace.
+
+   Rendu par accumulation de lueur le long du rayon (pas de
+   normales, pas d'éclairage) : c'est bien moins coûteux qu'un
+   raymarching classique et ça reste assez sombre pour que le
+   texte par-dessus demeure lisible.
    ========================================================= */
 (() => {
   'use strict';
+
   const canvas = document.getElementById('bg-canvas');
   if (!canvas) return;
-  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
-  const gl = canvas.getContext('webgl', { antialias: false, alpha: false, powerPreference: 'low-power' })
-          || canvas.getContext('experimental-webgl');
-
+  const gl = canvas.getContext('webgl', { antialias: false, alpha: false, powerPreference: 'low-power' });
   if (!gl) { fallback(); return; }
 
-  const vert = `
-    attribute vec2 p;
-    void main(){ gl_Position = vec4(p, 0.0, 1.0); }
-  `;
+  const small = matchMedia('(max-width: 860px)').matches;
+  const STEPS = small ? 46 : 76;
 
-  // Fractal-noise flow field, tuned very dark with a cool blue core.
-  const frag = `
-    precision highp float;
-    uniform vec2  u_res;
-    uniform float u_time;
-    uniform vec2  u_mouse;
+  const VERT = 'attribute vec2 p;void main(){gl_Position=vec4(p,0.,1.);}';
 
-    mat2 rot(float a){ float c=cos(a), s=sin(a); return mat2(c,-s,s,c); }
+  const FRAG = `
+  precision highp float;
 
-    float hash(vec2 p){ return fract(sin(dot(p, vec2(127.1,311.7)))*43758.5453); }
-    float noise(vec2 p){
-      vec2 i=floor(p), f=fract(p);
-      float a=hash(i), b=hash(i+vec2(1.,0.)), c=hash(i+vec2(0.,1.)), d=hash(i+vec2(1.,1.));
-      vec2 u=f*f*(3.-2.*f);
-      return mix(a,b,u.x)+(c-a)*u.y*(1.-u.x)+(d-b)*u.x*u.y;
+  uniform vec2  u_res;
+  uniform float u_time;
+  uniform vec2  u_mouse;
+  uniform float u_z;          // profondeur caméra, pilotée par le scroll
+
+  const float SPACING = 4.2;              // écart entre deux arches
+  const vec2  ROOM    = vec2(2.35, 1.42); // demi-largeur / demi-hauteur du volume
+
+  float sdBox2(vec2 p, vec2 b){
+    vec2 q = abs(p) - b;
+    return min(max(q.x, q.y), 0.0) + length(max(q, 0.0));
+  }
+
+  /* Contour rectangulaire, répété le long de z */
+  float arches(vec3 p){
+    float zi   = mod(p.z, SPACING) - SPACING * 0.5;
+    float ring = abs(sdBox2(p.xy, ROOM)) - 0.014;
+    return max(ring, abs(zi) - 0.05);
+  }
+
+  /* Les quatre arêtes du volume, continues jusqu'au point de fuite */
+  float edges(vec3 p){
+    return length(abs(p.xy) - ROOM);
+  }
+
+  void main(){
+    vec2 uv = (gl_FragCoord.xy - 0.5 * u_res) / u_res.y;
+
+    vec2 m = u_mouse - 0.5;
+    vec3 ro = vec3(m.x * 0.55, m.y * 0.34 + sin(u_time * 0.13) * 0.05, u_z);
+    vec3 rd = normalize(vec3(uv, 1.5));
+
+    vec3 violet = vec3(0.42, 0.17, 0.86);
+    vec3 pale   = vec3(0.62, 0.50, 0.95);
+
+    vec3 col = vec3(0.0);
+    float t  = 0.35;
+
+    for (int i = 0; i < ${STEPS}; i++){
+      vec3 p = ro + rd * t;
+
+      float da = arches(p);
+      float de = edges(p);
+
+      float fog = exp(-t * 0.062);
+      col += violet * exp(-da * 30.0) * 0.040 * fog;   // arches
+      col += pale   * exp(-de * 13.0) * 0.016 * fog;   // arêtes
+
+      t += clamp(min(da, de) * 0.75, 0.07, 1.15);
+      if (t > 62.0) break;
     }
-    float fbm(vec2 p){
-      float v=0., a=0.5;
-      for(int i=0;i<6;i++){ v+=a*noise(p); p=rot(0.5)*p*2.0; a*=0.5; }
-      return v;
-    }
 
-    void main(){
-      vec2 uv = (gl_FragCoord.xy - 0.5*u_res)/u_res.y;
-      float t = u_time*0.045;
+    /* Lumière au bout du volume : elle donne envie d'avancer, mais elle
+       tombe pile au centre de l'écran — là où passe le texte. On la garde
+       serrée et discrète : c'est une promesse, pas un projecteur. */
+    float axis = max(dot(rd, vec3(0.0, 0.0, 1.0)), 0.0);
+    col += violet * pow(axis, 320.0) * 0.30;
+    col += pale   * pow(axis, 1600.0) * 0.20;
 
-      // domain warp
-      vec2 q = vec2(fbm(uv*1.6 + t), fbm(uv*1.6 - t + 4.2));
-      vec2 r = vec2(fbm(uv*1.6 + q*1.4 + t*1.3), fbm(uv*1.6 + q*1.4 - t));
-      float f = fbm(uv*1.6 + r*1.2);
+    /* Fond très sombre + vignette calée sur le petit côté */
+    col += vec3(0.014, 0.011, 0.019);
+    float d2  = length(uv / vec2(max(u_res.x / u_res.y, 1.0), 1.0));
+    col *= 0.30 + 0.70 * smoothstep(1.15, 0.12, d2);
 
-      // mouse-driven core
-      vec2 m = (u_mouse - 0.5) * vec2(u_res.x/u_res.y, 1.0);
-      float d = length(uv - m*0.9);
-      float core = smoothstep(0.9, 0.0, d) * 0.5;
+    /* Grain léger, casse le banding des dégradés */
+    col += fract(sin(dot(gl_FragCoord.xy + u_time, vec2(127.1, 311.7))) * 43758.5453) * 0.016 - 0.008;
 
-      // colour: black ground, violet only as a whisper
-      vec3 base = vec3(0.017, 0.014, 0.022);
-      vec3 vio  = vec3(0.30, 0.12, 0.60);
-      vec3 hi   = vec3(0.62, 0.48, 0.92);
+    gl_FragColor = vec4(col, 1.0);
+  }`;
 
-      float veins = smoothstep(0.55, 0.92, f);
-      float glow  = pow(f, 4.0);
-
-      vec3 col = base;
-      col += vio * (r.x*0.10 + veins*0.11);
-      col += hi  * glow * 0.05;
-      col += vio * core * (0.26 + r.y*0.18);
-
-      // vignette — anchored on the shorter side so narrow screens stay dark
-      float d2 = length(uv / vec2(max(u_res.x/u_res.y, 1.0), 1.0));
-      float vig = smoothstep(1.05, 0.15, d2);
-      col *= 0.20 + 0.80*vig;
-
-      // subtle grain via time-jitter
-      col += (hash(gl_FragCoord.xy + t)*0.02 - 0.01);
-
-      gl_FragColor = vec4(col, 1.0);
-    }
-  `;
-
-  function compile(type, src) {
+  function compile(type, src){
     const s = gl.createShader(type);
-    gl.shaderSource(s, src); gl.compileShader(s);
-    if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) { console.warn(gl.getShaderInfoLog(s)); return null; }
+    gl.shaderSource(s, src);
+    gl.compileShader(s);
+    if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) {
+      console.warn('shader:', gl.getShaderInfoLog(s));
+      return null;
+    }
     return s;
   }
-  const vs = compile(gl.VERTEX_SHADER, vert);
-  const fs = compile(gl.FRAGMENT_SHADER, frag);
+
+  const vs = compile(gl.VERTEX_SHADER, VERT);
+  const fs = compile(gl.FRAGMENT_SHADER, FRAG);
   if (!vs || !fs) { fallback(); return; }
 
   const prog = gl.createProgram();
-  gl.attachShader(prog, vs); gl.attachShader(prog, fs); gl.linkProgram(prog);
+  gl.attachShader(prog, vs);
+  gl.attachShader(prog, fs);
+  gl.linkProgram(prog);
   if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) { fallback(); return; }
   gl.useProgram(prog);
 
-  const buf = gl.createBuffer();
-  gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+  gl.bindBuffer(gl.ARRAY_BUFFER, gl.createBuffer());
   gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
   const loc = gl.getAttribLocation(prog, 'p');
   gl.enableVertexAttribArray(loc);
   gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
 
-  const uRes = gl.getUniformLocation(prog, 'u_res');
-  const uTime = gl.getUniformLocation(prog, 'u_time');
+  const uRes   = gl.getUniformLocation(prog, 'u_res');
+  const uTime  = gl.getUniformLocation(prog, 'u_time');
   const uMouse = gl.getUniformLocation(prog, 'u_mouse');
+  const uZ     = gl.getUniformLocation(prog, 'u_z');
 
-  let mouse = [0.5, 0.5], tMouse = [0.5, 0.5];
-  addEventListener('mousemove', e => { tMouse = [e.clientX / innerWidth, 1 - e.clientY / innerHeight]; }, { passive: true });
+  /* ---------- Entrées ---------- */
+  let mouse = [0.5, 0.5], mouseTarget = [0.5, 0.5];
+  addEventListener('mousemove', e => {
+    mouseTarget = [e.clientX / innerWidth, 1 - e.clientY / innerHeight];
+  }, { passive: true });
 
-  // Lower resolution on phones — the field is diffuse, so nobody sees the difference,
-  // and it keeps the shader off the battery.
-  const smallScreen = matchMedia('(max-width: 860px)').matches;
-  const DPR = Math.min(devicePixelRatio || 1, smallScreen ? 0.8 : 1.6);
-  function resize() {
-    const w = Math.floor(innerWidth * DPR), h = Math.floor(innerHeight * DPR);
+  // 90 px de scroll = 1 unité de profondeur ; on passe donc une arche
+  // toutes les ~380 px, ce qui reste lisible même en défilement rapide.
+  let z = 0, zTarget = 0;
+  const readScroll = () => { zTarget = scrollY / 90; };
+  addEventListener('scroll', readScroll, { passive: true });
+  readScroll();
+
+  /* ---------- Taille ---------- */
+  const DPR = Math.min(devicePixelRatio || 1, small ? 0.8 : 1.5);
+  function resize(){
+    const w = Math.max(1, Math.floor(innerWidth * DPR));
+    const h = Math.max(1, Math.floor(innerHeight * DPR));
     canvas.width = w; canvas.height = h;
-    canvas.style.width = innerWidth + 'px'; canvas.style.height = innerHeight + 'px';
+    canvas.style.width = innerWidth + 'px';
+    canvas.style.height = innerHeight + 'px';
     gl.viewport(0, 0, w, h);
     gl.uniform2f(uRes, w, h);
   }
-  addEventListener('resize', resize); resize();
+  addEventListener('resize', resize);
+  resize();
 
+  /* ---------- Boucle ---------- */
   let running = true;
-  document.addEventListener('visibilitychange', () => { running = !document.hidden; if (running) requestAnimationFrame(frame); });
+  document.addEventListener('visibilitychange', () => {
+    running = !document.hidden;
+    if (running) requestAnimationFrame(frame);
+  });
 
-  const start = performance.now();
-  function frame(now) {
+  const t0 = performance.now();
+  function frame(now){
     if (!running) return;
-    mouse[0] += (tMouse[0] - mouse[0]) * 0.04;
-    mouse[1] += (tMouse[1] - mouse[1]) * 0.04;
-    gl.uniform1f(uTime, (now - start) / 1000);
+    const time = (now - t0) / 1000;
+
+    mouse[0] += (mouseTarget[0] - mouse[0]) * 0.04;
+    mouse[1] += (mouseTarget[1] - mouse[1]) * 0.04;
+    z += (zTarget - z) * 0.075;                 // le retard donne du poids
+
+    gl.uniform1f(uTime, time);
     gl.uniform2f(uMouse, mouse[0], mouse[1]);
+    gl.uniform1f(uZ, z + time * 0.06);          // dérive lente, même à l'arrêt
     gl.drawArrays(gl.TRIANGLES, 0, 3);
     requestAnimationFrame(frame);
   }
   requestAnimationFrame(frame);
 
-  /* ---------- Canvas fallback (soft drifting orbs) ---------- */
-  function fallback() {
+  /* ---------- Repli sans WebGL ---------- */
+  function fallback(){
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
     let W, H;
-    function rs() { W = canvas.width = innerWidth; H = canvas.height = innerHeight; }
+    const rs = () => { W = canvas.width = innerWidth; H = canvas.height = innerHeight; };
     addEventListener('resize', rs); rs();
+
     const orbs = Array.from({ length: 5 }, (_, i) => ({
       x: Math.random() * W, y: Math.random() * H,
       r: 220 + Math.random() * 260,
-      dx: (Math.random() - 0.5) * 0.25, dy: (Math.random() - 0.5) * 0.25,
+      dx: (Math.random() - .5) * .25, dy: (Math.random() - .5) * .25,
       c: i % 2 ? '78,40,140' : '30,20,54'
     }));
-    (function draw() {
-      ctx.fillStyle = '#060607'; ctx.fillRect(0, 0, W, H);
+
+    (function draw(){
+      ctx.fillStyle = '#050506'; ctx.fillRect(0, 0, W, H);
       ctx.globalCompositeOperation = 'lighter';
       orbs.forEach(o => {
         o.x += o.dx; o.y += o.dy;
         if (o.x < -o.r || o.x > W + o.r) o.dx *= -1;
         if (o.y < -o.r || o.y > H + o.r) o.dy *= -1;
         const g = ctx.createRadialGradient(o.x, o.y, 0, o.x, o.y, o.r);
-        g.addColorStop(0, `rgba(${o.c},0.30)`); g.addColorStop(1, 'rgba(6,6,7,0)');
-        ctx.fillStyle = g; ctx.beginPath(); ctx.arc(o.x, o.y, o.r, 0, Math.PI * 2); ctx.fill();
+        g.addColorStop(0, `rgba(${o.c},.30)`);
+        g.addColorStop(1, 'rgba(5,5,6,0)');
+        ctx.fillStyle = g;
+        ctx.beginPath(); ctx.arc(o.x, o.y, o.r, 0, Math.PI * 2); ctx.fill();
       });
       ctx.globalCompositeOperation = 'source-over';
       requestAnimationFrame(draw);
