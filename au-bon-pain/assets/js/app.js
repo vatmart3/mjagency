@@ -302,6 +302,7 @@ function majPanier() {
   });
 
   majCreneaux();
+  majBarre();
 }
 
 $('#lignes').addEventListener('click', e => {
@@ -399,13 +400,14 @@ function ouvrirPanier() {
   $('#ouvrir-panier').setAttribute('aria-expanded', 'true');
   document.body.style.overflow = 'hidden';
   majCreneaux();
+  majBarre();
   setTimeout(() => $('#fermer-panier').focus(), 60);
 }
 function fermerPanier() {
   drawer.classList.remove('on'); voile.classList.remove('on');
   $('#ouvrir-panier').setAttribute('aria-expanded', 'false');
   document.body.style.overflow = '';
-  setTimeout(() => { drawer.hidden = true; voile.hidden = true; }, 480);
+  setTimeout(() => { drawer.hidden = true; voile.hidden = true; majBarre(); }, 480);
   if (dernierFocus) dernierFocus.focus();
 }
 
@@ -497,6 +499,14 @@ function majSandwich() {
   const s = litSandwich();
   $('#sandwich-prix').textContent = euro(s.prix);
 
+  /* Le choix relu en mots : on vérifie sa commande sans relire les cases */
+  const mots = $('#sandwich-mots');
+  if (mots) {
+    const crud = s.crud.length ? s.crud.join(', ').toLowerCase() : 'sans crudités';
+    mots.innerHTML = `<b>${s.gar}</b> sur ${s.pain.toLowerCase()}, ${crud}, `
+      + `${s.sauce.toLowerCase()}${s.formule ? ', en formule midi' : ''}.`;
+  }
+
   /* Le dessin suit les choix : teinte de la garniture, sauce, crudités */
   const gar = form.querySelector('input[name=garniture]:checked');
   const sauce = form.querySelector('input[name=sauce]:checked');
@@ -571,20 +581,111 @@ function toast(msg) {
   tId = setTimeout(() => t.classList.remove('on'), 2600);
 }
 
-/* Filtres de la carte */
+/* Filtres de la carte — les cartes s'effacent puis reviennent,
+   au lieu de disparaître d'un coup */
 $$('.filtre').forEach(f => f.addEventListener('click', () => {
   $$('.filtre').forEach(x => { x.classList.remove('is-on'); x.setAttribute('aria-pressed', 'false'); });
   f.classList.add('is-on'); f.setAttribute('aria-pressed', 'true');
 
   const cible = f.dataset.f;
   let visibles = 0;
+
   $$('.plat').forEach(p => {
     const ok = cible === 'tout' || p.dataset.cat === cible;
-    p.classList.toggle('is-hidden', !ok);
     if (ok) visibles++;
+
+    if (!doux) {                       /* mouvement réduit : on coupe court */
+      p.classList.toggle('is-hidden', !ok);
+      return;
+    }
+    if (ok && p.classList.contains('is-hidden')) {
+      p.classList.remove('is-hidden', 'part');
+      p.classList.add('arrive');
+      setTimeout(() => p.classList.remove('arrive'), 460);
+    } else if (!ok && !p.classList.contains('is-hidden')) {
+      p.classList.add('part');
+      setTimeout(() => { p.classList.add('is-hidden'); p.classList.remove('part'); }, 200);
+    }
   });
+
   $('#grille-vide').hidden = visibles > 0;
 }));
+
+/* ---------------------------------------------------------
+   11 · « Tout chaud »
+   Chaque produit porte la ou les fournées dont il sort
+   (data-fournee). Pendant les 75 minutes qui suivent, la carte
+   le dit — c'est l'information qu'on vient chercher.
+   --------------------------------------------------------- */
+const FENETRE_CHAUD = 75 / 60;   /* heures */
+
+function majChaud() {
+  const now = new Date();
+  const h = decimal(now);
+  const ouvert = etatOuverture(now).etat !== 'ferme';
+  const chauds = [];
+
+  $$('.plat[data-fournee]').forEach(p => {
+    const sorties = p.dataset.fournee.split(',').map(Number);
+    const chaud = ouvert && sorties.some(f => h >= f && h - f <= FENETRE_CHAUD);
+
+    p.classList.toggle('est-chaud', chaud);
+    let pastille = $('.chaud', p);
+    if (chaud && !pastille) {
+      pastille = document.createElement('span');
+      pastille.className = 'chaud';
+      pastille.textContent = 'Tout chaud';
+      p.prepend(pastille);
+    } else if (!chaud && pastille) {
+      pastille.remove();
+    }
+    if (chaud) chauds.push(p.dataset.nom.toLowerCase());
+  });
+
+  /* Le résumé sous le titre de la carte */
+  const ligne = $('#carte-chaud');
+  if (!ligne) return;
+  if (!chauds.length) { ligne.hidden = true; return; }
+  ligne.hidden = false;
+  const reste = chauds.length - 3;
+  const liste = reste > 0
+    ? chauds.slice(0, 3).join(', ') + (reste === 1 ? ' et un autre' : ` et ${reste} autres`)
+    : chauds.join(', ');
+  ligne.textContent = `Sorti du four à l’instant : ${liste}.`;
+}
+
+/* ---------------------------------------------------------
+   12 · La barre du sac (téléphone) et le repère de navigation
+   --------------------------------------------------------- */
+function majBarre() {
+  const barre = $('#barre-sac');
+  if (!barre) return;
+  const n = nbArticles();
+  barre.hidden = n === 0 || !drawer.hidden;
+  document.body.classList.toggle('avec-barre', !barre.hidden);
+  if (n === 0) return;
+  $('#barre-n').textContent = `${n} article${n > 1 ? 's' : ''}`;
+  $('#barre-total').textContent = euro(totalPanier());
+}
+$('#barre-sac').addEventListener('click', ouvrirPanier);
+
+/* Repère de section : le lien de la section lue s'annonce */
+const liens = $$('.nav__links a');
+const sections = liens
+  .map(a => ({ a, sec: document.querySelector(a.getAttribute('href')) }))
+  .filter(x => x.sec);
+
+if ('IntersectionObserver' in window && sections.length) {
+  const spy = new IntersectionObserver(entries => {
+    entries.forEach(en => {
+      if (!en.isIntersecting) return;
+      liens.forEach(a => a.classList.remove('ici'));
+      const trouve = sections.find(x => x.sec === en.target);
+      if (trouve) trouve.a.classList.add('ici');
+    });
+  }, { rootMargin: '-45% 0px -50% 0px' });
+  sections.forEach(x => spy.observe(x.sec));
+}
 
 /* ---------------------------------------------------------
    10 · Démarrage — puis on repasse toutes les 30 secondes,
@@ -593,7 +694,8 @@ $$('.filtre').forEach(f => f.addEventListener('click', () => {
 dessineCadran();
 majEtat();
 majFour();
+majChaud();
 majPanier();
 majSandwich();
 
-setInterval(() => { majEtat(); majFour(); }, 30000);
+setInterval(() => { majEtat(); majFour(); majChaud(); }, 30000);

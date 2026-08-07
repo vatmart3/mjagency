@@ -459,6 +459,12 @@ body.scrolled .nav__in{
 .composer__aside .lead{margin-top:18px}
 
 .sandwich-viz{margin-top:36px}
+/* Le choix relu en mots, sous le dessin */
+.sandwich-mots{
+  margin-top:24px;font-size:14.5px;line-height:1.6;
+  color:var(--n-txt-2,var(--brun));max-width:34ch;
+}
+.sandwich-mots b{font-weight:600;color:var(--n-txt,var(--encre))}
 .sandwich-viz__svg{width:100%;height:auto;overflow:visible}
 .sv-ombre{fill:rgba(36,23,8,.14);filter:blur(8px)}
 .sv-haut path{fill:#E3A24C}
@@ -762,4 +768,228 @@ body.scrolled .nav__in{
   }
   .reveal{opacity:1;transform:none}
   .blob{animation:none}
+}
+
+/* =========================================================
+   SECONDE PASSE — la matière, la nuit, le pouce
+   Ce bloc s'ajoute au système du haut de fichier ; il ne le
+   contredit pas, il l'étend.
+   ========================================================= */
+
+/* ---------------------------------------------------------
+   « Tout chaud » — le seul badge qui dise l'heure qu'il est.
+   Posé par app.js quand une fournée vient de sortir.
+   --------------------------------------------------------- */
+.plat{position:relative}
+.chaud{
+  position:absolute;top:14px;right:14px;z-index:2;
+  display:inline-flex;align-items:center;gap:6px;
+  font-size:11.5px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;
+  padding:6px 11px 6px 9px;border-radius:var(--r-pill);
+  background:linear-gradient(135deg,var(--braise),#7E3410);color:#FFEFD8;
+  box-shadow:0 6px 18px rgba(168,71,27,.34);
+  animation:chaudEntre .5s var(--ease-out) both;
+}
+.chaud::before{
+  content:"";width:7px;height:7px;border-radius:50%;
+  background:var(--miel);box-shadow:0 0 0 0 rgba(232,163,61,.7);
+  animation:braise 2.2s var(--ease) infinite;
+}
+@keyframes chaudEntre{from{opacity:0;transform:translateY(-6px) scale(.9)}to{opacity:1;transform:none}}
+@keyframes braise{
+  0%{box-shadow:0 0 0 0 rgba(232,163,61,.6)}
+  70%{box-shadow:0 0 0 7px rgba(232,163,61,0)}
+  100%{box-shadow:0 0 0 0 rgba(232,163,61,0)}
+}
+/* Quand la pastille est là, le dessin descend pour lui laisser la place */
+.plat.est-chaud .plat__img{margin-top:14px}
+.plat--vedette.est-chaud .plat__img{margin-top:0}
+
+/* La carte entière se réchauffe, discrètement */
+.grille .plat.est-chaud{
+  background:linear-gradient(165deg,rgba(232,163,61,.17),rgba(255,252,245,.76));
+  border-color:rgba(201,118,47,.34);
+}
+
+.carte-chaud{
+  margin-top:14px;font-size:15px;color:var(--braise);font-weight:500;
+  display:flex;align-items:center;gap:9px;
+}
+.carte-chaud::before{
+  content:"";width:9px;height:9px;border-radius:50%;flex:0 0 auto;
+  background:var(--braise);animation:braise 2.2s var(--ease) infinite;
+}
+
+/* ---------------------------------------------------------
+   La carte : placement dense pour que les vedettes ne
+   laissent pas de trou, et filtrage animé plutôt que sec.
+   --------------------------------------------------------- */
+.grille{grid-auto-flow:row dense}
+.plat{
+  transition:transform .45s var(--ease-out),box-shadow .45s var(--ease),
+             background .45s var(--ease),border-color .45s var(--ease),
+             opacity .3s var(--ease);
+}
+.plat.part{opacity:0;transform:scale(.96)}
+.plat.arrive{animation:platArrive .45s var(--ease-out) both}
+@keyframes platArrive{from{opacity:0;transform:translateY(10px) scale(.97)}to{opacity:1;transform:none}}
+
+/* Les prix s'alignent en colonne : chiffres à largeur fixe */
+.plat__prix,.panier__total strong,.composer__total strong,.horaires td{font-variant-numeric:tabular-nums}
+
+/* ---------------------------------------------------------
+   L'atelier de nuit — le configurateur sur une feuille sombre.
+   C'est le seul endroit où le site change de fond : le sandwich
+   se monte dans l'arrière-boutique, pas dans la vitrine.
+   --------------------------------------------------------- */
+.sec--nuit{
+  --n-encre:#1B1006;
+  --n-txt:#F6E9D4;
+  --n-txt-2:#C9B79A;
+  --n-surf:rgba(255,252,245,.07);
+  --n-rule:rgba(246,233,212,.16);
+  padding-block:clamp(56px,7vw,92px);
+}
+.sec--nuit > .container{
+  background:
+    radial-gradient(120% 90% at 15% 0%,rgba(201,118,47,.30),transparent 60%),
+    radial-gradient(90% 80% at 100% 100%,rgba(168,71,27,.26),transparent 62%),
+    linear-gradient(160deg,#2A1809,var(--n-encre));
+  border-radius:clamp(24px,3vw,40px);
+  padding:clamp(28px,4.5vw,68px);
+  max-width:calc(var(--maxw) - 2 * var(--pad));
+  box-shadow:0 40px 90px rgba(27,16,6,.34);
+  color:var(--n-txt);
+  overflow:hidden;
+}
+.sec--nuit .h2,.sec--nuit .etape legend{color:var(--n-txt)}
+.sec--nuit .lead{color:var(--n-txt-2)}
+.sec--nuit .etape__n{background:rgba(232,163,61,.22);color:var(--miel)}
+.sec--nuit .etape__note{color:var(--n-txt-2)}
+
+.sec--nuit .composer__form{
+  background:var(--n-surf);border-color:var(--n-rule);
+  box-shadow:none;
+}
+.sec--nuit .choix label{
+  background:rgba(255,252,245,.05);border-color:var(--n-rule);color:var(--n-txt);
+}
+.sec--nuit .choix label:hover{background:rgba(255,252,245,.11)}
+.sec--nuit .choix label em{color:var(--n-txt-2)}
+.sec--nuit .choix input{background:rgba(0,0,0,.28);border-color:rgba(246,233,212,.3)}
+.sec--nuit .choix input:checked{
+  background:var(--miel);border-color:var(--miel);
+  box-shadow:inset 0 0 0 3.2px #2A1809;
+}
+.sec--nuit .choix label:has(input:checked){
+  background:rgba(232,163,61,.16);border-color:rgba(232,163,61,.5);box-shadow:none;
+}
+.sec--nuit .choix label:has(input:checked) em{color:var(--miel)}
+
+.sec--nuit .formule{
+  background:linear-gradient(120deg,rgba(232,163,61,.20),rgba(255,252,245,.05));
+  border-color:rgba(232,163,61,.42);
+}
+.sec--nuit .formule:has(input:checked){border-color:var(--miel)}
+.sec--nuit .formule input{background:rgba(0,0,0,.28);border-color:rgba(246,233,212,.3)}
+.sec--nuit .formule input:checked{background:var(--miel);border-color:var(--miel);box-shadow:inset 0 0 0 3.4px #2A1809}
+.sec--nuit .formule__txt em{color:var(--n-txt-2)}
+.sec--nuit .formule__prix{color:var(--miel)}
+
+.sec--nuit .composer__bas{border-top-color:var(--n-rule)}
+.sec--nuit .composer__total span{color:var(--n-txt-2)}
+.sec--nuit .composer__total strong{color:var(--n-txt)}
+.sec--nuit .composer__recap{color:#9FD6A8}
+.sec--nuit .btn--plein{
+  background:linear-gradient(135deg,var(--miel),#C97F2E);color:#241708;
+  box-shadow:0 10px 26px rgba(232,163,61,.28);
+}
+.sec--nuit .btn--plein:hover{background:linear-gradient(135deg,#F2B455,#D5872F);color:#241708}
+.sec--nuit :focus-visible{outline-color:var(--miel)}
+/* Le pain du dessin s'éclaire pour tenir sur fond sombre */
+.sec--nuit .sv-ombre{fill:rgba(0,0,0,.4)}
+
+/* ---------------------------------------------------------
+   Ce qui ne se voit pas — les trois décisions
+   --------------------------------------------------------- */
+.pain{display:grid;grid-template-columns:minmax(0,.85fr) minmax(0,1.15fr);gap:clamp(32px,5vw,72px);align-items:start}
+.pain__txt .lead{margin-top:18px}
+.faits{display:grid;gap:2px;border-top:1px solid var(--rule)}
+.fait{
+  display:grid;grid-template-columns:minmax(110px,.5fr) minmax(150px,.6fr) minmax(0,1.2fr);
+  gap:clamp(14px,2.5vw,32px);align-items:baseline;
+  padding:24px 4px;border-bottom:1px solid var(--rule);
+  transition:background .35s var(--ease),padding-left .35s var(--ease-out);
+}
+.fait:hover{background:rgba(255,252,245,.5);padding-left:14px}
+.fait dt{
+  font-size:12.5px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--croute);
+}
+.fait dd{display:flex;flex-direction:column;gap:2px}
+.fait dd strong{
+  font-family:var(--serif);font-size:clamp(30px,3.4vw,42px);font-weight:400;
+  line-height:1;letter-spacing:-.03em;color:var(--encre);
+}
+.fait dd span{font-size:12.5px;color:var(--gris)}
+.fait p{font-size:14.5px;line-height:1.55;color:var(--brun)}
+
+/* ---------------------------------------------------------
+   Repères de navigation : la section lue s'annonce
+   --------------------------------------------------------- */
+.nav__links a{position:relative}
+.nav__links a::after{
+  content:"";position:absolute;left:14px;right:14px;bottom:4px;height:1.5px;
+  background:var(--braise);border-radius:2px;
+  transform:scaleX(0);transform-origin:left;
+  transition:transform .4s var(--ease-out);
+}
+.nav__links a.ici{color:var(--encre)}
+.nav__links a.ici::after{transform:scaleX(1)}
+
+/* ---------------------------------------------------------
+   La barre du sac — téléphone seulement
+   --------------------------------------------------------- */
+.barre-sac{
+  position:fixed;left:12px;right:12px;bottom:calc(12px + env(safe-area-inset-bottom));
+  z-index:80;display:none;align-items:center;justify-content:space-between;gap:14px;
+  padding:13px 18px;border-radius:var(--r-pill);text-align:left;
+  background:var(--encre);color:var(--mie);
+  box-shadow:0 18px 40px rgba(36,23,8,.32);
+  animation:barreMonte .45s var(--ease-out) both;
+}
+@keyframes barreMonte{from{transform:translateY(120%)}to{transform:none}}
+.barre-sac__g{display:flex;flex-direction:column;line-height:1.25}
+.barre-sac__n{font-size:12px;color:rgba(255,252,245,.66)}
+.barre-sac__t{font-family:var(--serif);font-size:21px;letter-spacing:-.02em}
+.barre-sac__go{
+  font-size:14.5px;font-weight:500;background:var(--miel);color:var(--encre);
+  padding:10px 16px;border-radius:var(--r-pill);white-space:nowrap;
+}
+@media (max-width:640px){
+  .barre-sac:not([hidden]){display:flex}
+  /* Le message ne doit pas passer sous la barre */
+  .toast{bottom:calc(84px + env(safe-area-inset-bottom))}
+}
+
+/* ---------------------------------------------------------
+   Adaptations de cette passe
+   --------------------------------------------------------- */
+@media (max-width:900px){
+  .pain{grid-template-columns:1fr}
+}
+@media (max-width:640px){
+  .fait{grid-template-columns:1fr;gap:8px;padding:22px 4px}
+  .fait dd{flex-direction:row;align-items:baseline;gap:10px}
+  .fait:hover{padding-left:4px}
+  .chaud{top:12px;right:12px;font-size:10.5px;padding:5px 10px 5px 8px}
+}
+
+@media (prefers-reduced-motion:reduce){
+  .chaud,.chaud::before,.carte-chaud::before,.barre-sac,.plat.arrive{animation:none}
+}
+
+/* La barre ne doit pas recouvrir la dernière carte ni le pied de page */
+@media (max-width:640px){
+  body.avec-barre{padding-bottom:calc(84px + env(safe-area-inset-bottom))}
 }

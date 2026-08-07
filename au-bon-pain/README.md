@@ -28,10 +28,19 @@ et est-ce que je vais faire la queue**.
 - **Le sac** — panier persistant (`localStorage`), créneaux de retrait par quart d'heure
   générés depuis les horaires, jamais moins de 20 minutes après maintenant, et report
   automatique au prochain jour ouvré quand la journée est finie.
-- **Composez votre sandwich** — quatre étapes, prix en direct, et le sandwich se dessine
-  à l'écran pendant qu'on le choisit (la garniture prend sa couleur, la sauce apparaît).
-- **Zéro photo** — les illustrations sont des SVG dessinés à la main, le décor est un
-  dégradé animé avec grain. Pas de banque d'images, pas de droits à payer, page très légère.
+- **« Tout chaud »** — chaque produit porte sa fournée (`data-fournee` dans le HTML).
+  Pendant les 75 minutes qui suivent, sa carte se réchauffe et porte une pastille, et
+  le haut de la carte résume ce qui vient de sortir. C'est la même horloge que le cadran :
+  une seule vérité, deux affichages.
+- **Composez votre sandwich** — quatre étapes, prix en direct, le sandwich se dessine
+  pendant qu'on le choisit, et le choix est relu en mots sous le dessin. La section passe
+  sur fond sombre : c'est l'arrière-boutique, pas la vitrine — le seul endroit du site
+  qui change de fond.
+- **La barre du sac** — sur téléphone, le total et l'accès au sac restent sous le pouce
+  dès qu'il y a quelque chose dedans.
+- **Zéro photo** — les seize illustrations sont des SVG dessinés à la main (dégradés,
+  reflets, ombres portées), le décor est un dégradé animé avec grain. Pas de banque
+  d'images, pas de droits à payer, page très légère.
 
 ## Comment la commande arrive au commerçant
 
@@ -56,7 +65,9 @@ fourchette 1–10 €). **Le reste est une proposition et doit être corrigé av
 | --- | --- |
 | Horaires (posés à 7 h – 13 h du lundi au samedi, fermé le dimanche) | `app.js` → `HORAIRES`, et le tableau de `index.html` |
 | Heures des fournées | `app.js` → `FOURNEES`, et la section `#four` de `index.html` |
+| Quel produit sort de quelle fournée — c'est ce qui déclenche « tout chaud » | `index.html`, attribut `data-fournee` (liste séparée par des virgules) |
 | Noms des produits, descriptions et **prix** | `index.html`, attribut `data-prix` de chaque `<article class="plat">` |
+| Section « Ce qui ne se voit pas » : farine T65 d'un seul moulin de l'Hérault, 18 h de levain, four à sole à 250°. **Ce sont des hypothèses de rédaction**, à confirmer ou remplacer par les vraies réponses du boulanger | `index.html`, section `.sec--pain` |
 | Options et prix du configurateur | `index.html`, section `#composer`, attributs `data-prix` |
 | Domaine — la page est hébergée sous `mjagency.eu/au-bon-pain` ; à changer le jour où la boulangerie prend son propre nom de domaine | balise `<link rel="canonical">` |
 | Lien « Laisser un avis » | il attend le `placeid` Google de l'établissement |
