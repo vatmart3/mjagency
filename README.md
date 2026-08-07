@@ -69,6 +69,22 @@ les variables ci-dessous, rien ne change — seul l'email part.
 
 Plus `ALERTE_TEL` (le numéro destinataire, format `+33…`).
 
+**Diagnostiquer.** Ouvrir `/api/contact` dans un navigateur affiche l'état :
+canal reconnu ou non, variables manquantes, mode de détail. Aucune valeur
+n'est révélée, seulement leur présence.
+
+Pour un envoi d'essai sans passer par le formulaire, poser
+`ALERTE_TEST_CLE=<un mot au hasard>` puis :
+
+```bash
+curl -X POST "https://www.mjagency.eu/api/contact?test=<ce même mot>"
+```
+
+La réponse contient le code et le message renvoyés par le fournisseur —
+c'est là qu'on lit pourquoi rien n'arrive. Sans `ALERTE_TEST_CLE`, la route
+n'existe pas : sinon n'importe qui pourrait faire sonner le téléphone en
+boucle.
+
 L'alerte **ne peut jamais faire échouer un envoi** : elle est tentée après
 que l'email est parti, avec un délai maximum de 5 secondes, et ses ratés
 partent dans les journaux sans que le visiteur en sache rien.

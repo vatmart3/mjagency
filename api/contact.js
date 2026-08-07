@@ -124,13 +124,55 @@ module.exports = async (req, res) => {
      jamais la clé elle-même ni aucune adresse. C'est ce qui permet de
      distinguer « pas déployé » de « mal configuré » sans lire les journaux. */
   if (req.method === 'GET') {
+    const canal = String(process.env.ALERTE_CANAL || '').trim().toLowerCase();
+
+    // Ce dont chaque canal a besoin pour fonctionner. On ne dit jamais la
+    // valeur, seulement si elle est là — ça suffit à voir ce qui manque.
+    const requis = {
+      'callmebot':   ['ALERTE_TEL', 'CALLMEBOT_APIKEY'],
+      'twilio':      ['TWILIO_SID', 'TWILIO_TOKEN', 'TWILIO_FROM'],
+      'free-mobile': ['FREE_USER', 'FREE_PASS']
+    }[canal] || [];
+
     return res.status(200).json({
       ok: true,
       service: 'contact',
       deploye: true,
       cleConfiguree: Boolean(process.env.RESEND_API_KEY),
-      expediteurPersonnalise: Boolean(process.env.MAIL_FROM)
+      expediteurPersonnalise: Boolean(process.env.MAIL_FROM),
+      alerte: {
+        canal: canal || '(aucun)',
+        canalReconnu: canal === '' || requis.length > 0,
+        variablesManquantes: requis.filter(v => !process.env[v]),
+        detail: String(process.env.ALERTE_DETAIL || 'minimal').toLowerCase()
+      }
     });
+  }
+
+  /* Envoi d'essai de l'alerte, sans passer par le formulaire ni écrire à
+     personne. Protégé par un secret : sans ALERTE_TEST_CLE la route n'existe
+     pas, sinon n'importe qui pourrait faire sonner le téléphone en boucle.
+     C'est le seul endroit où la réponse du fournisseur est renvoyée telle
+     quelle — c'est justement ce qu'on cherche à lire quand rien n'arrive. */
+  if (req.method === 'POST' && req.query && req.query.test) {
+    const attendu = String(process.env.ALERTE_TEST_CLE || '');
+    if (!attendu || String(req.query.test) !== attendu) {
+      return res.status(404).json({ ok: false, error: 'Introuvable' });
+    }
+    try {
+      const r = await alerter({
+        nom: 'Essai depuis le site', email: 'essai@mjagency.eu',
+        societe: '', budget: '', message: 'Ceci est un test.',
+        date: '', heure: ''
+      });
+      if (!r) return res.status(200).json({ ok: false, raison: 'ALERTE_CANAL absent ou inconnu' });
+      const corps = await r.text().catch(() => '');
+      return res.status(200).json({
+        ok: r.ok, statutFournisseur: r.status, reponse: corps.slice(0, 400)
+      });
+    } catch (err) {
+      return res.status(200).json({ ok: false, raison: String(err && err.message || err) });
+    }
   }
 
   if (req.method !== 'POST') {
