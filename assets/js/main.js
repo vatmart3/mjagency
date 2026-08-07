@@ -252,18 +252,28 @@
           })
         });
         const data = await rep.json().catch(() => ({}));
-        if (!rep.ok || !data.ok) throw new Error(data.error || `HTTP ${rep.status}`);
+        if (!rep.ok || !data.ok) {
+          // Une réponse sans JSON exploitable veut presque toujours dire que
+          // la route n'a pas été déployée : on le nomme, plutôt que de laisser
+          // toutes les pannes se ressembler.
+          const err = new Error(data.error || `HTTP ${rep.status}`);
+          err.code = data.code || (rep.status === 404 ? 'ROUTE-ABSENTE' : 'HTTP-' + rep.status);
+          throw err;
+        }
 
         afficher(`Merci ${c.nom} — votre demande pour le ${c.date} à ${c.heure} est bien partie. Nous confirmons par email sous 24 h.`, 'ok');
         form.reset();
       } catch (err) {
         // On ne prétend jamais que c'est envoyé : on donne une porte de sortie,
-        // avec la demande déjà rédigée pour que rien ne soit à ressaisir.
+        // avec la demande déjà rédigée pour que rien ne soit à ressaisir. Le
+        // code sert à nommer la panne sans avoir à ouvrir les journaux.
         const lien = `mailto:${DESTINATAIRE}?subject=${encodeURIComponent(sujet)}&body=${encodeURIComponent(corpsTexte(c))}`;
+        const code = err.code || 'RESEAU';
         afficher(null, 'erreur',
           `L'envoi a échoué. <a href="${lien}">Envoyez-la depuis votre messagerie</a> ` +
-          `— tout est déjà rempli — ou appelez le <a href="tel:+33611718368">06 11 71 83 68</a>.`);
-        console.warn('Formulaire :', err);
+          `— tout est déjà rempli — ou appelez le <a href="tel:+33611718368">06 11 71 83 68</a>. ` +
+          `<small class="form-msg__ref">réf. ${code}</small>`);
+        console.warn('Formulaire :', code, err);
       } finally {
         if (btn) { btn.disabled = false; btn.innerHTML = btnTexte; }
       }

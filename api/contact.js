@@ -42,9 +42,24 @@ function lireCorps(req) {
 }
 
 module.exports = async (req, res) => {
+  /* Ouvrir /api/contact dans un navigateur envoie un GET. Plutôt que de
+     répondre sèchement, on en fait un point de contrôle : il dit si la
+     fonction est bien déployée et si la clé est configurée — deux booléens,
+     jamais la clé elle-même ni aucune adresse. C'est ce qui permet de
+     distinguer « pas déployé » de « mal configuré » sans lire les journaux. */
+  if (req.method === 'GET') {
+    return res.status(200).json({
+      ok: true,
+      service: 'contact',
+      deploye: true,
+      cleConfiguree: Boolean(process.env.RESEND_API_KEY),
+      expediteurPersonnalise: Boolean(process.env.MAIL_FROM)
+    });
+  }
+
   if (req.method !== 'POST') {
-    res.setHeader('Allow', 'POST');
-    return res.status(405).json({ ok: false, error: 'Méthode non autorisée' });
+    res.setHeader('Allow', 'GET, POST');
+    return res.status(405).json({ ok: false, error: 'Méthode non autorisée', code: 'METHODE' });
   }
 
   const b = lireCorps(req);
@@ -64,13 +79,13 @@ module.exports = async (req, res) => {
     heure:   coupe(b.heure, 20)
   };
 
-  if (!c.nom)            return res.status(400).json({ ok: false, error: 'Nom manquant' });
-  if (!estEmail(c.email)) return res.status(400).json({ ok: false, error: 'Email invalide' });
+  if (!c.nom)             return res.status(400).json({ ok: false, error: 'Nom manquant', code: 'NOM' });
+  if (!estEmail(c.email)) return res.status(400).json({ ok: false, error: 'Email invalide', code: 'EMAIL' });
 
   const cle = process.env.RESEND_API_KEY;
   if (!cle) {
-    console.error('RESEND_API_KEY absente des variables d\'environnement');
-    return res.status(500).json({ ok: false, error: 'Service indisponible' });
+    console.error('RESEND_API_KEY absente : ajoutez-la dans Settings → Environment Variables, puis redéployez.');
+    return res.status(500).json({ ok: false, error: 'Service indisponible', code: 'CLE-ABSENTE' });
   }
 
   const sujet = uneLigne(
@@ -114,14 +129,20 @@ module.exports = async (req, res) => {
 
     if (!rep.ok) {
       // Le détail reste dans les journaux Vercel : il peut contenir des
-      // informations sur la configuration du compte.
+      // informations sur la configuration du compte. Le visiteur ne reçoit
+      // qu'un code, assez précis pour être rapporté, assez vague pour ne
+      // rien révéler.
       console.error('Resend', rep.status, await rep.text().catch(() => ''));
-      return res.status(502).json({ ok: false, error: "L'envoi a échoué" });
+      const code = rep.status === 401 || rep.status === 403 ? 'CLE-REFUSEE'
+                 : rep.status === 422 ? 'EXPEDITEUR'
+                 : rep.status === 429 ? 'QUOTA'
+                 : 'RESEND-' + rep.status;
+      return res.status(502).json({ ok: false, error: "L'envoi a échoué", code });
     }
 
     return res.status(200).json({ ok: true });
   } catch (err) {
     console.error('Resend injoignable', err);
-    return res.status(502).json({ ok: false, error: "L'envoi a échoué" });
+    return res.status(502).json({ ok: false, error: "L'envoi a échoué", code: 'RESEND-INJOIGNABLE' });
   }
 };

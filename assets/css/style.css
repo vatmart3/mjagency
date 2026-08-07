@@ -354,6 +354,9 @@ a.work-item:hover .work-item__title{color:var(--blue)}
 }
 .form-msg.show{display:block}
 .form-msg--erreur{background:rgba(255,59,48,.08);color:#B3261E}
+.form-msg a{text-decoration:underline}
+/* Référence de panne : lisible si on la cherche, muette sinon. */
+.form-msg__ref{display:block;margin-top:6px;font-size:12px;opacity:.6;letter-spacing:.02em}
 
 /* ---------- Filtres ---------- */
 .filters{display:flex;flex-wrap:wrap;gap:var(--s1);justify-content:center}
