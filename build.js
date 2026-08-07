@@ -30,11 +30,23 @@ function slice(html, startMarker, endMarker, { keepMarkers = false } = {}) {
     : html.slice(s + startMarker.length, e);
 }
 
+const SITE = 'https://www.mjagency.eu';
+
 /* Les liens inter-pages deviennent des cibles du routeur */
 function toRouterLinks(html) {
   return html.replace(
     /href="(index|work|studio|contact)\.html"/g,
     (_, name) => `href="#" data-go="${name === 'index' ? 'home' : name}"`
+  );
+}
+
+/* Le fichier unique n'emporte pas les dossiers voisins : un lien relatif
+   vers un site client n'y mène nulle part. On le pointe donc sur la version
+   en ligne, ouverte dans un nouvel onglet. */
+function toExternalSites(html) {
+  return html.replace(
+    /href="([a-z0-9-]+)\/index\.html"/g,
+    (_, dir) => `href="${SITE}/${dir}" target="_blank" rel="noopener"`
   );
 }
 
@@ -46,7 +58,7 @@ const footer     = toRouterLinks(slice(index, '<footer class="footer container">
 
 const bodies = PAGES.map(([file, name]) => {
   const inner = slice(read(file), '<main class="wrap">', '</main>');
-  return `<div class="page${name === 'home' ? ' active' : ''}" id="page-${name}">\n${toRouterLinks(inner)}\n</div>`;
+  return `<div class="page${name === 'home' ? ' active' : ''}" id="page-${name}">\n${toExternalSites(toRouterLinks(inner))}\n</div>`;
 }).join('\n\n');
 
 const out = `<title>MJ Agency — Studio créatif digital</title>
