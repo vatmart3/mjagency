@@ -494,6 +494,64 @@ a.work-item:hover .work-item__title{color:var(--blue)}
   .board__type{flex-direction:column;align-items:flex-start;gap:2px}
 }
 
+/* ---------- Gyroscope ----------
+   Illustration du livrable « motion & 3D ». Volume réel : les anneaux
+   sont des cercles à plat, inclinés dans l'espace, et la scène tourne
+   autour de l'axe Y. Le navigateur les compose en perspective, donc les
+   croisements avant/arrière sont justes — aucune image, aucun script. */
+.feature__viz--3d{
+  aspect-ratio:16/10;overflow:hidden;position:relative;
+  display:grid;place-items:center;
+  background:
+    radial-gradient(120% 90% at 50% 8%, #FFFFFF 0%, rgba(255,255,255,0) 62%),
+    linear-gradient(160deg, #EEF3FB 0%, #F5F5F7 52%, #ECEEF3 100%);
+}
+.gyro{position:relative;width:min(62%,260px);aspect-ratio:1;perspective:820px}
+.gyro__scene{
+  position:absolute;inset:0;transform-style:preserve-3d;
+  animation:gyro-tour 22s linear infinite;
+}
+@keyframes gyro-tour{
+  from{ transform:rotateX(-16deg) rotateY(0deg) }
+  to  { transform:rotateX(-16deg) rotateY(360deg) }
+}
+.gyro__ring{
+  position:absolute;inset:0;border-radius:50%;
+  border:2px solid rgba(0,113,227,.55);
+  box-shadow:0 0 0 1px rgba(255,255,255,.6) inset;
+}
+.gyro__ring--a{ transform:rotateY(  0deg) rotateX(64deg) }
+.gyro__ring--b{ transform:rotateY( 60deg) rotateX(64deg); border-color:rgba(13,13,15,.30) }
+.gyro__ring--c{ transform:rotateY(120deg) rotateX(64deg); border-color:rgba(0,113,227,.30) }
+/* Un quatrième anneau, debout, ferme la cage */
+.gyro__ring--d{ inset:11%; transform:rotateX(6deg); border-color:rgba(13,13,15,.14) }
+/* Le noyau est volontairement hors de la scène en profondeur : dans un
+   contexte preserve-3d, deux plans qui se croisent se découpent l'un
+   l'autre, et la sphère se retrouvait tranchée par les anneaux. */
+.gyro__core{
+  position:absolute;left:50%;top:50%;width:33%;aspect-ratio:1;
+  translate:-50% -50%;border-radius:50%;
+  background:radial-gradient(circle at 34% 30%, #FFFFFF 0%, #C9D8F2 44%, #0071E3 100%);
+  box-shadow:0 10px 24px rgba(0,84,168,.28);
+}
+/* Ombre au sol : elle donne au volume son assise */
+.gyro__sol{
+  position:absolute;left:50%;bottom:-13%;width:78%;height:12%;
+  translate:-50% 0;border-radius:50%;
+  background:radial-gradient(closest-side, rgba(13,13,15,.20), rgba(13,13,15,0) 70%);
+  animation:gyro-sol 22s linear infinite;
+}
+@keyframes gyro-sol{ 0%,100%{ opacity:.85; scale:1 1 } 50%{ opacity:.6; scale:.88 1 } }
+
+@media (prefers-reduced-motion: reduce){
+  .gyro__scene{ animation:none;transform:rotateX(-16deg) rotateY(24deg) }
+  .gyro__sol{ animation:none }
+}
+@media (max-width:860px){
+  .feature__viz--3d{aspect-ratio:4/3}
+  .gyro{width:min(58%,210px)}
+}
+
 .ticks{list-style:none;margin-top:var(--s3);display:flex;flex-direction:column;gap:10px}
 .ticks li{position:relative;padding-left:26px;font-size:16px;color:var(--dark-gray)}
 .ticks li::before{
