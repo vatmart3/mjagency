@@ -270,7 +270,17 @@ a.work-item:hover .work-item__title{color:var(--blue)}
 }
 .card:hover .card__go{background:var(--blue);color:#fff}
 .col-4{grid-column:span 4}.col-6{grid-column:span 6}.col-8{grid-column:span 8}
+.col-12{grid-column:span 12}
 @media (max-width:860px){.col-4,.col-6,.col-8{grid-column:span 12}}
+
+/* Carte pleine largeur : le 16/10 deviendrait un mur, on aplatit le visuel */
+.card--large .thumb{aspect-ratio:24/9}
+/* Le cadran du four du site, cité tel quel : arc complet, jamais rogné */
+.thumb__viz{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:min(30%,380px);height:auto}
+@media (max-width:860px){
+  .card--large .thumb{aspect-ratio:16/10}
+  .thumb__viz{width:min(48%,260px)}   /* le cadran doit rester lisible sur un téléphone */
+}
 
 /* Visuels : dégradés doux, jamais saturés */
 .ph{background-size:cover;background-position:center}
@@ -280,6 +290,8 @@ a.work-item:hover .work-item__title{color:var(--blue)}
 .ph-4{background:linear-gradient(160deg,#F7F2ED 0%,#ECE1D6 55%,#DDCDBC 100%)}
 .ph-5{background:linear-gradient(160deg,#F1EEF7 0%,#E1DCEC 55%,#CFC8E0 100%)}
 .ph-6{background:linear-gradient(160deg,#EDF3F7 0%,#DAE5EC 55%,#C6D6E0 100%)}
+/* Au Bon Pain : la seule teinte chaude de la page, celle du projet */
+.ph-pain{background:linear-gradient(160deg,#FBF4E7 0%,#F1DDB8 55%,#DFA65A 100%)}
 .ph-grid{background-image:linear-gradient(rgba(0,0,0,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(0,0,0,.05) 1px,transparent 1px);background-size:32px 32px}
 
 /* ---------- Savoir-faire ---------- */
@@ -620,6 +632,10 @@ a.work-item:hover .work-item__title{color:var(--blue)}
       <a href="#" data-go="work" class="btn">Tout voir</a>
     </div>
     <div class="work-list reveal">
+      <a href="au-bon-pain/index.html" class="work-item">
+        <span class="work-item__title">Au Bon Pain — Sète</span>
+        <span class="work-item__meta">Boulangerie, site &amp; commande en ligne — 2026</span>
+      </a>
       <a href="#" data-go="work" class="work-item">
         <span class="work-item__title">Aurea Finance</span>
         <span class="work-item__meta">Marque &amp; site vitrine — 2025</span>
@@ -713,6 +729,25 @@ a.work-item:hover .work-item__title{color:var(--blue)}
 
   <section class="container sep" style="padding-top:var(--sec);padding-bottom:var(--sec)">
     <div class="grid-cards reveal">
+
+      <!-- Seul projet consultable en ligne : la carte est donc un vrai lien,
+           mis en avant sur toute la largeur. -->
+      <a href="au-bon-pain/index.html" class="card card--large col-12" data-cat="web product" data-cursor="Voir le site">
+        <div class="thumb">
+          <div class="ph ph-pain"></div>
+          <svg class="thumb__viz" viewBox="0 -12 260 216" aria-hidden="true">
+            <path d="M 43.4 180 A 100 100 0 1 1 216.6 180" fill="none" stroke="rgba(36,23,8,.10)" stroke-width="16" stroke-linecap="round"/>
+            <path d="M 43.4 180 A 100 100 0 1 1 216.6 180" fill="none" stroke="#C9762F" stroke-width="16" stroke-linecap="round" pathLength="1" stroke-dasharray=".62 1"/>
+          </svg>
+        </div>
+        <div class="card__body">
+          <div>
+            <div class="card__meta">Boulangerie · Site &amp; commande — 2026 · en ligne</div>
+            <h3 class="card__title">Au Bon Pain — Sète</h3>
+          </div>
+          <span class="card__go">↗</span>
+        </div>
+      </a>
 
       <article class="card col-8" data-cat="brand web">
         <div class="thumb"><div class="ph ph-1"></div></div>
