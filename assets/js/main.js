@@ -7,97 +7,6 @@
   const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const fine = matchMedia('(hover: hover) and (pointer: fine)').matches;
 
-  /* =========================================================
-     APPAREILLAGE
-     Cadre, rail, guides de colonnes et barre d'état. Ces éléments
-     sont purement décoratifs : les injecter ici plutôt que de les
-     recopier dans chaque page évite huit fichiers à maintenir en
-     parallèle, et une page oubliée qui n'aurait pas le même cadre.
-     ========================================================= */
-  (function appareillage() {
-    const frag = document.createDocumentFragment();
-
-    const cadre = document.createElement('div');
-    cadre.className = 'frame';
-    cadre.setAttribute('aria-hidden', 'true');
-    cadre.innerHTML = '<span></span><span></span><span></span><span></span>';
-
-    const guides = document.createElement('div');
-    guides.className = 'guides';
-    guides.setAttribute('aria-hidden', 'true');
-    guides.innerHTML = '<i></i><i></i><i></i><i></i>';
-
-    const rail = document.createElement('div');
-    rail.className = 'rail';
-    rail.setAttribute('aria-hidden', 'true');
-    rail.innerHTML = '<b>MJ Agency — Studio · Sète, Hérault</b>';
-
-    const statut = document.createElement('div');
-    statut.className = 'status';
-    statut.setAttribute('aria-hidden', 'true');
-    statut.innerHTML =
-      '<i><span class="led"></span> Disponible</i>' +
-      '<i class="hide-s">43.4053° N · 3.6969° E</i>' +
-      '<i data-horloge>--:--:--</i>';
-
-    frag.append(cadre, guides, rail, statut);
-    document.body.prepend(frag);
-
-    // Heure locale de Sète : la barre d'état doit dire quelque chose de vrai.
-    const horloge = statut.querySelector('[data-horloge]');
-    const tic = () => {
-      horloge.textContent = new Date().toLocaleTimeString('fr-FR', {
-        timeZone: 'Europe/Paris', hour12: false
-      }) + ' CET';
-    };
-    tic();
-    setInterval(tic, 1000);
-  })();
-
-  /* ---------------- Custom cursor ---------------- */
-  if (fine) {
-    const dot = document.createElement('div'); dot.className = 'cursor-dot';
-    const ring = document.createElement('div'); ring.className = 'cursor-ring';
-    document.body.append(dot, ring);
-
-    let mx = innerWidth / 2, my = innerHeight / 2, rx = mx, ry = my;
-    addEventListener('mousemove', e => {
-      mx = e.clientX; my = e.clientY;
-      dot.style.transform = `translate(${mx}px, ${my}px) translate(-50%,-50%)`;
-    }, { passive: true });
-
-    (function loop() {
-      rx += (mx - rx) * 0.16; ry += (my - ry) * 0.16;
-      ring.style.transform = `translate(${rx}px, ${ry}px) translate(-50%,-50%)`;
-      requestAnimationFrame(loop);
-    })();
-
-    const sel = 'a, button, .card, .cal__day.avail, .slot, input, textarea, select';
-    document.addEventListener('mouseover', e => {
-      const t = e.target.closest(sel); if (!t) return;
-      ring.classList.add('hover');
-      const label = t.getAttribute('data-cursor');
-      if (label) { ring.classList.add('label'); ring.setAttribute('data-label', label); }
-    });
-    document.addEventListener('mouseout', e => {
-      if (e.target.closest(sel)) ring.classList.remove('hover', 'label');
-    });
-  }
-
-  /* ---------------- Magnetic buttons ---------------- */
-  if (fine && !reduced) {
-    document.querySelectorAll('[data-magnetic]').forEach(el => {
-      const strength = parseFloat(el.getAttribute('data-magnetic')) || 0.3;
-      el.addEventListener('mousemove', e => {
-        const r = el.getBoundingClientRect();
-        const x = e.clientX - (r.left + r.width / 2);
-        const y = e.clientY - (r.top + r.height / 2);
-        el.style.transform = `translate(${x * strength}px, ${y * strength}px)`;
-      });
-      el.addEventListener('mouseleave', () => { el.style.transform = ''; });
-    });
-  }
-
   /* ---------------- Scroll reveal ---------------- */
   const io = new IntersectionObserver(entries => {
     entries.forEach(en => {
@@ -569,22 +478,13 @@
   /* ---------------- Navigation ----------------
      Two modes from one file: when several .page blocks are present
      (the single-file build) we swap them in place; otherwise we do a
-     normal page load. Both share the same curtain wipe.            */
-  const curtain = document.querySelector('.curtain');
+     normal page load.                                              */
   const pageEls = document.querySelectorAll('.page');
   const isRouter = pageEls.length > 1;
 
-  if (curtain && !reduced) {
-    curtain.classList.add('cover');
-    requestAnimationFrame(() => setTimeout(() => curtain.classList.add('up'), 40));
-  }
-
-  function wipe(then) {
-    if (!curtain || reduced) { then(); return; }
-    curtain.classList.remove('up');
-    curtain.classList.add('cover');
-    setTimeout(() => { then(); curtain.classList.add('up'); }, 520);
-  }
+  // Navigation nette, sans rideau : la charte demande des interactions
+  // discrètes, et un effet de transition sur chaque clic n'en est pas une.
+  function wipe(then) { then(); }
 
   if (isRouter) {
     const pages = {};
@@ -626,9 +526,7 @@
     });
   }
 
-  const loader = document.querySelector('.loader');
   function boot() {
-    if (loader) setTimeout(() => loader.classList.add('done'), 900);
     const scope = isRouter ? document.querySelector('.page.active') : document;
     syncBackdrop(scope);
     revealHero(scope);

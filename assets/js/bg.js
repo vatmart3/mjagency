@@ -94,15 +94,12 @@
     vec3 ro = vec3(m.x * 0.55, m.y * 0.34 + sin(u_time * 0.13) * 0.05, u_z);
     vec3 rd = normalize(vec3(uv, 1.5));
 
-    // Lumière argentée, sans teinte : la structure se lit par la valeur
-    // et non par la couleur. C'est ce qui fait basculer la scène du
-    // « néon » vers quelque chose de plus posé.
-    vec3 acier  = vec3(0.52, 0.53, 0.57);   // arches
-    vec3 clair  = vec3(0.72, 0.73, 0.78);   // arêtes
-    vec3 ecran  = vec3(0.86, 0.88, 0.92);   // écrans allumés
-
-    vec3 col = vec3(0.0);
-    float t  = 0.35;
+    // Charte claire : on n'ajoute plus de la lumière sur du noir, on
+    // retire de la densité à du blanc. Le volume devient une maquette
+    // d'architecture sous lumière naturelle, dans l'esprit des visuels
+    // de la charte — formes blanches, matière, profondeur.
+    float dens = 0.0;
+    float t = 0.35;
 
     for (int i = 0; i < ${STEPS}; i++){
       vec3 p = ro + rd * t;
@@ -114,33 +111,31 @@
       float ds = screens(q);
       float dg = grille(p);
 
-      float fog = exp(-t * 0.062);
-      col += acier * exp(-max(da, 0.0) * 30.0) * 0.030 * fog;   // arches
-      col += clair * exp(-max(de, 0.0) * 13.0) * 0.012 * fog;   // arêtes
-      col += clair * exp(-max(dd, 0.0) * 28.0) * 0.026 * fog;   // postes de travail
-      col += ecran * exp(-max(ds, 0.0) *  9.0) * 0.040 * fog;   // écrans allumés
-      col += acier * exp(-max(dg, 0.0) * 26.0) * 0.020 * fog;   // quadrillage au sol
+      float fog = exp(-t * 0.070);
+      dens += exp(-max(da, 0.0) * 30.0) * 0.034 * fog;   // arches
+      dens += exp(-max(de, 0.0) * 13.0) * 0.014 * fog;   // arêtes
+      dens += exp(-max(dd, 0.0) * 28.0) * 0.030 * fog;   // postes de travail
+      dens += exp(-max(ds, 0.0) *  9.0) * 0.026 * fog;   // écrans
+      dens += exp(-max(dg, 0.0) * 26.0) * 0.020 * fog;   // quadrillage au sol
 
       t += clamp(min(min(da, de), min(dd, ds)) * 0.72, 0.06, 1.15);
       if (t > 62.0) break;
     }
 
-    /* Lumière au bout du volume : elle donne envie d'avancer, mais elle
-       tombe pile au centre de l'écran — là où passe le texte. On la garde
-       serrée et discrète : c'est une promesse, pas un projecteur. */
+    /* Le fond du volume s'ouvre sur une lumière blanche : la profondeur
+       s'éclaircit au lieu de s'assombrir. */
     float axis = max(dot(rd, vec3(0.0, 0.0, 1.0)), 0.0);
-    col += clair * pow(axis, 320.0) * 0.20;
-    col += vec3(1.0) * pow(axis, 1600.0) * 0.16;
+    dens -= pow(axis, 300.0) * 0.22;
 
-    /* Fond très sombre + vignette calée sur le petit côté */
-    col += vec3(0.011, 0.012, 0.014);
-    float d2  = length(uv / vec2(max(u_res.x / u_res.y, 1.0), 1.0));
-    col *= 0.30 + 0.70 * smoothstep(1.15, 0.12, d2);
+    /* Blanc cassé de la charte, moins la densité accumulée */
+    vec3 fond = vec3(0.961, 0.961, 0.969);          // #F5F5F7
+    vec3 col  = fond - clamp(dens, 0.0, 1.0) * vec3(0.62, 0.63, 0.66);
 
-    /* Grain léger, casse le banding des dégradés */
-    col += fract(sin(dot(gl_FragCoord.xy + u_time, vec2(127.1, 311.7))) * 43758.5453) * 0.016 - 0.008;
+    /* Vignette douce : les bords s'éclaircissent, le centre garde la matière */
+    float d2 = length(uv / vec2(max(u_res.x / u_res.y, 1.0), 1.0));
+    col = mix(fond, col, smoothstep(1.25, 0.20, d2) * 0.92 + 0.08);
 
-    gl_FragColor = vec4(min(col, vec3(1.0)), 1.0);
+    gl_FragColor = vec4(clamp(col, 0.0, 1.0), 1.0);
   }`;
 
   function compile(type, src){
@@ -245,19 +240,19 @@
       x: Math.random() * W, y: Math.random() * H,
       r: 220 + Math.random() * 260,
       dx: (Math.random() - .5) * .25, dy: (Math.random() - .5) * .25,
-      c: i % 2 ? '58,58,64' : '26,26,30'
+      c: i % 2 ? '205,214,226' : '226,226,232'
     }));
 
     (function draw(){
-      ctx.fillStyle = '#08090B'; ctx.fillRect(0, 0, W, H);
-      ctx.globalCompositeOperation = 'lighter';
+      ctx.fillStyle = '#F5F5F7'; ctx.fillRect(0, 0, W, H);
+      ctx.globalCompositeOperation = 'multiply';
       orbs.forEach(o => {
         o.x += o.dx; o.y += o.dy;
         if (o.x < -o.r || o.x > W + o.r) o.dx *= -1;
         if (o.y < -o.r || o.y > H + o.r) o.dy *= -1;
         const g = ctx.createRadialGradient(o.x, o.y, 0, o.x, o.y, o.r);
-        g.addColorStop(0, `rgba(${o.c},.30)`);
-        g.addColorStop(1, 'rgba(8,9,11,0)');
+        g.addColorStop(0, `rgba(${o.c},.55)`);
+        g.addColorStop(1, 'rgba(245,245,247,0)');
         ctx.fillStyle = g;
         ctx.beginPath(); ctx.arc(o.x, o.y, o.r, 0, Math.PI * 2); ctx.fill();
       });

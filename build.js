@@ -42,7 +42,6 @@ const index = read('index.html');
 
 const nav        = toRouterLinks(slice(index, '<header class="nav"', '</header>', { keepMarkers: true }));
 const mobileMenu = toRouterLinks(slice(index, '<nav class="mobile-menu"', '</nav>', { keepMarkers: true }));
-const loader     = slice(index, '<div class="loader">', '</div>\n</div>', { keepMarkers: true });
 const footer     = toRouterLinks(slice(index, '<footer class="footer container">', '</footer>', { keepMarkers: true }));
 
 const bodies = PAGES.map(([file, name]) => {
@@ -78,9 +77,6 @@ ${read('assets/css/style.css')}
   .loader{display:none}
 </style></noscript>
 
-${loader}
-
-<div class="curtain"></div>
 <canvas id="bg-canvas"></canvas>
 <div class="work-preview"><div class="ph ph-1"></div></div>
 
