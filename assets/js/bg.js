@@ -12,8 +12,15 @@
 (() => {
   'use strict';
 
-  const canvas = document.getElementById('bg-canvas');
-  if (!canvas) return;
+  // Le canvas se crée lui-même plutôt que d'être recopié dans huit pages :
+  // une seule source, et aucune page ne peut se retrouver sans fond.
+  let canvas = document.getElementById('bg-canvas');
+  if (!canvas) {
+    canvas = document.createElement('canvas');
+    canvas.id = 'bg-canvas';
+    canvas.setAttribute('aria-hidden', 'true');
+    document.body.prepend(canvas);
+  }
   if (matchMedia('(prefers-reduced-motion: reduce)').matches) { degrade(); return; }
 
   const gl = canvas.getContext('webgl', { antialias: false, alpha: true, powerPreference: 'low-power' });
@@ -29,6 +36,7 @@
   uniform vec2  u_res;
   uniform float u_time;
   uniform vec2  u_mouse;
+  uniform float u_scroll;      // progression du défilement, en hauteurs d'écran
 
   mat2 rot(float a){ float c = cos(a), s = sin(a); return mat2(c, -s, s, c); }
 
@@ -52,14 +60,21 @@
     vec2 uv = gl_FragCoord.xy / u_res;
     vec2 q  = (gl_FragCoord.xy - 0.5 * u_res) / u_res.y;
 
-    float t = u_time * 0.018;                    // très lent : on doit à peine le voir bouger
+    float t = u_time * 0.018;                    // dérive lente, indépendante du scroll
     vec2  m = (u_mouse - 0.5) * 0.16;
+
+    // Le défilement déplace le domaine : les masses glissent vers le haut
+    // et tournent légèrement, donc le fond change réellement de page en
+    // page au lieu de se contenter d'onduler sur place.
+    vec2 d = q;
+    d.y += u_scroll * 0.42;
+    d = rot(u_scroll * 0.10) * d;
 
     // Double déformation du domaine : c'est ce qui donne aux masses
     // leur mouvement organique plutôt qu'un simple défilement.
-    vec2 w1 = vec2(fbm(q * 1.10 + t + m), fbm(q * 1.10 - t * 0.8 + 3.1));
-    vec2 w2 = vec2(fbm(q * 1.35 + w1 * 1.2 + t * 1.3), fbm(q * 1.35 + w1 * 1.2 - t));
-    float f = fbm(q * 1.20 + w2 * 1.1);
+    vec2 w1 = vec2(fbm(d * 1.10 + t + m), fbm(d * 1.10 - t * 0.8 + 3.1));
+    vec2 w2 = vec2(fbm(d * 1.35 + w1 * 1.2 + t * 1.3), fbm(d * 1.35 + w1 * 1.2 - t));
+    float f = fbm(d * 1.20 + w2 * 1.1);
 
     // Palette de la charte : blancs, bleu très dilué, lavande à peine posée
     vec3 blanc   = vec3(1.000, 1.000, 1.000);
@@ -74,7 +89,8 @@
     // Le centre haut reste clair pour ne pas gêner le titre, mais les
     // masses restent lisibles sur les côtés : sans ça, le mouvement ne
     // se perçoit plus du tout.
-    float degage = smoothstep(0.62, 0.02, length(vec2(q.x * 0.55, q.y - 0.22)));
+    float degage = smoothstep(0.62, 0.02, length(vec2(q.x * 0.55, q.y - 0.22)))
+                 * (1.0 - smoothstep(0.0, 0.8, u_scroll));
     col = mix(col, blanc, degage * 0.72);
 
     // Léger tramage : sans lui, des dégradés aussi doux montrent des bandes
@@ -109,9 +125,15 @@
 
   const uRes   = gl.getUniformLocation(prog, 'u_res');
   const uTime  = gl.getUniformLocation(prog, 'u_time');
-  const uMouse = gl.getUniformLocation(prog, 'u_mouse');
+  const uMouse  = gl.getUniformLocation(prog, 'u_mouse');
+  const uScroll = gl.getUniformLocation(prog, 'u_scroll');
 
   let souris = [0.5, 0.5], cible = [0.5, 0.5];
+  let defile = 0, defileCible = 0;
+  const lireScroll = () => { defileCible = scrollY / Math.max(innerHeight, 1); };
+  addEventListener('scroll', lireScroll, { passive: true });
+  lireScroll();
+
   addEventListener('mousemove', e => {
     cible = [e.clientX / innerWidth, 1 - e.clientY / innerHeight];
   }, { passive: true });
@@ -141,8 +163,10 @@
     if (!actif) return;
     souris[0] += (cible[0] - souris[0]) * 0.03;
     souris[1] += (cible[1] - souris[1]) * 0.03;
+    defile += (defileCible - defile) * 0.08;      // le retard donne de l'inertie
     gl.uniform1f(uTime, (now - t0) / 1000);
     gl.uniform2f(uMouse, souris[0], souris[1]);
+    gl.uniform1f(uScroll, defile);
     gl.drawArrays(gl.TRIANGLES, 0, 3);
     requestAnimationFrame(image);
   }

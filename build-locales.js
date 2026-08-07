@@ -346,6 +346,7 @@ ${VILLES.map(o => `      <a href="${o.slug}.html">${o.lienPied}</a>`).join('\n')
   <div class="footer__bottom"><span>© 2026 MJ Agency — Sète, Hérault</span><span>Conçu avec intention.</span></div>
 </footer>
 
+<script src="assets/js/bg.js"></script>
 <script src="assets/js/main.js"></script>
 </body>
 </html>
