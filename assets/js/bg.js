@@ -77,6 +77,16 @@
     return sdBox3(q - vec3(0.26, -0.47, 0.0), vec3(0.014, 0.19, 0.30));
   }
 
+  /* Quadrillage au sol — la trame d'un plan, pas un décor.
+     La distance doit rester positive : une valeur négative ferait
+     exploser exp(-d) plus bas et brûlerait l'image. */
+  float grille(vec3 p){
+    float sol = p.y + ROOM.y;               // positif au-dessus du sol
+    if (sol < 0.0) return 1e5;
+    vec2 g = abs(fract(p.xz * 1.4) - 0.5) / 1.4;
+    return max(min(g.x, g.y), 0.0) + sol;
+  }
+
   void main(){
     vec2 uv = (gl_FragCoord.xy - 0.5 * u_res) / u_res.y;
 
@@ -102,12 +112,14 @@
       float de = edges(p);
       float dd = desks(q);
       float ds = screens(q);
+      float dg = grille(p);
 
       float fog = exp(-t * 0.062);
-      col += acier * exp(-da * 30.0) * 0.030 * fog;   // arches
-      col += clair * exp(-de * 13.0) * 0.012 * fog;   // arêtes
-      col += clair * exp(-dd * 28.0) * 0.026 * fog;   // postes de travail
-      col += ecran * exp(-ds *  9.0) * 0.040 * fog;   // écrans allumés
+      col += acier * exp(-max(da, 0.0) * 30.0) * 0.030 * fog;   // arches
+      col += clair * exp(-max(de, 0.0) * 13.0) * 0.012 * fog;   // arêtes
+      col += clair * exp(-max(dd, 0.0) * 28.0) * 0.026 * fog;   // postes de travail
+      col += ecran * exp(-max(ds, 0.0) *  9.0) * 0.040 * fog;   // écrans allumés
+      col += acier * exp(-max(dg, 0.0) * 26.0) * 0.020 * fog;   // quadrillage au sol
 
       t += clamp(min(min(da, de), min(dd, ds)) * 0.72, 0.06, 1.15);
       if (t > 62.0) break;
@@ -121,14 +133,14 @@
     col += vec3(1.0) * pow(axis, 1600.0) * 0.16;
 
     /* Fond très sombre + vignette calée sur le petit côté */
-    col += vec3(0.013, 0.013, 0.015);
+    col += vec3(0.011, 0.012, 0.014);
     float d2  = length(uv / vec2(max(u_res.x / u_res.y, 1.0), 1.0));
     col *= 0.30 + 0.70 * smoothstep(1.15, 0.12, d2);
 
     /* Grain léger, casse le banding des dégradés */
     col += fract(sin(dot(gl_FragCoord.xy + u_time, vec2(127.1, 311.7))) * 43758.5453) * 0.016 - 0.008;
 
-    gl_FragColor = vec4(col, 1.0);
+    gl_FragColor = vec4(min(col, vec3(1.0)), 1.0);
   }`;
 
   function compile(type, src){
@@ -237,7 +249,7 @@
     }));
 
     (function draw(){
-      ctx.fillStyle = '#000000'; ctx.fillRect(0, 0, W, H);
+      ctx.fillStyle = '#08090B'; ctx.fillRect(0, 0, W, H);
       ctx.globalCompositeOperation = 'lighter';
       orbs.forEach(o => {
         o.x += o.dx; o.y += o.dy;
@@ -245,7 +257,7 @@
         if (o.y < -o.r || o.y > H + o.r) o.dy *= -1;
         const g = ctx.createRadialGradient(o.x, o.y, 0, o.x, o.y, o.r);
         g.addColorStop(0, `rgba(${o.c},.30)`);
-        g.addColorStop(1, 'rgba(0,0,0,0)');
+        g.addColorStop(1, 'rgba(8,9,11,0)');
         ctx.fillStyle = g;
         ctx.beginPath(); ctx.arc(o.x, o.y, o.r, 0, Math.PI * 2); ctx.fill();
       });

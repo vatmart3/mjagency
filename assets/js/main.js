@@ -7,6 +7,53 @@
   const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const fine = matchMedia('(hover: hover) and (pointer: fine)').matches;
 
+  /* =========================================================
+     APPAREILLAGE
+     Cadre, rail, guides de colonnes et barre d'état. Ces éléments
+     sont purement décoratifs : les injecter ici plutôt que de les
+     recopier dans chaque page évite huit fichiers à maintenir en
+     parallèle, et une page oubliée qui n'aurait pas le même cadre.
+     ========================================================= */
+  (function appareillage() {
+    const frag = document.createDocumentFragment();
+
+    const cadre = document.createElement('div');
+    cadre.className = 'frame';
+    cadre.setAttribute('aria-hidden', 'true');
+    cadre.innerHTML = '<span></span><span></span><span></span><span></span>';
+
+    const guides = document.createElement('div');
+    guides.className = 'guides';
+    guides.setAttribute('aria-hidden', 'true');
+    guides.innerHTML = '<i></i><i></i><i></i><i></i>';
+
+    const rail = document.createElement('div');
+    rail.className = 'rail';
+    rail.setAttribute('aria-hidden', 'true');
+    rail.innerHTML = '<b>MJ Agency — Studio · Sète, Hérault</b>';
+
+    const statut = document.createElement('div');
+    statut.className = 'status';
+    statut.setAttribute('aria-hidden', 'true');
+    statut.innerHTML =
+      '<i><span class="led"></span> Disponible</i>' +
+      '<i class="hide-s">43.4053° N · 3.6969° E</i>' +
+      '<i data-horloge>--:--:--</i>';
+
+    frag.append(cadre, guides, rail, statut);
+    document.body.prepend(frag);
+
+    // Heure locale de Sète : la barre d'état doit dire quelque chose de vrai.
+    const horloge = statut.querySelector('[data-horloge]');
+    const tic = () => {
+      horloge.textContent = new Date().toLocaleTimeString('fr-FR', {
+        timeZone: 'Europe/Paris', hour12: false
+      }) + ' CET';
+    };
+    tic();
+    setInterval(tic, 1000);
+  })();
+
   /* ---------------- Custom cursor ---------------- */
   if (fine) {
     const dot = document.createElement('div'); dot.className = 'cursor-dot';
