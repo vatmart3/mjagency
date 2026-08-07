@@ -250,7 +250,6 @@ body.studio-3d #bg-canvas{opacity:1}
 a.work-item:hover{background:var(--off-white);padding-left:var(--s3)}
 a.work-item:hover .work-item__title{color:var(--blue)}
 
-.work-preview{display:none}
 
 /* ---------- 08 · Cartes ---------- */
 .grid-cards{display:grid;grid-template-columns:repeat(12,1fr);gap:var(--gutter)}
@@ -430,35 +429,49 @@ a.work-item:hover .work-item__title{color:var(--blue)}
   padding-block:var(--s3);border-top:1px solid var(--rule);font-size:13px;color:var(--gray);
 }
 
+/* ---------- Hero : actions et chiffres de confiance ---------- */
+.hero__actions{display:flex;align-items:center;gap:var(--s3);flex-wrap:wrap;justify-content:center}
+.trust{
+  list-style:none;display:flex;flex-wrap:wrap;justify-content:center;
+  gap:var(--s2) var(--s6);margin-top:var(--s8);
+  font-size:15px;color:var(--gray);
+}
+.trust b{font-weight:600;color:var(--black);font-variant-numeric:tabular-nums}
+.trust .u{color:var(--blue)}
+
+/* ---------- Blocs de présentation ----------
+   Le texte et le visuel alternent de côté : c'est ce qui donne au
+   défilement son rythme, sans avoir besoin d'effets. */
+.features{display:flex;flex-direction:column;gap:var(--s6)}
+.feature{
+  display:grid;grid-template-columns:1fr 1fr;gap:var(--s6);align-items:center;
+  background:var(--white);border-radius:var(--radius);padding:var(--s6);
+  box-shadow:var(--shadow-s);
+}
+.sep:nth-of-type(even) .feature{background:var(--white)}
+.feature--rev .feature__txt{order:2}
+.feature__t{font-size:clamp(24px,2.6vw,32px);font-weight:700;letter-spacing:-.021em;color:var(--black)}
+.feature__d{margin-top:var(--s2);color:var(--gray);font-size:18px;line-height:1.55;max-width:42ch}
+.feature__viz{aspect-ratio:16/10;border-radius:var(--radius-s);overflow:hidden}
+.feature__viz .ph{width:100%;height:100%}
+
+.ticks{list-style:none;margin-top:var(--s3);display:flex;flex-direction:column;gap:10px}
+.ticks li{position:relative;padding-left:26px;font-size:16px;color:var(--dark-gray)}
+.ticks li::before{
+  content:"";position:absolute;left:0;top:.42em;width:14px;height:8px;
+  border-left:2px solid var(--blue);border-bottom:2px solid var(--blue);
+  transform:rotate(-45deg);border-radius:1px;
+}
+
+@media (max-width:860px){
+  .feature{grid-template-columns:1fr;gap:var(--s4);padding:var(--s4)}
+  .feature--rev .feature__txt{order:0}
+  .trust{gap:var(--s2) var(--s4);margin-top:var(--s6)}
+}
+
 /* ---------- Utilitaires ---------- */
 .mt-s{margin-top:var(--s2)}.mt-m{margin-top:var(--s3)}
 .stack{display:flex;flex-direction:column;gap:var(--s3);align-items:center;text-align:center}
-
-/* =========================================================
-   BASSIN DE THAU
-   ========================================================= */
-.thau{position:relative;height:300vh;background:var(--off-white)}
-.thau__stage{position:sticky;top:0;height:100svh;overflow:hidden;display:grid;place-items:center}
-.thau__map{position:absolute;inset:0;z-index:1;background:var(--off-white);clip-path:inset(30% 32% round 22px);will-change:clip-path}
-.thau__map svg{position:absolute;inset:0;width:100%;height:100%;transform:translate(var(--tx,0%),var(--ty,0%)) scale(var(--ms,2));transform-origin:center;will-change:transform}
-.thau__phone{position:relative;z-index:3;pointer-events:none;border-radius:34px;box-shadow:var(--shadow-m),0 0 0 1px rgba(0,0,0,.06)}
-.thau__phone::before{content:"";position:absolute;top:12px;left:50%;transform:translateX(-50%);width:64px;height:5px;border-radius:5px;background:rgba(0,0,0,.12)}
-.thau__intro{position:absolute;z-index:4;left:0;right:0;top:clamp(96px,15vh,160px);display:flex;flex-direction:column;align-items:center;gap:var(--s2);text-align:center;padding-inline:var(--pad)}
-.thau__towns{position:absolute;z-index:4;inset:auto var(--pad) clamp(48px,7vh,84px) var(--pad);opacity:0;display:flex;flex-direction:column;align-items:center;gap:var(--s3);text-align:center}
-.thau__towns .lead{max-width:52ch}
-.thau__towns .towns{justify-content:center}
-.thau__scrim{position:absolute;inset:0;z-index:2;pointer-events:none;background:linear-gradient(180deg,rgba(245,245,247,.9) 0%,transparent 26%,transparent 48%,rgba(245,245,247,.94) 84%,var(--off-white) 100%)}
-.thau__hint{position:absolute;z-index:4;left:50%;bottom:clamp(24px,4vh,40px);transform:translateX(-50%);font-size:13px;color:var(--gray)}
-
-@media (max-width:860px){
-  .thau{height:auto}
-  .thau__stage{position:static;height:auto;min-height:0;overflow:visible;display:flex;flex-direction:column;gap:var(--s3);align-items:stretch;justify-items:stretch;padding-block:var(--sec)}
-  .thau__phone,.thau__hint,.thau__scrim{display:none}
-  .thau__intro{order:1;position:static;padding-inline:var(--pad);opacity:1!important;top:auto}
-  .thau__map{order:2;position:relative;inset:auto;margin-inline:var(--pad);aspect-ratio:8/5;border-radius:var(--radius);overflow:hidden;clip-path:none!important;box-shadow:var(--shadow-s)}
-  .thau__map svg{transform:none!important}
-  .thau__towns{order:3;position:static;padding-inline:var(--pad);opacity:1!important;transform:none!important}
-}
 
 /* =========================================================
    MOBILE
@@ -504,7 +517,6 @@ a.work-item:hover .work-item__title{color:var(--blue)}
 </style></noscript>
 
 <canvas id="bg-canvas"></canvas>
-<div class="work-preview"><div class="ph ph-1"></div></div>
 
 <header class="nav">
   <a href="#" data-go="home" class="nav__logo"><span class="dot"></span> MJ <em>Agency</em></a>
@@ -531,195 +543,147 @@ a.work-item:hover .work-item__title{color:var(--blue)}
 
   <!-- HERO -->
   <section class="hero container">
-    <span class="eyebrow hero__eyebrow">Agence web &amp; studio créatif · Sète, Hérault</span>
+    <span class="eyebrow hero__eyebrow">Studio créatif · Sète, Hérault</span>
     <h1 class="hero__title display">
-      <span class="line"><span>Design</span></span>
-      <span class="line"><span>qui <span class="outline">marque.</span></span></span>
+      <span class="line"><span>Conçu pour durer.</span></span>
     </h1>
     <div class="hero__meta">
-      <p class="lead">MJ Agency est une <strong>agence web à Sète</strong>. Nous créons des sites internet, des identités de marque et des expériences digitales premium pour les entreprises de l'Hérault et d'ailleurs.</p>
-      <a href="#" data-go="work" class="btn" data-magnetic="0.25" data-cursor="Voir">Voir nos réalisations <span class="arw" aria-hidden="true">↗</span></a>
-    </div>
-  </section>
-
-  <!-- PREUVE -->
-  <section class="container pad-y sep">
-    <div class="stats rs">
-      <div class="stat"><div class="stat__num"><span data-count="60">0</span><span class="u">+</span></div><div class="stat__label">Projets livrés</div></div>
-      <div class="stat"><div class="stat__num"><span data-count="9">0</span><span class="u"> ans</span></div><div class="stat__label">D'expérience</div></div>
-      <div class="stat"><div class="stat__num"><span data-count="30">0</span><span class="u"> j</span></div><div class="stat__label">Délai moyen</div></div>
-      <div class="stat"><div class="stat__num"><span data-count="98">0</span><span class="u">%</span></div><div class="stat__label">Clients satisfaits</div></div>
-    </div>
-  </section>
-
-  <!-- INTRO LOCALE -->
-  <section class="container pad-y sep">
-    <div class="split">
-      <div class="reveal">
-        <span class="eyebrow">Notre conviction</span>
-        <h2 class="h2 mt-m">Une agence web<br>ancrée à Sète.</h2>
-      </div>
-      <div class="reveal">
-        <p class="lead">Installés au bord de l'étang de Thau, nous accompagnons les commerçants, artisans, restaurateurs, vignerons et PME de la région qui veulent enfin une image à la hauteur de leur travail.</p>
-        <p class="lead mt-m dim">Un interlocuteur unique, joignable, qui se déplace. De la première maquette à la mise en ligne, tout se fait ici — pas de sous-traitance à l'autre bout du monde.</p>
+      <p class="lead">Nous concevons des sites internet et des identités de marque pour les entreprises qui veulent une image à la hauteur de leur travail. Une seule équipe, du premier croquis à la mise en ligne.</p>
+      <div class="hero__actions">
+        <a href="#" data-go="contact" class="btn btn--glow">Réserver un appel</a>
+        <a href="#" data-go="work" class="link-t">Voir nos réalisations <span class="arw" aria-hidden="true">↗</span></a>
       </div>
     </div>
+    <ul class="trust" aria-label="Chiffres clés">
+      <li><b><span data-count="60">0</span><span class="u">+</span></b> projets livrés</li>
+      <li><b><span data-count="9">0</span></b> ans d’expérience</li>
+      <li><b><span data-count="30">0</span><span class="u"> j</span></b> de délai moyen</li>
+      <li><b><span data-count="98">0</span><span class="u">%</span></b> de clients fidèles</li>
+    </ul>
   </section>
 
-  <!-- SERVICES -->
+  <!-- CE QUE NOUS FAISONS -->
   <section class="container pad-y sep">
-    <div class="sec-head">
-      <div class="sec-head__t reveal">
-        <span class="eyebrow">Nos services</span>
-        <h2 class="h2">Ce que nous faisons</h2>
-      </div>
-      <p class="lead reveal">Quatre métiers, un seul studio. Tout ce qu'il faut pour exister en ligne, sans passer par cinq prestataires.</p>
+    <div class="sec-head reveal">
+      <span class="eyebrow">Nos métiers</span>
+      <h2 class="h2">Trois savoir-faire,<br>un seul interlocuteur.</h2>
+      <p class="lead">Tout ce qu’il faut pour exister en ligne, sans passer par cinq prestataires qui ne se parlent pas.</p>
     </div>
-    <div class="cap-list reveal">
-      <article class="cap">
-        <h3 class="cap__name">Création de<br>site internet</h3>
-        <p class="cap__desc">Sites vitrines, e-commerce et pages de vente. Rapides, pensés pour le mobile et référencés sur Google dès la mise en ligne.</p>
+
+    <div class="features">
+      <article class="feature reveal">
+        <div class="feature__txt">
+          <h3 class="feature__t">Sites internet</h3>
+          <p class="feature__d">Vitrines, boutiques en ligne et pages de vente. Rapides, pensés pour le mobile, et référencés sur Google dès le jour de la mise en ligne.</p>
+          <ul class="ticks">
+            <li>Design sur-mesure, aucun thème acheté</li>
+            <li>Chargement sous deux secondes</li>
+            <li>Vous modifiez vos textes vous-même</li>
+          </ul>
+        </div>
+        <div class="feature__viz"><div class="ph ph-1"></div></div>
       </article>
-      <article class="cap">
-        <h3 class="cap__name">Identité<br>de marque</h3>
-        <p class="cap__desc">Logo, charte graphique, cartes de visite, signalétique. Une image cohérente sur tous vos supports, en ligne comme en boutique.</p>
+
+      <article class="feature feature--rev reveal">
+        <div class="feature__txt">
+          <h3 class="feature__t">Identité de marque</h3>
+          <p class="feature__d">Logo, couleurs, typographies, supports imprimés. Une image cohérente en ligne comme en boutique, qui tient dans le temps.</p>
+          <ul class="ticks">
+            <li>Charte graphique complète et livrée</li>
+            <li>Déclinaisons cartes, enseigne, véhicules</li>
+            <li>Fichiers sources, ils vous appartiennent</li>
+          </ul>
+        </div>
+        <div class="feature__viz"><div class="ph ph-5"></div></div>
       </article>
-      <article class="cap">
-        <h3 class="cap__name">Design UI/UX</h3>
-        <p class="cap__desc">Interfaces d'applications et de produits web. Une esthétique précise au service de l'usage et de la conversion.</p>
-      </article>
-      <article class="cap">
-        <h3 class="cap__name">Motion &amp; 3D</h3>
-        <p class="cap__desc">Habillage animé, vidéos de marque, rendus 3D et expériences WebGL temps réel — comme le décor de cette page.</p>
+
+      <article class="feature reveal">
+        <div class="feature__txt">
+          <h3 class="feature__t">Motion &amp; 3D</h3>
+          <p class="feature__d">Habillage animé, vidéos de marque, rendus 3D. Ce qui fait qu’on se souvient de vous plutôt que du concurrent d’à côté.</p>
+          <ul class="ticks">
+            <li>Animations pour vos réseaux</li>
+            <li>Rendus produit et volumes 3D</li>
+            <li>Formats prêts pour chaque plateforme</li>
+          </ul>
+        </div>
+        <div class="feature__viz"><div class="ph ph-3"></div></div>
       </article>
     </div>
   </section>
 
   <!-- RÉALISATIONS -->
   <section class="container pad-y sep">
-    <div class="sec-head">
-      <div class="sec-head__t reveal">
-        <span class="eyebrow">Sélection</span>
-        <h2 class="h2">Réalisations</h2>
-      </div>
-      <a href="#" data-go="work" class="btn reveal" data-magnetic="0.25">Tout voir <span class="arw" aria-hidden="true">↗</span></a>
+    <div class="sec-head reveal">
+      <span class="eyebrow">Sélection</span>
+      <h2 class="h2">Nos dernières réalisations</h2>
+      <a href="#" data-go="work" class="btn">Tout voir</a>
     </div>
     <div class="work-list reveal">
-      <a href="#" data-go="work" class="work-item" data-ph="ph-1" data-cursor="Ouvrir">
+      <a href="#" data-go="work" class="work-item">
         <span class="work-item__title">Aurea Finance</span>
-        <span class="work-item__meta">Marque · Site vitrine — 2025</span>
+        <span class="work-item__meta">Marque &amp; site vitrine — 2025</span>
       </a>
-      <a href="#" data-go="work" class="work-item" data-ph="ph-2" data-cursor="Ouvrir">
+      <a href="#" data-go="work" class="work-item">
         <span class="work-item__title">Noir Atelier</span>
-        <span class="work-item__meta">Identité · Web — 2025</span>
+        <span class="work-item__meta">Identité &amp; web — 2025</span>
       </a>
-      <a href="#" data-go="work" class="work-item" data-ph="ph-5" data-cursor="Ouvrir">
+      <a href="#" data-go="work" class="work-item">
         <span class="work-item__title">Lumen Studio</span>
-        <span class="work-item__meta">3D · Motion — 2024</span>
+        <span class="work-item__meta">3D &amp; motion — 2024</span>
       </a>
-      <a href="#" data-go="work" class="work-item" data-ph="ph-3" data-cursor="Ouvrir">
+      <a href="#" data-go="work" class="work-item">
         <span class="work-item__title">Vela Living</span>
-        <span class="work-item__meta">E-commerce · Marque — 2024</span>
+        <span class="work-item__meta">Boutique en ligne — 2024</span>
       </a>
     </div>
   </section>
 
-  <!-- ZONE D'INTERVENTION — on entre dans la carte -->
-  <section class="thau sep" id="zone" data-thau aria-labelledby="zone-title">
-    <div class="thau__stage">
+  <!-- MÉTHODE -->
+  <section class="container pad-y sep">
+    <div class="sec-head reveal">
+      <span class="eyebrow">Comment ça se passe</span>
+      <h2 class="h2">Quatre temps,<br>zéro surprise.</h2>
+      <p class="lead">Un devis fixe, un calendrier annoncé, un interlocuteur qui répond. Le reste, c’est notre affaire.</p>
+    </div>
+    <div class="steps rs">
+      <div class="step"><div class="step__no">01</div><div class="step__name">Écoute</div><p class="step__desc">Un rendez-vous chez vous. On regarde votre activité, vos clients, ce qui vous distingue.</p></div>
+      <div class="step"><div class="step__no">02</div><div class="step__name">Direction</div><p class="step__desc">Une maquette, une seule idée forte. Vous validez avant qu’une ligne de code soit écrite.</p></div>
+      <div class="step"><div class="step__no">03</div><div class="step__name">Fabrication</div><p class="step__desc">On construit, vous suivez l’avancement sur un lien privé, mis à jour en continu.</p></div>
+      <div class="step"><div class="step__no">04</div><div class="step__name">Mise en ligne</div><p class="step__desc">On publie, on référence, on vous forme. Une heure suffit pour être autonome.</p></div>
+    </div>
+  </section>
 
-      <div class="thau__map" data-thau-map aria-hidden="true">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1000" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Carte stylisée du bassin de Thau : Marseillan, Mèze, Bouzigues, Balaruc, Sète et Frontignan">
-        <defs>
-          <linearGradient id="thEtang" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0" stop-color="#D9E2EC"/><stop offset="1" stop-color="#C2CFDC"/>
-          </linearGradient>
-          <linearGradient id="thMer" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0" stop-color="#E8EDF2"/><stop offset="1" stop-color="#DCE3EA"/>
-          </linearGradient>
-          <radialGradient id="thHalo" cx="0.5" cy="0.5" r="0.5">
-            <stop offset="0" stop-color="#0071E3" stop-opacity=".22"/><stop offset="1" stop-color="#0071E3" stop-opacity="0"/>
-          </radialGradient>
-          <pattern id="thGrid" width="64" height="64" patternUnits="userSpaceOnUse">
-            <path d="M64 0H0V64" fill="none" stroke="#0D0D0F" stroke-opacity=".05" stroke-width="1"/>
-          </pattern>
-        </defs>
-
-        <rect width="1600" height="1000" fill="#F5F5F7"/>
-        <rect width="1600" height="1000" fill="url(#thGrid)"/>
-
-        <!-- Mer Méditerranée -->
-        <path d="M1600 1000 L1600 300 L1120 470 L985 558 L835 648 L675 738 L515 828 L410 890 L330 950 L330 1000 Z" fill="url(#thMer)"/>
-        <path d="M1600 300 L1120 470 L985 558 L835 648 L675 738 L515 828 L410 890 L330 950"
-              fill="none" stroke="#86868B" stroke-opacity=".55" stroke-width="2"/>
-
-        <!-- Étang de Thau -->
-        <path d="M330 745 C430 660 560 555 700 455 C830 370 940 305 1020 280
-                 C1062 268 1096 300 1090 336 C1082 380 1040 402 1000 430
-                 C900 470 760 555 620 640 C520 698 420 730 336 752 Z"
-              fill="url(#thEtang)" stroke="#86868B" stroke-opacity=".6" stroke-width="2"/>
-
-        <!-- Lido : le cordon de sable entre l'étang et la mer -->
-        <path d="M1085 420 C950 510 800 600 640 690 C560 735 480 780 380 840
-                 L410 890 C515 828 675 738 835 648 C935 590 1050 512 1118 464 Z"
-              fill="#EDEFF2" stroke="#86868B" stroke-opacity=".35" stroke-width="1.5"/>
-
-        <!-- Canaux de Sète -->
-        <g stroke="#0071E3" stroke-opacity=".5" stroke-width="3" stroke-linecap="round">
-          <path d="M1072 452 L1104 424"/><path d="M1092 486 L1126 458"/>
-        </g>
-
-        <circle cx="1082" cy="475" r="150" fill="url(#thHalo)"/>
-
-        <!-- Communes -->
-        <g fill="#86868B" font-family="-apple-system, Helvetica, Arial, sans-serif" font-size="19" letter-spacing="0">
-          <g><circle cx="360" cy="730" r="5"/><text x="376" y="736" fill="#86868B">Marseillan</text></g>
-          <g><circle cx="450" cy="845" r="5"/><text x="466" y="851" fill="#A0A0A5">Marseillan-Plage</text></g>
-          <g><circle cx="700" cy="440" r="5"/><text x="716" y="446" fill="#86868B">Mèze</text></g>
-          <g><circle cx="925" cy="315" r="5"/><text x="941" y="321" fill="#86868B">Bouzigues</text></g>
-          <g><circle cx="1040" cy="330" r="5"/><text x="1056" y="336" fill="#86868B">Balaruc-les-Bains</text></g>
-          <g><circle cx="1326" cy="290" r="5"/><text x="1342" y="296" fill="#86868B">Frontignan</text></g>
-        </g>
-
-        <!-- Étiquette de l'étang -->
-        <text x="640" y="560" fill="#1D1D1F" fill-opacity=".30" font-family="Helvetica, Arial, sans-serif"
-              font-size="22" letter-spacing="6" transform="rotate(-32 640 560)">ÉTANG DE THAU</text>
-
-        <!-- Sète, le point d'ancrage -->
-        <circle cx="1082" cy="475" r="17" fill="none" stroke="#0071E3" stroke-width="2" opacity=".7"/>
-        <circle cx="1082" cy="475" r="8" fill="#0071E3"/>
-        <text x="1108" y="482" fill="#0D0D0F" font-family="-apple-system, Helvetica, Arial, sans-serif" font-size="28" font-weight="600" letter-spacing="0">Sète</text>
-      </svg>
+  <!-- ANCRAGE LOCAL -->
+  <section class="container pad-y sep" id="zone">
+    <div class="split reveal">
+      <div>
+        <span class="eyebrow">Zone d’intervention</span>
+        <h2 class="h2 mt-s">Installés à Sète,<br>au bord de l’étang.</h2>
+        <p class="lead mt-m">Nous nous déplaçons dans tout l’Hérault, sans frais. Voir votre local, vos produits et votre façon de travailler change tout au moment de concevoir le site.</p>
+        <a href="#" data-go="contact" class="link-t mt-m">Prendre rendez-vous <span class="arw" aria-hidden="true">↗</span></a>
       </div>
-
-      <div class="thau__scrim" aria-hidden="true"></div>
-
-      <div class="thau__phone" data-thau-phone aria-hidden="true"></div>
-
-      <div class="thau__intro" data-thau-intro>
-        <span class="eyebrow">Zone d'intervention</span>
-        <h2 class="h2" id="zone-title">Sète et<br>les alentours</h2>
-      </div>
-
-      <div class="thau__towns" data-thau-towns>
-        <p class="lead">Basés à Sète, au bord de l'étang de Thau, nous intervenons dans tout l'Hérault. Un rendez-vous sur place reste possible partout autour du bassin.</p>
+      <div>
         <ul class="towns">
           <li>Sète</li><li>Frontignan</li><li>Balaruc-les-Bains</li><li>Bouzigues</li>
           <li>Mèze</li><li>Marseillan</li><li>Poussan</li><li>Gigean</li>
           <li>Agde</li><li>Pézenas</li><li>Montpellier</li><li>Béziers</li>
         </ul>
+        <p class="zone__note">Ailleurs en France ou à l’étranger&nbsp;? Nous travaillons aussi entièrement à distance.</p>
       </div>
-
-      <span class="thau__hint" data-thau-hint>Scroll</span>
     </div>
   </section>
 
-  <!-- CTA -->
+  <!-- APPEL -->
   <section class="container pad-y sep">
     <div class="cta-band reveal">
-      <span class="eyebrow">Disponible pour de nouveaux projets — 2026</span>
-      <h2 class="h2">Parlons de<br>votre projet.</h2>
-      <a href="#" data-go="contact" class="btn btn--glow" data-magnetic="0.3" data-cursor="Réserver">Réserver un appel <span class="arw" aria-hidden="true">↗</span></a>
+      <span class="eyebrow">Devis gratuit · Réponse sous 24 h</span>
+      <h2 class="h2">Parlons de votre projet.</h2>
+      <p class="lead">Trente minutes au téléphone, sans engagement. On cadre votre besoin et on vous dit franchement ce que ça coûte.</p>
+      <div class="hero__actions">
+        <a href="#" data-go="contact" class="btn btn--glow">Réserver un appel</a>
+        <a href="tel:+33611718368" class="link-t">06 11 71 83 68</a>
+      </div>
     </div>
   </section>
 
@@ -731,9 +695,9 @@ a.work-item:hover .work-item__title{color:var(--blue)}
 
   <section class="container" style="padding-top:clamp(130px,18vh,200px);padding-bottom:clamp(36px,5vw,60px)">
     <div class="stack">
-      <span class="eyebrow reveal">Nos réalisations · 2023 — 2026</span>
-      <h1 class="display reveal">Réalisations</h1>
-      <p class="lead reveal">Sites internet, identités de marque et projets de design menés depuis notre studio de Sète, pour des clients de l'Hérault et de toute la France.</p>
+      <span class="eyebrow reveal">Portfolio · 2023 — 2026</span>
+      <h1 class="display reveal">Nos réalisations.</h1>
+      <p class="lead reveal">Chaque projet part d’une contrainte réelle&nbsp;: un budget, un délai, un public. Voici ce que ça donne.</p>
     </div>
   </section>
 
@@ -817,9 +781,9 @@ a.work-item:hover .work-item__title{color:var(--blue)}
 
   <section class="container" style="padding-top:clamp(130px,18vh,200px);padding-bottom:clamp(36px,5vw,60px)">
     <div class="stack">
-      <span class="eyebrow reveal">Studio créatif · Sète, Hérault</span>
-      <h1 class="display reveal">Peu de<br>bruit.</h1>
-      <p class="lead reveal">MJ Agency est un studio créatif indépendant installé à Sète. Une petite équipe, obsédée par la précision, qui préfère faire moins de projets — mais mieux.</p>
+      <span class="eyebrow reveal">Le studio</span>
+      <h1 class="display reveal">Petite équipe,<br>grandes attentions.</h1>
+      <p class="lead reveal">Studio indépendant installé à Sète. Nous prenons peu de projets à la fois, pour pouvoir nous occuper de chacun comme il faut.</p>
     </div>
   </section>
 
@@ -828,7 +792,7 @@ a.work-item:hover .work-item__title{color:var(--blue)}
       <div class="figure reveal"><div class="ph ph-5 ph-grid"></div></div>
       <div class="reveal">
         <span class="eyebrow">Manifeste</span>
-        <h2 class="h2 mt-m">Une équipe<br>qui croit au détail.</h2>
+        <h2 class="h2 mt-m">Le détail fait<br>toute la différence.</h2>
         <p class="lead mt-m">Une marque forte n'est pas la somme de ses effets, mais la cohérence de ses intentions. Nous travaillons la matière — typographie, rythme, mouvement, silence — jusqu'à ce que tout paraisse évident.</p>
         <p class="lead mt-m dim">Le résultat&nbsp;: des identités qui respirent le premium et des interfaces qui donnent envie de rester.</p>
       </div>
@@ -891,9 +855,9 @@ a.work-item:hover .work-item__title{color:var(--blue)}
 
   <section class="container" style="padding-top:clamp(130px,18vh,200px);padding-bottom:clamp(30px,4vw,50px)">
     <div class="stack">
-      <span class="eyebrow reveal">Agence web à Sète · Réponse sous 24 h</span>
-      <h1 class="display reveal">Parlons<br>de vous.</h1>
-      <p class="lead reveal">Un projet de site internet, une identité à refaire&nbsp;? Choisissez un créneau ou écrivez-nous. Nous nous déplaçons dans tout l'Hérault.</p>
+      <span class="eyebrow reveal">Réponse sous 24 h</span>
+      <h1 class="display reveal">Parlons-en.</h1>
+      <p class="lead reveal">Trente minutes au téléphone, sans engagement. On cadre votre besoin et on vous dit franchement ce que ça coûte.</p>
     </div>
   </section>
 
@@ -901,7 +865,7 @@ a.work-item:hover .work-item__title{color:var(--blue)}
     <div class="sec-head">
       <div class="sec-head__t reveal">
         <span class="eyebrow">Réservation</span>
-        <h2 class="h2">Choisissez<br>un créneau</h2>
+        <h2 class="h2">Choisissez un créneau</h2>
       </div>
       <p class="lead reveal">Un appel de 30 minutes, sans engagement. On fait connaissance et on cadre votre projet.</p>
     </div>
@@ -963,7 +927,7 @@ a.work-item:hover .work-item__title{color:var(--blue)}
     <div class="split">
       <div class="reveal">
         <span class="eyebrow">Ou directement</span>
-        <h2 class="h2 mt-m">Écrivez-nous.</h2>
+        <h2 class="h2 mt-m">Ou écrivez-nous directement.</h2>
       </div>
       <div class="reveal">
         <a href="mailto:mjagency.officiel@gmail.com" class="work-item" data-cursor="Email">
@@ -1031,29 +995,27 @@ a.work-item:hover .work-item__title{color:var(--blue)}
 
 <script>
 /* =========================================================
-   MJ AGENCY — Décor WebGL
-   Un volume de studio raymarché : des arches rectangulaires et
-   quatre arêtes lumineuses fuient vers un point de lumière.
-   Le scroll pousse la caméra dans la profondeur — on entre
-   littéralement dans l'espace.
+   MJ AGENCY — Champ de dégradés
 
-   Rendu par accumulation de lueur le long du rayon (pas de
-   normales, pas d'éclairage) : c'est bien moins coûteux qu'un
-   raymarching classique et ça reste assez sombre pour que le
-   texte par-dessus demeure lisible.
+   Un voile de couleur qui respire, très clair, très lent.
+   Aucun objet, aucune scène : juste de la lumière qui bouge,
+   dans l'esprit « subtle gradients » de la charte.
+
+   Le rendu tient en un seul quad et un bruit fractal ; il n'y a
+   ni géométrie ni éclairage à calculer, donc le coût reste
+   marginal même sur un téléphone.
    ========================================================= */
 (() => {
   'use strict';
 
   const canvas = document.getElementById('bg-canvas');
   if (!canvas) return;
-  if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) { degrade(); return; }
 
-  const gl = canvas.getContext('webgl', { antialias: false, alpha: false, powerPreference: 'low-power' });
-  if (!gl) { fallback(); return; }
+  const gl = canvas.getContext('webgl', { antialias: false, alpha: true, powerPreference: 'low-power' });
+  if (!gl) { degrade(); return; }
 
-  const small = matchMedia('(max-width: 860px)').matches;
-  const STEPS = small ? 40 : 68;
+  const petit = matchMedia('(max-width: 860px)').matches;
 
   const VERT = 'attribute vec2 p;void main(){gl_Position=vec4(p,0.,1.);}';
 
@@ -1063,133 +1025,76 @@ a.work-item:hover .work-item__title{color:var(--blue)}
   uniform vec2  u_res;
   uniform float u_time;
   uniform vec2  u_mouse;
-  uniform float u_z;          // profondeur caméra, pilotée par le scroll
 
-  const float SPACING = 4.2;              // écart entre deux arches
-  const vec2  ROOM    = vec2(2.35, 1.42); // demi-largeur / demi-hauteur du volume
+  mat2 rot(float a){ float c = cos(a), s = sin(a); return mat2(c, -s, s, c); }
 
-  float sdBox2(vec2 p, vec2 b){
-    vec2 q = abs(p) - b;
-    return min(max(q.x, q.y), 0.0) + length(max(q, 0.0));
+  float hash(vec2 p){ return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
+
+  float bruit(vec2 p){
+    vec2 i = floor(p), f = fract(p);
+    float a = hash(i),            b = hash(i + vec2(1.0, 0.0));
+    float c = hash(i + vec2(0.0, 1.0)), d = hash(i + vec2(1.0, 1.0));
+    vec2 u = f * f * (3.0 - 2.0 * f);
+    return mix(a, b, u.x) + (c - a) * u.y * (1.0 - u.x) + (d - b) * u.x * u.y;
   }
 
-  float sdBox3(vec3 p, vec3 b){
-    vec3 q = abs(p) - b;
-    return length(max(q, 0.0)) + min(max(q.x, max(q.y, q.z)), 0.0);
-  }
-
-  /* Contour rectangulaire, répété le long de z */
-  float arches(vec3 p){
-    float zi   = mod(p.z, SPACING) - SPACING * 0.5;
-    float ring = abs(sdBox2(p.xy, ROOM)) - 0.014;
-    return max(ring, abs(zi) - 0.05);
-  }
-
-  /* Les quatre arêtes du volume, continues jusqu'au point de fuite */
-  float edges(vec3 p){
-    return length(abs(p.xy) - ROOM);
-  }
-
-  /* Repère local d'un poste de travail : abs(x) place le même poste
-     contre les deux murs, le décalage en z l'intercale entre deux arches. */
-  vec3 deskSpace(vec3 p){
-    float zi = mod(p.z - SPACING * 0.5, SPACING) - SPACING * 0.5;
-    return vec3(abs(p.x) - (ROOM.x - 0.54), p.y, zi);
-  }
-
-  /* Plateau + piétements, tracés en contour comme le reste du volume */
-  float desks(vec3 q){
-    float top  = abs(sdBox3(q - vec3(0.0, -0.72, 0.0), vec3(0.46, 0.014, 0.86))) - 0.010;
-    float legs = abs(sdBox3(vec3(q.x, q.y + 1.07, abs(q.z) - 0.78), vec3(0.42, 0.35, 0.018))) - 0.008;
-    return min(top, legs);
-  }
-
-  /* Les écrans : seuls volumes réellement allumés de la scène */
-  float screens(vec3 q){
-    return sdBox3(q - vec3(0.26, -0.47, 0.0), vec3(0.014, 0.19, 0.30));
-  }
-
-  /* Quadrillage au sol — la trame d'un plan, pas un décor.
-     La distance doit rester positive : une valeur négative ferait
-     exploser exp(-d) plus bas et brûlerait l'image. */
-  float grille(vec3 p){
-    float sol = p.y + ROOM.y;               // positif au-dessus du sol
-    if (sol < 0.0) return 1e5;
-    vec2 g = abs(fract(p.xz * 1.4) - 0.5) / 1.4;
-    return max(min(g.x, g.y), 0.0) + sol;
+  float fbm(vec2 p){
+    float v = 0.0, a = 0.5;
+    for (int i = 0; i < 5; i++){ v += a * bruit(p); p = rot(0.6) * p * 2.02; a *= 0.5; }
+    return v;
   }
 
   void main(){
-    vec2 uv = (gl_FragCoord.xy - 0.5 * u_res) / u_res.y;
+    vec2 uv = gl_FragCoord.xy / u_res;
+    vec2 q  = (gl_FragCoord.xy - 0.5 * u_res) / u_res.y;
 
-    vec2 m = u_mouse - 0.5;
-    vec3 ro = vec3(m.x * 0.55, m.y * 0.34 + sin(u_time * 0.13) * 0.05, u_z);
-    vec3 rd = normalize(vec3(uv, 1.5));
+    float t = u_time * 0.018;                    // très lent : on doit à peine le voir bouger
+    vec2  m = (u_mouse - 0.5) * 0.16;
 
-    // Charte claire : on n'ajoute plus de la lumière sur du noir, on
-    // retire de la densité à du blanc. Le volume devient une maquette
-    // d'architecture sous lumière naturelle, dans l'esprit des visuels
-    // de la charte — formes blanches, matière, profondeur.
-    float dens = 0.0;
-    float t = 0.35;
+    // Double déformation du domaine : c'est ce qui donne aux masses
+    // leur mouvement organique plutôt qu'un simple défilement.
+    vec2 w1 = vec2(fbm(q * 1.10 + t + m), fbm(q * 1.10 - t * 0.8 + 3.1));
+    vec2 w2 = vec2(fbm(q * 1.35 + w1 * 1.2 + t * 1.3), fbm(q * 1.35 + w1 * 1.2 - t));
+    float f = fbm(q * 1.20 + w2 * 1.1);
 
-    for (int i = 0; i < ${STEPS}; i++){
-      vec3 p = ro + rd * t;
-      vec3 q = deskSpace(p);
+    // Palette de la charte : blancs, bleu très dilué, lavande à peine posée
+    vec3 blanc   = vec3(1.000, 1.000, 1.000);
+    vec3 casse   = vec3(0.961, 0.961, 0.969);   // #F5F5F7
+    vec3 bleu    = vec3(0.898, 0.933, 0.984);
+    vec3 lavande = vec3(0.941, 0.925, 0.973);
 
-      float da = arches(p);
-      float de = edges(p);
-      float dd = desks(q);
-      float ds = screens(q);
-      float dg = grille(p);
+    vec3 col = mix(blanc, casse, smoothstep(0.22, 0.78, f));
+    col = mix(col, bleu,    smoothstep(0.30, 0.80, w2.x));
+    col = mix(col, lavande, smoothstep(0.36, 0.86, w1.y) * 0.80);
 
-      float fog = exp(-t * 0.070);
-      dens += exp(-max(da, 0.0) * 30.0) * 0.034 * fog;   // arches
-      dens += exp(-max(de, 0.0) * 13.0) * 0.014 * fog;   // arêtes
-      dens += exp(-max(dd, 0.0) * 28.0) * 0.030 * fog;   // postes de travail
-      dens += exp(-max(ds, 0.0) *  9.0) * 0.026 * fog;   // écrans
-      dens += exp(-max(dg, 0.0) * 26.0) * 0.020 * fog;   // quadrillage au sol
+    // Le centre haut reste clair pour ne pas gêner le titre, mais les
+    // masses restent lisibles sur les côtés : sans ça, le mouvement ne
+    // se perçoit plus du tout.
+    float degage = smoothstep(0.62, 0.02, length(vec2(q.x * 0.55, q.y - 0.22)));
+    col = mix(col, blanc, degage * 0.72);
 
-      t += clamp(min(min(da, de), min(dd, ds)) * 0.72, 0.06, 1.15);
-      if (t > 62.0) break;
-    }
-
-    /* Le fond du volume s'ouvre sur une lumière blanche : la profondeur
-       s'éclaircit au lieu de s'assombrir. */
-    float axis = max(dot(rd, vec3(0.0, 0.0, 1.0)), 0.0);
-    dens -= pow(axis, 300.0) * 0.22;
-
-    /* Blanc cassé de la charte, moins la densité accumulée */
-    vec3 fond = vec3(0.961, 0.961, 0.969);          // #F5F5F7
-    vec3 col  = fond - clamp(dens, 0.0, 1.0) * vec3(0.62, 0.63, 0.66);
-
-    /* Vignette douce : les bords s'éclaircissent, le centre garde la matière */
-    float d2 = length(uv / vec2(max(u_res.x / u_res.y, 1.0), 1.0));
-    col = mix(fond, col, smoothstep(1.25, 0.20, d2) * 0.92 + 0.08);
-
-    gl_FragColor = vec4(clamp(col, 0.0, 1.0), 1.0);
+    // Léger tramage : sans lui, des dégradés aussi doux montrent des bandes
+    float grain = (hash(gl_FragCoord.xy + fract(u_time)) - 0.5) * 0.006;
+    gl_FragColor = vec4(col + grain, 1.0);
   }`;
 
-  function compile(type, src){
+  function compiler(type, src){
     const s = gl.createShader(type);
     gl.shaderSource(s, src);
     gl.compileShader(s);
-    if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) {
-      console.warn('shader:', gl.getShaderInfoLog(s));
-      return null;
-    }
+    if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) { console.warn(gl.getShaderInfoLog(s)); return null; }
     return s;
   }
 
-  const vs = compile(gl.VERTEX_SHADER, VERT);
-  const fs = compile(gl.FRAGMENT_SHADER, FRAG);
-  if (!vs || !fs) { fallback(); return; }
+  const vs = compiler(gl.VERTEX_SHADER, VERT);
+  const fs = compiler(gl.FRAGMENT_SHADER, FRAG);
+  if (!vs || !fs) { degrade(); return; }
 
   const prog = gl.createProgram();
   gl.attachShader(prog, vs);
   gl.attachShader(prog, fs);
   gl.linkProgram(prog);
-  if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) { fallback(); return; }
+  if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) { degrade(); return; }
   gl.useProgram(prog);
 
   gl.bindBuffer(gl.ARRAY_BUFFER, gl.createBuffer());
@@ -1201,24 +1106,15 @@ a.work-item:hover .work-item__title{color:var(--blue)}
   const uRes   = gl.getUniformLocation(prog, 'u_res');
   const uTime  = gl.getUniformLocation(prog, 'u_time');
   const uMouse = gl.getUniformLocation(prog, 'u_mouse');
-  const uZ     = gl.getUniformLocation(prog, 'u_z');
 
-  /* ---------- Entrées ---------- */
-  let mouse = [0.5, 0.5], mouseTarget = [0.5, 0.5];
+  let souris = [0.5, 0.5], cible = [0.5, 0.5];
   addEventListener('mousemove', e => {
-    mouseTarget = [e.clientX / innerWidth, 1 - e.clientY / innerHeight];
+    cible = [e.clientX / innerWidth, 1 - e.clientY / innerHeight];
   }, { passive: true });
 
-  // 90 px de scroll = 1 unité de profondeur ; on passe donc une arche
-  // toutes les ~380 px, ce qui reste lisible même en défilement rapide.
-  let z = 0, zTarget = 0;
-  const readScroll = () => { zTarget = scrollY / 90; };
-  addEventListener('scroll', readScroll, { passive: true });
-  readScroll();
-
-  /* ---------- Taille ---------- */
-  const DPR = Math.min(devicePixelRatio || 1, small ? 0.8 : 1.5);
-  function resize(){
+  // Le champ est diffus : le rendre en pleine résolution ne se verrait pas.
+  const DPR = Math.min(devicePixelRatio || 1, petit ? 0.6 : 1.0);
+  function redimensionner(){
     const w = Math.max(1, Math.floor(innerWidth * DPR));
     const h = Math.max(1, Math.floor(innerHeight * DPR));
     canvas.width = w; canvas.height = h;
@@ -1227,70 +1123,34 @@ a.work-item:hover .work-item__title{color:var(--blue)}
     gl.viewport(0, 0, w, h);
     gl.uniform2f(uRes, w, h);
   }
-  addEventListener('resize', resize);
-  resize();
+  addEventListener('resize', redimensionner);
+  redimensionner();
 
-  /* ---------- Boucle ---------- */
-  let running = true;
+  let actif = true;
   document.addEventListener('visibilitychange', () => {
-    running = !document.hidden;
-    if (running) requestAnimationFrame(frame);
+    actif = !document.hidden;
+    if (actif) requestAnimationFrame(image);
   });
 
-  // En build fichier unique le canvas survit au changement de page : tant qu'il
-  // est masqué, on saute le rendu plutôt que de calculer un shader invisible.
-  const visible = () => document.body.classList.contains('studio-3d');
-
   const t0 = performance.now();
-  function frame(now){
-    if (!running) return;
-    if (!visible()) { requestAnimationFrame(frame); return; }
-
-    const time = (now - t0) / 1000;
-
-    mouse[0] += (mouseTarget[0] - mouse[0]) * 0.04;
-    mouse[1] += (mouseTarget[1] - mouse[1]) * 0.04;
-    z += (zTarget - z) * 0.075;                 // le retard donne du poids
-
-    gl.uniform1f(uTime, time);
-    gl.uniform2f(uMouse, mouse[0], mouse[1]);
-    gl.uniform1f(uZ, z + time * 0.06);          // dérive lente, même à l'arrêt
+  function image(now){
+    if (!actif) return;
+    souris[0] += (cible[0] - souris[0]) * 0.03;
+    souris[1] += (cible[1] - souris[1]) * 0.03;
+    gl.uniform1f(uTime, (now - t0) / 1000);
+    gl.uniform2f(uMouse, souris[0], souris[1]);
     gl.drawArrays(gl.TRIANGLES, 0, 3);
-    requestAnimationFrame(frame);
+    requestAnimationFrame(image);
   }
-  requestAnimationFrame(frame);
+  requestAnimationFrame(image);
 
-  /* ---------- Repli sans WebGL ---------- */
-  function fallback(){
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-    let W, H;
-    const rs = () => { W = canvas.width = innerWidth; H = canvas.height = innerHeight; };
-    addEventListener('resize', rs); rs();
-
-    const orbs = Array.from({ length: 5 }, (_, i) => ({
-      x: Math.random() * W, y: Math.random() * H,
-      r: 220 + Math.random() * 260,
-      dx: (Math.random() - .5) * .25, dy: (Math.random() - .5) * .25,
-      c: i % 2 ? '205,214,226' : '226,226,232'
-    }));
-
-    (function draw(){
-      ctx.fillStyle = '#F5F5F7'; ctx.fillRect(0, 0, W, H);
-      ctx.globalCompositeOperation = 'multiply';
-      orbs.forEach(o => {
-        o.x += o.dx; o.y += o.dy;
-        if (o.x < -o.r || o.x > W + o.r) o.dx *= -1;
-        if (o.y < -o.r || o.y > H + o.r) o.dy *= -1;
-        const g = ctx.createRadialGradient(o.x, o.y, 0, o.x, o.y, o.r);
-        g.addColorStop(0, `rgba(${o.c},.55)`);
-        g.addColorStop(1, 'rgba(245,245,247,0)');
-        ctx.fillStyle = g;
-        ctx.beginPath(); ctx.arc(o.x, o.y, o.r, 0, Math.PI * 2); ctx.fill();
-      });
-      ctx.globalCompositeOperation = 'source-over';
-      requestAnimationFrame(draw);
-    })();
+  /* Sans WebGL — ou sans animation demandée — un dégradé fixe équivalent. */
+  function degrade(){
+    canvas.style.background =
+      'radial-gradient(70% 55% at 18% 12%, #E8F0FB 0%, rgba(232,240,251,0) 60%),' +
+      'radial-gradient(60% 50% at 84% 30%, #F0EDF8 0%, rgba(240,237,248,0) 62%),' +
+      'radial-gradient(80% 60% at 50% 100%, #F5F5F7 0%, rgba(245,245,247,0) 70%),' +
+      '#FFFFFF';
   }
 })();
 
@@ -1354,27 +1214,6 @@ a.work-item:hover .work-item__title{color:var(--blue)}
     });
   }
 
-  /* ---------------- Work list floating preview ---------------- */
-  const preview = document.querySelector('.work-preview');
-  if (preview && fine) {
-    const ph = preview.querySelector('.ph');
-    document.querySelectorAll('.work-item[data-ph]').forEach(item => {
-      item.addEventListener('mouseenter', () => {
-        preview.classList.add('show');
-        ph.className = 'ph ' + item.getAttribute('data-ph');
-      });
-      item.addEventListener('mouseleave', () => preview.classList.remove('show'));
-    });
-    let raf;
-    addEventListener('mousemove', e => {
-      cancelAnimationFrame(raf);
-      raf = requestAnimationFrame(() => {
-        preview.style.left = e.clientX + 'px';
-        preview.style.top = e.clientY + 'px';
-      });
-    }, { passive: true });
-  }
-
   /* ---------------- Portfolio filters ---------------- */
   const filterBtns = document.querySelectorAll('.filters .tag');
   if (filterBtns.length) {
@@ -1388,158 +1227,6 @@ a.work-item:hover .work-item__title{color:var(--blue)}
       });
     }));
   }
-
-  /* ---------------- Bassin de Thau : entrée dans la carte ----------------
-     La carte occupe déjà tout l'écran ; seul son masque s'ouvre. On ne
-     touche donc qu'à clip-path et opacity, jamais aux dimensions, pour
-     que le navigateur n'ait aucune mise en page à refaire pendant le
-     défilement. */
-  (function thau() {
-    const sec = document.querySelector('[data-thau]');
-    if (!sec) return;
-
-    const stage = sec.querySelector('.thau__stage');
-    const map   = sec.querySelector('[data-thau-map]');
-    const phone = sec.querySelector('[data-thau-phone]');
-    const intro = sec.querySelector('[data-thau-intro]');
-    const towns = sec.querySelector('[data-thau-towns]');
-    const hint  = sec.querySelector('[data-thau-hint]');
-
-    const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
-    const ease  = t => t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
-
-    let W = 0, H = 0, pw = 0, ph = 0;
-
-    // Sur un grand écran on dessine un téléphone. Sur un téléphone, c'est
-    // inutile — et un peu absurde : l'appareil du visiteur EST le téléphone.
-    // Le masque part donc des bords de l'écran, avec le rayon d'angle d'un
-    // vrai mobile, et s'ouvre jusqu'au plein bord.
-    let surMobile = false, rayonDepart = 26;
-
-    function measure() {
-      W = stage.clientWidth;
-      H = stage.clientHeight;
-      surMobile = (W / H) < 1;
-
-      if (surMobile) {
-        // Un simple liseré de 12 px ne se verrait pas : on part d'un
-        // cadre nettement en retrait, aux angles d'un écran de mobile,
-        // pour que l'ouverture se lise vraiment.
-        pw = W * 0.86;
-        ph = H * 0.80;
-        rayonDepart = 40;
-        phone.style.display = 'none';
-      } else {
-        pw = Math.min(300, W * 0.68);
-        ph = Math.min(620, H * 0.72);
-        rayonDepart = 26;
-        phone.style.display = '';
-        phone.style.width  = pw + 'px';
-        phone.style.height = ph + 'px';
-      }
-    }
-
-    // Sur mobile — et quand l'utilisateur refuse les animations — la
-    // section est une section ordinaire, entièrement mise en page par le
-    // CSS. Le script ne doit alors poser aucun style en ligne, sinon il
-    // écraserait cette mise en page.
-    const statique = () => reduced || matchMedia('(max-width: 860px)').matches;
-
-    function nettoyer() {
-      [map, phone, intro, towns, stage].forEach(el => {
-        if (!el) return;
-        el.style.clipPath = '';
-        el.style.opacity = '';
-        el.style.transform = '';
-        el.style.width = '';
-        el.style.height = '';
-        el.style.display = '';
-      });
-      map.style.removeProperty('--ms');
-      map.style.removeProperty('--tx');
-      map.style.removeProperty('--ty');
-    }
-
-    let ticking = false;
-
-    function apply() {
-      ticking = false;
-      if (statique()) return;
-      const rect  = sec.getBoundingClientRect();
-      const track = sec.offsetHeight - H;
-      if (track <= 0) return;
-      const p = clamp(-rect.top / track, 0, 1);
-
-      // 1. le masque s'ouvre jusqu'au plein cadre
-      const zoom = ease(clamp((p - 0.10) / 0.52, 0, 1));
-      const cx = (W - pw) / 2 * (1 - zoom);
-      const cy = (H - ph) / 2 * (1 - zoom);
-      map.style.clipPath = `inset(${cy}px ${cx}px round ${rayonDepart * (1 - zoom)}px)`;
-
-      // Sète occupe 67,6 % de la largeur et 47,5 % de la hauteur du dessin.
-      // Au départ on est zoomé sur elle ; en s'ouvrant, le cadre recule
-      // jusqu'à montrer le bassin entier, recentré.
-      // Un écran portrait ne peut pas contenir une lagune de 19 km : la
-      // carte y tient en bande, donc le gros plan de départ doit serrer
-      // beaucoup plus fort pour rester lisible dans le téléphone.
-      const narrow = surMobile;
-      const startS = narrow ? 2.6 : 1.75;
-      const endS   = narrow ? 1.10 : 1.0;
-      const S  = startS - (startS - endS) * zoom;
-      // En portrait, la carte finit en bande : on la remonte pour qu'elle
-      // ne se retrouve pas derrière la liste des communes.
-      const endY = narrow ? -15 : 0;
-      const tx = -(67.6 - 50) * S * (1 - zoom);
-      const ty = -(47.5 - 50) * S * (1 - zoom) + endY * zoom;
-      map.style.setProperty('--ms', S.toFixed(3));
-      map.style.setProperty('--tx', tx.toFixed(2) + '%');
-      map.style.setProperty('--ty', ty.toFixed(2) + '%');
-
-      // 2. le châssis et le titre s'effacent une fois passés
-      if (!surMobile) phone.style.opacity = String(clamp(1 - (p - 0.26) / 0.20, 0, 1));
-      intro.style.opacity = String(clamp(1 - (p - 0.16) / 0.18, 0, 1));
-      if (hint) hint.style.opacity = String(clamp(1 - p / 0.12, 0, 1));
-
-      // 3. les communes montent une fois qu'on est dedans
-      const t = clamp((p - 0.62) / 0.18, 0, 1);
-      towns.style.opacity = String(t);
-      towns.style.transform = `translateY(${((1 - t) * 26).toFixed(1)}px)`;
-
-      // 4. fondu de sortie : l'enchaînement vers la suite reste continu
-      stage.style.opacity = String(1 - clamp((p - 0.90) / 0.10, 0, 1) * 0.55);
-    }
-
-    function onScroll() {
-      if (!ticking) { ticking = true; requestAnimationFrame(apply); }
-    }
-
-    // Pendant l'inertie de défilement, iOS n'émet pas d'événement scroll
-    // de façon régulière. On préfère donc recalculer à chaque image tant
-    // que la section est visible, et ne rien faire le reste du temps.
-    let boucle = null, aLEcran = false;
-
-    function tourner() {
-      apply();
-      boucle = (aLEcran && !statique()) ? requestAnimationFrame(tourner) : null;
-    }
-
-    new IntersectionObserver(entrees => {
-      aLEcran = entrees[0].isIntersecting;
-      if (aLEcran && !boucle && !statique()) tourner();
-    }, { rootMargin: '25% 0px' }).observe(sec);
-
-    function rafraichir() {
-      if (statique()) { nettoyer(); return; }
-      measure();
-      apply();
-      if (aLEcran && !boucle) tourner();
-    }
-
-    addEventListener('scroll', onScroll, { passive: true });
-    addEventListener('resize', rafraichir);
-    addEventListener('orientationchange', () => setTimeout(rafraichir, 250));
-    rafraichir();
-  })();
 
   /* ---------------- Booking calendar ---------------- */
   (function calendar() {

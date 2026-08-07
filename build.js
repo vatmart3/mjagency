@@ -78,7 +78,6 @@ ${read('assets/css/style.css')}
 </style></noscript>
 
 <canvas id="bg-canvas"></canvas>
-<div class="work-preview"><div class="ph ph-1"></div></div>
 
 ${nav}
 

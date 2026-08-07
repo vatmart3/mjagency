@@ -215,7 +215,6 @@ body.studio-3d #bg-canvas{opacity:1}
 a.work-item:hover{background:var(--off-white);padding-left:var(--s3)}
 a.work-item:hover .work-item__title{color:var(--blue)}
 
-.work-preview{display:none}
 
 /* ---------- 08 · Cartes ---------- */
 .grid-cards{display:grid;grid-template-columns:repeat(12,1fr);gap:var(--gutter)}
@@ -395,35 +394,49 @@ a.work-item:hover .work-item__title{color:var(--blue)}
   padding-block:var(--s3);border-top:1px solid var(--rule);font-size:13px;color:var(--gray);
 }
 
+/* ---------- Hero : actions et chiffres de confiance ---------- */
+.hero__actions{display:flex;align-items:center;gap:var(--s3);flex-wrap:wrap;justify-content:center}
+.trust{
+  list-style:none;display:flex;flex-wrap:wrap;justify-content:center;
+  gap:var(--s2) var(--s6);margin-top:var(--s8);
+  font-size:15px;color:var(--gray);
+}
+.trust b{font-weight:600;color:var(--black);font-variant-numeric:tabular-nums}
+.trust .u{color:var(--blue)}
+
+/* ---------- Blocs de présentation ----------
+   Le texte et le visuel alternent de côté : c'est ce qui donne au
+   défilement son rythme, sans avoir besoin d'effets. */
+.features{display:flex;flex-direction:column;gap:var(--s6)}
+.feature{
+  display:grid;grid-template-columns:1fr 1fr;gap:var(--s6);align-items:center;
+  background:var(--white);border-radius:var(--radius);padding:var(--s6);
+  box-shadow:var(--shadow-s);
+}
+.sep:nth-of-type(even) .feature{background:var(--white)}
+.feature--rev .feature__txt{order:2}
+.feature__t{font-size:clamp(24px,2.6vw,32px);font-weight:700;letter-spacing:-.021em;color:var(--black)}
+.feature__d{margin-top:var(--s2);color:var(--gray);font-size:18px;line-height:1.55;max-width:42ch}
+.feature__viz{aspect-ratio:16/10;border-radius:var(--radius-s);overflow:hidden}
+.feature__viz .ph{width:100%;height:100%}
+
+.ticks{list-style:none;margin-top:var(--s3);display:flex;flex-direction:column;gap:10px}
+.ticks li{position:relative;padding-left:26px;font-size:16px;color:var(--dark-gray)}
+.ticks li::before{
+  content:"";position:absolute;left:0;top:.42em;width:14px;height:8px;
+  border-left:2px solid var(--blue);border-bottom:2px solid var(--blue);
+  transform:rotate(-45deg);border-radius:1px;
+}
+
+@media (max-width:860px){
+  .feature{grid-template-columns:1fr;gap:var(--s4);padding:var(--s4)}
+  .feature--rev .feature__txt{order:0}
+  .trust{gap:var(--s2) var(--s4);margin-top:var(--s6)}
+}
+
 /* ---------- Utilitaires ---------- */
 .mt-s{margin-top:var(--s2)}.mt-m{margin-top:var(--s3)}
 .stack{display:flex;flex-direction:column;gap:var(--s3);align-items:center;text-align:center}
-
-/* =========================================================
-   BASSIN DE THAU
-   ========================================================= */
-.thau{position:relative;height:300vh;background:var(--off-white)}
-.thau__stage{position:sticky;top:0;height:100svh;overflow:hidden;display:grid;place-items:center}
-.thau__map{position:absolute;inset:0;z-index:1;background:var(--off-white);clip-path:inset(30% 32% round 22px);will-change:clip-path}
-.thau__map svg{position:absolute;inset:0;width:100%;height:100%;transform:translate(var(--tx,0%),var(--ty,0%)) scale(var(--ms,2));transform-origin:center;will-change:transform}
-.thau__phone{position:relative;z-index:3;pointer-events:none;border-radius:34px;box-shadow:var(--shadow-m),0 0 0 1px rgba(0,0,0,.06)}
-.thau__phone::before{content:"";position:absolute;top:12px;left:50%;transform:translateX(-50%);width:64px;height:5px;border-radius:5px;background:rgba(0,0,0,.12)}
-.thau__intro{position:absolute;z-index:4;left:0;right:0;top:clamp(96px,15vh,160px);display:flex;flex-direction:column;align-items:center;gap:var(--s2);text-align:center;padding-inline:var(--pad)}
-.thau__towns{position:absolute;z-index:4;inset:auto var(--pad) clamp(48px,7vh,84px) var(--pad);opacity:0;display:flex;flex-direction:column;align-items:center;gap:var(--s3);text-align:center}
-.thau__towns .lead{max-width:52ch}
-.thau__towns .towns{justify-content:center}
-.thau__scrim{position:absolute;inset:0;z-index:2;pointer-events:none;background:linear-gradient(180deg,rgba(245,245,247,.9) 0%,transparent 26%,transparent 48%,rgba(245,245,247,.94) 84%,var(--off-white) 100%)}
-.thau__hint{position:absolute;z-index:4;left:50%;bottom:clamp(24px,4vh,40px);transform:translateX(-50%);font-size:13px;color:var(--gray)}
-
-@media (max-width:860px){
-  .thau{height:auto}
-  .thau__stage{position:static;height:auto;min-height:0;overflow:visible;display:flex;flex-direction:column;gap:var(--s3);align-items:stretch;justify-items:stretch;padding-block:var(--sec)}
-  .thau__phone,.thau__hint,.thau__scrim{display:none}
-  .thau__intro{order:1;position:static;padding-inline:var(--pad);opacity:1!important;top:auto}
-  .thau__map{order:2;position:relative;inset:auto;margin-inline:var(--pad);aspect-ratio:8/5;border-radius:var(--radius);overflow:hidden;clip-path:none!important;box-shadow:var(--shadow-s)}
-  .thau__map svg{transform:none!important}
-  .thau__towns{order:3;position:static;padding-inline:var(--pad);opacity:1!important;transform:none!important}
-}
 
 /* =========================================================
    MOBILE
