@@ -46,7 +46,7 @@
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;scroll-behavior:smooth;overflow-x:clip}
 body{
-  background:var(--white);
+  background:transparent;
   color:var(--dark-gray);
   font-family:var(--font);
   font-size:18px;line-height:1.55;
@@ -62,17 +62,18 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
 /* Éléments hérités de l'ancienne direction, sans objet ici */
 .loader,.curtain,.frame,.rail,.status,.guides,.cursor-dot,.cursor-ring{display:none!important}
 
-#bg-canvas{position:fixed;inset:0;z-index:0;width:100%;height:100%;pointer-events:none;opacity:0;transition:opacity .8s var(--ease)}
-body.studio-3d #bg-canvas{opacity:1}
+/* Le fond couvre toutes les pages et se voit à travers les sections */
+#bg-canvas{position:fixed;inset:0;z-index:0;width:100%;height:100%;pointer-events:none}
 
 /* ---------- Gabarit ---------- */
 .wrap,.footer{position:relative;z-index:2}
 .container{width:100%;max-width:var(--maxw);margin-inline:auto;padding-inline:var(--pad)}
 .pad-y{padding-block:var(--sec)}
 
-/* Alternance blanc / gris très clair : le rythme des pages Apple */
-.sep{background:var(--white)}
-.sep:nth-of-type(even){background:var(--off-white)}
+/* Les sections laissent passer le fond : c'est ce qui rend le défilement
+   vivant. Les cartes, elles, restent opaques — le contenu doit rester net. */
+.sep{background:transparent}
+.sep:nth-of-type(even){background:rgba(245,245,247,.55)}
 
 /* ---------- 02 · Typographie ---------- */
 .display{
@@ -271,7 +272,7 @@ a.work-item:hover .work-item__title{color:var(--blue)}
 
 /* ---------- Bande d'appel ---------- */
 .cta-band{
-  background:var(--off-white);border-radius:var(--radius);
+  background:rgba(255,255,255,.72);backdrop-filter:blur(10px);border-radius:var(--radius);
   padding:clamp(48px,7vw,88px) var(--s4);
   display:flex;flex-direction:column;align-items:center;gap:var(--s3);text-align:center;
 }
@@ -375,7 +376,7 @@ a.work-item:hover .work-item__title{color:var(--blue)}
 .figure .ph{width:100%;height:100%}
 
 /* ---------- Pied de page ---------- */
-.footer{background:var(--off-white);padding-top:var(--s6)}
+.footer{background:rgba(245,245,247,.78);backdrop-filter:blur(8px);padding-top:var(--s6)}
 .footer__big{
   font-size:clamp(32px,4.4vw,52px);font-weight:700;letter-spacing:-.024em;
   color:var(--black);text-align:center;line-height:1.1;

@@ -81,7 +81,7 @@
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;scroll-behavior:smooth;overflow-x:clip}
 body{
-  background:var(--white);
+  background:transparent;
   color:var(--dark-gray);
   font-family:var(--font);
   font-size:18px;line-height:1.55;
@@ -97,17 +97,18 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
 /* Éléments hérités de l'ancienne direction, sans objet ici */
 .loader,.curtain,.frame,.rail,.status,.guides,.cursor-dot,.cursor-ring{display:none!important}
 
-#bg-canvas{position:fixed;inset:0;z-index:0;width:100%;height:100%;pointer-events:none;opacity:0;transition:opacity .8s var(--ease)}
-body.studio-3d #bg-canvas{opacity:1}
+/* Le fond couvre toutes les pages et se voit à travers les sections */
+#bg-canvas{position:fixed;inset:0;z-index:0;width:100%;height:100%;pointer-events:none}
 
 /* ---------- Gabarit ---------- */
 .wrap,.footer{position:relative;z-index:2}
 .container{width:100%;max-width:var(--maxw);margin-inline:auto;padding-inline:var(--pad)}
 .pad-y{padding-block:var(--sec)}
 
-/* Alternance blanc / gris très clair : le rythme des pages Apple */
-.sep{background:var(--white)}
-.sep:nth-of-type(even){background:var(--off-white)}
+/* Les sections laissent passer le fond : c'est ce qui rend le défilement
+   vivant. Les cartes, elles, restent opaques — le contenu doit rester net. */
+.sep{background:transparent}
+.sep:nth-of-type(even){background:rgba(245,245,247,.55)}
 
 /* ---------- 02 · Typographie ---------- */
 .display{
@@ -306,7 +307,7 @@ a.work-item:hover .work-item__title{color:var(--blue)}
 
 /* ---------- Bande d'appel ---------- */
 .cta-band{
-  background:var(--off-white);border-radius:var(--radius);
+  background:rgba(255,255,255,.72);backdrop-filter:blur(10px);border-radius:var(--radius);
   padding:clamp(48px,7vw,88px) var(--s4);
   display:flex;flex-direction:column;align-items:center;gap:var(--s3);text-align:center;
 }
@@ -410,7 +411,7 @@ a.work-item:hover .work-item__title{color:var(--blue)}
 .figure .ph{width:100%;height:100%}
 
 /* ---------- Pied de page ---------- */
-.footer{background:var(--off-white);padding-top:var(--s6)}
+.footer{background:rgba(245,245,247,.78);backdrop-filter:blur(8px);padding-top:var(--s6)}
 .footer__big{
   font-size:clamp(32px,4.4vw,52px);font-weight:700;letter-spacing:-.024em;
   color:var(--black);text-align:center;line-height:1.1;
@@ -1112,8 +1113,15 @@ a.work-item:hover .work-item__title{color:var(--blue)}
 (() => {
   'use strict';
 
-  const canvas = document.getElementById('bg-canvas');
-  if (!canvas) return;
+  // Le canvas se crée lui-même plutôt que d'être recopié dans huit pages :
+  // une seule source, et aucune page ne peut se retrouver sans fond.
+  let canvas = document.getElementById('bg-canvas');
+  if (!canvas) {
+    canvas = document.createElement('canvas');
+    canvas.id = 'bg-canvas';
+    canvas.setAttribute('aria-hidden', 'true');
+    document.body.prepend(canvas);
+  }
   if (matchMedia('(prefers-reduced-motion: reduce)').matches) { degrade(); return; }
 
   const gl = canvas.getContext('webgl', { antialias: false, alpha: true, powerPreference: 'low-power' });
@@ -1129,6 +1137,7 @@ a.work-item:hover .work-item__title{color:var(--blue)}
   uniform vec2  u_res;
   uniform float u_time;
   uniform vec2  u_mouse;
+  uniform float u_scroll;      // progression du défilement, en hauteurs d'écran
 
   mat2 rot(float a){ float c = cos(a), s = sin(a); return mat2(c, -s, s, c); }
 
@@ -1152,14 +1161,21 @@ a.work-item:hover .work-item__title{color:var(--blue)}
     vec2 uv = gl_FragCoord.xy / u_res;
     vec2 q  = (gl_FragCoord.xy - 0.5 * u_res) / u_res.y;
 
-    float t = u_time * 0.018;                    // très lent : on doit à peine le voir bouger
+    float t = u_time * 0.018;                    // dérive lente, indépendante du scroll
     vec2  m = (u_mouse - 0.5) * 0.16;
+
+    // Le défilement déplace le domaine : les masses glissent vers le haut
+    // et tournent légèrement, donc le fond change réellement de page en
+    // page au lieu de se contenter d'onduler sur place.
+    vec2 d = q;
+    d.y += u_scroll * 0.42;
+    d = rot(u_scroll * 0.10) * d;
 
     // Double déformation du domaine : c'est ce qui donne aux masses
     // leur mouvement organique plutôt qu'un simple défilement.
-    vec2 w1 = vec2(fbm(q * 1.10 + t + m), fbm(q * 1.10 - t * 0.8 + 3.1));
-    vec2 w2 = vec2(fbm(q * 1.35 + w1 * 1.2 + t * 1.3), fbm(q * 1.35 + w1 * 1.2 - t));
-    float f = fbm(q * 1.20 + w2 * 1.1);
+    vec2 w1 = vec2(fbm(d * 1.10 + t + m), fbm(d * 1.10 - t * 0.8 + 3.1));
+    vec2 w2 = vec2(fbm(d * 1.35 + w1 * 1.2 + t * 1.3), fbm(d * 1.35 + w1 * 1.2 - t));
+    float f = fbm(d * 1.20 + w2 * 1.1);
 
     // Palette de la charte : blancs, bleu très dilué, lavande à peine posée
     vec3 blanc   = vec3(1.000, 1.000, 1.000);
@@ -1174,7 +1190,8 @@ a.work-item:hover .work-item__title{color:var(--blue)}
     // Le centre haut reste clair pour ne pas gêner le titre, mais les
     // masses restent lisibles sur les côtés : sans ça, le mouvement ne
     // se perçoit plus du tout.
-    float degage = smoothstep(0.62, 0.02, length(vec2(q.x * 0.55, q.y - 0.22)));
+    float degage = smoothstep(0.62, 0.02, length(vec2(q.x * 0.55, q.y - 0.22)))
+                 * (1.0 - smoothstep(0.0, 0.8, u_scroll));
     col = mix(col, blanc, degage * 0.72);
 
     // Léger tramage : sans lui, des dégradés aussi doux montrent des bandes
@@ -1209,9 +1226,15 @@ a.work-item:hover .work-item__title{color:var(--blue)}
 
   const uRes   = gl.getUniformLocation(prog, 'u_res');
   const uTime  = gl.getUniformLocation(prog, 'u_time');
-  const uMouse = gl.getUniformLocation(prog, 'u_mouse');
+  const uMouse  = gl.getUniformLocation(prog, 'u_mouse');
+  const uScroll = gl.getUniformLocation(prog, 'u_scroll');
 
   let souris = [0.5, 0.5], cible = [0.5, 0.5];
+  let defile = 0, defileCible = 0;
+  const lireScroll = () => { defileCible = scrollY / Math.max(innerHeight, 1); };
+  addEventListener('scroll', lireScroll, { passive: true });
+  lireScroll();
+
   addEventListener('mousemove', e => {
     cible = [e.clientX / innerWidth, 1 - e.clientY / innerHeight];
   }, { passive: true });
@@ -1241,8 +1264,10 @@ a.work-item:hover .work-item__title{color:var(--blue)}
     if (!actif) return;
     souris[0] += (cible[0] - souris[0]) * 0.03;
     souris[1] += (cible[1] - souris[1]) * 0.03;
+    defile += (defileCible - defile) * 0.08;      // le retard donne de l'inertie
     gl.uniform1f(uTime, (now - t0) / 1000);
     gl.uniform2f(uMouse, souris[0], souris[1]);
+    gl.uniform1f(uScroll, defile);
     gl.drawArrays(gl.TRIANGLES, 0, 3);
     requestAnimationFrame(image);
   }
@@ -1549,13 +1574,6 @@ a.work-item:hover .work-item__title{color:var(--blue)}
     });
   }
 
-  /* Le décor 3D n'appartient qu'à l'accueil — seule page à porter un .hero.
-     Le déduire de la structure évite d'avoir à marquer chaque page à la main. */
-  function syncBackdrop(scope) {
-    const isHome = !!(scope || document).querySelector('.hero');
-    document.body.classList.toggle('studio-3d', isHome);
-  }
-
   function closeMenu() {
     if (!menu || !menu.classList.contains('open')) return;
     menu.classList.remove('open');
@@ -1598,7 +1616,6 @@ a.work-item:hover .work-item__title{color:var(--blue)}
         const page = pages[name];
         page.querySelectorAll('.reveal, .rs').forEach(el => { el.classList.remove('in'); io.observe(el); });
         page.querySelectorAll('[data-count]').forEach(el => countIO.observe(el));
-        syncBackdrop(page);
         revealHero(page);
       });
     });
@@ -1617,7 +1634,6 @@ a.work-item:hover .work-item__title{color:var(--blue)}
 
   function boot() {
     const scope = isRouter ? document.querySelector('.page.active') : document;
-    syncBackdrop(scope);
     revealHero(scope);
   }
   if (document.readyState === 'complete') boot();
