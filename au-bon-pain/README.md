@@ -58,7 +58,7 @@ fourchette 1–10 €). **Le reste est une proposition et doit être corrigé av
 | Heures des fournées | `app.js` → `FOURNEES`, et la section `#four` de `index.html` |
 | Noms des produits, descriptions et **prix** | `index.html`, attribut `data-prix` de chaque `<article class="plat">` |
 | Options et prix du configurateur | `index.html`, section `#composer`, attributs `data-prix` |
-| Domaine — la page est hébergée sous `mjagency.fr/au-bon-pain` ; à changer le jour où la boulangerie prend son propre nom de domaine | balise `<link rel="canonical">` |
+| Domaine — la page est hébergée sous `mjagency.eu/au-bon-pain` ; à changer le jour où la boulangerie prend son propre nom de domaine | balise `<link rel="canonical">` |
 | Lien « Laisser un avis » | il attend le `placeid` Google de l'établissement |
 
 Aucun avis n'a été inventé : la section avis affiche la note agrégée publiée par Google

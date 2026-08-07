@@ -16,7 +16,7 @@
 const fs = require('fs');
 const path = require('path');
 
-const SITE = 'https://www.mjagency.fr';
+const SITE = 'https://www.mjagency.eu';
 const TEL_AFF = '06 11 71 83 68';
 const TEL_URI = '+33611718368';
 const MAIL = 'mjagency.officiel@gmail.com';
@@ -359,12 +359,15 @@ VILLES.forEach(v => {
 });
 
 /* ---------- Plan du site ---------- */
+/* Ce tableau est la seule source du plan du site : toute page ajoutée au
+   dépôt doit être déclarée ici, sinon la prochaine génération l'oublie. */
 const urls = [
   ['/', 'monthly', '1.0'],
   ['/work', 'monthly', '0.8'],
   ['/studio', 'yearly', '0.7'],
   ['/contact', 'yearly', '0.9'],
-  ...VILLES.map(v => ['/' + v.slug, 'monthly', '0.8'])
+  ...VILLES.map(v => ['/' + v.slug, 'monthly', '0.8']),
+  ['/au-bon-pain', 'monthly', '0.6'],        /* site client hébergé ici */
 ];
 fs.writeFileSync(path.join(__dirname, 'sitemap.xml'),
   `<?xml version="1.0" encoding="UTF-8"?>
