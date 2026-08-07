@@ -36,17 +36,20 @@
 :root{
   color-scheme: dark;
 
-  /* Palette — noir dominant, violet en filigrane */
-  --bg:        #050506;
-  --bg-2:      #0a0a0c;
-  --line:      rgba(255,255,255,.07);
-  --line-2:    rgba(255,255,255,.13);
-  --ink:       #f2f2f0;
-  --ink-soft:  #9d9da4;
-  --ink-dim:   #63636b;
+  /* Palette — noir et gris neutres. Le violet ne sert plus qu'à trois
+     choses : le bouton principal, la pastille du logo et le point de
+     Sète sur la carte. Partout ailleurs, la couleur a été retirée. */
+  --bg:        #000000;
+  --bg-2:      #0b0b0d;
+  --surface:   #131316;
+  --line:      rgba(255,255,255,.09);
+  --line-2:    rgba(255,255,255,.16);
+  --ink:       #f5f5f7;
+  --ink-soft:  #a1a1a6;
+  --ink-dim:   #6e6e73;
   --accent:    #9d5bff;
-  --accent-2:  #cbb0ff;
-  --glow:      rgba(157,91,255,.45);
+  --accent-2:  #c9b6ff;
+  --glow:      rgba(157,91,255,.32);
 
   /* Anton porte tout l'affichage : une seule graisse (400), très condensée.
      Ne jamais lui demander 700 — le navigateur fabriquerait un faux gras. */
@@ -66,9 +69,10 @@
 html{-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;scroll-behavior:smooth}
 body{
   /* Fond statique des pages internes : une lueur froide en haut, rien de plus.
+     Aucune teinte : c'est ce qui donne le calme.
      Sur l'accueil, le canvas du studio 3D passe par-dessus. */
   background-color:var(--bg);
-  background-image:radial-gradient(115% 80% at 50% -15%, rgba(58,28,108,.28), transparent 62%);
+  background-image:radial-gradient(120% 75% at 50% -18%, rgba(255,255,255,.05), transparent 60%);
   background-attachment:scroll;
   background-repeat:no-repeat;
   color:var(--ink);
@@ -92,7 +96,7 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
 /* ---------- Grain ---------- */
 body::after{
   content:"";position:fixed;inset:0;pointer-events:none;z-index:9998;
-  opacity:.03;mix-blend-mode:overlay;
+  opacity:.02;mix-blend-mode:overlay;
   background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 
@@ -153,16 +157,8 @@ body.studio-3d #bg-canvas{opacity:1}
    contenu : la coupure se voit sans alourdir. */
 .sep{position:relative;border-top:1px solid var(--line-2)}
 .sep::before{
-  content:"";position:absolute;top:-3px;left:var(--pad);
-  width:5px;height:5px;border-radius:50%;background:var(--accent);
-  box-shadow:0 0 10px var(--glow);
-}
-/* Le filet de section porte aussi une lueur qui s'éteint vers la droite */
-.sep::after{
-  content:"";position:absolute;top:-1px;left:var(--pad);right:auto;
-  width:min(240px,40%);height:1px;
-  background:linear-gradient(90deg,var(--accent),transparent);
-  opacity:.55;
+  content:"";position:absolute;top:-2.5px;left:var(--pad);
+  width:4px;height:4px;border-radius:50%;background:var(--ink-dim);
 }
 
 /* ---------- Nav ---------- */
@@ -271,7 +267,7 @@ body.studio-3d #bg-canvas{opacity:1}
 .btn--glow{
   background:linear-gradient(180deg,#e6d6ff 0%,#9d5bff 55%,#e6d6ff 100%);
   color:#180730;border:none;
-  box-shadow:0 0 34px -10px var(--glow),inset 0 1px 1px rgba(255,255,255,.6);
+  box-shadow:0 0 26px -12px var(--glow),inset 0 1px 1px rgba(255,255,255,.5);
 }
 .btn--glow::before{display:none}
 .btn--glow:hover{color:#180730;filter:brightness(1.05)}
@@ -351,12 +347,12 @@ a.work-item:hover::before{transform:scaleY(1)}
 
 /* Visuels générés (aucune image externe) */
 .ph{background-size:cover;background-position:center}
-.ph-1{background:radial-gradient(120% 120% at 20% 10%,#33176b 0%,#160931 45%,#060508 100%)}
-.ph-2{background:radial-gradient(120% 120% at 80% 10%,#33333c 0%,#121216 50%,#050506 100%)}
-.ph-3{background:radial-gradient(120% 120% at 50% 0%,#1d3f42 0%,#08191b 45%,#050708 100%)}
-.ph-4{background:radial-gradient(120% 120% at 30% 90%,#432716 0%,#170e07 50%,#060402 100%)}
-.ph-5{background:radial-gradient(120% 120% at 70% 30%,#261646 0%,#100820 50%,#050408 100%)}
-.ph-6{background:radial-gradient(120% 120% at 10% 50%,#123340 0%,#061920 50%,#040709 100%)}
+.ph-1{background:radial-gradient(120% 120% at 20% 10%,#2e2e34 0%,#141418 45%,#08080a 100%)}
+.ph-2{background:radial-gradient(120% 120% at 80% 10%,#36363c 0%,#151519 50%,#09090b 100%)}
+.ph-3{background:radial-gradient(120% 120% at 50% 0%,#282c2e 0%,#111315 45%,#07080a 100%)}
+.ph-4{background:radial-gradient(120% 120% at 30% 90%,#332f2a 0%,#171512 50%,#0a0908 100%)}
+.ph-5{background:radial-gradient(120% 120% at 70% 30%,#2b2930 0%,#141317 50%,#08080b 100%)}
+.ph-6{background:radial-gradient(120% 120% at 10% 50%,#262c2f 0%,#101314 50%,#070809 100%)}
 .ph-grid{background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);background-size:32px 32px}
 
 /* ---------- Savoir-faire ---------- */
@@ -492,7 +488,7 @@ a.work-item:hover::before{transform:scaleY(1)}
 .zone{display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(24px,4vw,60px)}
 .zone__title{
   font-family:var(--font-body);font-size:11px;font-weight:600;
-  letter-spacing:.2em;text-transform:uppercase;color:var(--accent-2);
+  letter-spacing:.2em;text-transform:uppercase;color:var(--ink-soft);
   padding-bottom:14px;margin-bottom:18px;border-bottom:1px solid var(--line);
 }
 .towns{list-style:none;display:flex;flex-wrap:wrap;gap:8px}
@@ -524,7 +520,7 @@ a.work-item:hover::before{transform:scaleY(1)}
   position:absolute;inset:0;z-index:1;
   /* même teinte que le fond du dessin : en portrait la carte ne remplit
      pas la hauteur, et les bandes doivent passer inaperçues */
-  background:#08070d;
+  background:#0a0a0c;
   clip-path:inset(30% 32% round 26px);
   will-change:clip-path;
 }
@@ -810,32 +806,32 @@ a.work-item:hover::before{transform:scaleY(1)}
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1000" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Carte stylisée du bassin de Thau : Marseillan, Mèze, Bouzigues, Balaruc, Sète et Frontignan">
         <defs>
           <linearGradient id="thEtang" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0" stop-color="#31157010"/><stop offset="0" stop-color="#2c1268"/><stop offset="1" stop-color="#160a34"/>
+            <stop offset="0" stop-color="#2b2b31"/><stop offset="1" stop-color="#141418"/>
           </linearGradient>
           <linearGradient id="thMer" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0" stop-color="#180b38"/><stop offset="1" stop-color="#090414"/>
+            <stop offset="0" stop-color="#16161a"/><stop offset="1" stop-color="#070709"/>
           </linearGradient>
           <radialGradient id="thHalo" cx="0.5" cy="0.5" r="0.5">
-            <stop offset="0" stop-color="#9d5bff" stop-opacity=".5"/><stop offset="1" stop-color="#9d5bff" stop-opacity="0"/>
+            <stop offset="0" stop-color="#9d5bff" stop-opacity=".34"/><stop offset="1" stop-color="#9d5bff" stop-opacity="0"/>
           </radialGradient>
           <pattern id="thGrid" width="64" height="64" patternUnits="userSpaceOnUse">
             <path d="M64 0H0V64" fill="none" stroke="#fff" stroke-opacity=".045" stroke-width="1"/>
           </pattern>
         </defs>
 
-        <rect width="1600" height="1000" fill="#08070d"/>
+        <rect width="1600" height="1000" fill="#0a0a0c"/>
         <rect width="1600" height="1000" fill="url(#thGrid)"/>
 
         <!-- Mer Méditerranée -->
         <path d="M1600 1000 L1600 300 L1120 470 L985 558 L835 648 L675 738 L515 828 L410 890 L330 950 L330 1000 Z" fill="url(#thMer)"/>
         <path d="M1600 300 L1120 470 L985 558 L835 648 L675 738 L515 828 L410 890 L330 950"
-              fill="none" stroke="#9d5bff" stroke-opacity=".28" stroke-width="2"/>
+              fill="none" stroke="#ffffff" stroke-opacity=".22" stroke-width="2"/>
 
         <!-- Étang de Thau -->
         <path d="M330 745 C430 660 560 555 700 455 C830 370 940 305 1020 280
                  C1062 268 1096 300 1090 336 C1082 380 1040 402 1000 430
                  C900 470 760 555 620 640 C520 698 420 730 336 752 Z"
-              fill="url(#thEtang)" stroke="#9d5bff" stroke-opacity=".45" stroke-width="2.5"/>
+              fill="url(#thEtang)" stroke="#ffffff" stroke-opacity=".30" stroke-width="2"/>
 
         <!-- Lido : le cordon de sable entre l'étang et la mer -->
         <path d="M1085 420 C950 510 800 600 640 690 C560 735 480 780 380 840
@@ -843,30 +839,30 @@ a.work-item:hover::before{transform:scaleY(1)}
               fill="#141020" stroke="#fff" stroke-opacity=".10" stroke-width="1.5"/>
 
         <!-- Canaux de Sète -->
-        <g stroke="#9d5bff" stroke-opacity=".4" stroke-width="3" stroke-linecap="round">
+        <g stroke="#ffffff" stroke-opacity=".30" stroke-width="3" stroke-linecap="round">
           <path d="M1072 452 L1104 424"/><path d="M1092 486 L1126 458"/>
         </g>
 
         <circle cx="1082" cy="475" r="150" fill="url(#thHalo)"/>
 
         <!-- Communes -->
-        <g fill="#cbb0ff" font-family="Helvetica, Arial, sans-serif" font-size="18" letter-spacing="1.5">
-          <g><circle cx="360" cy="730" r="5"/><text x="376" y="736" fill="#9d9da4">Marseillan</text></g>
-          <g><circle cx="450" cy="845" r="5"/><text x="466" y="851" fill="#63636b">Marseillan-Plage</text></g>
-          <g><circle cx="700" cy="440" r="5"/><text x="716" y="446" fill="#9d9da4">Mèze</text></g>
-          <g><circle cx="925" cy="315" r="5"/><text x="941" y="321" fill="#9d9da4">Bouzigues</text></g>
-          <g><circle cx="1040" cy="330" r="5"/><text x="1056" y="336" fill="#9d9da4">Balaruc-les-Bains</text></g>
-          <g><circle cx="1326" cy="290" r="5"/><text x="1342" y="296" fill="#9d9da4">Frontignan</text></g>
+        <g fill="#a1a1a6" font-family="Helvetica, Arial, sans-serif" font-size="18" letter-spacing="1.5">
+          <g><circle cx="360" cy="730" r="5"/><text x="376" y="736" fill="#a1a1a6">Marseillan</text></g>
+          <g><circle cx="450" cy="845" r="5"/><text x="466" y="851" fill="#6e6e73">Marseillan-Plage</text></g>
+          <g><circle cx="700" cy="440" r="5"/><text x="716" y="446" fill="#a1a1a6">Mèze</text></g>
+          <g><circle cx="925" cy="315" r="5"/><text x="941" y="321" fill="#a1a1a6">Bouzigues</text></g>
+          <g><circle cx="1040" cy="330" r="5"/><text x="1056" y="336" fill="#a1a1a6">Balaruc-les-Bains</text></g>
+          <g><circle cx="1326" cy="290" r="5"/><text x="1342" y="296" fill="#a1a1a6">Frontignan</text></g>
         </g>
 
         <!-- Étiquette de l'étang -->
-        <text x="640" y="560" fill="#cbb0ff" fill-opacity=".55" font-family="Helvetica, Arial, sans-serif"
+        <text x="640" y="560" fill="#f5f5f7" fill-opacity=".38" font-family="Helvetica, Arial, sans-serif"
               font-size="22" letter-spacing="7" transform="rotate(-32 640 560)">ÉTANG DE THAU</text>
 
         <!-- Sète, le point d'ancrage -->
         <circle cx="1082" cy="475" r="17" fill="none" stroke="#9d5bff" stroke-width="2" opacity=".85"/>
         <circle cx="1082" cy="475" r="8" fill="#9d5bff"/>
-        <text x="1108" y="482" fill="#f2f2f0" font-family="Helvetica, Arial, sans-serif" font-size="26" letter-spacing="2">Sète</text>
+        <text x="1108" y="482" fill="#f5f5f7" font-family="Helvetica, Arial, sans-serif" font-size="26" letter-spacing="2">Sète</text>
       </svg>
       </div>
 
@@ -1294,9 +1290,12 @@ a.work-item:hover::before{transform:scaleY(1)}
     vec3 ro = vec3(m.x * 0.55, m.y * 0.34 + sin(u_time * 0.13) * 0.05, u_z);
     vec3 rd = normalize(vec3(uv, 1.5));
 
-    vec3 violet = vec3(0.42, 0.17, 0.86);
-    vec3 pale   = vec3(0.62, 0.50, 0.95);
-    vec3 lit    = vec3(0.52, 0.56, 0.98);   // lueur froide des écrans
+    // Lumière argentée, sans teinte : la structure se lit par la valeur
+    // et non par la couleur. C'est ce qui fait basculer la scène du
+    // « néon » vers quelque chose de plus posé.
+    vec3 acier  = vec3(0.52, 0.53, 0.57);   // arches
+    vec3 clair  = vec3(0.72, 0.73, 0.78);   // arêtes
+    vec3 ecran  = vec3(0.86, 0.88, 0.92);   // écrans allumés
 
     vec3 col = vec3(0.0);
     float t  = 0.35;
@@ -1311,10 +1310,10 @@ a.work-item:hover::before{transform:scaleY(1)}
       float ds = screens(q);
 
       float fog = exp(-t * 0.062);
-      col += violet * exp(-da * 30.0) * 0.038 * fog;   // arches
-      col += pale   * exp(-de * 13.0) * 0.015 * fog;   // arêtes
-      col += pale   * exp(-dd * 28.0) * 0.032 * fog;   // postes de travail
-      col += lit    * exp(-ds *  9.0) * 0.052 * fog;   // écrans allumés
+      col += acier * exp(-da * 30.0) * 0.030 * fog;   // arches
+      col += clair * exp(-de * 13.0) * 0.012 * fog;   // arêtes
+      col += clair * exp(-dd * 28.0) * 0.026 * fog;   // postes de travail
+      col += ecran * exp(-ds *  9.0) * 0.040 * fog;   // écrans allumés
 
       t += clamp(min(min(da, de), min(dd, ds)) * 0.72, 0.06, 1.15);
       if (t > 62.0) break;
@@ -1324,11 +1323,11 @@ a.work-item:hover::before{transform:scaleY(1)}
        tombe pile au centre de l'écran — là où passe le texte. On la garde
        serrée et discrète : c'est une promesse, pas un projecteur. */
     float axis = max(dot(rd, vec3(0.0, 0.0, 1.0)), 0.0);
-    col += violet * pow(axis, 320.0) * 0.30;
-    col += pale   * pow(axis, 1600.0) * 0.20;
+    col += clair * pow(axis, 320.0) * 0.20;
+    col += vec3(1.0) * pow(axis, 1600.0) * 0.16;
 
     /* Fond très sombre + vignette calée sur le petit côté */
-    col += vec3(0.014, 0.011, 0.019);
+    col += vec3(0.013, 0.013, 0.015);
     float d2  = length(uv / vec2(max(u_res.x / u_res.y, 1.0), 1.0));
     col *= 0.30 + 0.70 * smoothstep(1.15, 0.12, d2);
 
@@ -1440,11 +1439,11 @@ a.work-item:hover::before{transform:scaleY(1)}
       x: Math.random() * W, y: Math.random() * H,
       r: 220 + Math.random() * 260,
       dx: (Math.random() - .5) * .25, dy: (Math.random() - .5) * .25,
-      c: i % 2 ? '78,40,140' : '30,20,54'
+      c: i % 2 ? '58,58,64' : '26,26,30'
     }));
 
     (function draw(){
-      ctx.fillStyle = '#050506'; ctx.fillRect(0, 0, W, H);
+      ctx.fillStyle = '#000000'; ctx.fillRect(0, 0, W, H);
       ctx.globalCompositeOperation = 'lighter';
       orbs.forEach(o => {
         o.x += o.dx; o.y += o.dy;
@@ -1452,7 +1451,7 @@ a.work-item:hover::before{transform:scaleY(1)}
         if (o.y < -o.r || o.y > H + o.r) o.dy *= -1;
         const g = ctx.createRadialGradient(o.x, o.y, 0, o.x, o.y, o.r);
         g.addColorStop(0, `rgba(${o.c},.30)`);
-        g.addColorStop(1, 'rgba(5,5,6,0)');
+        g.addColorStop(1, 'rgba(0,0,0,0)');
         ctx.fillStyle = g;
         ctx.beginPath(); ctx.arc(o.x, o.y, o.r, 0, Math.PI * 2); ctx.fill();
       });

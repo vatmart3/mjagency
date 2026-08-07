@@ -84,9 +84,12 @@
     vec3 ro = vec3(m.x * 0.55, m.y * 0.34 + sin(u_time * 0.13) * 0.05, u_z);
     vec3 rd = normalize(vec3(uv, 1.5));
 
-    vec3 violet = vec3(0.42, 0.17, 0.86);
-    vec3 pale   = vec3(0.62, 0.50, 0.95);
-    vec3 lit    = vec3(0.52, 0.56, 0.98);   // lueur froide des écrans
+    // Lumière argentée, sans teinte : la structure se lit par la valeur
+    // et non par la couleur. C'est ce qui fait basculer la scène du
+    // « néon » vers quelque chose de plus posé.
+    vec3 acier  = vec3(0.52, 0.53, 0.57);   // arches
+    vec3 clair  = vec3(0.72, 0.73, 0.78);   // arêtes
+    vec3 ecran  = vec3(0.86, 0.88, 0.92);   // écrans allumés
 
     vec3 col = vec3(0.0);
     float t  = 0.35;
@@ -101,10 +104,10 @@
       float ds = screens(q);
 
       float fog = exp(-t * 0.062);
-      col += violet * exp(-da * 30.0) * 0.038 * fog;   // arches
-      col += pale   * exp(-de * 13.0) * 0.015 * fog;   // arêtes
-      col += pale   * exp(-dd * 28.0) * 0.032 * fog;   // postes de travail
-      col += lit    * exp(-ds *  9.0) * 0.052 * fog;   // écrans allumés
+      col += acier * exp(-da * 30.0) * 0.030 * fog;   // arches
+      col += clair * exp(-de * 13.0) * 0.012 * fog;   // arêtes
+      col += clair * exp(-dd * 28.0) * 0.026 * fog;   // postes de travail
+      col += ecran * exp(-ds *  9.0) * 0.040 * fog;   // écrans allumés
 
       t += clamp(min(min(da, de), min(dd, ds)) * 0.72, 0.06, 1.15);
       if (t > 62.0) break;
@@ -114,11 +117,11 @@
        tombe pile au centre de l'écran — là où passe le texte. On la garde
        serrée et discrète : c'est une promesse, pas un projecteur. */
     float axis = max(dot(rd, vec3(0.0, 0.0, 1.0)), 0.0);
-    col += violet * pow(axis, 320.0) * 0.30;
-    col += pale   * pow(axis, 1600.0) * 0.20;
+    col += clair * pow(axis, 320.0) * 0.20;
+    col += vec3(1.0) * pow(axis, 1600.0) * 0.16;
 
     /* Fond très sombre + vignette calée sur le petit côté */
-    col += vec3(0.014, 0.011, 0.019);
+    col += vec3(0.013, 0.013, 0.015);
     float d2  = length(uv / vec2(max(u_res.x / u_res.y, 1.0), 1.0));
     col *= 0.30 + 0.70 * smoothstep(1.15, 0.12, d2);
 
@@ -230,11 +233,11 @@
       x: Math.random() * W, y: Math.random() * H,
       r: 220 + Math.random() * 260,
       dx: (Math.random() - .5) * .25, dy: (Math.random() - .5) * .25,
-      c: i % 2 ? '78,40,140' : '30,20,54'
+      c: i % 2 ? '58,58,64' : '26,26,30'
     }));
 
     (function draw(){
-      ctx.fillStyle = '#050506'; ctx.fillRect(0, 0, W, H);
+      ctx.fillStyle = '#000000'; ctx.fillRect(0, 0, W, H);
       ctx.globalCompositeOperation = 'lighter';
       orbs.forEach(o => {
         o.x += o.dx; o.y += o.dy;
@@ -242,7 +245,7 @@
         if (o.y < -o.r || o.y > H + o.r) o.dy *= -1;
         const g = ctx.createRadialGradient(o.x, o.y, 0, o.x, o.y, o.r);
         g.addColorStop(0, `rgba(${o.c},.30)`);
-        g.addColorStop(1, 'rgba(5,5,6,0)');
+        g.addColorStop(1, 'rgba(0,0,0,0)');
         ctx.fillStyle = g;
         ctx.beginPath(); ctx.arc(o.x, o.y, o.r, 0, Math.PI * 2); ctx.fill();
       });

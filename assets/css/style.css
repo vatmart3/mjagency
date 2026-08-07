@@ -6,17 +6,20 @@
 :root{
   color-scheme: dark;
 
-  /* Palette — noir dominant, violet en filigrane */
-  --bg:        #050506;
-  --bg-2:      #0a0a0c;
-  --line:      rgba(255,255,255,.07);
-  --line-2:    rgba(255,255,255,.13);
-  --ink:       #f2f2f0;
-  --ink-soft:  #9d9da4;
-  --ink-dim:   #63636b;
+  /* Palette — noir et gris neutres. Le violet ne sert plus qu'à trois
+     choses : le bouton principal, la pastille du logo et le point de
+     Sète sur la carte. Partout ailleurs, la couleur a été retirée. */
+  --bg:        #000000;
+  --bg-2:      #0b0b0d;
+  --surface:   #131316;
+  --line:      rgba(255,255,255,.09);
+  --line-2:    rgba(255,255,255,.16);
+  --ink:       #f5f5f7;
+  --ink-soft:  #a1a1a6;
+  --ink-dim:   #6e6e73;
   --accent:    #9d5bff;
-  --accent-2:  #cbb0ff;
-  --glow:      rgba(157,91,255,.45);
+  --accent-2:  #c9b6ff;
+  --glow:      rgba(157,91,255,.32);
 
   /* Anton porte tout l'affichage : une seule graisse (400), très condensée.
      Ne jamais lui demander 700 — le navigateur fabriquerait un faux gras. */
@@ -36,9 +39,10 @@
 html{-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;scroll-behavior:smooth}
 body{
   /* Fond statique des pages internes : une lueur froide en haut, rien de plus.
+     Aucune teinte : c'est ce qui donne le calme.
      Sur l'accueil, le canvas du studio 3D passe par-dessus. */
   background-color:var(--bg);
-  background-image:radial-gradient(115% 80% at 50% -15%, rgba(58,28,108,.28), transparent 62%);
+  background-image:radial-gradient(120% 75% at 50% -18%, rgba(255,255,255,.05), transparent 60%);
   background-attachment:scroll;
   background-repeat:no-repeat;
   color:var(--ink);
@@ -62,7 +66,7 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
 /* ---------- Grain ---------- */
 body::after{
   content:"";position:fixed;inset:0;pointer-events:none;z-index:9998;
-  opacity:.03;mix-blend-mode:overlay;
+  opacity:.02;mix-blend-mode:overlay;
   background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 
@@ -123,16 +127,8 @@ body.studio-3d #bg-canvas{opacity:1}
    contenu : la coupure se voit sans alourdir. */
 .sep{position:relative;border-top:1px solid var(--line-2)}
 .sep::before{
-  content:"";position:absolute;top:-3px;left:var(--pad);
-  width:5px;height:5px;border-radius:50%;background:var(--accent);
-  box-shadow:0 0 10px var(--glow);
-}
-/* Le filet de section porte aussi une lueur qui s'éteint vers la droite */
-.sep::after{
-  content:"";position:absolute;top:-1px;left:var(--pad);right:auto;
-  width:min(240px,40%);height:1px;
-  background:linear-gradient(90deg,var(--accent),transparent);
-  opacity:.55;
+  content:"";position:absolute;top:-2.5px;left:var(--pad);
+  width:4px;height:4px;border-radius:50%;background:var(--ink-dim);
 }
 
 /* ---------- Nav ---------- */
@@ -241,7 +237,7 @@ body.studio-3d #bg-canvas{opacity:1}
 .btn--glow{
   background:linear-gradient(180deg,#e6d6ff 0%,#9d5bff 55%,#e6d6ff 100%);
   color:#180730;border:none;
-  box-shadow:0 0 34px -10px var(--glow),inset 0 1px 1px rgba(255,255,255,.6);
+  box-shadow:0 0 26px -12px var(--glow),inset 0 1px 1px rgba(255,255,255,.5);
 }
 .btn--glow::before{display:none}
 .btn--glow:hover{color:#180730;filter:brightness(1.05)}
@@ -321,12 +317,12 @@ a.work-item:hover::before{transform:scaleY(1)}
 
 /* Visuels générés (aucune image externe) */
 .ph{background-size:cover;background-position:center}
-.ph-1{background:radial-gradient(120% 120% at 20% 10%,#33176b 0%,#160931 45%,#060508 100%)}
-.ph-2{background:radial-gradient(120% 120% at 80% 10%,#33333c 0%,#121216 50%,#050506 100%)}
-.ph-3{background:radial-gradient(120% 120% at 50% 0%,#1d3f42 0%,#08191b 45%,#050708 100%)}
-.ph-4{background:radial-gradient(120% 120% at 30% 90%,#432716 0%,#170e07 50%,#060402 100%)}
-.ph-5{background:radial-gradient(120% 120% at 70% 30%,#261646 0%,#100820 50%,#050408 100%)}
-.ph-6{background:radial-gradient(120% 120% at 10% 50%,#123340 0%,#061920 50%,#040709 100%)}
+.ph-1{background:radial-gradient(120% 120% at 20% 10%,#2e2e34 0%,#141418 45%,#08080a 100%)}
+.ph-2{background:radial-gradient(120% 120% at 80% 10%,#36363c 0%,#151519 50%,#09090b 100%)}
+.ph-3{background:radial-gradient(120% 120% at 50% 0%,#282c2e 0%,#111315 45%,#07080a 100%)}
+.ph-4{background:radial-gradient(120% 120% at 30% 90%,#332f2a 0%,#171512 50%,#0a0908 100%)}
+.ph-5{background:radial-gradient(120% 120% at 70% 30%,#2b2930 0%,#141317 50%,#08080b 100%)}
+.ph-6{background:radial-gradient(120% 120% at 10% 50%,#262c2f 0%,#101314 50%,#070809 100%)}
 .ph-grid{background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);background-size:32px 32px}
 
 /* ---------- Savoir-faire ---------- */
@@ -462,7 +458,7 @@ a.work-item:hover::before{transform:scaleY(1)}
 .zone{display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(24px,4vw,60px)}
 .zone__title{
   font-family:var(--font-body);font-size:11px;font-weight:600;
-  letter-spacing:.2em;text-transform:uppercase;color:var(--accent-2);
+  letter-spacing:.2em;text-transform:uppercase;color:var(--ink-soft);
   padding-bottom:14px;margin-bottom:18px;border-bottom:1px solid var(--line);
 }
 .towns{list-style:none;display:flex;flex-wrap:wrap;gap:8px}
@@ -494,7 +490,7 @@ a.work-item:hover::before{transform:scaleY(1)}
   position:absolute;inset:0;z-index:1;
   /* même teinte que le fond du dessin : en portrait la carte ne remplit
      pas la hauteur, et les bandes doivent passer inaperçues */
-  background:#08070d;
+  background:#0a0a0c;
   clip-path:inset(30% 32% round 26px);
   will-change:clip-path;
 }
