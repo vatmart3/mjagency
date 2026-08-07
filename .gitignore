@@ -1,3 +1,10 @@
 scratch-*.png
 .DS_Store
 node_modules/
+
+# Secrets : la clé Resend vit dans les variables d'environnement Vercel.
+# Un fichier local pour `vercel dev` ne doit jamais partir dans un commit.
+.env
+.env.*
+!.env.example
+.vercel/
