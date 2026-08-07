@@ -34,6 +34,82 @@ const echappe = v => String(v)
   .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
   .replace(/"/g, '&quot;');
 
+/* ---------------------------------------------------------------------
+   Alerte immédiate — WhatsApp ou SMS
+
+   Facultative, et surtout : elle ne conditionne jamais la réponse. Si le
+   service d'alerte tombe, l'email est déjà parti et la demande n'est pas
+   perdue — on ne fait pas échouer un formulaire à cause d'une notification.
+
+   Par défaut le message ne contient que le prénom et le créneau. Les
+   coordonnées du prospect restent dans l'email, qui passe par un
+   prestataire en règle. Faire transiter des données personnelles par un
+   service gratuit de notification est un choix qui vous engage : il faut
+   le poser sciemment, avec ALERTE_DETAIL=complet.
+
+   Variables :
+     ALERTE_CANAL   callmebot | twilio | free-mobile   (absente = pas d'alerte)
+     ALERTE_TEL     numéro destinataire, format +33…
+     ALERTE_DETAIL  minimal (défaut) | complet
+   --------------------------------------------------------------------- */
+async function alerter(c) {
+  const canal = String(process.env.ALERTE_CANAL || '').trim().toLowerCase();
+  if (!canal || canal === 'off') return;
+
+  const tel = String(process.env.ALERTE_TEL || '').trim();
+  const complet = String(process.env.ALERTE_DETAIL || '').toLowerCase() === 'complet';
+
+  const texte = [
+    `Nouvelle demande — ${c.nom}`,
+    c.date ? `Créneau : ${c.date} ${c.heure}` : null,
+    complet ? `Email : ${c.email}` : null,
+    complet && c.societe ? `Société : ${c.societe}` : null,
+    complet && c.budget ? `Budget : ${c.budget}` : null,
+    complet && c.message ? `\n${c.message.slice(0, 500)}` : null,
+    complet ? null : 'Détails dans votre boîte mail.'
+  ].filter(Boolean).join('\n');
+
+  // Une notification ne doit pas faire patienter le visiteur : au-delà de
+  // cinq secondes, on abandonne et on laisse l'email faire son travail.
+  const signal = AbortSignal.timeout(5000);
+
+  if (canal === 'callmebot') {
+    const u = new URL('https://api.callmebot.com/whatsapp.php');
+    u.searchParams.set('phone', tel);
+    u.searchParams.set('text', texte);
+    u.searchParams.set('apikey', String(process.env.CALLMEBOT_APIKEY || ''));
+    return fetch(u, { signal });
+  }
+
+  if (canal === 'twilio') {
+    const sid = String(process.env.TWILIO_SID || '');
+    const corps = new URLSearchParams({
+      To: String(process.env.ALERTE_TEL_TWILIO || tel),
+      From: String(process.env.TWILIO_FROM || ''),
+      Body: texte
+    });
+    return fetch(`https://api.twilio.com/2010-04-01/Accounts/${encodeURIComponent(sid)}/Messages.json`, {
+      method: 'POST',
+      headers: {
+        Authorization: 'Basic ' + Buffer.from(`${sid}:${process.env.TWILIO_TOKEN || ''}`).toString('base64'),
+        'Content-Type': 'application/x-www-form-urlencoded'
+      },
+      body: corps,
+      signal
+    });
+  }
+
+  if (canal === 'free-mobile') {
+    const u = new URL('https://smsapi.free-mobile.fr/sendmsg');
+    u.searchParams.set('user', String(process.env.FREE_USER || ''));
+    u.searchParams.set('pass', String(process.env.FREE_PASS || ''));
+    u.searchParams.set('msg', texte);
+    return fetch(u, { signal });
+  }
+
+  console.warn('ALERTE_CANAL inconnu :', canal);
+}
+
 function lireCorps(req) {
   // Vercel décode déjà le JSON ; on gère quand même la chaîne brute,
   // pour ne pas dépendre d'un détail de la plateforme.
@@ -138,6 +214,15 @@ module.exports = async (req, res) => {
                  : rep.status === 429 ? 'QUOTA'
                  : 'RESEND-' + rep.status;
       return res.status(502).json({ ok: false, error: "L'envoi a échoué", code });
+    }
+
+    // L'email est parti : à partir d'ici, plus rien ne doit pouvoir faire
+    // échouer la demande. L'alerte est tentée, ses ratés sont journalisés.
+    try {
+      const r = await alerter(c);
+      if (r && !r.ok) console.error('Alerte refusée', r.status, await r.text().catch(() => ''));
+    } catch (err) {
+      console.error('Alerte non partie', err);
     }
 
     return res.status(200).json({ ok: true });

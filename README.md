@@ -56,6 +56,32 @@ titulaire du compte**. Pour envoyer depuis `@mjagency.eu`, vérifier le
 domaine dans Resend → **Domains** et poser les enregistrements DNS proposés
 chez le registrar.
 
+### Alerte WhatsApp ou SMS (facultative)
+
+En plus de l'email, chaque demande peut déclencher une notification. Sans
+les variables ci-dessous, rien ne change — seul l'email part.
+
+| `ALERTE_CANAL` | Canal | Coût | Mise en route |
+|---|---|---|---|
+| `callmebot` | WhatsApp | gratuit | Écrire `I allow callmebot to send me messages` au **+34 644 51 95 23** sur WhatsApp ; il répond avec la clé → `CALLMEBOT_APIKEY` |
+| `twilio` | WhatsApp ou SMS | payant | Compte Twilio → `TWILIO_SID`, `TWILIO_TOKEN`, `TWILIO_FROM` |
+| `free-mobile` | SMS | gratuit | Réservé aux abonnés Free Mobile. Espace abonné → Mes Options → Notifications par SMS → `FREE_USER`, `FREE_PASS` |
+
+Plus `ALERTE_TEL` (le numéro destinataire, format `+33…`).
+
+L'alerte **ne peut jamais faire échouer un envoi** : elle est tentée après
+que l'email est parti, avec un délai maximum de 5 secondes, et ses ratés
+partent dans les journaux sans que le visiteur en sache rien.
+
+Par défaut (`ALERTE_DETAIL=minimal`) le message ne contient que le nom et le
+créneau — les coordonnées du prospect restent dans l'email, qui passe par un
+prestataire en règle. `ALERTE_DETAIL=complet` y ajoute email, société, budget
+et message : c'est faire transiter des données personnelles par le service
+choisi, ce qui se décide en connaissance de cause. CallMeBot en particulier
+est un service gratuit sans engagement contractuel — parfait pour un simple
+« quelqu'un a rempli le formulaire », discutable pour y verser un fichier
+prospects.
+
 ### Ce qui est protégé
 
 - Champ piège (`site`), vérifié côté serveur — rempli, la requête renvoie un
