@@ -420,6 +420,67 @@ a.work-item:hover .work-item__title{color:var(--blue)}
 .feature__viz{aspect-ratio:16/10;border-radius:var(--radius-s);overflow:hidden}
 .feature__viz .ph{width:100%;height:100%}
 
+/* ---------- Planche de charte graphique ----------
+   Illustration du livrable « identité de marque », construite en HTML
+   plutôt qu'en image : nette à toutes les définitions, elle pèse
+   quelques lignes et se met à jour avec le design system. */
+.feature__viz--board{
+  aspect-ratio:16/10;background:var(--off-white);
+  display:grid;place-items:center;padding:var(--s3);
+}
+.board{
+  width:100%;max-width:420px;background:var(--white);
+  border-radius:var(--radius-s);box-shadow:var(--shadow-s);
+  padding:var(--s3);display:flex;flex-direction:column;gap:var(--s2);
+}
+.board__head{
+  display:flex;align-items:center;gap:8px;
+  font-size:13px;font-weight:600;color:var(--black);
+  padding-bottom:12px;border-bottom:1px solid var(--rule);
+}
+.board__mark{
+  width:22px;height:22px;border-radius:6px;background:var(--black);color:#fff;
+  display:grid;place-items:center;flex:none;
+}
+.board__grid{display:grid;grid-template-columns:1fr 1fr;gap:var(--s2)}
+.board__cell{display:flex;flex-direction:column;gap:8px}
+.board__lab{font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--gray)}
+
+.board__swatches{display:flex;gap:5px}
+.board__swatches i{
+  width:26px;height:26px;border-radius:6px;background:var(--c);
+  box-shadow:inset 0 0 0 1px rgba(0,0,0,.08);
+}
+.board__type{display:flex;align-items:baseline;gap:8px}
+.board__type b{font-size:26px;font-weight:700;letter-spacing:-.02em;color:var(--black);line-height:1}
+.board__type small{font-size:10px;color:var(--gray)}
+
+.board__btns{display:flex;flex-wrap:wrap;gap:6px}
+.board__btn{
+  font-size:10px;padding:6px 12px;border-radius:980px;
+  border:1px solid var(--rule-2);color:var(--dark-gray);background:var(--white);
+}
+.board__btn--p{background:#2563EB;border-color:#2563EB;color:#fff}
+
+.board__card{
+  border:1px solid var(--rule);border-radius:8px;padding:10px;
+  display:flex;flex-direction:column;gap:6px;
+}
+.board__card-i{width:18px;height:18px;border-radius:5px;background:#2563EB;opacity:.16}
+.board__bar{height:5px;border-radius:3px;background:var(--light-gray)}
+
+@media (max-width:860px){
+  /* En portrait, un cadre 16/10 est trop bas pour la planche : elle se
+     retrouvait coupée en bas. On lui rend sa hauteur naturelle. */
+  .feature__viz--board{aspect-ratio:auto;padding:var(--s3)}
+}
+@media (max-width:520px){
+  .board{padding:var(--s2);gap:12px}
+  .board__grid{gap:12px}
+  .board__swatches i{width:20px;height:20px}
+  .board__type{flex-direction:column;align-items:flex-start;gap:2px}
+}
+
 .ticks{list-style:none;margin-top:var(--s3);display:flex;flex-direction:column;gap:10px}
 .ticks li{position:relative;padding-left:26px;font-size:16px;color:var(--dark-gray)}
 .ticks li::before{
