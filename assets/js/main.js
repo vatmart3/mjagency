@@ -174,31 +174,28 @@
   /* =========================================================
      FORMULAIRE DE RÉSERVATION
 
-     Les demandes partent vers DESTINATAIRE.
+     La demande part vers /api/contact — une fonction serverless du
+     projet, qui la relaie à Resend. Aucune clé ne transite ici : c'est
+     tout l'intérêt par rapport à un service appelé depuis le navigateur,
+     où la clé est lisible dans le code source de la page.
 
-     La clé Web3Forms ci-dessous est publique par nature : elle circule
-     dans le navigateur du visiteur, donc elle est lisible dans le code
-     source. C'est le fonctionnement prévu du service. La protection
-     repose sur le champ piège plus bas ; en cas de spam, il suffit de
-     régénérer la clé sur web3forms.com ou d'y activer un captcha.
-
-     Si la clé venait à être retirée, le formulaire bascule sur
-     l'ouverture du logiciel de messagerie du visiteur, pré-rempli.
+     Cette route n'existe que sur le site déployé. Ouvert en fichier
+     local, ou dans un aperçu qui bloque les requêtes sortantes, l'appel
+     échoue — le repli propose alors d'écrire directement.
      ========================================================= */
-  const CLE_WEB3FORMS = '2931713f-3b41-44f3-829a-ce10b5f63700';
-  const DESTINATAIRE  = 'vatmart3@gmail.com';          // boîte qui reçoit
-  const CONTACT_PUBLIC = 'mjagency.officiel@gmail.com'; // adresse montrée aux visiteurs
+  const POINT_ENVOI    = '/api/contact';
+  const DESTINATAIRE   = 'vatmart3@gmail.com';   // boîte qui reçoit, et repli mailto
 
   document.querySelectorAll('form[data-demo]').forEach(form => {
     const msg = form.querySelector('.form-msg');
     const btn = form.querySelector('button[type="submit"]');
     const btnTexte = btn ? btn.innerHTML : '';
 
-    function afficher(texte, etat) {
+    function afficher(texte, etat, html) {
       if (!msg) return;
       msg.classList.add('show');
       msg.classList.toggle('form-msg--erreur', etat === 'erreur');
-      msg.textContent = texte;
+      if (html) msg.innerHTML = html; else msg.textContent = texte;
     }
 
     function champs() {
@@ -240,38 +237,43 @@
 
       const sujet = `Demande de rendez-vous — ${c.nom} (${c.date} ${c.heure})`;
 
-      if (CLE_WEB3FORMS === 'A_REMPLACER') {
-        // Repli : on ouvre la messagerie du visiteur, pré-remplie.
-        afficher("Votre logiciel de messagerie va s'ouvrir avec la demande pré-remplie. Il ne reste qu'à l'envoyer.", 'info');
-        location.href = `mailto:${DESTINATAIRE}?subject=${encodeURIComponent(sujet)}&body=${encodeURIComponent(corpsTexte(c))}`;
-        return;
-      }
-
       if (btn) { btn.disabled = true; btn.textContent = 'Envoi…'; }
       afficher('Envoi en cours…', 'info');
 
       try {
-        const rep = await fetch('https://api.web3forms.com/submit', {
+        const rep = await fetch(POINT_ENVOI, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
           body: JSON.stringify({
-            access_key: CLE_WEB3FORMS,
-            subject: sujet,
-            from_name: 'Site MJ Agency',
-            replyto: c.email,
-            Nom: c.nom, Email: c.email, Société: c.societe,
-            Budget: c.budget, Date: c.date, Heure: c.heure, Projet: c.message
+            nom: c.nom, email: c.email, societe: c.societe,
+            budget: c.budget, message: c.message,
+            date: c.date, heure: c.heure,
+            site: (piege && piege.value) || ''   // le piège est vérifié aussi côté serveur
           })
         });
-        const data = await rep.json();
-        if (!rep.ok || !data.success) throw new Error(data.message || 'Envoi refusé');
+        const data = await rep.json().catch(() => ({}));
+        if (!rep.ok || !data.ok) {
+          // Une réponse sans JSON exploitable veut presque toujours dire que
+          // la route n'a pas été déployée : on le nomme, plutôt que de laisser
+          // toutes les pannes se ressembler.
+          const err = new Error(data.error || `HTTP ${rep.status}`);
+          err.code = data.code || (rep.status === 404 ? 'ROUTE-ABSENTE' : 'HTTP-' + rep.status);
+          throw err;
+        }
 
         afficher(`Merci ${c.nom} — votre demande pour le ${c.date} à ${c.heure} est bien partie. Nous confirmons par email sous 24 h.`, 'ok');
         form.reset();
       } catch (err) {
-        // On ne prétend jamais que c'est envoyé : on donne une porte de sortie.
-        afficher("L'envoi a échoué. Écrivez-nous directement à " + CONTACT_PUBLIC + " ou appelez le 06 11 71 83 68.", 'erreur');
-        console.warn('Formulaire :', err);
+        // On ne prétend jamais que c'est envoyé : on donne une porte de sortie,
+        // avec la demande déjà rédigée pour que rien ne soit à ressaisir. Le
+        // code sert à nommer la panne sans avoir à ouvrir les journaux.
+        const lien = `mailto:${DESTINATAIRE}?subject=${encodeURIComponent(sujet)}&body=${encodeURIComponent(corpsTexte(c))}`;
+        const code = err.code || 'RESEAU';
+        afficher(null, 'erreur',
+          `L'envoi a échoué. <a href="${lien}">Envoyez-la depuis votre messagerie</a> ` +
+          `— tout est déjà rempli — ou appelez le <a href="tel:+33611718368">06 11 71 83 68</a>. ` +
+          `<small class="form-msg__ref">réf. ${code}</small>`);
+        console.warn('Formulaire :', code, err);
       } finally {
         if (btn) { btn.disabled = false; btn.innerHTML = btnTexte; }
       }
