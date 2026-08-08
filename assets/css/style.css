@@ -256,8 +256,8 @@ a.work-item:hover .work-item__title{color:var(--blue)}
 .ph-4{background:linear-gradient(160deg,#F7F2ED 0%,#ECE1D6 55%,#DDCDBC 100%)}
 .ph-5{background:linear-gradient(160deg,#F1EEF7 0%,#E1DCEC 55%,#CFC8E0 100%)}
 .ph-6{background:linear-gradient(160deg,#EDF3F7 0%,#DAE5EC 55%,#C6D6E0 100%)}
-/* Au Bon Pain : la seule teinte chaude de la page, celle du projet */
-.ph-pain{background:linear-gradient(160deg,#FBF4E7 0%,#F1DDB8 55%,#DFA65A 100%)}
+/* Au Bon Pain : le projet est sombre, sa vignette l'annonce */
+.ph-pain{background:linear-gradient(160deg,#2C2219 0%,#1B150E 58%,#2A1D12 100%)}
 .ph-grid{background-image:linear-gradient(rgba(0,0,0,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(0,0,0,.05) 1px,transparent 1px);background-size:32px 32px}
 
 /* ---------- Savoir-faire ---------- */

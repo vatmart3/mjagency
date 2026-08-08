@@ -315,8 +315,9 @@ $('#lignes').addEventListener('click', e => {
   majPanier();
 });
 
-/* Boutons « + » de la carte */
-$$('.plat').forEach(plat => {
+/* Boutons « + » — la carte et les cartes mises en avant partagent le même
+   contrat : data-id, data-nom, data-prix, et une illustration. */
+$$('[data-id][data-prix]').forEach(plat => {
   const btn = $('.add', plat);
   btn.addEventListener('click', () => {
     ajouter({
@@ -625,7 +626,9 @@ function majChaud() {
   const ouvert = etatOuverture(now).etat !== 'ferme';
   const chauds = [];
 
-  $$('.plat[data-fournee]').forEach(p => {
+  const vus = new Set();
+
+  $$('[data-fournee]').forEach(p => {
     const sorties = p.dataset.fournee.split(',').map(Number);
     const chaud = ouvert && sorties.some(f => h >= f && h - f <= FENETRE_CHAUD);
 
@@ -639,7 +642,10 @@ function majChaud() {
     } else if (!chaud && pastille) {
       pastille.remove();
     }
-    if (chaud) chauds.push(p.dataset.nom.toLowerCase());
+    if (chaud && !vus.has(p.dataset.id)) {
+      vus.add(p.dataset.id);
+      chauds.push(p.dataset.nom.toLowerCase());
+    }
   });
 
   /* Le résumé sous le titre de la carte */
@@ -699,3 +705,66 @@ majPanier();
 majSandwich();
 
 setInterval(() => { majEtat(); majFour(); majChaud(); }, 30000);
+
+/* ---------------------------------------------------------
+   13 · La recherche
+   Elle ne va nulle part : elle filtre la carte sur place, sur le
+   nom et la description, et dit combien de produits restent.
+   --------------------------------------------------------- */
+const boiteRech = $('#recherche');
+const champRech = $('#q');
+
+function ouvrirRecherche() {
+  boiteRech.hidden = false;
+  $('#ouvrir-recherche').setAttribute('aria-expanded', 'true');
+  champRech.focus();
+}
+function fermerRecherche() {
+  boiteRech.hidden = true;
+  $('#ouvrir-recherche').setAttribute('aria-expanded', 'false');
+  champRech.value = '';
+  chercher();
+  $('#ouvrir-recherche').focus();
+}
+
+$('#ouvrir-recherche').addEventListener('click', () => {
+  boiteRech.hidden ? ouvrirRecherche() : fermerRecherche();
+});
+$('#fermer-recherche').addEventListener('click', fermerRecherche);
+
+function chercher() {
+  const q = champRech.value.trim().toLowerCase();
+  const compteur = $('#recherche-n');
+
+  if (!q) {
+    /* Champ vide : on rend la main au filtre par famille */
+    const actif = $('.filtre.is-on');
+    $$('.plat').forEach(p => {
+      p.classList.toggle('is-hidden',
+        !(actif.dataset.f === 'tout' || p.dataset.cat === actif.dataset.f));
+    });
+    compteur.textContent = '';
+    $('#grille-vide').hidden = true;
+    return;
+  }
+
+  let n = 0;
+  $$('.plat').forEach(p => {
+    const texte = (p.dataset.nom + ' ' + $('.plat__desc', p).textContent).toLowerCase();
+    const ok = texte.includes(q);
+    p.classList.toggle('is-hidden', !ok);
+    if (ok) n++;
+  });
+  compteur.textContent = n === 0 ? 'aucun résultat'
+    : n === 1 ? '1 produit' : `${n} produits`;
+  $('#grille-vide').hidden = n > 0;
+
+  /* Chercher, c'est vouloir voir la carte */
+  if (n > 0) document.querySelector('#carte').scrollIntoView({ block: 'start' });
+}
+
+champRech.addEventListener('input', chercher);
+champRech.addEventListener('keydown', e => { if (e.key === 'Escape') fermerRecherche(); });
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && !boiteRech.hidden) fermerRecherche();
+});
