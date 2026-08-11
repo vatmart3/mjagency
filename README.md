@@ -111,22 +111,25 @@ prospects.
 dans un aperçu qui bloque les requêtes sortantes, le formulaire affichera
 toujours le repli.
 
-## Le masque — `/spider`
+## L'interface embarquée — `/spider`
 
 Une page à part, hors du site : on l'ouvre au téléphone, on autorise la
-caméra, et l'écran devient l'intérieur d'un masque. Elle n'est liée depuis
-aucune autre page et porte `noindex`.
+caméra, et l'écran devient une couche de données par-dessus le réel. Elle
+n'est liée depuis aucune autre page et porte `noindex`.
 
-Ce qu'elle fait, entièrement dans le navigateur :
+Rien n'est déguisé et rien n'est plaqué sur le visage : ce que le suivi
+produit sert à l'interface, pas à un costume.
 
-- **Suivi du visage** — un masque est redessiné image par image sur la tête :
-  contour, toile, grandes lentilles. Il suit l'inclinaison, parce que le
-  tracé est calculé dans le repère penché de la tête et non dans celui de
-  l'écran.
-- **Suivi du corps** — quand on recule, le squelette détecté est habillé :
-  buste, bras, jambes, gants, bottes, emblème de poitrine.
-- **Quatre tenues** — Écarlate, Nuit, Sang & Nuit, Spectre. On en change
-  **en balayant la main devant la caméra**, ou en touchant les pastilles.
+- **Les mains commandent la page.** Elles sont suivies et dessinées en
+  filaire — on voit ce que la machine voit, donc on comprend pourquoi un
+  geste passe ou non. Deux commandes, et deux seulement :
+  **balayer** horizontalement change de profil, **pincer** le pouce et
+  l'index ouvre le micro d'IRIS.
+- **Un viseur** verrouille le visage : quatre équerres, une ligne de
+  balayage, une croix sur l'arête du nez, et un relevé d'inclinaison et de
+  distance. Il se coupe d'un bouton.
+- **Quatre profils** — Écarlate, Azur, Ambre, Viride. Un profil n'est
+  qu'une couleur d'accent : toute l'interface la reprend d'un coup.
 - **Météo réelle** de la position, heure, date, batterie, images/seconde.
 - **IRIS**, à qui l'on parle au micro et qui répond à voix haute.
 
@@ -137,7 +140,7 @@ depuis un CDN) et aucune image n'est transmise. Partent seulement :
 
 | Vers | Quoi |
 |---|---|
-| `/api/iris` → Claude | les mots dictés, plus heure, ville, météo et tenue en contexte |
+| `/api/iris` → Claude | les mots dictés, plus heure, ville, météo et profil en contexte |
 | `/api/meteo` → Open-Meteo | des coordonnées arrondies |
 
 ### Mise en service
@@ -149,8 +152,9 @@ Une seule variable, dans Vercel → **Settings → Environment Variables** :
 | `ANTHROPIC_API_KEY` | la clé `sk-ant-…` de [console.anthropic.com](https://console.anthropic.com) | pour IRIS |
 
 La météo ne demande aucune clé. Sans `ANTHROPIC_API_KEY`, la page fonctionne
-toujours : `/api/iris` répond `503 SANS-CLE` et le masque bascule sur un mode
-hors ligne qui sait encore donner l'heure, la météo, la position et la tenue.
+toujours : `/api/iris` répond `503 SANS-CLE` et l'interface bascule sur un
+mode hors ligne qui sait encore donner l'heure, la météo, la position et le
+profil.
 
 `vercel.json` accorde 60 secondes à `/api/iris` — le modèle réfléchit avant
 de répondre, et la limite de 10 secondes par défaut le couperait.
@@ -169,8 +173,8 @@ Chaque brique tombe seule, sans emporter les autres :
 
 | Absent | Conséquence |
 |---|---|
-| MediaPipe (CDN injoignable) | plus de masque, mais caméra, heure, météo et dialogue continuent |
-| Reconnaissance vocale (Firefox, certains Android) | le bouton micro se désactive, on tape dans le champ |
+| MediaPipe (CDN injoignable) | plus de gestes ni de viseur, mais caméra, heure, météo et dialogue continuent |
+| Reconnaissance vocale (Firefox, certains Android) | le bouton micro et le pincement se désactivent, on tape dans le champ |
 | Synthèse vocale | les réponses restent lisibles à l'écran |
 | `ANTHROPIC_API_KEY` | mode hors ligne, réponses courtes tirées des capteurs |
 | Géolocalisation refusée | position déduite de l'adresse IP par le serveur |
@@ -181,13 +185,16 @@ Chaque brique tombe seule, sans emporter les autres :
   site déployé convient ; en local il faut `localhost`, pas une IP.
 - **Sur iPhone**, ajouter la page à l'écran d'accueil donne un vrai plein
   écran, sans barre de navigateur.
-- Les modèles de suivi pèsent une quinzaine de mégaoctets ; ils se chargent
-  l'un après l'autre — le masque apparaît avant les mains et le corps.
-- Le costume est dessiné, jamais photographié : chaque tenue n'est qu'un jeu
-  de couleurs dans `TENUES`, en tête de `assets/js/spider.js`. En ajouter une
-  revient à ajouter une entrée.
+- Les deux modèles de suivi pèsent une dizaine de mégaoctets ; ils se
+  chargent l'un après l'autre — les mains d'abord, puisque ce sont elles
+  qui commandent, le viseur ensuite.
+- Un profil n'est qu'une entrée dans `PROFILS`, en tête de
+  `assets/js/spider.js` : deux couleurs et un nom. Toute l'interface suit,
+  parce que la feuille de style entière découle de `--accent`.
 
 ## Lancer en local
+
+
 
 ```bash
 npx serve .
@@ -209,17 +216,17 @@ node build-locales.js   # → 4 pages locales + sitemap.xml
 
 ```
 index.html · work.html · studio.html · contact.html
-spider.html            → le masque (hors site, noindex)
+spider.html            → interface embarquée (hors site, noindex)
 api/contact.js         → réception du formulaire (Resend)
-api/iris.js            → dialogue du masque (Claude)
+api/iris.js            → dialogue d'IRIS (Claude)
 api/meteo.js           → météo réelle (Open-Meteo)
 assets/
   css/style.css        → design system
   css/fonts.css        → pile typographique système
-  css/spider.css       → interface du masque
+  css/spider.css       → interface embarquée
   js/main.js           → reveals, calendrier, formulaire, menu
   js/bg.js             → objet 3D en fond + repli
-  js/spider.js         → suivi, masque, tenues, gestes, IRIS
+  js/spider.js         → suivi, viseur, gestes, profils, IRIS
 build.js               → aperçu en fichier unique
 build-locales.js       → pages locales + sitemap
 vercel.json            → URL sans extension, en-têtes de sécurité

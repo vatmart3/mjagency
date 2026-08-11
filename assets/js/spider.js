@@ -1,7 +1,12 @@
 /* =========================================================
-   MJ AGENCY — MASQUE
-   Interface embarquée : suivi du visage et du corps, tenues
-   changées au geste, météo réelle, et IRIS au bout du micro.
+   MJ AGENCY — INTERFACE EMBARQUÉE (/spider)
+   La caméra en fond, une couche de données par-dessus, et le tout
+   piloté aux doigts.
+
+   Rien n'est déguisé et rien n'est plaqué sur le visage : ce que le
+   suivi produit sert à l'interface, pas à un costume. Les mains sont
+   dessinées en filaire et commandent la page ; le visage n'est qu'une
+   cible verrouillée par le viseur.
 
    Tout se calcule dans le navigateur. Les images de la caméra ne
    quittent jamais l'appareil : seuls les mots dictés partent vers
@@ -10,73 +15,47 @@
    Le suivi vient de MediaPipe Tasks Vision, chargé depuis un CDN.
    S'il ne se charge pas, la page reste utilisable : caméra, heure,
    météo et conversation continuent de fonctionner.
-
-   Repères du visage : le maillage MediaPipe numérote 478 points.
-   Ceux utilisés ici sont nommés en tête de fichier plutôt que
-   dispersés dans le code — ce sont des constantes du modèle, pas
-   des choix de dessin.
    ========================================================= */
 
 const CDN  = 'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.22';
 const WASM = CDN + '/wasm';
 const MODELES = {
-  visage: 'https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task',
   mains:  'https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task',
-  corps:  'https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_lite/float16/1/pose_landmarker_lite.task',
+  visage: 'https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task',
 };
 
-/* Le contour du visage, dans l'ordre du tour — c'est la boucle
-   FACE_OVAL de MediaPipe, écrite à plat. */
-const OVALE = [10,338,297,332,284,251,389,356,454,323,361,288,397,365,379,
-               378,400,377,152,148,176,149,150,136,172,58,132,93,234,127,
-               162,21,54,103,67,109];
+/* Les 21 repères de la main, reliés doigt par doigt. C'est la table
+   HAND_CONNECTIONS de MediaPipe, écrite en chaînes plutôt qu'en paires :
+   une polyligne par doigt se trace d'un seul trait. */
+const DOIGTS = [
+  [0, 1, 2, 3, 4],        // pouce
+  [0, 5, 6, 7, 8],        // index
+  [5, 9, 10, 11, 12],     // majeur
+  [9, 13, 14, 15, 16],    // annulaire
+  [13, 17, 18, 19, 20],   // auriculaire
+  [0, 17],                // base de la paume
+];
+const BOUTS = [4, 8, 12, 16, 20];
+const POUCE = 4, INDEX = 8, PAUME = 9, POIGNET = 0;
 
-const OEIL_G = [33,133,159,145,160,144,158,153];
-const OEIL_D = [362,263,386,374,385,380,387,373];
-const MENTON = 152, FRONT = 10, JOUE_G = 234, JOUE_D = 454;
-
-/* Repères du corps, sur les 33 points de PoseLandmarker. */
-const C = {
-  nez:0, epauleG:11, epauleD:12, coudeG:13, coudeD:14, poignetG:15, poignetD:16,
-  hancheG:23, hancheD:24, genouG:25, genouD:26, chevilleG:27, chevilleD:28,
-};
+/* Repères du visage utiles au viseur : les yeux donnent l'inclinaison
+   et l'écart, dont on tire une distance approchée. */
+const OEIL_G = [33, 133, 159, 145];
+const OEIL_D = [362, 263, 386, 374];
+const NEZ = 4;
 
 /* ---------------------------------------------------------------------
-   Les tenues
+   Les profils d'interface
 
-   Dessinées, jamais photographiées : chaque tenue n'est qu'un jeu de
-   couleurs appliqué au même tracé. En ajouter une revient à ajouter
-   une ligne ici.
+   Un profil n'est qu'une couleur d'accent, posée en variable CSS :
+   toute l'interface — filets, panneaux, viseur, filaire de la main —
+   la reprend d'un coup. En ajouter un revient à ajouter une ligne.
    --------------------------------------------------------------------- */
-const TENUES = [
-  {
-    id:'ecarlate', libelle:'#ff2b3d', nom:'ÉCARLATE',
-    masque:'#c8102e', masqueOmbre:'#75081a', toile:'#170103',
-    lentille:'#ffffff', lentilleOmbre:'#b8c6d8', cerne:'#08080a',
-    torse:'#c8102e', torseOmbre:'#7d0a1d', bras:'#c8102e',
-    jambes:'#141b4d', jambesOmbre:'#080d29', gants:'#c8102e', emblem:'#0a0a0c',
-  },
-  {
-    id:'nuit', libelle:'#e8ecf5', nom:'NUIT',
-    masque:'#15161b', masqueOmbre:'#050507', toile:'#33363f',
-    lentille:'#ffffff', lentilleOmbre:'#9aa6b8', cerne:'#000000',
-    torse:'#15161b', torseOmbre:'#050507', bras:'#15161b',
-    jambes:'#0d0e12', jambesOmbre:'#000000', gants:'#25272f', emblem:'#e8ecf5',
-  },
-  {
-    id:'sang', libelle:'#ff5a68', nom:'SANG & NUIT',
-    masque:'#8c0f1e', masqueOmbre:'#3d040c', toile:'#0a0a0c',
-    lentille:'#ff5a68', lentilleOmbre:'#8c0f1e', cerne:'#000000',
-    torse:'#101015', torseOmbre:'#030304', bras:'#101015',
-    jambes:'#101015', jambesOmbre:'#030304', gants:'#8c0f1e', emblem:'#8c0f1e',
-  },
-  {
-    id:'spectre', libelle:'#e9edf5', nom:'SPECTRE',
-    masque:'#e9edf5', masqueOmbre:'#9aa3b5', toile:'#5c6478',
-    lentille:'#10131a', lentilleOmbre:'#000000', cerne:'#e9edf5',
-    torse:'#e9edf5', torseOmbre:'#a8b0c0', bras:'#e9edf5',
-    jambes:'#c9cfdb', jambesOmbre:'#8d95a6', gants:'#10131a', emblem:'#10131a',
-  },
+const PROFILS = [
+  { id:'ecarlate', nom:'ÉCARLATE', accent:'#ff2b3d', rgb:'255,43,61'  },
+  { id:'azur',     nom:'AZUR',     accent:'#38d9ff', rgb:'56,217,255' },
+  { id:'ambre',    nom:'AMBRE',    accent:'#ffb000', rgb:'255,176,0'  },
+  { id:'viride',   nom:'VIRIDE',   accent:'#39ff88', rgb:'57,255,136' },
 ];
 
 /* ---------------------------------------------------------------------
@@ -85,25 +64,23 @@ const TENUES = [
 const $  = s => document.querySelector(s);
 const $$ = s => Array.from(document.querySelectorAll(s));
 const dist = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
-const milieu = (a, b) => ({ x:(a.x + b.x) / 2, y:(a.y + b.y) / 2 });
 
 const cam = $('#cam');
 const cv  = $('#ar');
 const ctx = cv.getContext('2d');
 
 const etat = {
-  marche:false, facing:'user', corps:true,
-  tenue:0, trame:0, ips:0,
-  visage:null, mains:null, pose:null,
-  perteVisage:99, pertePose:99,
+  marche:false, facing:'user', cible:true,
+  profil:0, trame:0, ips:0,
+  mains:null, visage:null, perteVisage:99,
   meteo:null, ecoute:false, attend:false,
 };
 
 const historique = [];      // le fil de la conversation avec IRIS
 const vue = { ox:0, oy:0, dw:0, dh:0, w:0, h:0 };
 
-let lmVisage = null, lmMains = null, lmCorps = null;
-const horlogeDetection = { visage:0, mains:0, corps:0 };
+let lmMains = null, lmVisage = null;
+const horlogeDetection = { mains:0, visage:0 };
 let raf = 0;
 
 /* =====================================================================
@@ -144,11 +121,11 @@ $('#lancer').addEventListener('click', async () => {
   chargerMeteo();
   setInterval(chargerMeteo, 10 * 60 * 1000);
   construirePastilles();
-  appliquerTenue(0);
+  appliquerProfil(0);
   boucle();
   chargerSuivi();
 
-  setTimeout(() => direIris("Masque en ligne. Je vous écoute quand vous voulez.", false), 900);
+  setTimeout(() => direIris("Interface en ligne. Je vous écoute quand vous voulez.", false), 900);
 });
 
 /* =====================================================================
@@ -182,8 +159,8 @@ async function ouvrirCamera(facing) {
 }
 
 /* Le flux est affiché en `cover` : une partie déborde du cadre. Sans ce
-   calcul, le masque se poserait à côté du visage sur tout écran dont le
-   rapport diffère de celui de la caméra. */
+   calcul, le filaire de la main se poserait à côté de la main sur tout
+   écran dont le rapport diffère de celui de la caméra. */
 function calerVue() {
   const r = Math.min(window.devicePixelRatio || 1, 2.5);
   const w = Math.round(cv.clientWidth * r), h = Math.round(cv.clientHeight * r);
@@ -207,21 +184,20 @@ window.addEventListener('orientationchange', () => setTimeout(calerVue, 250));
 /* =====================================================================
    3. Chargement du suivi
 
-   Les trois modèles pèsent une quinzaine de mégaoctets à eux tous. On
-   les charge l'un après l'autre, dans l'ordre de l'utilité : le visage
-   d'abord — c'est lui qui fait apparaître le masque — puis les mains,
-   puis le corps. L'interface est utilisable dès le premier.
+   Les mains d'abord : ce sont elles qui commandent la page, donc elles
+   doivent répondre au plus vite. Le viseur du visage suit, et sa panne
+   éventuelle ne coûte qu'un ornement.
    ===================================================================== */
 
 async function chargerSuivi() {
-  voyant('visage', 'attente');
+  voyant('mains', 'attente');
   let V, resolveur;
   try {
     V = await import(/* @vite-ignore */ CDN + '/vision_bundle.mjs');
     resolveur = await V.FilesetResolver.forVisionTasks(WASM);
   } catch (err) {
     console.error('MediaPipe indisponible', err);
-    voyant('visage', 'off'); voyant('mains', 'off'); voyant('corps', 'off');
+    voyant('mains', 'off'); voyant('cible', 'off');
     mouchard('SUIVI INDISPONIBLE — MODE VUE SEULE');
     return;
   }
@@ -243,43 +219,32 @@ async function chargerSuivi() {
   };
 
   try {
-    lmVisage = await creer(V.FaceLandmarker, {
-      baseOptions:{ modelAssetPath:MODELES.visage },
-      runningMode:'VIDEO', numFaces:1,
-      outputFaceBlendshapes:false, outputFacialTransformationMatrixes:false,
-    });
-    voyant('visage', 'on');
-  } catch (err) { console.error(err); voyant('visage', 'off'); }
-
-  voyant('mains', 'attente');
-  try {
     lmMains = await creer(V.HandLandmarker, {
       baseOptions:{ modelAssetPath:MODELES.mains },
       runningMode:'VIDEO', numHands:1,
       minHandDetectionConfidence:0.5, minTrackingConfidence:0.5,
     });
     voyant('mains', 'on');
-    mouchard('BALAYEZ LA MAIN POUR CHANGER DE TENUE');
+    mouchard('BALAYEZ · PINCEZ POUR PARLER');
   } catch (err) { console.error(err); voyant('mains', 'off'); }
 
-  voyant('corps', 'attente');
+  voyant('cible', 'attente');
   try {
-    lmCorps = await creer(V.PoseLandmarker, {
-      baseOptions:{ modelAssetPath:MODELES.corps },
-      runningMode:'VIDEO', numPoses:1,
-      minPoseDetectionConfidence:0.5, minTrackingConfidence:0.5,
+    lmVisage = await creer(V.FaceLandmarker, {
+      baseOptions:{ modelAssetPath:MODELES.visage },
+      runningMode:'VIDEO', numFaces:1,
+      outputFaceBlendshapes:false, outputFacialTransformationMatrixes:false,
     });
-    voyant('corps', 'on');
-  } catch (err) { console.error(err); voyant('corps', 'off'); }
+    voyant('cible', 'on');
+  } catch (err) { console.error(err); voyant('cible', 'off'); }
 }
 
 /* =====================================================================
    4. La boucle
 
-   Le visage est analysé à chaque image — c'est lui qu'on regarde. Les
-   mains une image sur trois, le corps une sur quatre : leurs modèles
-   sont lourds et leurs mouvements lents. Entre deux analyses, le
-   lissage exponentiel garde le tracé fluide.
+   Les mains sont analysées à chaque image : une commande gestuelle qui
+   réagit une fois sur trois passe pour cassée. Le viseur, lui, se
+   contente d'une image sur trois.
    ===================================================================== */
 
 function boucle(t) {
@@ -293,54 +258,37 @@ function boucle(t) {
 
   const maintenant = performance.now();
 
-  if (lmVisage) {
-    const h = horlogeDetection.visage = Math.max(maintenant, horlogeDetection.visage + 1);
-    const r = safe(() => lmVisage.detectForVideo(cam, h));
-    const pts = r && r.faceLandmarks && r.faceLandmarks[0];
-    if (pts) { etat.visage = lisser(etat.visage, pts, 0.55); etat.perteVisage = 0; }
-    else if (++etat.perteVisage > 10) etat.visage = null;
-  }
-
-  if (lmMains && etat.trame % 3 === 0) {
+  if (lmMains) {
     const h = horlogeDetection.mains = Math.max(maintenant, horlogeDetection.mains + 1);
     const r = safe(() => lmMains.detectForVideo(cam, h));
     etat.mains = (r && r.landmarks && r.landmarks[0]) || null;
     if (etat.mains) suivreGeste(etat.mains, maintenant);
   }
 
-  if (lmCorps && etat.corps && etat.trame % 4 === 0) {
-    const h = horlogeDetection.corps = Math.max(maintenant, horlogeDetection.corps + 1);
-    const r = safe(() => lmCorps.detectForVideo(cam, h));
-    const pts = r && r.landmarks && r.landmarks[0];
-    if (pts) {
-      // Certaines versions du modèle ne renseignent pas la visibilité et
-      // renvoient zéro partout. On ne peut alors pas s'en servir pour
-      // filtrer : mieux vaut tout considérer visible que ne rien dessiner.
-      const vMax = pts.reduce((m, p) => Math.max(m, p.visibility === undefined ? 1 : p.visibility), 0);
-      const net = vMax > 0.02 ? pts : pts.map(p => ({ x:p.x, y:p.y, visibility:1 }));
-      etat.pose = lisser(etat.pose, net, 0.4);
-      etat.pertePose = 0;
-    }
-    else if (++etat.pertePose > 12) etat.pose = null;
+  if (lmVisage && etat.cible && etat.trame % 3 === 0) {
+    const h = horlogeDetection.visage = Math.max(maintenant, horlogeDetection.visage + 1);
+    const r = safe(() => lmVisage.detectForVideo(cam, h));
+    const pts = r && r.faceLandmarks && r.faceLandmarks[0];
+    if (pts) { etat.visage = lisser(etat.visage, pts, 0.5); etat.perteVisage = 0; }
+    else if (++etat.perteVisage > 10) etat.visage = null;
   }
 
-  const T = TENUES[etat.tenue];
-  if (etat.corps && etat.pose) dessinerTenue(etat.pose, T);
-  if (etat.visage) dessinerMasque(etat.visage, T);
-  if (etat.mains) dessinerMain(etat.mains);
+  const accent = PROFILS[etat.profil];
+  if (etat.cible && etat.visage) dessinerCible(etat.visage, accent, maintenant);
+  if (etat.mains) dessinerMain(etat.mains, accent);
+  majReleve();
 }
 
 function safe(fn) { try { return fn(); } catch (err) { console.warn(err); return null; } }
 
 /* Lissage exponentiel : chaque repère se rapproche de sa nouvelle
-   position au lieu d'y sauter. Sans cela, le masque tremble. */
+   position au lieu d'y sauter. Sans cela, le viseur tremble. */
 function lisser(avant, pts, a) {
-  const net = pts.map(p => ({ x:p.x, y:p.y, v:p.visibility === undefined ? 1 : p.visibility }));
+  const net = pts.map(p => ({ x:p.x, y:p.y }));
   if (!avant || avant.length !== net.length) return net;
   return net.map((p, i) => ({
     x: avant[i].x + (p.x - avant[i].x) * a,
     y: avant[i].y + (p.y - avant[i].y) * a,
-    v: avant[i].v + (p.v - avant[i].v) * a,
   }));
 }
 
@@ -355,396 +303,165 @@ function mesurerIps(t) {
 }
 
 /* =====================================================================
-   5. Le masque
+   5. Le viseur
 
-   Le maillage donne le contour du visage, qui s'arrête à la naissance
-   des cheveux. Un masque, lui, couvre le crâne : on travaille donc
-   dans le repère penché de la tête — un axe entre les yeux, un axe
-   menton-front — et on étire le contour vers le haut. Passer par ce
-   repère plutôt que par les axes de l'écran est ce qui permet au
-   masque de suivre une tête inclinée.
+   Quatre équerres autour du visage, une ligne de balayage qui le
+   parcourt, une croix sur le nez. C'est un instrument de mesure, pas
+   un déguisement : il ne recouvre rien.
    ===================================================================== */
 
-function reperesTete(pts) {
-  const g = moyenne(pts, OEIL_G), d = moyenne(pts, OEIL_D);
-  const ecart = Math.max(1, dist(g, d));
-  const droite = { x:(d.x - g.x) / ecart, y:(d.y - g.y) / ecart };
-  const haut = { x:droite.y, y:-droite.x };              // perpendiculaire, vers le haut
-  const front = P(pts[FRONT]), menton = P(pts[MENTON]);
-
-  // Garde-fou : l'axe vertical doit pointer du menton vers le front. Sans
-  // cette vérification, une tête très inclinée retournerait le masque.
-  if ((front.x - menton.x) * haut.x + (front.y - menton.y) * haut.y < 0) {
-    haut.x = -haut.x; haut.y = -haut.y;
+function dessinerCible(pts, profil, t) {
+  let x1 = Infinity, y1 = Infinity, x2 = -Infinity, y2 = -Infinity;
+  for (const l of pts) {
+    const p = P(l);
+    if (p.x < x1) x1 = p.x; if (p.x > x2) x2 = p.x;
+    if (p.y < y1) y1 = p.y; if (p.y > y2) y2 = p.y;
   }
+  // Un peu d'air autour du visage : une équerre collée au menton se lit mal.
+  const mx = (x2 - x1) * 0.14, my = (y2 - y1) * 0.10;
+  x1 -= mx; x2 += mx; y1 -= my; y2 += my;
 
-  return {
-    oeilG:g, oeilD:d, ecart, droite, haut,
-    centre:{ x:(front.x + menton.x) / 2, y:(front.y + menton.y) / 2 },
-    hauteur:Math.max(1, dist(front, menton)),
-    largeur:Math.max(1, dist(P(pts[JOUE_G]), P(pts[JOUE_D]))),
-    angle:Math.atan2(droite.y, droite.x),
-  };
-}
-
-const moyenne = (pts, idx) => {
-  let x = 0, y = 0;
-  for (const i of idx) { const p = P(pts[i]); x += p.x; y += p.y; }
-  return { x:x / idx.length, y:y / idx.length };
-};
-
-function dessinerMasque(pts, T) {
-  const R = reperesTete(pts);
-
-  // Contour dilaté : plus large sur les côtés, beaucoup plus haut sur
-  // le crâne, à peine sous le menton.
-  const contour = OVALE.map(i => {
-    const p = P(pts[i]);
-    const dx = p.x - R.centre.x, dy = p.y - R.centre.y;
-    const u = dx * R.droite.x + dy * R.droite.y;
-    const v = dx * R.haut.x + dy * R.haut.y;
-    const u2 = u * 1.13;
-    const v2 = v * (v > 0 ? 1.46 : 1.07);
-    return {
-      x: R.centre.x + R.droite.x * u2 + R.haut.x * v2,
-      y: R.centre.y + R.droite.y * u2 + R.haut.y * v2,
-    };
-  });
-
+  const l = Math.min((x2 - x1), (y2 - y1)) * 0.26;
   ctx.save();
-  cheminLisse(contour);
-
-  // Le tissu : plus clair là où la lumière tomberait, sombre sur les bords.
-  const g = ctx.createRadialGradient(
-    R.centre.x - R.droite.x * R.largeur * 0.18, R.centre.y - R.hauteur * 0.28, R.largeur * 0.12,
-    R.centre.x, R.centre.y, R.largeur * 0.95
-  );
-  g.addColorStop(0, T.masque);
-  g.addColorStop(0.62, T.masque);
-  g.addColorStop(1, T.masqueOmbre);
-  ctx.fillStyle = g;
-  ctx.fill();
-
-  // La toile, contenue dans le masque
-  ctx.clip();
-  dessinerToile(R.centre, R.haut, R.hauteur * 1.55, R.angle, T.toile, R.largeur * 0.0075, R.hauteur * 0.26);
-  ctx.restore();
-
-  // Liseré de contour : sans lui le masque flotte sur l'image.
-  ctx.save();
-  cheminLisse(contour);
-  ctx.strokeStyle = T.masqueOmbre;
-  ctx.lineWidth = Math.max(1, R.largeur * 0.02);
-  ctx.globalAlpha = 0.75;
-  ctx.stroke();
-  ctx.restore();
-
-  dessinerLentille(R, T, +1);   // œil côté image gauche
-  dessinerLentille(R, T, -1);
-}
-
-/* Toile d'araignée : des rayons partant d'un point, et des anneaux
-   entre eux. Le tout est tracé en coordonnées de la tête, donc suit
-   son inclinaison. */
-function dessinerToile(centre, haut, rayon, angle, couleur, trait, decalage) {
-  const o = { x:centre.x + haut.x * decalage, y:centre.y + haut.y * decalage };
-  ctx.strokeStyle = couleur;
-  ctx.lineWidth = Math.max(0.6, trait);
-  ctx.globalAlpha = 0.65;
+  ctx.strokeStyle = profil.accent;
+  ctx.lineWidth = Math.max(1.4, (x2 - x1) * 0.008);
+  ctx.globalAlpha = 0.9;
   ctx.lineCap = 'round';
 
   ctx.beginPath();
-  for (let i = 0; i < 18; i++) {
-    const a = angle + (i / 18) * Math.PI * 2;
-    ctx.moveTo(o.x, o.y);
-    ctx.lineTo(o.x + Math.cos(a) * rayon, o.y + Math.sin(a) * rayon);
-  }
+  ctx.moveTo(x1, y1 + l); ctx.lineTo(x1, y1); ctx.lineTo(x1 + l, y1);
+  ctx.moveTo(x2 - l, y1); ctx.lineTo(x2, y1); ctx.lineTo(x2, y1 + l);
+  ctx.moveTo(x2, y2 - l); ctx.lineTo(x2, y2); ctx.lineTo(x2 - l, y2);
+  ctx.moveTo(x1 + l, y2); ctx.lineTo(x1, y2); ctx.lineTo(x1, y2 - l);
   ctx.stroke();
 
-  ctx.globalAlpha = 0.5;
-  ctx.beginPath();
-  for (let k = 1; k <= 10; k++) {
-    const r = rayon * (k / 10) * 0.96;
-    ctx.ellipse(o.x, o.y, r, r * 0.9, angle, 0, Math.PI * 2);
-  }
-  ctx.stroke();
-  ctx.globalAlpha = 1;
-}
-
-/* Les lentilles : deux amandes surdimensionnées, cernées de noir.
-   `sens` vaut +1 pour l'œil situé à gauche dans l'image, -1 pour
-   l'autre ; il retourne le tracé pour que la pointe reste du côté du nez. */
-function dessinerLentille(R, T, sens) {
-  const base = sens > 0 ? R.oeilG : R.oeilD;
-  // Demi-largeur et demi-hauteur. Le tracé s'étend d'environ -1 à +1,1 :
-  // au-delà de la moitié de l'écart inter-oculaire, les deux lentilles
-  // se chevauchent au-dessus du nez.
-  const l = R.ecart * 0.50, h = R.ecart * 0.30;
-
-  // On pousse la lentille vers l'extérieur et légèrement vers le haut :
-  // c'est ce décalage qui donne le regard, plutôt que le calque d'un œil.
-  const cx = base.x - R.droite.x * sens * R.ecart * 0.10 - R.haut.x * R.ecart * 0.05;
-  const cy = base.y - R.droite.y * sens * R.ecart * 0.10 - R.haut.y * R.ecart * 0.05;
-
-  ctx.save();
-  ctx.translate(cx, cy);
-  ctx.rotate(R.angle);
-  ctx.scale(-sens * l, h);      // -sens : la pointe pointe vers le nez
-
-  const forme = () => {
-    ctx.beginPath();
-    ctx.moveTo(-1, 0.05);
-    ctx.bezierCurveTo(-0.55, -0.95, 0.45, -1.0, 0.92, -0.35);
-    ctx.bezierCurveTo(1.12, 0.05, 0.85, 0.85, 0.15, 0.95);
-    ctx.bezierCurveTo(-0.35, 0.95, -0.85, 0.5, -1, 0.05);
-    ctx.closePath();
-  };
-
-  forme();
-  ctx.fillStyle = T.lentille;
-  ctx.fill();
-
-  // Dégradé interne : la lentille paraît bombée, pas collée.
-  const g = ctx.createLinearGradient(0, -1, 0, 1);
-  g.addColorStop(0, 'rgba(255,255,255,.55)');
-  g.addColorStop(0.45, 'rgba(255,255,255,0)');
-  g.addColorStop(1, T.lentilleOmbre);
+  // Ligne de balayage : elle descend puis remonte, en boucle.
+  const cycle = (t % 2600) / 2600;
+  const y = y1 + (y2 - y1) * (cycle < 0.5 ? cycle * 2 : (1 - cycle) * 2);
+  const g = ctx.createLinearGradient(x1, 0, x2, 0);
+  g.addColorStop(0, 'transparent');
+  g.addColorStop(0.5, profil.accent);
+  g.addColorStop(1, 'transparent');
   ctx.globalAlpha = 0.55;
-  ctx.fillStyle = g;
-  ctx.fill();
-  ctx.globalAlpha = 1;
-
-  ctx.restore();
-
-  // Le cerne, tracé hors de l'échelle déformée pour garder une épaisseur
-  // constante — sans quoi il serait ovalisé comme la lentille.
-  ctx.save();
-  ctx.translate(cx, cy);
-  ctx.rotate(R.angle);
-  ctx.scale(-sens * l, h);
-  ctx.beginPath();
-  ctx.moveTo(-1, 0.05);
-  ctx.bezierCurveTo(-0.55, -0.95, 0.45, -1.0, 0.92, -0.35);
-  ctx.bezierCurveTo(1.12, 0.05, 0.85, 0.85, 0.15, 0.95);
-  ctx.bezierCurveTo(-0.35, 0.95, -0.85, 0.5, -1, 0.05);
-  ctx.closePath();
-  ctx.restore();
-  ctx.lineWidth = Math.max(1.5, R.ecart * 0.048);
-  ctx.strokeStyle = T.cerne;
-  ctx.lineJoin = 'round';
-  ctx.stroke();
-}
-
-/* Tracé fermé et adouci : on passe par les milieux de segments, ce qui
-   arrondit un polygone de 36 points sans le déformer. */
-function cheminLisse(pts) {
-  const n = pts.length;
-  ctx.beginPath();
-  let m = milieu(pts[n - 1], pts[0]);
-  ctx.moveTo(m.x, m.y);
-  for (let i = 0; i < n; i++) {
-    const p = pts[i], q = pts[(i + 1) % n];
-    const mm = milieu(p, q);
-    ctx.quadraticCurveTo(p.x, p.y, mm.x, mm.y);
-  }
-  ctx.closePath();
-}
-
-/* =====================================================================
-   6. La tenue
-
-   Le squelette donne treize points utiles. Le costume en est déduit :
-   un tronc, quatre membres tracés au gros trait rond, des gants et des
-   bottes. Rien n'est plaqué sur l'image — tout est reconstruit.
-   ===================================================================== */
-
-function dessinerTenue(pts, T) {
-  const vis = i => (pts[i] ? pts[i].v : 0);
-  if (vis(C.epauleG) < 0.5 || vis(C.epauleD) < 0.5) return;
-
-  const eG = P(pts[C.epauleG]), eD = P(pts[C.epauleD]);
-  const largeur = Math.max(20, dist(eG, eD));
-  const trait = largeur * 0.21;
-
-  const troncVisible = vis(C.hancheG) > 0.4 && vis(C.hancheD) > 0.4;
-  const hG = troncVisible ? P(pts[C.hancheG]) : { x:eG.x, y:eG.y + largeur * 1.1 };
-  const hD = troncVisible ? P(pts[C.hancheD]) : { x:eD.x, y:eD.y + largeur * 1.1 };
-
-  ctx.save();
-  ctx.lineCap = 'round';
-  ctx.lineJoin = 'round';
-
-  // --- Jambes, dessinées en premier : elles passent derrière le tronc.
-  if (troncVisible) {
-    membre(pts, [C.hancheG, C.genouG, C.chevilleG], trait * 1.16, T.jambes, T.jambesOmbre);
-    membre(pts, [C.hancheD, C.genouD, C.chevilleD], trait * 1.16, T.jambes, T.jambesOmbre);
-    botte(pts, C.chevilleG, largeur * 0.13, T.gants);
-    botte(pts, C.chevilleD, largeur * 0.13, T.gants);
-  }
-
-  // --- Le tronc
-  // Six points, pas quatre : le lissage d'un simple quadrilatère
-  // épaules-hanches donne un œuf. Les deux points de taille, resserrés,
-  // sont ce qui rend au buste une silhouette de torse.
-  const centreT = { x:(eG.x + eD.x + hG.x + hD.x) / 4, y:(eG.y + eD.y + hG.y + hD.y) / 4 };
-  const ux = (eD.x - eG.x) / largeur, uy = (eD.y - eG.y) / largeur;   // axe des épaules
-  const ecarter = (p, k) => ({ x:p.x + ux * k, y:p.y + uy * k });
-  const entre = (a, b, t) => ({ x:a.x + (b.x - a.x) * t, y:a.y + (b.y - a.y) * t });
-
-  const epG = ecarter(eG, -largeur * 0.13), epD = ecarter(eD, largeur * 0.13);
-  const baG = ecarter(hG, -largeur * 0.11), baD = ecarter(hD, largeur * 0.11);
-  const taG = ecarter(entre(epG, baG, 0.55),  largeur * 0.045);
-  const taD = ecarter(entre(epD, baD, 0.55), -largeur * 0.045);
-  const tronc = [epG, epD, taD, baD, baG, taG];
-
-  ctx.save();
-  cheminLisse(tronc);
-  const gt = ctx.createLinearGradient(eG.x, eG.y, hD.x, hD.y);
-  gt.addColorStop(0, T.torse);
-  gt.addColorStop(1, T.torseOmbre);
-  ctx.fillStyle = gt;
-  ctx.fill();
-
-  // Toile sur le buste, rayonnant du plexus
-  ctx.clip();
-  const hautT = { x:(eG.x - hG.x) / Math.max(1, dist(eG, hG)), y:(eG.y - hG.y) / Math.max(1, dist(eG, hG)) };
-  const droiteT = { x:-hautT.y, y:hautT.x };
-  dessinerToile(centreT, hautT, largeur * 2.2, Math.atan2(droiteT.y, droiteT.x),
-                T.toile, largeur * 0.009, largeur * 0.12);
-  ctx.restore();
-
-  // --- Bras
-  membre(pts, [C.epauleG, C.coudeG, C.poignetG], trait, T.bras, T.torseOmbre);
-  membre(pts, [C.epauleD, C.coudeD, C.poignetD], trait, T.bras, T.torseOmbre);
-  botte(pts, C.poignetG, largeur * 0.115, T.gants);
-  botte(pts, C.poignetD, largeur * 0.115, T.gants);
-
-  // --- Cou : relie la tenue au masque, sinon la tête flotte.
-  if (vis(C.nez) > 0.4) {
-    const nez = P(pts[C.nez]), epaules = milieu(eG, eD);
-    ctx.beginPath();
-    ctx.moveTo(epaules.x, epaules.y);
-    ctx.lineTo(epaules.x + (nez.x - epaules.x) * 0.55, epaules.y + (nez.y - epaules.y) * 0.55);
-    ctx.strokeStyle = T.masqueOmbre;
-    ctx.lineWidth = largeur * 0.26;
-    ctx.stroke();
-  }
-
-  // --- L'emblème de poitrine
-  const plexus = {
-    x: centreT.x + (milieu(eG, eD).x - centreT.x) * 0.42,
-    y: centreT.y + (milieu(eG, eD).y - centreT.y) * 0.42,
-  };
-  emblem(plexus, largeur * 0.19, Math.atan2(eD.y - eG.y, eD.x - eG.x), T.emblem);
-
-  ctx.restore();
-}
-
-/* Un membre : deux segments d'épaisseur décroissante. On ne le trace
-   pas si un de ses points est trop incertain — mieux vaut un bras
-   absent qu'un bras jeté au hasard dans le décor. */
-function membre(pts, chaine, trait, couleur, ombre) {
-  for (let i = 0; i < chaine.length - 1; i++) {
-    const a = pts[chaine[i]], b = pts[chaine[i + 1]];
-    if (!a || !b || a.v < 0.4 || b.v < 0.4) continue;
-    const A = P(a), B = P(b);
-    ctx.beginPath();
-    ctx.moveTo(A.x, A.y);
-    ctx.lineTo(B.x, B.y);
-    ctx.strokeStyle = couleur;
-    ctx.lineWidth = trait * (i === 0 ? 1 : 0.82);
-    ctx.stroke();
-
-    // Un filet d'ombre sur un bord donne du volume au cylindre.
-    ctx.save();
-    ctx.globalAlpha = 0.35;
-    ctx.strokeStyle = ombre;
-    ctx.lineWidth = trait * (i === 0 ? 0.3 : 0.24);
-    ctx.translate(trait * 0.24, trait * 0.1);
-    ctx.beginPath();
-    ctx.moveTo(A.x, A.y);
-    ctx.lineTo(B.x, B.y);
-    ctx.stroke();
-    ctx.restore();
-  }
-}
-
-function botte(pts, idx, r, couleur) {
-  const p = pts[idx];
-  if (!p || p.v < 0.4) return;
-  const q = P(p);
-  ctx.beginPath();
-  ctx.arc(q.x, q.y, r, 0, Math.PI * 2);
-  ctx.fillStyle = couleur;
-  ctx.fill();
-}
-
-/* Emblème : une silhouette d'arachnide, tracée géométriquement —
-   corps, tête, huit pattes symétriques. */
-function emblem(centre, taille, angle, couleur) {
-  ctx.save();
-  ctx.translate(centre.x, centre.y);
-  ctx.rotate(angle);
-  ctx.scale(taille, taille);
-  ctx.fillStyle = couleur;
-  ctx.strokeStyle = couleur;
-  ctx.lineCap = 'round';
-  ctx.lineWidth = 0.09;
-
-  ctx.beginPath();
-  ctx.ellipse(0, 0.14, 0.17, 0.34, 0, 0, Math.PI * 2);
-  ctx.fill();
-  ctx.beginPath();
-  ctx.ellipse(0, -0.26, 0.12, 0.14, 0, 0, Math.PI * 2);
-  ctx.fill();
-
-  // Quatre pattes de chaque côté, deux vers le haut, deux vers le bas.
-  const pattes = [
-    [-0.10, -0.20, -0.62, -0.62, -0.98, -0.34],
-    [-0.12, -0.05, -0.70, -0.28, -1.02, 0.06],
-    [-0.12,  0.12, -0.70,  0.14, -0.98,  0.48],
-    [-0.10,  0.28, -0.58,  0.52, -0.82,  0.92],
-  ];
-  for (const s of [-1, 1]) {
-    for (const [x1, y1, cx, cy, x2, y2] of pattes) {
-      ctx.beginPath();
-      ctx.moveTo(x1 * s, y1);
-      ctx.quadraticCurveTo(cx * s, cy, x2 * s, y2);
-      ctx.stroke();
-    }
-  }
-  ctx.restore();
-}
-
-/* Un discret repère sur l'index : l'utilisateur voit que sa main est
-   suivie, donc que le balayage a une chance d'aboutir. */
-function dessinerMain(main) {
-  const p = P(main[8]);
-  ctx.save();
-  ctx.globalAlpha = 0.55;
-  ctx.strokeStyle = '#ff2b3d';
+  ctx.strokeStyle = g;
   ctx.lineWidth = 1.6;
   ctx.beginPath();
-  ctx.arc(p.x, p.y, 13, 0, Math.PI * 2);
-  ctx.moveTo(p.x - 20, p.y); ctx.lineTo(p.x - 15, p.y);
-  ctx.moveTo(p.x + 15, p.y); ctx.lineTo(p.x + 20, p.y);
+  ctx.moveTo(x1, y); ctx.lineTo(x2, y);
+  ctx.stroke();
+
+  // Croix sur l'arête du nez
+  const n = P(pts[NEZ]);
+  const c = (x2 - x1) * 0.05;
+  ctx.globalAlpha = 0.75;
+  ctx.strokeStyle = profil.accent;
+  ctx.lineWidth = 1.3;
+  ctx.beginPath();
+  ctx.moveTo(n.x - c, n.y); ctx.lineTo(n.x + c, n.y);
+  ctx.moveTo(n.x, n.y - c); ctx.lineTo(n.x, n.y + c);
   ctx.stroke();
   ctx.restore();
 }
 
 /* =====================================================================
-   7. Le balayage
+   6. La main en filaire
 
-   On garde la trajectoire du centre de la main sur les dernières
-   fractions de seconde. Un déplacement franc, surtout horizontal et
-   assez rapide, vaut changement de tenue. Le délai de garde évite
-   qu'un même mouvement ne compte trois fois.
+   Le squelette entier est tracé, parce que c'est lui qui rend le
+   contrôle lisible : on voit ce que la machine voit, donc on comprend
+   pourquoi un geste passe ou ne passe pas.
+   ===================================================================== */
+
+function dessinerMain(main, profil) {
+  const pts = main.map(P);
+  const echelle = Math.max(12, dist(pts[POIGNET], pts[PAUME]));
+
+  ctx.save();
+  ctx.lineCap = 'round';
+  ctx.lineJoin = 'round';
+
+  // Halo : un second tracé large et transparent sous le trait net.
+  for (const [alpha, largeur] of [[0.18, echelle * 0.22], [0.95, Math.max(1.6, echelle * 0.05)]]) {
+    ctx.globalAlpha = alpha;
+    ctx.strokeStyle = profil.accent;
+    ctx.lineWidth = largeur;
+    ctx.beginPath();
+    for (const doigt of DOIGTS) {
+      ctx.moveTo(pts[doigt[0]].x, pts[doigt[0]].y);
+      for (let i = 1; i < doigt.length; i++) ctx.lineTo(pts[doigt[i]].x, pts[doigt[i]].y);
+    }
+    ctx.stroke();
+  }
+
+  // Articulations
+  ctx.globalAlpha = 0.9;
+  ctx.fillStyle = profil.accent;
+  for (let i = 0; i < pts.length; i++) {
+    ctx.beginPath();
+    ctx.arc(pts[i].x, pts[i].y, BOUTS.includes(i) ? echelle * 0.09 : echelle * 0.055, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  // Le pincement : le trait pouce-index se resserre et s'allume.
+  const serre = pincement(main);
+  ctx.globalAlpha = 0.35 + serre * 0.6;
+  ctx.strokeStyle = serre > 0.6 ? '#ffffff' : profil.accent;
+  ctx.lineWidth = Math.max(1.2, echelle * 0.04);
+  ctx.setLineDash([echelle * 0.14, echelle * 0.12]);
+  ctx.beginPath();
+  ctx.moveTo(pts[POUCE].x, pts[POUCE].y);
+  ctx.lineTo(pts[INDEX].x, pts[INDEX].y);
+  ctx.stroke();
+  ctx.setLineDash([]);
+
+  // Viseur sur l'index : le doigt qui commande
+  const p = pts[INDEX];
+  const r = echelle * 0.42;
+  ctx.globalAlpha = 0.8;
+  ctx.strokeStyle = profil.accent;
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  ctx.arc(p.x, p.y, r, 0, Math.PI * 2);
+  ctx.moveTo(p.x - r * 1.5, p.y); ctx.lineTo(p.x - r * 1.15, p.y);
+  ctx.moveTo(p.x + r * 1.15, p.y); ctx.lineTo(p.x + r * 1.5, p.y);
+  ctx.moveTo(p.x, p.y - r * 1.5); ctx.lineTo(p.x, p.y - r * 1.15);
+  ctx.moveTo(p.x, p.y + r * 1.15); ctx.lineTo(p.x, p.y + r * 1.5);
+  ctx.stroke();
+
+  ctx.restore();
+}
+
+/* =====================================================================
+   7. Les gestes
+
+   Deux commandes, et deux seulement : on ne pilote pas une page à
+   l'aveugle avec un vocabulaire de gestes qu'il faudrait apprendre.
+
+   — Balayer, franc et horizontal : profil suivant ou précédent.
+   — Pincer pouce et index : ouvrir le micro d'IRIS.
    ===================================================================== */
 
 const trace = [];
-let dernierGeste = 0;
+let dernierGeste = 0, pinceAvant = false, dernierPince = 0;
+
+/* Le serrage, rapporté à la taille de la main : sinon un pincement
+   détecté de près ne le serait plus de loin. 0 = ouvert, 1 = fermé. */
+function pincement(main) {
+  const taille = Math.max(1e-4, dist(main[POIGNET], main[PAUME]));
+  const rapport = dist(main[POUCE], main[INDEX]) / taille;
+  return Math.max(0, Math.min(1, (0.85 - rapport) / 0.55));
+}
 
 function suivreGeste(main, t) {
+  // --- Pincement : au front montant seulement, pour ne pas rouvrir le
+  // micro tant que les doigts restent joints.
+  const serre = pincement(main) > 0.72;
+  if (serre && !pinceAvant && t - dernierPince > 1500) {
+    dernierPince = t;
+    basculerMicro();
+    if (navigator.vibrate) navigator.vibrate(24);
+  }
+  pinceAvant = serre;
+
+  // --- Balayage : trajectoire du centre de la paume sur 700 ms.
   const paume = [0, 5, 9, 13, 17].reduce((acc, i) => {
     acc.x += main[i].x / 5; acc.y += main[i].y / 5; return acc;
   }, { x:0, y:0 });
@@ -761,44 +478,47 @@ function suivreGeste(main, t) {
   trace.length = 0;
   // L'image est en miroir : un x croissant dans la vidéo est un
   // déplacement vers la gauche de l'écran.
-  changerTenue(dx > 0 ? -1 : +1);
+  changerProfil(dx > 0 ? -1 : +1);
   if (navigator.vibrate) navigator.vibrate(18);
 }
 
 /* =====================================================================
-   8. Les tenues, côté interface
+   8. Les profils, côté interface
    ===================================================================== */
 
 function construirePastilles() {
   const boite = $('#pastilles');
   boite.innerHTML = '';
-  TENUES.forEach((t, i) => {
+  PROFILS.forEach((p, i) => {
     const b = document.createElement('button');
     b.type = 'button';
     b.setAttribute('role', 'tab');
-    b.setAttribute('aria-label', t.nom);
-    b.style.background = t.masque;
-    b.style.color = t.masque;
-    b.addEventListener('click', () => appliquerTenue(i));
+    b.setAttribute('aria-label', p.nom);
+    b.style.background = p.accent;
+    b.style.color = p.accent;
+    b.addEventListener('click', () => appliquerProfil(i));
     boite.appendChild(b);
   });
 }
 
-function changerTenue(pas) {
-  appliquerTenue((etat.tenue + pas + TENUES.length) % TENUES.length);
+function changerProfil(pas) {
+  appliquerProfil((etat.profil + pas + PROFILS.length) % PROFILS.length);
 }
 
-function appliquerTenue(i) {
-  etat.tenue = i;
-  const t = TENUES[i];
-  $('#tenue-nom').textContent = t.nom;
-  $('#tenue-nom').style.color = t.libelle;
+/* Un seul point d'entrée pour la couleur : on pose deux variables CSS
+   et toute l'interface suit, filets et panneaux compris. */
+function appliquerProfil(i) {
+  etat.profil = i;
+  const p = PROFILS[i];
+  document.documentElement.style.setProperty('--accent', p.accent);
+  document.documentElement.style.setProperty('--accent-rgb', p.rgb);
+  $('#profil-nom').textContent = p.nom;
   $$('#pastilles button').forEach((b, k) => b.setAttribute('aria-selected', String(k === i)));
-  mouchard('TENUE · ' + t.nom);
+  mouchard('PROFIL · ' + p.nom);
 }
 
 /* =====================================================================
-   9. Horloge, météo, voyants
+   9. Horloge, météo, relevés, voyants
    ===================================================================== */
 
 function demarrerHorloge() {
@@ -822,6 +542,32 @@ function demarrerHorloge() {
     $('#batterie').textContent = '—';
   }
 }
+
+/* Le relevé du viseur : inclinaison de la tête, et une distance
+   approchée. L'estimation part d'un écart entre les yeux de 6,3 cm —
+   la moyenne adulte — et d'une focale déduite de la largeur d'image.
+   C'est un ordre de grandeur affiché comme tel, pas une mesure. */
+function majReleve() {
+  if (etat.trame % 10) return;
+  const el = $('#cible');
+  if (!el) return;
+
+  if (!etat.cible || !etat.visage) {
+    el.textContent = 'CIBLE — AUCUNE';
+    return;
+  }
+  const g = centre(etat.visage, OEIL_G), d = centre(etat.visage, OEIL_D);
+  const ecart = Math.max(1, dist(g, d));
+  const angle = Math.round(Math.atan2(d.y - g.y, d.x - g.x) * 180 / Math.PI);
+  const cm = Math.round((6.3 * vue.dw * 1.15 / ecart) / 5) * 5;
+  el.textContent = `CIBLE ${angle > 0 ? '+' : ''}${angle}° · ≈${cm} CM`;
+}
+
+const centre = (pts, idx) => {
+  let x = 0, y = 0;
+  for (const i of idx) { const p = P(pts[i]); x += p.x; y += p.y; }
+  return { x:x / idx.length, y:y / idx.length };
+};
 
 async function chargerMeteo() {
   const pos = await positionner();
@@ -1003,12 +749,16 @@ if (SR) {
 
 function arreterEcoute() { if (reco && etat.ecoute) { try { reco.stop(); } catch {} } }
 
-$('#micro').addEventListener('click', () => {
-  if (!reco) return;
+/* Un seul chemin pour ouvrir ou fermer le micro, que l'ordre vienne du
+   bouton ou du pincement. */
+function basculerMicro() {
+  if (!reco) return mouchard('MICRO INDISPONIBLE');
   if (etat.ecoute) return arreterEcoute();
   if ('speechSynthesis' in window) speechSynthesis.cancel();
   try { reco.start(); } catch { /* déjà démarrée */ }
-});
+}
+
+$('#micro').addEventListener('click', basculerMicro);
 
 $('#saisie').addEventListener('submit', e => {
   e.preventDefault();
@@ -1066,13 +816,13 @@ function contexte() {
     date: d.toLocaleDateString('fr-FR', { weekday:'long', day:'numeric', month:'long', year:'numeric' }),
     ville: m ? (m.pays ? `${m.ville}, ${m.pays}` : m.ville) : '',
     meteo: m ? `${m.libelle}, ${m.temp} °C (ressenti ${m.ressenti} °C), vent ${m.vent} km/h, humidité ${m.humidite} %, min ${m.min} °C / max ${m.max} °C` : '',
-    tenue: TENUES[etat.tenue].nom,
+    profil: PROFILS[etat.profil].nom,
   };
 }
 
 /* Le cerveau de secours. Il ne comprend rien : il reconnaît quelques
-   mots et lit les capteurs. C'est assez pour que le masque ne devienne
-   jamais complètement muet. */
+   mots et lit les capteurs. C'est assez pour que l'interface ne
+   devienne jamais complètement muette. */
 function horsLigne(q) {
   const t = q.toLowerCase();
   const m = etat.meteo;
@@ -1088,10 +838,10 @@ function horsLigne(q) {
   if (/où|ou suis|position|ville|endroit/.test(t)) {
     return m ? `Position approximative : ${m.ville}.` : "Position indéterminée.";
   }
-  if (/tenue|costume|masque|couleur/.test(t)) {
-    return `Tenue ${TENUES[etat.tenue].nom}. Balayez la main pour en changer.`;
+  if (/profil|couleur|interface|thème|theme/.test(t)) {
+    return `Profil ${PROFILS[etat.profil].nom}. Balayez la main pour en changer.`;
   }
-  return "Liaison avec IRIS coupée. Je garde l'heure, la météo et les tenues.";
+  return "Liaison avec IRIS coupée. Je garde l'heure, la météo et les profils.";
 }
 
 /* =====================================================================
@@ -1100,19 +850,19 @@ function horsLigne(q) {
 
 $$('.outils button').forEach(b => b.addEventListener('click', async () => {
   switch (b.dataset.outil) {
-    case 'tenue-prec': changerTenue(-1); break;
-    case 'tenue-suiv': changerTenue(+1); break;
+    case 'profil-prec': changerProfil(-1); break;
+    case 'profil-suiv': changerProfil(+1); break;
 
-    case 'corps':
-      etat.corps = !etat.corps;
-      b.setAttribute('aria-pressed', String(etat.corps));
-      if (!etat.corps) etat.pose = null;
-      mouchard(etat.corps ? 'TENUE INTÉGRALE' : 'MASQUE SEUL');
+    case 'cible':
+      etat.cible = !etat.cible;
+      b.setAttribute('aria-pressed', String(etat.cible));
+      if (!etat.cible) etat.visage = null;
+      mouchard(etat.cible ? 'VISEUR ACTIF' : 'VISEUR COUPÉ');
       break;
 
     case 'camera':
       etat.facing = etat.facing === 'user' ? 'environment' : 'user';
-      etat.visage = etat.pose = null;
+      etat.visage = null;
       try { await ouvrirCamera(etat.facing); }
       catch (err) { console.error(err); mouchard('CAMÉRA INDISPONIBLE'); }
       mouchard(etat.facing === 'user' ? 'CAMÉRA FRONTALE' : 'CAMÉRA ARRIÈRE');
@@ -1129,7 +879,7 @@ $$('.outils button').forEach(b => b.addEventListener('click', async () => {
   }
 }));
 
-/* Onglet quitté : on relâche la caméra et on coupe la voix. Un masque
+/* Onglet quitté : on relâche la caméra et on coupe la voix. Une page
    qui continue de filmer en arrière-plan serait indéfendable. */
 document.addEventListener('visibilitychange', () => {
   if (document.hidden) {

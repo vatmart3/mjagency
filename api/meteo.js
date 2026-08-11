@@ -1,5 +1,5 @@
 /* =========================================================
-   MJ AGENCY — Météo réelle pour l'interface du masque
+   MJ AGENCY — Météo réelle pour l'interface embarquée
 
    Fonction serverless Vercel. Elle interroge Open-Meteo, qui ne
    demande aucune clé, et BigDataCloud pour retrouver le nom de la
@@ -85,7 +85,7 @@ async function commune(lat, lon) {
 
 module.exports = async (req, res) => {
   // Dix minutes de cache en périphérie : la météo ne change pas à la
-  // seconde, et le masque interroge la route à chaque ouverture.
+  // seconde, et l'interface interroge la route à chaque ouverture.
   res.setHeader('Cache-Control', 's-maxage=600, stale-while-revalidate=1800');
 
   if (req.method !== 'GET') {

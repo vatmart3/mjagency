@@ -1,7 +1,7 @@
 /* =========================================================
-   MJ AGENCY — IRIS, la voix du masque
+   MJ AGENCY — IRIS, la voix de l'interface
 
-   Fonction serverless Vercel : le masque (spider.html) poste ici,
+   Fonction serverless Vercel : l'interface (spider.html) poste ici,
    et c'est ce code — pas le navigateur — qui parle à l'API Claude.
    La clé d'API vit dans les variables d'environnement du projet ;
    elle n'apparaît jamais dans le code de la page, donc personne ne
@@ -39,7 +39,7 @@ function corps(req) {
 
    Elle porte tout le caractère d'IRIS : une intelligence embarquée qui
    répond dans l'oreille, pas un assistant qui rédige. Le contexte réel
-   (heure, ville, météo, tenue) y est injecté à chaque appel pour qu'elle
+   (heure, ville, météo, profil) y est injecté à chaque appel pour qu'elle
    réponde « il fait 21 degrés » plutôt que « je ne peux pas savoir ».
    --------------------------------------------------------------------- */
 function consigne(ctx) {
@@ -48,10 +48,10 @@ function consigne(ctx) {
     ctx.date    && `Date : ${ctx.date}`,
     ctx.ville   && `Position approximative : ${ctx.ville}`,
     ctx.meteo   && `Météo actuelle sur place : ${ctx.meteo}`,
-    ctx.tenue   && `Tenue active : ${ctx.tenue}`,
+    ctx.profil  && `Profil d'interface actif : ${ctx.profil}`,
   ].filter(Boolean);
 
-  return `Tu es IRIS, l'intelligence embarquée dans le masque d'un justicier masqué. Tu lui parles dans l'oreille pendant qu'il est en mouvement, en français.
+  return `Tu es IRIS, l'intelligence embarquée d'une interface portée. Tu parles dans l'oreille de son porteur pendant qu'il est en mouvement, en français.
 
 Ta voix : calme, nette, un peu synthétique, avec un humour sec très occasionnel. Tu es une alliée, pas une servante — tu peux le contredire ou lui dire qu'une idée est mauvaise.
 
@@ -124,8 +124,8 @@ module.exports = async (req, res) => {
   const c = corps(req);
   const ctx = c.contexte && typeof c.contexte === 'object' ? c.contexte : {};
 
-  /* On ne renvoie à l'API que les derniers tours : la conversation d'un
-     masque est un fil court, pas des archives. */
+  /* On ne renvoie à l'API que les derniers tours : la conversation est
+     un fil court, pas des archives. */
   const historique = Array.isArray(c.messages) ? c.messages.slice(-MAX.tours) : [];
   const messages = historique
     .filter(m => m && (m.role === 'user' || m.role === 'assistant') && String(m.content || '').trim())
@@ -146,7 +146,7 @@ module.exports = async (req, res) => {
       date:  coupe(ctx.date,  MAX.contexte),
       ville: coupe(ctx.ville, MAX.contexte),
       meteo: coupe(ctx.meteo, MAX.contexte),
-      tenue: coupe(ctx.tenue, MAX.contexte),
+      profil: coupe(ctx.profil, MAX.contexte),
     }),
     messages,
   };
@@ -163,7 +163,7 @@ module.exports = async (req, res) => {
 
     if (!rep.ok) {
       // Le détail reste dans les journaux Vercel : il peut contenir des
-      // informations sur la configuration du compte. Le masque ne reçoit
+      // informations sur la configuration du compte. La page ne reçoit
       // qu'un code, assez précis pour être rapporté, assez vague pour ne
       // rien révéler.
       console.error('Anthropic', rep.status, await rep.text().catch(() => ''));

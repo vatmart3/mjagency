@@ -3,9 +3,9 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
-<title>MASQUE — Interface IRIS</title>
+<title>INTERFACE — IRIS</title>
 <meta name="robots" content="noindex, nofollow">
-<meta name="description" content="Interface de masque en réalité augmentée : suivi du visage et du corps, météo réelle, et une IA à qui parler.">
+<meta name="description" content="Interface embarquée : contrôle gestuel aux doigts, viseur, météo réelle et une IA à qui parler.">
 <meta name="theme-color" content="#050507">
 
 <!-- Ajoutée à l'écran d'accueil, la page s'ouvre sans barre de navigateur :
@@ -13,7 +13,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="MASQUE">
+<meta name="apple-mobile-web-app-title" content="INTERFACE">
 
 <link rel="stylesheet" href="assets/css/spider.css">
 </head>
@@ -21,7 +21,7 @@
 
 <!-- ============================================================
      La scène : le flux de la caméra, et par-dessus le calque où
-     sont peints le masque et la tenue.
+     sont peints le viseur et le filaire des mains.
      ============================================================ -->
 <div id="scene">
   <video id="cam" playsinline autoplay muted></video>
@@ -74,19 +74,19 @@
   <section class="panneau p-etat">
     <h2 class="etiq">CAPTEURS</h2>
     <ul class="voyants">
-      <li><i data-voyant="visage"></i>VISAGE</li>
       <li><i data-voyant="mains"></i>MAINS</li>
-      <li><i data-voyant="corps"></i>CORPS</li>
+      <li><i data-voyant="cible"></i>VISEUR</li>
       <li><i data-voyant="liaison"></i>LIAISON</li>
     </ul>
+    <p class="sous mince" id="cible">CIBLE — AUCUNE</p>
     <p class="sous mince"><span id="fps">--</span> IPS · <span id="batterie">—</span></p>
   </section>
 
-  <!-- Tenue active -->
-  <section class="panneau p-tenue">
-    <h2 class="etiq">TENUE</h2>
-    <p class="tenue-nom" id="tenue-nom">—</p>
-    <div class="pastilles" id="pastilles" role="tablist" aria-label="Choix de la tenue"></div>
+  <!-- Profil d'interface -->
+  <section class="panneau p-profil">
+    <h2 class="etiq">PROFIL</h2>
+    <p class="profil-nom" id="profil-nom">—</p>
+    <div class="pastilles" id="pastilles" role="tablist" aria-label="Profil d’interface"></div>
     <p class="sous mince">Balayez la main · ou touchez</p>
   </section>
 
@@ -109,9 +109,9 @@
 
   <!-- Barre d'outils -->
   <nav class="outils" aria-label="Réglages">
-    <button type="button" data-outil="tenue-prec" aria-label="Tenue précédente">‹</button>
-    <button type="button" data-outil="tenue-suiv" aria-label="Tenue suivante">›</button>
-    <button type="button" data-outil="corps" aria-pressed="true">TENUE</button>
+    <button type="button" data-outil="profil-prec" aria-label="Profil précédent">‹</button>
+    <button type="button" data-outil="profil-suiv" aria-label="Profil suivant">›</button>
+    <button type="button" data-outil="cible" aria-pressed="true">VISEUR</button>
     <button type="button" data-outil="camera" aria-label="Changer de caméra">⟲</button>
     <button type="button" data-outil="quitter" aria-label="Quitter">✕</button>
   </nav>
@@ -127,18 +127,18 @@
 <div id="sas">
   <div class="sas-boite">
     <p class="sas-sur">Système embarqué</p>
-    <h1 class="sas-titre">MASQUE<span>.</span></h1>
+    <h1 class="sas-titre">INTERFACE<span>.</span></h1>
     <p class="sas-texte">
-      Suivi du visage et du corps en direct, tenues interchangeables au
-      geste, météo réelle de votre position, et IRIS — une intelligence
-      à qui parler pendant la mission.
+      Une couche de données par-dessus le réel : viseur, météo de votre
+      position, heure. Vos mains sont suivies en filaire et commandent
+      la page. IRIS écoute et répond.
     </p>
     <ul class="sas-liste">
+      <li>Balayez la main devant l'objectif pour changer de profil.</li>
+      <li>Pincez le pouce et l'index pour ouvrir le micro d'IRIS.</li>
       <li>La caméra reste sur l'appareil : aucune image n'est envoyée nulle part.</li>
-      <li>Seuls vos mots partent vers IRIS, le temps de sa réponse.</li>
-      <li>Tenez le téléphone à hauteur du visage, en pleine lumière.</li>
     </ul>
-    <button type="button" id="lancer" class="sas-bouton">ACTIVER LE MASQUE</button>
+    <button type="button" id="lancer" class="sas-bouton">ACTIVER L’INTERFACE</button>
     <p class="sas-note" id="sas-note">Autorisez la caméra à l'invite du navigateur.</p>
   </div>
   <a class="sas-retour" href="index.html">← mjagency.eu</a>
