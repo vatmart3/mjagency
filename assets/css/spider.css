@@ -1,0 +1,347 @@
+/* =========================================================
+   MJ AGENCY — Interface du masque
+
+   Une seule idée dirige cette feuille : on regarde à travers un
+   masque, pas un écran. D'où le voile sombre en périphérie, les
+   filets de balayage, et une typographie de machine — rien de la
+   charte claire du site, qui n'aurait aucun sens ici.
+
+   Palette : noir profond, écarlate, blanc froid. Trois couleurs.
+   ========================================================= */
+
+:root{
+  color-scheme: dark;
+
+  --noir:      #050507;
+  --noir-2:    #0b0b10;
+  --rouge:     #ff2b3d;
+  --rouge-bas: #b0121f;
+  --blanc:     #f2f5ff;
+  --froid:     #7fd4ff;
+  --or:        #ffc14d;
+
+  --verre:     rgba(8, 8, 14, .52);
+  --trait:     rgba(255, 43, 61, .34);
+  --trait-2:   rgba(255, 43, 61, .12);
+
+  --mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, "Roboto Mono", monospace;
+
+  /* Encoches et barres système : tout le HUD s'y appuie. */
+  --sh: env(safe-area-inset-top, 0px);
+  --sb: env(safe-area-inset-bottom, 0px);
+  --sg: env(safe-area-inset-left, 0px);
+  --sd: env(safe-area-inset-right, 0px);
+}
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+html,body{height:100%;overflow:hidden;background:var(--noir)}
+body{
+  font-family:var(--mono);
+  color:var(--blanc);
+  -webkit-font-smoothing:antialiased;
+  -webkit-tap-highlight-color:transparent;
+  text-transform:uppercase;
+  letter-spacing:.06em;
+  overscroll-behavior:none;
+}
+button{font:inherit;color:inherit;background:none;border:none;cursor:pointer;letter-spacing:inherit;text-transform:inherit}
+svg{display:block}
+
+/* ---------- La scène ---------- */
+
+#scene{position:fixed;inset:0;background:#000}
+
+#cam,#ar{
+  position:absolute;inset:0;
+  width:100%;height:100%;
+  /* La caméra frontale est inversée : sans ce miroir, lever la main
+     droite déplace l'image vers la gauche et le geste devient absurde. */
+  transform:scaleX(-1);
+}
+#cam{object-fit:cover;background:#000}
+#ar{pointer-events:none}
+body.dos #cam, body.dos #ar{transform:none}   /* caméra arrière : pas de miroir */
+
+/* Le voile : vignette, teinte, et filets de balayage. C'est lui qui
+   transforme un flux vidéo en « vue depuis l'intérieur ».
+   Composition normale, volontairement : en mode `screen`, la vignette
+   sombre n'assombrit rien — superposer du noir en `screen` est sans
+   effet, et tout le pourtour resterait à nu. */
+#voile{
+  position:absolute;inset:0;pointer-events:none;
+  background:
+    radial-gradient(115% 85% at 50% 45%, transparent 34%, rgba(3,0,4,.55) 76%, rgba(2,0,3,.93) 100%),
+    linear-gradient(rgba(255,43,61,.07), rgba(0,0,0,0) 32%),
+    repeating-linear-gradient(to bottom, rgba(255,255,255,.03) 0 1px, transparent 1px 3px);
+}
+#voile::after{
+  content:"";position:absolute;inset:0;
+  background:linear-gradient(to bottom, transparent, rgba(255,43,61,.16), transparent);
+  height:34%;
+  animation:balayage 7s linear infinite;
+}
+@keyframes balayage{from{transform:translateY(-120%)}to{transform:translateY(420%)}}
+
+/* ---------- Trame du HUD ---------- */
+
+#hud{position:fixed;inset:0;pointer-events:none;z-index:3}
+#hud[hidden]{display:none}
+#hud > *{pointer-events:none}
+#hud .canal, #hud .outils, #hud .pastilles{pointer-events:auto}
+
+/* Ouverture : tout le HUD se déploie une fois, à l'allumage. */
+#hud.allume .panneau,#hud.allume .canal,#hud.allume .outils{animation:apparait .5s var(--e,cubic-bezier(.2,.7,.3,1)) both}
+#hud.allume .p-heure{animation-delay:.05s}
+#hud.allume .p-meteo{animation-delay:.12s}
+#hud.allume .p-etat{animation-delay:.19s}
+#hud.allume .p-tenue{animation-delay:.26s}
+#hud.allume .canal{animation-delay:.33s}
+@keyframes apparait{from{opacity:0;transform:translateY(6px) scale(.98);filter:blur(3px)}to{opacity:1;transform:none;filter:none}}
+
+/* Les quatre équerres d'angle */
+.coins i{
+  position:fixed;width:clamp(28px,7vw,52px);height:clamp(28px,7vw,52px);
+  border:2px solid var(--rouge);opacity:.55;
+  filter:drop-shadow(0 0 6px rgba(255,43,61,.6));
+}
+.coins i:nth-child(1){top:calc(var(--sh) + 10px);left:calc(var(--sg) + 10px);border-right:0;border-bottom:0}
+.coins i:nth-child(2){top:calc(var(--sh) + 10px);right:calc(var(--sd) + 10px);border-left:0;border-bottom:0}
+.coins i:nth-child(3){bottom:calc(var(--sb) + 10px);left:calc(var(--sg) + 10px);border-right:0;border-top:0}
+.coins i:nth-child(4){bottom:calc(var(--sb) + 10px);right:calc(var(--sd) + 10px);border-left:0;border-top:0}
+
+/* Réticule */
+#reticule{position:fixed;top:50%;left:50%;width:min(46vw,240px);aspect-ratio:1;transform:translate(-50%,-50%);opacity:.28}
+#reticule svg{width:100%;height:100%;fill:none;stroke:var(--rouge);stroke-width:1.2}
+.r-tourne{stroke-dasharray:14 26;transform-origin:100px 100px;animation:tourne 18s linear infinite}
+@keyframes tourne{to{transform:rotate(360deg)}}
+
+/* ---------- Panneaux ---------- */
+
+.panneau{
+  position:fixed;
+  background:var(--verre);
+  border:1px solid var(--trait);
+  backdrop-filter:blur(9px) saturate(1.3);
+  -webkit-backdrop-filter:blur(9px) saturate(1.3);
+  padding:9px 11px;
+  box-shadow:0 0 0 1px rgba(0,0,0,.5), 0 0 22px rgba(255,43,61,.13), inset 0 0 26px rgba(255,43,61,.05);
+  /* Coins coupés : le rectangle plein ferait fenêtre de logiciel. */
+  clip-path:polygon(0 8px, 8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%);
+  min-width:112px;
+}
+.p-heure{top:calc(var(--sh) + 22px);left:calc(var(--sg) + 22px)}
+.p-meteo{top:calc(var(--sh) + 22px);right:calc(var(--sd) + 22px);text-align:right;min-width:148px}
+.p-etat {bottom:calc(var(--sb) + 92px);left:calc(var(--sg) + 22px)}
+.p-tenue{bottom:calc(var(--sb) + 92px);right:calc(var(--sd) + 22px);text-align:right}
+
+.etiq{
+  font-size:8px;font-weight:600;letter-spacing:.28em;
+  color:var(--rouge);opacity:.85;margin-bottom:5px;
+}
+.sous{font-size:9px;line-height:1.5;opacity:.72;font-weight:500}
+.sous.mince{opacity:.45}
+
+.heure{
+  font-size:clamp(20px,5.4vw,28px);font-weight:600;line-height:1;
+  font-variant-numeric:tabular-nums;
+  text-shadow:0 0 14px rgba(255,43,61,.55);
+  margin-bottom:3px;
+}
+
+/* Météo */
+.meteo-haut{display:flex;align-items:center;justify-content:flex-end;gap:8px}
+.meteo-haut .icone{width:26px;height:26px;fill:none;stroke:var(--blanc);stroke-width:2;stroke-linecap:round;stroke-linejoin:round;opacity:.9;filter:drop-shadow(0 0 5px rgba(127,212,255,.5))}
+.temp{font-size:clamp(22px,5.6vw,30px);font-weight:600;line-height:1;font-variant-numeric:tabular-nums;text-shadow:0 0 14px rgba(127,212,255,.4)}
+.temp i{font-style:normal;font-size:.55em;vertical-align:top;opacity:.6}
+.mesures{display:grid;grid-template-columns:1fr 1fr;gap:2px 12px;margin-top:7px;border-top:1px solid var(--trait-2);padding-top:6px}
+.mesures div{display:flex;flex-direction:column;align-items:flex-end}
+.mesures dt{font-size:7px;letter-spacing:.2em;opacity:.42}
+.mesures dd{font-size:10px;font-variant-numeric:tabular-nums;opacity:.86}
+
+/* Capteurs */
+.voyants{list-style:none;display:grid;gap:3px;font-size:8.5px;letter-spacing:.16em;opacity:.8;margin-bottom:6px}
+.voyants li{display:flex;align-items:center;gap:6px}
+.voyants i{width:6px;height:6px;border-radius:50%;background:#3a3a44;flex:none;transition:background .2s,box-shadow .2s}
+.voyants i.on{background:var(--rouge);box-shadow:0 0 8px var(--rouge)}
+.voyants i.attente{background:var(--or);box-shadow:0 0 8px var(--or);animation:clignote 1s steps(2) infinite}
+@keyframes clignote{50%{opacity:.25}}
+
+/* Tenue */
+.tenue-nom{font-size:12px;font-weight:600;letter-spacing:.14em;margin-bottom:6px;text-shadow:0 0 10px currentColor}
+.pastilles{display:flex;gap:6px;justify-content:flex-end;margin-bottom:5px}
+.pastilles button{
+  width:16px;height:16px;border-radius:50%;
+  border:1px solid rgba(255,255,255,.35);
+  transition:transform .18s, box-shadow .18s, border-color .18s;
+}
+.pastilles button[aria-selected="true"]{transform:scale(1.28);border-color:var(--blanc);box-shadow:0 0 10px currentColor}
+
+/* ---------- Canal IRIS ---------- */
+
+/* Centrage par les marges, pas par `transform` : l'animation d'ouverture
+   se termine sur `transform:none` et emporterait un translateX(-50%),
+   ce qui décalerait tout le bloc d'une demi-largeur d'écran. */
+.canal{
+  position:fixed;left:0;right:0;margin-inline:auto;
+  bottom:calc(var(--sb) + 22px);
+  width:min(560px, calc(100vw - 44px - var(--sg) - var(--sd)));
+  display:flex;flex-direction:column;gap:8px;
+}
+.canal-fil{display:flex;flex-direction:column;gap:5px;max-height:34vh;overflow:hidden;justify-content:flex-end}
+.bulle{
+  font-size:11px;line-height:1.5;letter-spacing:.03em;text-transform:none;
+  padding:7px 11px;border:1px solid var(--trait);background:var(--verre);
+  backdrop-filter:blur(9px);-webkit-backdrop-filter:blur(9px);
+  animation:apparait .3s cubic-bezier(.2,.7,.3,1) both;
+  clip-path:polygon(0 6px, 6px 0, 100% 0, 100% calc(100% - 6px), calc(100% - 6px) 100%, 0 100%);
+}
+.bulle.moi{align-self:flex-end;max-width:82%;border-color:rgba(255,255,255,.2);opacity:.7}
+.bulle.iris{align-self:flex-start;max-width:94%;border-color:var(--trait);color:var(--blanc)}
+.bulle.iris::before{content:"IRIS ▸ ";color:var(--rouge);font-weight:600;letter-spacing:.14em;text-transform:uppercase;font-size:9px}
+.bulle.ecoute{color:var(--froid);border-color:rgba(127,212,255,.3);font-style:italic}
+.bulle.souci{color:var(--or);border-color:rgba(255,193,77,.35)}
+
+.canal-saisie{
+  display:flex;align-items:center;gap:8px;
+  background:var(--verre);border:1px solid var(--trait);
+  backdrop-filter:blur(9px);-webkit-backdrop-filter:blur(9px);
+  padding:6px;
+  clip-path:polygon(0 8px, 8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%);
+}
+.canal-saisie input{
+  flex:1;min-width:0;background:none;border:0;outline:none;
+  font-family:var(--mono);color:var(--blanc);
+  text-transform:none;letter-spacing:.02em;padding:6px 2px;
+  /* 16 px exactement : en dessous, iOS zoome la page à la mise au point
+     du champ et fait sortir l'interface de l'écran. */
+  font-size:16px;
+}
+.canal-saisie input::placeholder{color:rgba(242,245,255,.34);text-transform:uppercase;font-size:10px;letter-spacing:.14em}
+
+.micro{
+  position:relative;width:38px;height:38px;flex:none;
+  border:1px solid var(--trait);border-radius:50%;
+  display:grid;place-items:center;
+  transition:border-color .2s, background .2s;
+}
+.micro svg{width:19px;height:19px;fill:none;stroke:var(--blanc);stroke-width:1.7;stroke-linecap:round}
+.micro .onde{position:absolute;inset:-1px;border-radius:50%;border:1px solid var(--rouge);opacity:0}
+.micro.actif{border-color:var(--rouge);background:rgba(255,43,61,.16)}
+.micro.actif svg{stroke:var(--rouge)}
+.micro.actif .onde{animation:onde 1.4s ease-out infinite}
+@keyframes onde{from{opacity:.8;transform:scale(1)}to{opacity:0;transform:scale(2.1)}}
+.micro[disabled]{opacity:.3;cursor:not-allowed}
+
+.envoi{width:34px;height:34px;flex:none;font-size:15px;opacity:.55;border:1px solid transparent}
+.envoi:active{opacity:1;color:var(--rouge)}
+
+/* ---------- Barre d'outils ---------- */
+
+/* Même raison que pour le canal : centrage sans `transform`. */
+.outils{
+  position:fixed;left:0;right:0;margin-inline:auto;
+  width:max-content;max-width:calc(100vw - 24px);
+  top:calc(var(--sh) + 20px);
+  display:flex;gap:5px;
+}
+.outils button{
+  min-width:34px;height:28px;padding:0 9px;
+  font-size:9px;letter-spacing:.16em;
+  border:1px solid var(--trait);background:var(--verre);
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+  opacity:.72;transition:opacity .18s, color .18s, border-color .18s;
+}
+.outils button:active{opacity:1;color:var(--rouge);border-color:var(--rouge)}
+.outils button[aria-pressed="false"]{opacity:.34;text-decoration:line-through}
+
+/* Message fugace. Placé sous le réticule : c'est la seule bande de
+   l'écran qu'aucun panneau ne traverse, même sur un téléphone étroit. */
+.mouchard{
+  position:fixed;left:50%;top:63%;transform:translate(-50%,-50%);
+  font-size:9.5px;letter-spacing:.2em;color:var(--rouge);
+  text-shadow:0 0 10px rgba(255,43,61,.7);
+  opacity:0;transition:opacity .25s;white-space:nowrap;
+}
+.mouchard.vu{opacity:1}
+
+/* ---------- Le sas ---------- */
+
+#sas{
+  position:fixed;inset:0;z-index:10;
+  display:grid;place-items:center;
+  padding:calc(var(--sh) + 26px) 24px calc(var(--sb) + 26px);
+  background:
+    radial-gradient(90% 70% at 50% 12%, rgba(255,43,61,.16), transparent 62%),
+    var(--noir);
+  transition:opacity .5s, visibility .5s;
+}
+#sas.parti{opacity:0;visibility:hidden}
+
+.sas-boite{max-width:430px;text-align:center}
+.sas-sur{font-size:8.5px;letter-spacing:.42em;color:var(--rouge);opacity:.9;margin-bottom:14px}
+.sas-titre{
+  font-size:clamp(38px,13vw,68px);font-weight:700;letter-spacing:.06em;line-height:1;
+  text-shadow:0 0 28px rgba(255,43,61,.55);margin-bottom:18px;
+}
+.sas-titre span{color:var(--rouge)}
+.sas-texte{font-size:12px;line-height:1.75;text-transform:none;letter-spacing:.01em;opacity:.72;margin-bottom:18px}
+.sas-liste{list-style:none;display:grid;gap:6px;margin-bottom:26px;text-align:left}
+.sas-liste li{
+  font-size:10px;line-height:1.6;text-transform:none;opacity:.5;
+  padding-left:14px;position:relative;
+}
+.sas-liste li::before{content:"▸";position:absolute;left:0;color:var(--rouge);opacity:.8}
+
+.sas-bouton{
+  width:100%;padding:16px;
+  font-size:12px;font-weight:600;letter-spacing:.28em;
+  border:1px solid var(--rouge);color:var(--blanc);
+  background:linear-gradient(rgba(255,43,61,.2), rgba(255,43,61,.06));
+  box-shadow:0 0 26px rgba(255,43,61,.28), inset 0 0 26px rgba(255,43,61,.1);
+  clip-path:polygon(0 10px, 10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%);
+  transition:transform .16s, box-shadow .16s;
+}
+.sas-bouton:active{transform:scale(.98);box-shadow:0 0 40px rgba(255,43,61,.5)}
+.sas-bouton[disabled]{opacity:.5;cursor:progress}
+
+.sas-note{font-size:9.5px;letter-spacing:.12em;opacity:.42;margin-top:14px;line-height:1.6;text-transform:none}
+.sas-note.souci{color:var(--or);opacity:.95}
+.sas-retour{
+  position:fixed;bottom:calc(var(--sb) + 16px);left:50%;transform:translateX(-50%);
+  font-size:9px;letter-spacing:.2em;color:var(--blanc);opacity:.32;text-decoration:none;
+}
+
+/* ---------- Écrans étroits ---------- */
+
+/* En dessous d'un écran d'ordinateur, la conversation occupe toute la
+   largeur du bas : les deux panneaux inférieurs viendraient se poser
+   dessus. On les remonte en deuxième rangée, sous l'heure et la météo,
+   et le bas de l'écran reste entièrement au dialogue. */
+@media (max-width:900px){
+  .p-etat, .p-tenue{bottom:auto;top:calc(var(--sh) + 205px)}
+  .p-etat{left:calc(var(--sg) + 22px)}
+  .p-tenue{right:calc(var(--sd) + 22px)}
+}
+
+@media (max-width:430px){
+  .panneau{padding:7px 9px;min-width:96px}
+  .p-heure,.p-meteo{top:calc(var(--sh) + 56px)}
+  .p-etat,.p-tenue{top:calc(var(--sh) + 236px)}
+  .mesures{grid-template-columns:1fr 1fr;gap:1px 8px}
+  #reticule{width:52vw;opacity:.18}
+  .canal-fil{max-height:24vh}
+  .mouchard{top:68%}
+}
+
+/* Paysage bas de plafond : on rend la place au visage. */
+@media (max-height:520px){
+  .p-etat,.p-tenue{display:none}
+  .canal-fil{max-height:18vh}
+  #reticule{display:none}
+}
+
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none !important;transition:none !important}
+  #voile::after{display:none}
+}

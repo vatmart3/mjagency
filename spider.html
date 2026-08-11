@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<title>MASQUE — Interface IRIS</title>
+<meta name="robots" content="noindex, nofollow">
+<meta name="description" content="Interface de masque en réalité augmentée : suivi du visage et du corps, météo réelle, et une IA à qui parler.">
+<meta name="theme-color" content="#050507">
+
+<!-- Ajoutée à l'écran d'accueil, la page s'ouvre sans barre de navigateur :
+     c'est la seule façon d'obtenir un vrai plein écran sur iPhone. -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="MASQUE">
+
+<link rel="stylesheet" href="assets/css/spider.css">
+</head>
+<body>
+
+<!-- ============================================================
+     La scène : le flux de la caméra, et par-dessus le calque où
+     sont peints le masque et la tenue.
+     ============================================================ -->
+<div id="scene">
+  <video id="cam" playsinline autoplay muted></video>
+  <canvas id="ar"></canvas>
+  <div id="voile" aria-hidden="true"></div>
+</div>
+
+<!-- ============================================================
+     L'interface. Elle ne capte aucun clic sauf là où c'est utile :
+     tout le reste laisse passer les gestes vers la scène.
+     ============================================================ -->
+<div id="hud" hidden>
+
+  <div class="coins" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+
+  <!-- Réticule central, purement décoratif -->
+  <div id="reticule" aria-hidden="true">
+    <svg viewBox="0 0 200 200">
+      <circle class="r-fin" cx="100" cy="100" r="72"></circle>
+      <circle class="r-tourne" cx="100" cy="100" r="86"></circle>
+      <path class="r-fin" d="M100 8v22M100 170v22M8 100h22M170 100h22"></path>
+    </svg>
+  </div>
+
+  <!-- Heure et date -->
+  <section class="panneau p-heure" aria-live="off">
+    <h2 class="etiq">HORLOGE</h2>
+    <p class="heure" id="heure">--:--:--</p>
+    <p class="sous" id="date">—</p>
+  </section>
+
+  <!-- Météo réelle -->
+  <section class="panneau p-meteo">
+    <h2 class="etiq">ATMOSPHÈRE</h2>
+    <div class="meteo-haut">
+      <svg class="icone" id="meteo-icone" viewBox="0 0 64 64" aria-hidden="true"></svg>
+      <p class="temp"><span id="meteo-temp">--</span><i>°</i></p>
+    </div>
+    <p class="sous" id="meteo-libelle">Acquisition…</p>
+    <p class="sous mince" id="meteo-lieu">—</p>
+    <dl class="mesures">
+      <div><dt>RESSENTI</dt><dd id="meteo-ressenti">--°</dd></div>
+      <div><dt>VENT</dt><dd id="meteo-vent">-- km/h</dd></div>
+      <div><dt>HUM.</dt><dd id="meteo-hum">--%</dd></div>
+      <div><dt>MIN/MAX</dt><dd id="meteo-minmax">--/--</dd></div>
+    </dl>
+  </section>
+
+  <!-- Capteurs -->
+  <section class="panneau p-etat">
+    <h2 class="etiq">CAPTEURS</h2>
+    <ul class="voyants">
+      <li><i data-voyant="visage"></i>VISAGE</li>
+      <li><i data-voyant="mains"></i>MAINS</li>
+      <li><i data-voyant="corps"></i>CORPS</li>
+      <li><i data-voyant="liaison"></i>LIAISON</li>
+    </ul>
+    <p class="sous mince"><span id="fps">--</span> IPS · <span id="batterie">—</span></p>
+  </section>
+
+  <!-- Tenue active -->
+  <section class="panneau p-tenue">
+    <h2 class="etiq">TENUE</h2>
+    <p class="tenue-nom" id="tenue-nom">—</p>
+    <div class="pastilles" id="pastilles" role="tablist" aria-label="Choix de la tenue"></div>
+    <p class="sous mince">Balayez la main · ou touchez</p>
+  </section>
+
+  <!-- Canal de communication avec IRIS -->
+  <section class="canal" id="canal">
+    <div class="canal-fil" id="fil" aria-live="polite"></div>
+    <form class="canal-saisie" id="saisie">
+      <button type="button" class="micro" id="micro" aria-label="Parler à IRIS">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M12 3a3 3 0 0 1 3 3v6a3 3 0 0 1-6 0V6a3 3 0 0 1 3-3Z"></path>
+          <path d="M5 11a7 7 0 0 0 14 0M12 18v3"></path>
+        </svg>
+        <span class="onde"></span>
+      </button>
+      <input id="texte" type="text" autocomplete="off" autocapitalize="sentences"
+             placeholder="Parler à IRIS…" aria-label="Message pour IRIS">
+      <button type="submit" class="envoi" aria-label="Envoyer">↵</button>
+    </form>
+  </section>
+
+  <!-- Barre d'outils -->
+  <nav class="outils" aria-label="Réglages">
+    <button type="button" data-outil="tenue-prec" aria-label="Tenue précédente">‹</button>
+    <button type="button" data-outil="tenue-suiv" aria-label="Tenue suivante">›</button>
+    <button type="button" data-outil="corps" aria-pressed="true">TENUE</button>
+    <button type="button" data-outil="camera" aria-label="Changer de caméra">⟲</button>
+    <button type="button" data-outil="quitter" aria-label="Quitter">✕</button>
+  </nav>
+
+  <p class="mouchard" id="mouchard" role="status"></p>
+</div>
+
+<!-- ============================================================
+     Le sas. Rien ne démarre avant un geste : la caméra, le micro et
+     la synthèse vocale exigent tous les trois une action délibérée,
+     sur iPhone comme ailleurs.
+     ============================================================ -->
+<div id="sas">
+  <div class="sas-boite">
+    <p class="sas-sur">Système embarqué</p>
+    <h1 class="sas-titre">MASQUE<span>.</span></h1>
+    <p class="sas-texte">
+      Suivi du visage et du corps en direct, tenues interchangeables au
+      geste, météo réelle de votre position, et IRIS — une intelligence
+      à qui parler pendant la mission.
+    </p>
+    <ul class="sas-liste">
+      <li>La caméra reste sur l'appareil : aucune image n'est envoyée nulle part.</li>
+      <li>Seuls vos mots partent vers IRIS, le temps de sa réponse.</li>
+      <li>Tenez le téléphone à hauteur du visage, en pleine lumière.</li>
+    </ul>
+    <button type="button" id="lancer" class="sas-bouton">ACTIVER LE MASQUE</button>
+    <p class="sas-note" id="sas-note">Autorisez la caméra à l'invite du navigateur.</p>
+  </div>
+  <a class="sas-retour" href="index.html">← mjagency.eu</a>
+</div>
+
+<script type="module" src="assets/js/spider.js"></script>
+</body>
+</html>

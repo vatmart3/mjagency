@@ -111,6 +111,82 @@ prospects.
 dans un aperçu qui bloque les requêtes sortantes, le formulaire affichera
 toujours le repli.
 
+## Le masque — `/spider`
+
+Une page à part, hors du site : on l'ouvre au téléphone, on autorise la
+caméra, et l'écran devient l'intérieur d'un masque. Elle n'est liée depuis
+aucune autre page et porte `noindex`.
+
+Ce qu'elle fait, entièrement dans le navigateur :
+
+- **Suivi du visage** — un masque est redessiné image par image sur la tête :
+  contour, toile, grandes lentilles. Il suit l'inclinaison, parce que le
+  tracé est calculé dans le repère penché de la tête et non dans celui de
+  l'écran.
+- **Suivi du corps** — quand on recule, le squelette détecté est habillé :
+  buste, bras, jambes, gants, bottes, emblème de poitrine.
+- **Quatre tenues** — Écarlate, Nuit, Sang & Nuit, Spectre. On en change
+  **en balayant la main devant la caméra**, ou en touchant les pastilles.
+- **Météo réelle** de la position, heure, date, batterie, images/seconde.
+- **IRIS**, à qui l'on parle au micro et qui répond à voix haute.
+
+### Ce qui sort de l'appareil
+
+Rien de la caméra. Le suivi tourne en local (MediaPipe Tasks Vision, chargé
+depuis un CDN) et aucune image n'est transmise. Partent seulement :
+
+| Vers | Quoi |
+|---|---|
+| `/api/iris` → Claude | les mots dictés, plus heure, ville, météo et tenue en contexte |
+| `/api/meteo` → Open-Meteo | des coordonnées arrondies |
+
+### Mise en service
+
+Une seule variable, dans Vercel → **Settings → Environment Variables** :
+
+| Nom | Valeur | Requis |
+|---|---|---|
+| `ANTHROPIC_API_KEY` | la clé `sk-ant-…` de [console.anthropic.com](https://console.anthropic.com) | pour IRIS |
+
+La météo ne demande aucune clé. Sans `ANTHROPIC_API_KEY`, la page fonctionne
+toujours : `/api/iris` répond `503 SANS-CLE` et le masque bascule sur un mode
+hors ligne qui sait encore donner l'heure, la météo, la position et la tenue.
+
+`vercel.json` accorde 60 secondes à `/api/iris` — le modèle réfléchit avant
+de répondre, et la limite de 10 secondes par défaut le couperait.
+
+**Une limite à connaître : `/api/iris` n'a pas de limitation de débit.** La
+route refuse les requêtes venant d'une autre origine, et l'absence d'en-têtes
+CORS empêche déjà tout navigateur tiers de l'appeler — mais un script qui
+connaît l'URL peut consommer le quota de la clé. Tant que la page reste un
+usage personnel, le garde-fou pratique est le plafond de dépense fixé dans
+la console Anthropic. Pour une mise en avant publique, il faudrait un vrai
+compteur par IP (Vercel KV ou équivalent).
+
+### Ce qui peut manquer, et ce qu'il se passe alors
+
+Chaque brique tombe seule, sans emporter les autres :
+
+| Absent | Conséquence |
+|---|---|
+| MediaPipe (CDN injoignable) | plus de masque, mais caméra, heure, météo et dialogue continuent |
+| Reconnaissance vocale (Firefox, certains Android) | le bouton micro se désactive, on tape dans le champ |
+| Synthèse vocale | les réponses restent lisibles à l'écran |
+| `ANTHROPIC_API_KEY` | mode hors ligne, réponses courtes tirées des capteurs |
+| Géolocalisation refusée | position déduite de l'adresse IP par le serveur |
+
+### À savoir
+
+- **HTTPS obligatoire** : `getUserMedia` refuse de s'ouvrir autrement. Le
+  site déployé convient ; en local il faut `localhost`, pas une IP.
+- **Sur iPhone**, ajouter la page à l'écran d'accueil donne un vrai plein
+  écran, sans barre de navigateur.
+- Les modèles de suivi pèsent une quinzaine de mégaoctets ; ils se chargent
+  l'un après l'autre — le masque apparaît avant les mains et le corps.
+- Le costume est dessiné, jamais photographié : chaque tenue n'est qu'un jeu
+  de couleurs dans `TENUES`, en tête de `assets/js/spider.js`. En ajouter une
+  revient à ajouter une entrée.
+
 ## Lancer en local
 
 ```bash
@@ -133,12 +209,17 @@ node build-locales.js   # → 4 pages locales + sitemap.xml
 
 ```
 index.html · work.html · studio.html · contact.html
+spider.html            → le masque (hors site, noindex)
 api/contact.js         → réception du formulaire (Resend)
+api/iris.js            → dialogue du masque (Claude)
+api/meteo.js           → météo réelle (Open-Meteo)
 assets/
   css/style.css        → design system
   css/fonts.css        → pile typographique système
+  css/spider.css       → interface du masque
   js/main.js           → reveals, calendrier, formulaire, menu
   js/bg.js             → objet 3D en fond + repli
+  js/spider.js         → suivi, masque, tenues, gestes, IRIS
 build.js               → aperçu en fichier unique
 build-locales.js       → pages locales + sitemap
 vercel.json            → URL sans extension, en-têtes de sécurité
