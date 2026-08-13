@@ -5,14 +5,16 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Au Bon Pain — Boulangerie à Sète · Pains, viennoiseries, sandwichs</title>
 <meta name="description" content="Au Bon Pain, 36 rue Paul Bousquet à Sète. Pains de tradition, viennoiseries, sandwichs, soupes et salades. Commande en ligne, retrait sans file d'attente. Ouvert de 7h à 13h.">
-<meta name="theme-color" content="#14100B">
+<meta name="theme-color" content="#16161A">
 <link rel="canonical" href="https://www.mjagency.eu/au-bon-pain">
 
 <meta property="og:type" content="website">
 <meta property="og:title" content="Au Bon Pain — Boulangerie à Sète">
-<meta property="og:description" content="Le vrai pain, sorti du four à 7 h 02. Commandez, passez, repartez : votre sac attend au comptoir.">
+<meta property="og:description" content="Le pain sort du four à 7 h 02. Commandez, passez, repartez : votre sac attend au comptoir.">
 <meta property="og:locale" content="fr_FR">
 
+<link rel="preload" href="assets/fonts/great-vibes-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="assets/fonts/lato-300.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="assets/css/style.css">
 
 <!-- Données structurées : ce qui fait remonter une boulangerie dans le pack local.
@@ -45,22 +47,18 @@
 <body>
 
 <!-- ============================================================
-     Décor : la nuit de l'atelier, deux halos de four qui dérivent
-     sous un voile de grain. Aucune image.
+     L'ardoise : schiste, grain de craie, halos de four.
      ============================================================ -->
 <div class="decor" aria-hidden="true">
   <span class="blob blob--1"></span>
   <span class="blob blob--2"></span>
   <span class="blob blob--3"></span>
-  <span class="blob blob--4"></span>
   <span class="grain"></span>
 </div>
 
 <a class="skip" href="#carte">Aller à la carte</a>
 
-<!-- ============================================================
-     Jeu d'illustrations — SVG dessinés à la main, dégradés et ombres.
-     ============================================================ -->
+<!-- Illustrations et ornements, dessinés à la main -->
 <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
   <defs>
     <linearGradient id="gCroute" x1="0" y1="0" x2="0" y2="1">
@@ -254,33 +252,176 @@
       <circle cx="41" cy="41.6" r="2.4"/><circle cx="19.4" cy="26.6" r="2.4"/>
     </g>
   </symbol>
+  <!-- ===== Ornements : épis, graines, bol, et les vignettes de section ===== -->
+  <symbol id="ic-epi" viewBox="0 0 44 120">
+    <g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M22 116V30"/>
+      <path d="M22 30c-4-7-4-15 0-22 4 7 4 15 0 22z"/>
+      <path d="M22 46c-7-1-11-6-11-13 6 1 11 6 11 13z"/>
+      <path d="M22 46c7-1 11-6 11-13-6 1-11 6-11 13z"/>
+      <path d="M22 62c-7-1-11-6-11-13 6 1 11 6 11 13z"/>
+      <path d="M22 62c7-1 11-6 11-13-6 1-11 6-11 13z"/>
+      <path d="M22 78c-7-1-11-6-11-13 6 1 11 6 11 13z"/>
+      <path d="M22 78c7-1 11-6 11-13-6 1-11 6-11 13z"/>
+      <path d="M22 96c-8 1-13-3-15-10 7 0 13 3 15 10z"/>
+    </g>
+  </symbol>
+
+  <symbol id="ic-epi-court" viewBox="0 0 40 26">
+    <g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round">
+      <path d="M2 13h30"/>
+      <path d="M14 13c1-5 4-8 9-9-1 5-4 8-9 9z"/>
+      <path d="M14 13c1 5 4 8 9 9-1-5-4-8-9-9z"/>
+      <path d="M22 13c1-5 4-8 9-9-1 5-4 8-9 9z"/>
+      <path d="M22 13c1 5 4 8 9 9-1-5-4-8-9-9z"/>
+      <path d="M32 13c3-2 5-2 6 0-1 2-3 2-6 0z"/>
+    </g>
+  </symbol>
+
+  <symbol id="ic-graines" viewBox="0 0 90 64">
+    <g fill="currentColor">
+      <ellipse cx="10" cy="16" rx="4.2" ry="2.3" transform="rotate(-24 10 16)"/>
+      <ellipse cx="26" cy="8"  rx="3.8" ry="2.1" transform="rotate(16 26 8)"/>
+      <ellipse cx="40" cy="20" rx="4.4" ry="2.4" transform="rotate(-8 40 20)"/>
+      <ellipse cx="58" cy="10" rx="3.6" ry="2"   transform="rotate(34 58 10)"/>
+      <ellipse cx="74" cy="22" rx="4.2" ry="2.3" transform="rotate(-16 74 22)"/>
+      <ellipse cx="18" cy="36" rx="3.4" ry="1.9" transform="rotate(28 18 36)"/>
+      <ellipse cx="34" cy="46" rx="4.2" ry="2.3" transform="rotate(-30 34 46)"/>
+      <ellipse cx="52" cy="38" rx="3.8" ry="2.1" transform="rotate(10 52 38)"/>
+      <ellipse cx="68" cy="48" rx="3.4" ry="1.9" transform="rotate(-20 68 48)"/>
+      <ellipse cx="84" cy="38" rx="3" ry="1.7"   transform="rotate(24 84 38)"/>
+    </g>
+  </symbol>
+
+  <symbol id="ic-bol" viewBox="0 0 100 84">
+    <ellipse cx="50" cy="74" rx="33" ry="6" fill="rgba(0,0,0,.55)"/>
+    <path d="M13 36h74c0 21-16.6 36-37 36S13 57 13 36z" fill="#EDE6DA"/>
+    <path d="M17 40h66c-1.5 16-14.4 27-33 27S18.5 56 17 40z" fill="#D8CFC0"/>
+    <ellipse cx="50" cy="35" rx="37" ry="10" fill="#FFFDF8"/>
+    <ellipse cx="50" cy="35" rx="30" ry="7.4" fill="#B8925A"/>
+    <g fill="#8E6C38" opacity=".85">
+      <ellipse cx="40" cy="33" rx="3.2" ry="1.8" transform="rotate(-20 40 33)"/>
+      <ellipse cx="52" cy="36" rx="3" ry="1.7" transform="rotate(14 52 36)"/>
+      <ellipse cx="62" cy="33" rx="2.8" ry="1.6" transform="rotate(-8 62 33)"/>
+      <ellipse cx="46" cy="38" rx="2.6" ry="1.5" transform="rotate(26 46 38)"/>
+    </g>
+  </symbol>
+
+  <!-- Vignettes de section, au trait -->
+  <symbol id="orn-panier" viewBox="0 0 60 42">
+    <g fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round">
+      <path d="M12 20h36l-3 15c-.3 2-2 3.4-4 3.4H19c-2 0-3.7-1.4-4-3.4z"/>
+      <path d="M8 20h44"/>
+      <path d="M20 20c0-6 4.4-10 10-10s10 4 10 10"/>
+      <path d="M17 24l3 14M25 24l1.6 14M35 24l-1.6 14M43 24l-3 14"/>
+      <path d="M30 10c-2-3-2-5.6 0-8 2 2.4 2 5 0 8z"/>
+    </g>
+  </symbol>
+
+  <symbol id="orn-miche" viewBox="0 0 60 42">
+    <g fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round">
+      <ellipse cx="30" cy="26" rx="18" ry="11"/>
+      <path d="M22 21l5 5M30 19l5 5M38 22l4 4"/>
+      <path d="M6 26c-2.6 0-4-1.4-4-3.4 2.4 0 4 1.2 4 3.4z"/>
+      <path d="M54 26c2.6 0 4-1.4 4-3.4-2.4 0-4 1.2-4 3.4z"/>
+      <path d="M30 9c-1.6-2.6-1.6-4.8 0-7 1.6 2.2 1.6 4.4 0 7z"/>
+    </g>
+  </symbol>
+
+  <symbol id="orn-sandwich" viewBox="0 0 60 42">
+    <g fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M14 30l12-18 12 18z"/>
+      <path d="M28 32l12-16 10 16z"/>
+      <path d="M18 30h16M32 32h14"/>
+      <path d="M6 34h48"/>
+    </g>
+  </symbol>
+
+  <symbol id="orn-etoile" viewBox="0 0 60 42">
+    <g fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round">
+      <path d="M30 12l3.4 7 7.6 1-5.5 5.4 1.3 7.6-6.8-3.6-6.8 3.6 1.3-7.6-5.5-5.4 7.6-1z"/>
+      <path d="M4 21h12M44 21h12"/>
+      <path d="M18 21c-1.4-1.6-1.4-3 0-4.6 1.4 1.6 1.4 3 0 4.6z"/>
+      <path d="M42 21c1.4-1.6 1.4-3 0-4.6-1.4 1.6-1.4 3 0 4.6z"/>
+    </g>
+  </symbol>
+
+  <symbol id="orn-fleur" viewBox="0 0 60 42">
+    <g fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round">
+      <path d="M30 14c-4 4-4 10 0 14 4-4 4-10 0-14z"/>
+      <path d="M4 28c8 0 14-2 18-6M56 28c-8 0-14-2-18-6"/>
+      <path d="M22 22c-2-2-2-4 0-6 2 2 2 4 0 6zM38 22c2-2 2-4 0-6-2 2-2 4 0 6z"/>
+    </g>
+  </symbol>
+
+  <!-- Pictogrammes des caractéristiques -->
+  <symbol id="sp-poids" viewBox="0 0 24 24">
+    <g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M4.5 9h15l1.6 10.4c.2 1.3-.8 2.6-2.2 2.6H5.1c-1.4 0-2.4-1.3-2.2-2.6z"/>
+      <circle cx="12" cy="5" r="3"/>
+      <path d="M9.6 6.8L5.6 9M14.4 6.8L18.4 9"/>
+    </g>
+  </symbol>
+  <symbol id="sp-temps" viewBox="0 0 24 24">
+    <g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+      <circle cx="12" cy="13.5" r="8"/>
+      <path d="M12 9.5v4l2.6 2"/>
+      <path d="M9.5 2h5M12 2v3.5"/>
+      <path d="M19 6.5l1.6-1.6"/>
+    </g>
+  </symbol>
+  <symbol id="sp-temp" viewBox="0 0 24 24">
+    <g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+      <path d="M14 14.6V5a2 2 0 0 0-4 0v9.6a4 4 0 1 0 4 0z"/>
+      <path d="M12 8v7.6"/>
+      <path d="M16.5 6H19M16.5 9.5H19"/>
+    </g>
+  </symbol>
+  <symbol id="sp-piece" viewBox="0 0 24 24">
+    <g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+      <circle cx="12" cy="12" r="9"/>
+      <path d="M15 8.6a4.6 4.6 0 1 0 0 6.8"/>
+      <path d="M8 11h6M8 13.4h6"/>
+    </g>
+  </symbol>
 </svg>
 
+<!-- Les semis d'épis et de graines, en marge du contenu -->
+<div class="semis" aria-hidden="true">
+  <svg class="s1" viewBox="0 0 44 120"><use href="#ic-epi"/></svg>
+  <svg class="s2" viewBox="0 0 44 120"><use href="#ic-epi"/></svg>
+  <svg class="s3" viewBox="0 0 44 120"><use href="#ic-epi"/></svg>
+  <svg class="s4" viewBox="0 0 44 120"><use href="#ic-epi"/></svg>
+  <svg class="g1" viewBox="0 0 90 64"><use href="#ic-graines"/></svg>
+  <svg class="g2" viewBox="0 0 90 64"><use href="#ic-graines"/></svg>
+  <svg class="g3" viewBox="0 0 90 64"><use href="#ic-graines"/></svg>
+</div>
+
 <!-- ============================================================
-     Barre de navigation — l'état d'ouverture y est calculé en direct.
+     Navigation — le nom au centre, entre deux épis.
      ============================================================ -->
 <header class="nav" id="nav">
   <div class="nav__in">
-    <a class="brand" href="#top" aria-label="Au Bon Pain, accueil">
-      <span class="brand__mark" aria-hidden="true">
-        <svg viewBox="0 0 64 64" width="30" height="30"><use href="#ic-baguette"/></svg>
-      </span>
-      <span class="brand__txt">
-        <strong>Au Bon Pain</strong>
-        <em>Sète</em>
-      </span>
-    </a>
-
-    <nav class="nav__links" aria-label="Sections du site">
-      <a href="#populaires">Populaires</a>
+    <nav class="nav__links" aria-label="Sections, gauche">
       <a href="#four">Le four</a>
       <a href="#carte">La carte</a>
-      <a href="#atelier">Composez</a>
-      <a href="#maison">La maison</a>
-      <a href="#infos">Nous trouver</a>
+      <a href="#recette">Composez</a>
     </nav>
 
-    <div class="nav__right">
+    <a class="brand" href="#top" aria-label="Au Bon Pain, accueil">
+      <span class="brand__ligne">
+        <svg class="brand__epi" viewBox="0 0 40 26" aria-hidden="true"><use href="#ic-epi-court"/></svg>
+        <span class="brand__nom">Au Bon Pain</span>
+        <svg class="brand__epi" viewBox="0 0 40 26" aria-hidden="true" style="transform:scaleX(-1)"><use href="#ic-epi-court"/></svg>
+      </span>
+      <span class="brand__sous">Sète</span>
+    </a>
+
+    <div class="nav__outils">
+      <nav class="nav__links nav__links--d" aria-label="Sections, droite">
+        <a href="#maison">La maison</a>
+        <a href="#infos">Nous trouver</a>
+      </nav>
       <span class="pill" id="pill-etat" data-etat="?">
         <i class="pill__dot" aria-hidden="true"></i>
         <span id="pill-txt">Horaires…</span>
@@ -292,10 +433,6 @@
         </svg>
       </button>
       <button class="panier-btn" id="ouvrir-panier" aria-expanded="false" aria-controls="panier">
-        <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
-          <path d="M4 8h16l-1.4 11.2A2 2 0 0 1 16.6 21H7.4a2 2 0 0 1-2-1.8L4 8Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
-          <path d="M9 8V6.5a3 3 0 0 1 6 0V8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
-        </svg>
         <span class="panier-btn__lbl">Commander</span>
         <span class="panier-btn__n" id="panier-n" hidden>0</span>
       </button>
@@ -305,146 +442,170 @@
 </header>
 
 <nav class="menu-mob" id="menu-mob" aria-label="Menu mobile" hidden>
-  <a href="#populaires">Les plus demandés</a>
   <a href="#four">Sortie du four</a>
   <a href="#carte">La carte</a>
-  <a href="#atelier">Composez votre sandwich</a>
+  <a href="#recette">Composez votre sandwich</a>
   <a href="#maison">La maison</a>
   <a href="#infos">Nous trouver</a>
   <a class="menu-mob__tel" href="tel:+33467535931">04 67 53 59 31</a>
 </nav>
 
-<!-- La recherche filtre la carte, elle ne mène nulle part ailleurs -->
 <div class="recherche" id="recherche" hidden>
   <div class="recherche__in">
-    <svg viewBox="0 0 24 24" width="19" height="19" aria-hidden="true" style="color:var(--creme-3);flex:0 0 auto">
+    <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" style="color:var(--craie-3);flex:0 0 auto">
       <circle cx="11" cy="11" r="6.5" fill="none" stroke="currentColor" stroke-width="1.8"/>
       <path d="M16 16l4.5 4.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
     </svg>
     <input id="q" type="search" placeholder="Chercher un pain, une viennoiserie…" aria-label="Chercher dans la carte">
     <span class="recherche__n" id="recherche-n"></span>
-    <button class="icone" id="fermer-recherche" aria-label="Fermer la recherche" style="width:34px;height:34px">×</button>
+    <button class="icone" id="fermer-recherche" aria-label="Fermer la recherche" style="width:30px;height:30px">×</button>
   </div>
 </div>
 
 <main id="top">
 
 <!-- ============================================================
-     HÉRO — la promesse à gauche, le cadran du four à droite.
+     LE HÉRO — un cadre d'ardoise. À gauche la fournée choisie,
+     à droite le four. Les pastilles parcourent la matinée.
      ============================================================ -->
 <section class="hero container">
-  <div class="hero__txt">
-    <p class="eyebrow reveal">Boulangerie artisanale · Sète</p>
-    <h1 class="display reveal">
-      Le vrai pain,<br>
-      <span class="or">sorti du four</span><br>
-      à 7 h 02.
-    </h1>
-    <p class="lead reveal">
-      Un pain ne se juge pas à son emballage, mais à l'heure où il sort.
-      Farine d'un seul moulin, levain lent, cuisson sur pierre — et quatre
-      fournées par matinée pour que vous tombiez toujours sur la bonne.
-    </p>
-    <div class="hero__cta reveal">
-      <a class="btn btn--or" href="#carte">Découvrir la carte</a>
-      <a class="btn" href="#four">Voir les fournées <span class="arw" aria-hidden="true">→</span></a>
-    </div>
+  <div class="cadre reveal">
+    <div class="cadre__in">
+      <div class="fournil">
+        <div class="rail" role="group" aria-label="Choisir une fournée">
+          <svg class="rail__fleche" viewBox="0 0 12 26" aria-hidden="true">
+            <path d="M6 1v20M2 17l4 5 4-5" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <button data-i="0" aria-label="Fournée de 07 h 00" aria-current="true"></button>
+          <button data-i="1" aria-label="Fournée de 08 h 30"></button>
+          <button data-i="2" aria-label="Fournée de 11 h 00"></button>
+          <button data-i="3" aria-label="Fournée de 12 h 00"></button>
+        </div>
 
-    <ul class="micro reveal">
-      <li><strong>4,3<span>/5</span></strong><span>79 avis Google</span></li>
-      <li><strong>1–10 €</strong><span>par personne</span></li>
-      <li><strong>4</strong><span>fournées par matinée</span></li>
-    </ul>
-  </div>
+        <div class="fournil__vue" data-vue="0">
+          <p class="fournil__h">Fournée de 07 h 00</p>
+          <p class="fournil__nom">Baguette de tradition</p>
+          <p class="fournil__sous">Au <b>Bon Pain</b></p>
+          <p class="fournil__desc">Farine française, pétrissage lent, croûte qui craque. Fournée toutes les deux heures.</p>
+          <div class="specs">
+              <span class="spec"><svg aria-hidden="true"><use href="#sp-poids"/></svg>250 g</span>
+              <span class="spec"><svg aria-hidden="true"><use href="#sp-temps"/></svg>20 min</span>
+              <span class="spec"><svg aria-hidden="true"><use href="#sp-temp"/></svg>250 °C</span>
+            </div>
+          <div class="fournil__cta">
+            <button class="btn add" data-id="tradition" data-nom="Baguette de tradition" data-prix="1.30" data-icone="ic-baguette">Ajouter au sac — 1,30 €</button>
+          </div>
+        </div>
+        <div class="fournil__vue" data-vue="1" hidden>
+          <p class="fournil__h">Fournée de 08 h 30</p>
+          <p class="fournil__nom">Croissant au beurre</p>
+          <p class="fournil__sous">Au <b>Bon Pain</b></p>
+          <p class="fournil__desc">Feuilletage à six tours, beurre de tourage. Sorti à 8 h 30, jamais réchauffé.</p>
+          <div class="specs">
+              <span class="spec"><svg aria-hidden="true"><use href="#sp-poids"/></svg>65 g</span>
+              <span class="spec"><svg aria-hidden="true"><use href="#sp-temps"/></svg>16 min</span>
+              <span class="spec"><svg aria-hidden="true"><use href="#sp-temp"/></svg>190 °C</span>
+            </div>
+          <div class="fournil__cta">
+            <button class="btn add" data-id="croissant" data-nom="Croissant au beurre" data-prix="1.30" data-icone="ic-croissant">Ajouter au sac — 1,30 €</button>
+          </div>
+        </div>
+        <div class="fournil__vue" data-vue="2" hidden>
+          <p class="fournil__h">Fournée de 11 h 00</p>
+          <p class="fournil__nom">Fougasse aux olives</p>
+          <p class="fournil__sous">Au <b>Bon Pain</b></p>
+          <p class="fournil__desc">Huile d'olive, olives noires, fleur de sel. Tiède, elle ne survit pas au trajet.</p>
+          <div class="specs">
+              <span class="spec"><svg aria-hidden="true"><use href="#sp-poids"/></svg>350 g</span>
+              <span class="spec"><svg aria-hidden="true"><use href="#sp-temps"/></svg>18 min</span>
+              <span class="spec"><svg aria-hidden="true"><use href="#sp-temp"/></svg>230 °C</span>
+            </div>
+          <div class="fournil__cta">
+            <button class="btn add" data-id="fougasse" data-nom="Fougasse aux olives" data-prix="3.60" data-icone="ic-fougasse">Ajouter au sac — 3,60 €</button>
+          </div>
+        </div>
+        <div class="fournil__vue" data-vue="3" hidden>
+          <p class="fournil__h">Fournée de 12 h 00</p>
+          <p class="fournil__nom">Pain de campagne</p>
+          <p class="fournil__sous">Au <b>Bon Pain</b></p>
+          <p class="fournil__desc">Miche au levain, mie dense, se garde trois jours. Vendu entier ou en demi.</p>
+          <div class="specs">
+              <span class="spec"><svg aria-hidden="true"><use href="#sp-poids"/></svg>800 g</span>
+              <span class="spec"><svg aria-hidden="true"><use href="#sp-temps"/></svg>45 min</span>
+              <span class="spec"><svg aria-hidden="true"><use href="#sp-temp"/></svg>240 °C</span>
+            </div>
+          <div class="fournil__cta">
+            <button class="btn add" data-id="campagne" data-nom="Pain de campagne" data-prix="3.20" data-icone="ic-campagne">Ajouter au sac — 3,20 €</button>
+          </div>
+        </div>
+      </div>
 
-  <!-- Le cadran couvre 7 h → 13 h, l'aiguille est à l'heure réelle du
-       visiteur, les points marquent les fournées. -->
-  <div class="hero__four reveal">
-    <div class="four-clock" id="four-clock">
-      <svg class="four-clock__svg" viewBox="0 -12 260 216" role="img" aria-labelledby="fc-title">
-        <title id="fc-title">Cadran des fournées, de 7 h à 13 h</title>
-        <defs>
-          <linearGradient id="g-arc" x1="0" y1="1" x2="1" y2="0">
-            <stop offset="0" stop-color="#E3BE84"/>
-            <stop offset=".55" stop-color="#E08B3C"/>
-            <stop offset="1" stop-color="#C2652A"/>
-          </linearGradient>
-        </defs>
-        <path class="fc-track" d="M 43.4 180 A 100 100 0 1 1 216.6 180" pathLength="1"/>
-        <path class="fc-fill" id="fc-fill" d="M 43.4 180 A 100 100 0 1 1 216.6 180" pathLength="1"/>
-        <g id="fc-ticks"></g>
-        <g id="fc-fournees"></g>
-        <g id="fc-needle"></g>
-      </svg>
-      <div class="four-clock__mid">
-        <p class="fc-kicker" id="fc-kicker">Prochaine fournée</p>
-        <p class="fc-big" id="fc-big">—</p>
-        <p class="fc-sub" id="fc-sub">chargement…</p>
+      <div class="hero__four">
+        <div class="four-clock" id="four-clock">
+          <svg class="four-clock__svg" viewBox="0 -12 260 216" role="img" aria-labelledby="fc-title">
+            <title id="fc-title">Cadran des fournées, de 7 h à 13 h</title>
+            <defs>
+              <linearGradient id="g-arc" x1="0" y1="1" x2="1" y2="0">
+                <stop offset="0" stop-color="#EBCD8E"/>
+                <stop offset=".55" stop-color="#E08B3C"/>
+                <stop offset="1" stop-color="#C2652A"/>
+              </linearGradient>
+            </defs>
+            <path class="fc-track" d="M 43.4 180 A 100 100 0 1 1 216.6 180" pathLength="1"/>
+            <path class="fc-fill" id="fc-fill" d="M 43.4 180 A 100 100 0 1 1 216.6 180" pathLength="1"/>
+            <g id="fc-ticks"></g>
+            <g id="fc-fournees"></g>
+            <g id="fc-needle"></g>
+          </svg>
+          <div class="four-clock__mid">
+            <p class="fc-kicker" id="fc-kicker">Prochaine fournée</p>
+            <p class="fc-big" id="fc-big">—</p>
+            <p class="fc-sub" id="fc-sub">chargement…</p>
+          </div>
+        </div>
+        <p class="four-clock__legend">Le cadran suit l'heure qu'il est chez vous</p>
       </div>
     </div>
-    <p class="four-clock__legend">Cadran vivant : il suit l'heure qu'il est chez vous.</p>
+    <svg class="bol" viewBox="0 0 100 84" aria-hidden="true"><use href="#ic-bol"/></svg>
   </div>
 </section>
 
 <!-- ============================================================
-     LES PLUS DEMANDÉS — trois cartes mises en avant. Mêmes
-     identifiants que la carte : le sac les regroupe.
+     NOTRE MAISON
      ============================================================ -->
-<section class="sec" id="populaires">
+<section class="sec" id="maison">
   <div class="container">
     <header class="sec__head reveal">
-      <p class="eyebrow">La vitrine</p>
-      <h2 class="h2">Les plus demandés</h2>
-      <p class="lead">Ce qui part le plus vite, chaque matin, avant même que la deuxième fournée sorte.</p>
+      <svg class="orn" viewBox="0 0 60 42" aria-hidden="true"><use href="#orn-panier"/></svg>
+      <h2 class="script">Notre maison</h2>
+      <p class="sous">Au <b>Bon Pain</b></p>
+      <p class="lead">
+        Un pain se décide la veille : la farine qu'on choisit, le temps qu'on accepte de
+        perdre, la chaleur qu'on lui donne. Ces trois choix n'ont pas bougé depuis
+        l'ouverture, et ils expliquent le goût mieux que n'importe quelle étiquette.
+        Le reste — sandwichs, soupes, salades — est préparé sur place, le matin même.
+      </p>
+      <svg class="orn orn--bas" viewBox="0 0 60 42" aria-hidden="true"><use href="#orn-fleur"/></svg>
     </header>
 
-    <div class="tops">
-      <article class="top reveal" data-id="tradition" data-fournee="7,12" data-nom="Baguette de tradition" data-prix="1.30">
-        <p class="top__note"><i aria-hidden="true">★</i> 9,4</p>
-        <div class="top__img"><svg viewBox="0 0 64 64" aria-hidden="true"><use href="#ic-baguette"/></svg></div>
-        <h3>Baguette de tradition</h3>
-        <p class="top__desc">Farine française, pétrissage lent, croûte qui craque sous la main.</p>
-        <div class="top__bas">
-          <span class="top__prix">1,30 €</span>
-          <button class="add" aria-label="Ajouter Baguette de tradition au sac">+</button>
-        </div>
-      </article>
-
-      <article class="top reveal" data-id="croissant" data-fournee="8.5" data-nom="Croissant au beurre" data-prix="1.30">
-        <p class="top__note"><i aria-hidden="true">★</i> 9,3</p>
-        <div class="top__img"><svg viewBox="0 0 64 64" aria-hidden="true"><use href="#ic-croissant"/></svg></div>
-        <h3>Croissant au beurre</h3>
-        <p class="top__desc">Feuilletage à six tours, beurre de tourage. Sorti à 8 h 30, jamais réchauffé.</p>
-        <div class="top__bas">
-          <span class="top__prix">1,30 €</span>
-          <button class="add" aria-label="Ajouter Croissant au beurre au sac">+</button>
-        </div>
-      </article>
-
-      <article class="top reveal" data-id="sandwich-jambon" data-nom="Sandwich jambon-beurre" data-prix="4.50">
-        <p class="top__note"><i aria-hidden="true">★</i> 9,2</p>
-        <div class="top__img"><svg viewBox="0 0 64 64" aria-hidden="true"><use href="#ic-sandwich"/></svg></div>
-        <h3>Sandwich jambon-beurre</h3>
-        <p class="top__desc">Jambon supérieur, beurre demi-sel, cornichons. Monté à la commande.</p>
-        <div class="top__bas">
-          <span class="top__prix">4,50 €</span>
-          <button class="add" aria-label="Ajouter Sandwich jambon-beurre au sac">+</button>
-        </div>
-      </article>
-    </div>
+    <ul class="stats reveal">
+      <li class="stat"><strong>1</strong><span>moulin, dans l'Hérault</span></li>
+      <li class="stat"><strong>18 h</strong><span>de fermentation au levain</span></li>
+      <li class="stat"><strong>250°</strong><span>de cuisson sur pierre</span></li>
+      <li class="stat"><strong>4,3</strong><span>sur 5, pour 79 avis Google</span></li>
+    </ul>
   </div>
 </section>
 
 <!-- ============================================================
-     LES FOURNÉES — la vraie information d'une boulangerie :
-     quoi est chaud, et à quelle heure.
+     SORTIE DU FOUR
      ============================================================ -->
 <section class="sec" id="four">
   <div class="container">
     <header class="sec__head reveal">
-      <p class="eyebrow">Quatre fois par matinée</p>
-      <h2 class="h2">Sortie du four</h2>
-      <p class="lead">La barre du cadran indique où nous en sommes. La carte qui s'allume, c'est celle qui vient de sortir.</p>
+      <svg class="orn" viewBox="0 0 60 42" aria-hidden="true"><use href="#orn-miche"/></svg>
+      <h2 class="script">Sortie du four</h2>
+      <p class="sous">Quatre <b>fournées</b> par matinée</p>
     </header>
 
     <ol class="fournees" id="fournees">
@@ -477,39 +638,42 @@
 </section>
 
 <!-- ============================================================
-     LA CARTE — chaque carte ajoute au sac sans quitter la page.
-     Les prix vivent dans data-prix : une seule source.
+     LA CARTE — fiches à caractéristiques
      ============================================================ -->
 <section class="sec" id="carte">
   <div class="container">
-    <header class="sec__head sec__head--row reveal">
-      <div class="sec__head__t">
-        <p class="eyebrow">Seize références</p>
-        <h2 class="h2">La carte</h2>
-        <p class="lead">Tout est préparé sur place le matin. Ajoutez, choisissez votre créneau, passez.</p>
-        <p class="carte-chaud" id="carte-chaud" hidden></p>
-      </div>
-      <div class="filtres" aria-label="Filtrer la carte">
-        <button class="filtre is-on" data-f="tout" aria-pressed="true">Tout</button>
-        <button class="filtre" data-f="pains" aria-pressed="false">Pains</button>
-        <button class="filtre" data-f="viennoiseries" aria-pressed="false">Viennoiseries</button>
-        <button class="filtre" data-f="salé" aria-pressed="false">Salé</button>
-        <button class="filtre" data-f="sucré" aria-pressed="false">Sucré</button>
-        <button class="filtre" data-f="boissons" aria-pressed="false">Boissons</button>
-      </div>
+    <header class="sec__head reveal">
+      <svg class="orn" viewBox="0 0 60 42" aria-hidden="true"><use href="#orn-panier"/></svg>
+      <h2 class="script">La carte</h2>
+      <p class="sous">Seize <b>références</b>, préparées sur place</p>
+      <p class="carte-chaud" id="carte-chaud" hidden></p>
     </header>
+
+    <div class="filtres reveal" aria-label="Filtrer la carte">
+      <button class="filtre is-on" data-f="tout" aria-pressed="true">Tout</button>
+      <button class="filtre" data-f="pains" aria-pressed="false">Pains</button>
+      <button class="filtre" data-f="viennoiseries" aria-pressed="false">Viennoiseries</button>
+      <button class="filtre" data-f="salé" aria-pressed="false">Salé</button>
+      <button class="filtre" data-f="sucré" aria-pressed="false">Sucré</button>
+      <button class="filtre" data-f="boissons" aria-pressed="false">Boissons</button>
+    </div>
 
     <div class="grille" id="grille">
 
       <article class="plat reveal plat--vedette" data-cat="pains" data-id="tradition" data-fournee="7,12" data-nom="Baguette de tradition" data-prix="1.30">
         <div class="plat__img"><svg viewBox="0 0 64 64" aria-hidden="true"><use href="#ic-baguette"/></svg></div>
         <div class="plat__corps">
-          <p class="plat__note"><span aria-hidden="true">★</span> 9,4 <em>· la plus vendue</em></p>
           <h3>Baguette de tradition</h3>
+          <p class="plat__sous">Au <b>Bon Pain</b> · la plus vendue</p>
           <p class="plat__desc">Farine française, pétrissage lent, croûte qui craque. Fournée toutes les deux heures.</p>
+          <div class="specs">
+              <span class="spec"><svg aria-hidden="true"><use href="#sp-poids"/></svg>250 g</span>
+              <span class="spec"><svg aria-hidden="true"><use href="#sp-temps"/></svg>20 min</span>
+              <span class="spec"><svg aria-hidden="true"><use href="#sp-temp"/></svg>250 °C</span>
+            </div>
           <div class="plat__bas">
             <span class="plat__prix">1,30 €</span>
-            <button class="add" aria-label="Ajouter Baguette de tradition au sac">+</button>
+            <button class="add btn" aria-label="Ajouter Baguette de tradition au sac">Ajouter</button>
           </div>
         </div>
       </article>
@@ -517,12 +681,17 @@
       <article class="plat reveal" data-cat="pains" data-id="campagne" data-fournee="7,12" data-nom="Pain de campagne" data-prix="3.20">
         <div class="plat__img"><svg viewBox="0 0 64 64" aria-hidden="true"><use href="#ic-campagne"/></svg></div>
         <div class="plat__corps">
-          <p class="plat__note"><span aria-hidden="true">★</span> 9,1</p>
           <h3>Pain de campagne</h3>
+          <p class="plat__sous">Au <b>Bon Pain</b></p>
           <p class="plat__desc">Miche au levain, mie dense, se garde trois jours. Vendu entier ou en demi.</p>
+          <div class="specs">
+              <span class="spec"><svg aria-hidden="true"><use href="#sp-poids"/></svg>800 g</span>
+              <span class="spec"><svg aria-hidden="true"><use href="#sp-temps"/></svg>45 min</span>
+              <span class="spec"><svg aria-hidden="true"><use href="#sp-temp"/></svg>240 °C</span>
+            </div>
           <div class="plat__bas">
             <span class="plat__prix">3,20 €</span>
-            <button class="add" aria-label="Ajouter Pain de campagne au sac">+</button>
+            <button class="add btn" aria-label="Ajouter Pain de campagne au sac">Ajouter</button>
           </div>
         </div>
       </article>
@@ -530,12 +699,17 @@
       <article class="plat reveal" data-cat="pains" data-id="fougasse" data-fournee="11" data-nom="Fougasse aux olives" data-prix="3.60">
         <div class="plat__img"><svg viewBox="0 0 64 64" aria-hidden="true"><use href="#ic-fougasse"/></svg></div>
         <div class="plat__corps">
-          <p class="plat__note"><span aria-hidden="true">★</span> 8,9 <em>· fournée de 11 h</em></p>
           <h3>Fougasse aux olives</h3>
+          <p class="plat__sous">Au <b>Bon Pain</b> · fournée de 11 h</p>
           <p class="plat__desc">Huile d'olive, olives noires, fleur de sel. Tiède, elle ne survit pas au trajet.</p>
+          <div class="specs">
+              <span class="spec"><svg aria-hidden="true"><use href="#sp-poids"/></svg>350 g</span>
+              <span class="spec"><svg aria-hidden="true"><use href="#sp-temps"/></svg>18 min</span>
+              <span class="spec"><svg aria-hidden="true"><use href="#sp-temp"/></svg>230 °C</span>
+            </div>
           <div class="plat__bas">
             <span class="plat__prix">3,60 €</span>
-            <button class="add" aria-label="Ajouter Fougasse aux olives au sac">+</button>
+            <button class="add btn" aria-label="Ajouter Fougasse aux olives au sac">Ajouter</button>
           </div>
         </div>
       </article>
@@ -543,12 +717,17 @@
       <article class="plat reveal plat--vedette" data-cat="viennoiseries" data-id="croissant" data-fournee="8.5" data-nom="Croissant au beurre" data-prix="1.30">
         <div class="plat__img"><svg viewBox="0 0 64 64" aria-hidden="true"><use href="#ic-croissant"/></svg></div>
         <div class="plat__corps">
-          <p class="plat__note"><span aria-hidden="true">★</span> 9,3</p>
           <h3>Croissant au beurre</h3>
+          <p class="plat__sous">Au <b>Bon Pain</b></p>
           <p class="plat__desc">Feuilletage à six tours, beurre de tourage. Sorti à 8 h 30, jamais réchauffé.</p>
+          <div class="specs">
+              <span class="spec"><svg aria-hidden="true"><use href="#sp-poids"/></svg>65 g</span>
+              <span class="spec"><svg aria-hidden="true"><use href="#sp-temps"/></svg>16 min</span>
+              <span class="spec"><svg aria-hidden="true"><use href="#sp-temp"/></svg>190 °C</span>
+            </div>
           <div class="plat__bas">
             <span class="plat__prix">1,30 €</span>
-            <button class="add" aria-label="Ajouter Croissant au beurre au sac">+</button>
+            <button class="add btn" aria-label="Ajouter Croissant au beurre au sac">Ajouter</button>
           </div>
         </div>
       </article>
@@ -556,12 +735,17 @@
       <article class="plat reveal" data-cat="viennoiseries" data-id="painchoco" data-fournee="8.5" data-nom="Pain au chocolat" data-prix="1.50">
         <div class="plat__img"><svg viewBox="0 0 64 64" aria-hidden="true"><use href="#ic-pain-choco"/></svg></div>
         <div class="plat__corps">
-          <p class="plat__note"><span aria-hidden="true">★</span> 9,0</p>
           <h3>Pain au chocolat</h3>
+          <p class="plat__sous">Au <b>Bon Pain</b></p>
           <p class="plat__desc">Deux barres de chocolat noir, pâte levée feuilletée. Le classique du comptoir.</p>
+          <div class="specs">
+              <span class="spec"><svg aria-hidden="true"><use href="#sp-poids"/></svg>75 g</span>
+              <span class="spec"><svg aria-hidden="true"><use href="#sp-temps"/></svg>16 min</span>
+              <span class="spec"><svg aria-hidden="true"><use href="#sp-temp"/></svg>190 °C</span>
+            </div>
           <div class="plat__bas">
             <span class="plat__prix">1,50 €</span>
-            <button class="add" aria-label="Ajouter Pain au chocolat au sac">+</button>
+            <button class="add btn" aria-label="Ajouter Pain au chocolat au sac">Ajouter</button>
           </div>
         </div>
       </article>
@@ -569,12 +753,17 @@
       <article class="plat reveal" data-cat="viennoiseries" data-id="brioche" data-fournee="8.5" data-nom="Brioche à tête" data-prix="2.40">
         <div class="plat__img"><svg viewBox="0 0 64 64" aria-hidden="true"><use href="#ic-brioche"/></svg></div>
         <div class="plat__corps">
-          <p class="plat__note"><span aria-hidden="true">★</span> 8,7</p>
           <h3>Brioche à tête</h3>
+          <p class="plat__sous">Au <b>Bon Pain</b></p>
           <p class="plat__desc">Mie filante, dorure à l'œuf. Se coupe en tranches épaisses pour le petit-déjeuner.</p>
+          <div class="specs">
+              <span class="spec"><svg aria-hidden="true"><use href="#sp-poids"/></svg>300 g</span>
+              <span class="spec"><svg aria-hidden="true"><use href="#sp-temps"/></svg>25 min</span>
+              <span class="spec"><svg aria-hidden="true"><use href="#sp-temp"/></svg>170 °C</span>
+            </div>
           <div class="plat__bas">
             <span class="plat__prix">2,40 €</span>
-            <button class="add" aria-label="Ajouter Brioche à tête au sac">+</button>
+            <button class="add btn" aria-label="Ajouter Brioche à tête au sac">Ajouter</button>
           </div>
         </div>
       </article>
@@ -582,12 +771,17 @@
       <article class="plat reveal" data-cat="viennoiseries" data-id="raisins" data-fournee="8.5" data-nom="Pain aux raisins" data-prix="1.70">
         <div class="plat__img"><svg viewBox="0 0 64 64" aria-hidden="true"><use href="#ic-pain-raisins"/></svg></div>
         <div class="plat__corps">
-          <p class="plat__note"><span aria-hidden="true">★</span> 8,9 <em>· fournée de 8 h 30</em></p>
           <h3>Pain aux raisins</h3>
+          <p class="plat__sous">Au <b>Bon Pain</b> · fournée de 8 h 30</p>
           <p class="plat__desc">Escargot de pâte feuilletée, crème pâtissière, raisins macérés au rhum.</p>
+          <div class="specs">
+              <span class="spec"><svg aria-hidden="true"><use href="#sp-poids"/></svg>90 g</span>
+              <span class="spec"><svg aria-hidden="true"><use href="#sp-temps"/></svg>18 min</span>
+              <span class="spec"><svg aria-hidden="true"><use href="#sp-temp"/></svg>190 °C</span>
+            </div>
           <div class="plat__bas">
             <span class="plat__prix">1,70 €</span>
-            <button class="add" aria-label="Ajouter Pain aux raisins au sac">+</button>
+            <button class="add btn" aria-label="Ajouter Pain aux raisins au sac">Ajouter</button>
           </div>
         </div>
       </article>
@@ -595,12 +789,17 @@
       <article class="plat reveal plat--vedette" data-cat="salé" data-id="sandwich-jambon" data-nom="Sandwich jambon-beurre" data-prix="4.50">
         <div class="plat__img"><svg viewBox="0 0 64 64" aria-hidden="true"><use href="#ic-sandwich"/></svg></div>
         <div class="plat__corps">
-          <p class="plat__note"><span aria-hidden="true">★</span> 9,2 <em>· formule midi</em></p>
           <h3>Sandwich jambon-beurre</h3>
+          <p class="plat__sous">Au <b>Bon Pain</b> · formule midi</p>
           <p class="plat__desc">Baguette de tradition, jambon supérieur, beurre demi-sel, cornichons. Monté à la commande.</p>
+          <div class="specs">
+              <span class="spec"><svg aria-hidden="true"><use href="#sp-poids"/></svg>240 g</span>
+              <span class="spec"><svg aria-hidden="true"><use href="#sp-temps"/></svg>à la commande</span>
+              <span class="spec"><svg aria-hidden="true"><use href="#sp-temp"/></svg>servi frais</span>
+            </div>
           <div class="plat__bas">
             <span class="plat__prix">4,50 €</span>
-            <button class="add" aria-label="Ajouter Sandwich jambon-beurre au sac">+</button>
+            <button class="add btn" aria-label="Ajouter Sandwich jambon-beurre au sac">Ajouter</button>
           </div>
         </div>
       </article>
@@ -608,12 +807,17 @@
       <article class="plat reveal" data-cat="salé" data-id="soupe" data-nom="Soupe du jour" data-prix="4.90">
         <div class="plat__img"><svg viewBox="0 0 64 64" aria-hidden="true"><use href="#ic-soupe"/></svg></div>
         <div class="plat__corps">
-          <p class="plat__note"><span aria-hidden="true">★</span> 8,8</p>
           <h3>Soupe du jour</h3>
+          <p class="plat__sous">Au <b>Bon Pain</b></p>
           <p class="plat__desc">Légumes du marché, servie chaude avec deux tranches de campagne. La recette change chaque jour.</p>
+          <div class="specs">
+              <span class="spec"><svg aria-hidden="true"><use href="#sp-poids"/></svg>30 cl</span>
+              <span class="spec"><svg aria-hidden="true"><use href="#sp-temps"/></svg>du jour</span>
+              <span class="spec"><svg aria-hidden="true"><use href="#sp-temp"/></svg>servie chaude</span>
+            </div>
           <div class="plat__bas">
             <span class="plat__prix">4,90 €</span>
-            <button class="add" aria-label="Ajouter Soupe du jour au sac">+</button>
+            <button class="add btn" aria-label="Ajouter Soupe du jour au sac">Ajouter</button>
           </div>
         </div>
       </article>
@@ -621,12 +825,17 @@
       <article class="plat reveal" data-cat="salé" data-id="salade" data-nom="Salade César" data-prix="7.90">
         <div class="plat__img"><svg viewBox="0 0 64 64" aria-hidden="true"><use href="#ic-salade"/></svg></div>
         <div class="plat__corps">
-          <p class="plat__note"><span aria-hidden="true">★</span> 8,6</p>
           <h3>Salade César</h3>
+          <p class="plat__sous">Au <b>Bon Pain</b></p>
           <p class="plat__desc">Poulet rôti, sucrine, copeaux de parmesan, croûtons maison, sauce à part.</p>
+          <div class="specs">
+              <span class="spec"><svg aria-hidden="true"><use href="#sp-poids"/></svg>280 g</span>
+              <span class="spec"><svg aria-hidden="true"><use href="#sp-temps"/></svg>à la commande</span>
+              <span class="spec"><svg aria-hidden="true"><use href="#sp-temp"/></svg>servie fraîche</span>
+            </div>
           <div class="plat__bas">
             <span class="plat__prix">7,90 €</span>
-            <button class="add" aria-label="Ajouter Salade César au sac">+</button>
+            <button class="add btn" aria-label="Ajouter Salade César au sac">Ajouter</button>
           </div>
         </div>
       </article>
@@ -634,12 +843,17 @@
       <article class="plat reveal" data-cat="salé" data-id="quiche" data-nom="Quiche lorraine" data-prix="4.20">
         <div class="plat__img"><svg viewBox="0 0 64 64" aria-hidden="true"><use href="#ic-quiche"/></svg></div>
         <div class="plat__corps">
-          <p class="plat__note"><span aria-hidden="true">★</span> 9,0</p>
           <h3>Quiche lorraine</h3>
+          <p class="plat__sous">Au <b>Bon Pain</b></p>
           <p class="plat__desc">Pâte brisée maison, lardons, crème fraîche, muscade. Part généreuse, servie tiède.</p>
+          <div class="specs">
+              <span class="spec"><svg aria-hidden="true"><use href="#sp-poids"/></svg>180 g</span>
+              <span class="spec"><svg aria-hidden="true"><use href="#sp-temps"/></svg>35 min</span>
+              <span class="spec"><svg aria-hidden="true"><use href="#sp-temp"/></svg>servie tiède</span>
+            </div>
           <div class="plat__bas">
             <span class="plat__prix">4,20 €</span>
-            <button class="add" aria-label="Ajouter Quiche lorraine au sac">+</button>
+            <button class="add btn" aria-label="Ajouter Quiche lorraine au sac">Ajouter</button>
           </div>
         </div>
       </article>
@@ -647,12 +861,17 @@
       <article class="plat reveal" data-cat="sucré" data-id="tarte" data-nom="Tartelette aux fruits rouges" data-prix="3.40">
         <div class="plat__img"><svg viewBox="0 0 64 64" aria-hidden="true"><use href="#ic-tarte"/></svg></div>
         <div class="plat__corps">
-          <p class="plat__note"><span aria-hidden="true">★</span> 9,1</p>
           <h3>Tartelette aux fruits rouges</h3>
+          <p class="plat__sous">Au <b>Bon Pain</b></p>
           <p class="plat__desc">Pâte sablée, crème pâtissière vanille, fruits frais posés le matin.</p>
+          <div class="specs">
+              <span class="spec"><svg aria-hidden="true"><use href="#sp-poids"/></svg>110 g</span>
+              <span class="spec"><svg aria-hidden="true"><use href="#sp-temps"/></svg>22 min</span>
+              <span class="spec"><svg aria-hidden="true"><use href="#sp-temp"/></svg>servie fraîche</span>
+            </div>
           <div class="plat__bas">
             <span class="plat__prix">3,40 €</span>
-            <button class="add" aria-label="Ajouter Tartelette aux fruits rouges au sac">+</button>
+            <button class="add btn" aria-label="Ajouter Tartelette aux fruits rouges au sac">Ajouter</button>
           </div>
         </div>
       </article>
@@ -660,12 +879,17 @@
       <article class="plat reveal" data-cat="sucré" data-id="cookie" data-nom="Cookie chocolat noir" data-prix="2.20">
         <div class="plat__img"><svg viewBox="0 0 64 64" aria-hidden="true"><use href="#ic-cookie"/></svg></div>
         <div class="plat__corps">
-          <p class="plat__note"><span aria-hidden="true">★</span> 8,9</p>
           <h3>Cookie chocolat noir</h3>
+          <p class="plat__sous">Au <b>Bon Pain</b></p>
           <p class="plat__desc">Cœur fondant, bords croquants, pépites 70 %. Cuit deux fois dans la journée.</p>
+          <div class="specs">
+              <span class="spec"><svg aria-hidden="true"><use href="#sp-poids"/></svg>85 g</span>
+              <span class="spec"><svg aria-hidden="true"><use href="#sp-temps"/></svg>12 min</span>
+              <span class="spec"><svg aria-hidden="true"><use href="#sp-temp"/></svg>180 °C</span>
+            </div>
           <div class="plat__bas">
             <span class="plat__prix">2,20 €</span>
-            <button class="add" aria-label="Ajouter Cookie chocolat noir au sac">+</button>
+            <button class="add btn" aria-label="Ajouter Cookie chocolat noir au sac">Ajouter</button>
           </div>
         </div>
       </article>
@@ -673,12 +897,17 @@
       <article class="plat reveal" data-cat="sucré" data-id="eclair" data-nom="Éclair au chocolat" data-prix="3.10">
         <div class="plat__img"><svg viewBox="0 0 64 64" aria-hidden="true"><use href="#ic-eclair"/></svg></div>
         <div class="plat__corps">
-          <p class="plat__note"><span aria-hidden="true">★</span> 9,2</p>
           <h3>Éclair au chocolat</h3>
+          <p class="plat__sous">Au <b>Bon Pain</b></p>
           <p class="plat__desc">Pâte à choux, crème au chocolat noir, glaçage brillant. Dressé le matin même.</p>
+          <div class="specs">
+              <span class="spec"><svg aria-hidden="true"><use href="#sp-poids"/></svg>95 g</span>
+              <span class="spec"><svg aria-hidden="true"><use href="#sp-temps"/></svg>30 min</span>
+              <span class="spec"><svg aria-hidden="true"><use href="#sp-temp"/></svg>servi frais</span>
+            </div>
           <div class="plat__bas">
             <span class="plat__prix">3,10 €</span>
-            <button class="add" aria-label="Ajouter Éclair au chocolat au sac">+</button>
+            <button class="add btn" aria-label="Ajouter Éclair au chocolat au sac">Ajouter</button>
           </div>
         </div>
       </article>
@@ -686,12 +915,17 @@
       <article class="plat reveal" data-cat="boissons" data-id="cafe" data-nom="Café allongé" data-prix="1.80">
         <div class="plat__img"><svg viewBox="0 0 64 64" aria-hidden="true"><use href="#ic-cafe"/></svg></div>
         <div class="plat__corps">
-          <p class="plat__note"><span aria-hidden="true">★</span> 8,5</p>
           <h3>Café allongé</h3>
+          <p class="plat__sous">Au <b>Bon Pain</b></p>
           <p class="plat__desc">Torréfaction du Sud, servi sur place ou en gobelet. Avec un croissant, c'est 2,80 €.</p>
+          <div class="specs">
+              <span class="spec"><svg aria-hidden="true"><use href="#sp-poids"/></svg>12 cl</span>
+              <span class="spec"><svg aria-hidden="true"><use href="#sp-temps"/></svg>25 s</span>
+              <span class="spec"><svg aria-hidden="true"><use href="#sp-temp"/></svg>servi chaud</span>
+            </div>
           <div class="plat__bas">
             <span class="plat__prix">1,80 €</span>
-            <button class="add" aria-label="Ajouter Café allongé au sac">+</button>
+            <button class="add btn" aria-label="Ajouter Café allongé au sac">Ajouter</button>
           </div>
         </div>
       </article>
@@ -699,12 +933,17 @@
       <article class="plat reveal" data-cat="boissons" data-id="jus" data-nom="Jus d'orange pressé" data-prix="3.20">
         <div class="plat__img"><svg viewBox="0 0 64 64" aria-hidden="true"><use href="#ic-jus"/></svg></div>
         <div class="plat__corps">
-          <p class="plat__note"><span aria-hidden="true">★</span> 8,8</p>
           <h3>Jus d'orange pressé</h3>
+          <p class="plat__sous">Au <b>Bon Pain</b></p>
           <p class="plat__desc">Pressé devant vous, sans sucre ajouté. 25 cl.</p>
+          <div class="specs">
+              <span class="spec"><svg aria-hidden="true"><use href="#sp-poids"/></svg>25 cl</span>
+              <span class="spec"><svg aria-hidden="true"><use href="#sp-temps"/></svg>pressé minute</span>
+              <span class="spec"><svg aria-hidden="true"><use href="#sp-temp"/></svg>servi frais</span>
+            </div>
           <div class="plat__bas">
             <span class="plat__prix">3,20 €</span>
-            <button class="add" aria-label="Ajouter Jus d'orange pressé au sac">+</button>
+            <button class="add btn" aria-label="Ajouter Jus d'orange pressé au sac">Ajouter</button>
           </div>
         </div>
       </article>
@@ -715,15 +954,16 @@
 </section>
 
 <!-- ============================================================
-     POURQUOI NOUS — la bande de services, filets verticaux.
+     NOS SERVICES
      ============================================================ -->
 <section class="sec">
   <div class="container">
     <header class="sec__head reveal">
-      <p class="eyebrow">Ce que nous faisons pour vous</p>
-      <h2 class="h2">Pourquoi Au Bon Pain</h2>
+      <svg class="orn" viewBox="0 0 60 42" aria-hidden="true"><use href="#orn-fleur"/></svg>
+      <h2 class="script">Nos services</h2>
+      <p class="sous">Ce que nous faisons <b>pour vous</b></p>
     </header>
-    <div class="services">
+    <div class="services reveal">
       <article class="service reveal">
         <span class="service__ic" aria-hidden="true">
           <svg viewBox="0 0 24 24"><rect x="6" y="2.5" width="12" height="19" rx="3" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M10.5 5.5h3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
@@ -757,51 +997,20 @@
 </section>
 
 <!-- ============================================================
-     LA MAISON — visuel, texte, et les chiffres qui comptent.
-     Les trois premiers chiffres sont des hypothèses de rédaction,
-     à valider par le boulanger (cf. README).
+     LA RECETTE — le sandwich se compose, la fiche kraft suit.
      ============================================================ -->
-<section class="sec" id="maison">
+<section class="sec" id="recette">
   <div class="container">
-    <div class="apropos reveal">
-      <div class="apropos__viz">
-        <svg viewBox="0 0 64 64" aria-hidden="true"><use href="#ic-campagne"/></svg>
-      </div>
-      <div class="apropos__txt">
-        <p class="eyebrow">La maison</p>
-        <h2 class="h2">Trois décisions,<br>prises <span class="or">la veille</span>.</h2>
-        <p class="lead">
-          Un pain se décide avant d'être cuit : la farine qu'on choisit, le temps qu'on
-          accepte de perdre, la chaleur qu'on lui donne. Ces trois choix n'ont pas bougé
-          depuis l'ouverture, et ils expliquent le goût mieux que n'importe quelle étiquette.
-        </p>
-        <ul class="stats">
-          <li class="stat"><strong>1</strong><span>moulin, dans l'Hérault</span></li>
-          <li class="stat"><strong>18 h</strong><span>de fermentation au levain</span></li>
-          <li class="stat"><strong>250°</strong><span>de cuisson sur pierre</span></li>
-          <li class="stat"><strong>4,3/5</strong><span>sur 79 avis Google</span></li>
-        </ul>
-        <div class="apropos__cta">
-          <a class="btn" href="#infos">Venir nous voir <span class="arw" aria-hidden="true">→</span></a>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
+    <header class="sec__head reveal">
+      <svg class="orn" viewBox="0 0 60 42" aria-hidden="true"><use href="#orn-sandwich"/></svg>
+      <h2 class="script">Composez votre sandwich</h2>
+      <p class="sous">Monté <b>à votre arrivée</b>, pas trois heures avant</p>
+    </header>
 
-<!-- ============================================================
-     L'ATELIER — le sandwich se monte à l'écran pendant qu'on le
-     choisit, et le prix suit.
-     ============================================================ -->
-<section class="sec" id="atelier">
-  <div class="container composer">
-    <div class="composer__aside reveal">
-      <p class="eyebrow">Sur mesure</p>
-      <h2 class="h2">Composez<br>votre sandwich</h2>
-      <p class="lead">Quatre choix, trente secondes. Il est monté à votre arrivée, pas trois heures avant.</p>
-
-      <div class="sandwich-viz" aria-hidden="true">
-        <svg viewBox="26 70 268 142" class="sandwich-viz__svg">
+    <div class="recette">
+      <div class="recette__gauche reveal">
+        <div class="sandwich-viz" aria-hidden="true">
+          <svg viewBox="26 70 268 142" class="sandwich-viz__svg">
           <ellipse class="sv-ombre" cx="160" cy="192" rx="112" ry="14"/>
           <g class="sv-layer sv-bas"><path d="M40 158h240c0 18-24 24-120 24S40 176 40 158z"/></g>
           <g class="sv-layer sv-sauce" id="sv-sauce"><path d="M46 150h228c-6 10-20 6-32 4s-24 6-38 2-26 5-40 1-30 4-42 0-26 3-36-7z"/></g>
@@ -812,12 +1021,25 @@
             <circle cx="118" cy="98" r="3"/><circle cx="152" cy="92" r="3"/><circle cx="188" cy="97" r="3"/><circle cx="216" cy="105" r="3"/><circle cx="92" cy="108" r="3"/>
           </g>
         </svg>
+        </div>
+        <aside class="fiche" aria-label="Récapitulatif">
+          <div class="fiche__bloc">
+            <svg class="fiche__ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#sp-temps"/></svg>
+            <span class="fiche__lbl">Préparation</span>
+            <span class="fiche__val">3</span>
+            <span class="fiche__u">minutes</span>
+          </div>
+          <div class="fiche__sep"></div>
+          <div class="fiche__bloc">
+            <svg class="fiche__ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#sp-piece"/></svg>
+            <span class="fiche__lbl">Total</span>
+            <span class="fiche__val" id="sandwich-prix">4,20 €</span>
+          </div>
+        </aside>
       </div>
-      <p class="sandwich-mots" id="sandwich-mots"></p>
-    </div>
 
-    <form class="composer__form reveal" id="form-sandwich">
-      <fieldset class="etape">
+      <form class="recette__txt reveal" id="form-sandwich">
+        <fieldset class="etape">
         <legend><span class="etape__n">1</span> Le pain</legend>
         <div class="choix">
           <label><input type="radio" name="pain" value="Baguette de tradition" data-prix="0" checked><span>Baguette de tradition</span><em>inclus</em></label>
@@ -869,33 +1091,45 @@
         <span class="formule__prix">+2,60 €</span>
       </label>
 
-      <div class="composer__bas">
-        <p class="composer__total"><span>Votre sandwich</span><strong id="sandwich-prix">4,20 €</strong></p>
-        <button class="btn btn--or" type="submit">Ajouter au sac</button>
-      </div>
-      <p class="composer__recap" id="sandwich-recap" aria-live="polite"></p>
-    </form>
+        <h3 style="margin-top:26px">Ce qu'il vous faut</h3>
+        <ul class="ingredients" id="ingredients"></ul>
+
+        <div class="composer__bas">
+          <button class="btn btn--plein" type="submit">Ajouter au sac</button>
+          <a class="lien-t" href="#carte">Voir la carte</a>
+        </div>
+        <p class="composer__recap" id="sandwich-recap" aria-live="polite"></p>
+      </form>
+    </div>
   </div>
 </section>
 
 <!-- ============================================================
-     AVIS — la note réelle publiée par Google. Aucun témoignage
-     n'est inventé : les avis restent chez Google, on y renvoie.
+     AVIS — la note publiée par Google, aucun témoignage inventé.
      ============================================================ -->
 <section class="sec">
-  <div class="container avis reveal">
-    <div class="avis__note">
-      <strong>4,3</strong>
-      <span class="avis__etoiles" aria-hidden="true">★★★★<span class="demi">★</span></span>
-      <span class="avis__n">79 avis Google</span>
-    </div>
-    <p class="avis__txt">
-      La note vient de Google et se met à jour chez eux. Un pain vous a plu, ou déçu ?
-      Dites-le : nous lisons tout, et c'est ce qui fait bouger la fournée du lendemain.
-    </p>
-    <div class="avis__cta">
-      <a class="btn" href="https://www.google.com/search?q=Au+Bon+Pain+36+Rue+Paul+Bousquet+S%C3%A8te" target="_blank" rel="noopener">Lire les avis <span class="arw" aria-hidden="true">→</span></a>
-      <a class="btn btn--or" href="https://search.google.com/local/writereview?placeid=" target="_blank" rel="noopener">Laisser un avis</a>
+  <div class="container">
+    <header class="sec__head reveal">
+      <svg class="orn" viewBox="0 0 60 42" aria-hidden="true"><use href="#orn-etoile"/></svg>
+      <h2 class="script">Ce qu'ils en disent</h2>
+      <p class="sous">Sur <b>Google</b>, et nulle part ailleurs</p>
+    </header>
+
+    <div class="avis reveal">
+      <div class="avis__note">
+        <strong>4,3</strong>
+        <span class="avis__etoiles" aria-hidden="true">★★★★<span class="demi">★</span></span>
+        <span class="avis__n">79 avis</span>
+      </div>
+      <p class="avis__txt">
+        La note vient de Google et se met à jour chez eux — nous n'avons rien recopié ici.
+        Un pain vous a plu, ou déçu ? Dites-le : nous lisons tout, et c'est ce qui fait
+        bouger la fournée du lendemain.
+      </p>
+      <div class="avis__cta">
+        <a class="btn btn--craie" href="https://www.google.com/search?q=Au+Bon+Pain+36+Rue+Paul+Bousquet+S%C3%A8te" target="_blank" rel="noopener">Lire les avis</a>
+        <a class="btn" href="https://search.google.com/local/writereview?placeid=" target="_blank" rel="noopener">Laisser un avis</a>
+      </div>
     </div>
   </div>
 </section>
@@ -906,36 +1140,32 @@
 <section class="sec">
   <div class="container">
     <div class="bande reveal">
-      <div>
-        <p class="eyebrow">Click &amp; collect</p>
-        <h2 class="h2">Prêt pour <span class="or">demain matin</span> ?</h2>
-        <p class="lead">Commandez ce soir, choisissez un créneau de quinze minutes, et votre sac vous attend au comptoir. Sans file d'attente, sans acompte.</p>
-        <div class="bande__cta">
-          <a class="btn btn--or" href="#carte">Commander</a>
-          <a class="btn" href="tel:+33467535931">04 67 53 59 31</a>
-        </div>
+      <svg class="orn" viewBox="0 0 60 42" aria-hidden="true" style="margin-inline:auto"><use href="#orn-miche"/></svg>
+      <h2 class="script">Prêt pour demain matin&nbsp;?</h2>
+      <p class="sous">Click &amp; <b>collect</b></p>
+      <p class="lead">Commandez ce soir, choisissez un créneau de quinze minutes, et votre sac vous attend au comptoir. Sans file d'attente, sans acompte.</p>
+      <div class="bande__cta">
+        <a class="btn btn--plein" href="#carte">Commander</a>
+        <a class="btn btn--craie" href="tel:+33467535931">04 67 53 59 31</a>
       </div>
-      <svg class="bande__viz" viewBox="0 0 64 64" aria-hidden="true"><use href="#ic-croissant"/></svg>
     </div>
   </div>
 </section>
 
 <!-- ============================================================
-     INFOS — adresse, horaires (jour du jour surligné), contact.
+     INFOS
      ============================================================ -->
 <section class="sec" id="infos">
   <div class="container infos">
     <div class="infos__col reveal">
-      <p class="eyebrow">Nous trouver</p>
-      <h2 class="h2">Entre la gare<br>et le canal.</h2>
-      <p class="infos__adr">
-        36 rue Paul Bousquet<br>
-        34200 Sète
-      </p>
+      <svg class="orn" viewBox="0 0 60 42" aria-hidden="true" style="margin-left:-6px"><use href="#orn-fleur"/></svg>
+      <h2 class="script">Nous trouver</h2>
+      <p class="sous">Entre la gare et <b>le canal</b></p>
+      <p class="infos__adr">36 rue Paul Bousquet<br>34200 Sète</p>
       <p class="infos__lead">Le four est visible depuis la rue : quand il tourne, la vitrine se remplit.</p>
       <div class="infos__cta">
-        <a class="btn btn--or" href="https://www.google.com/maps/dir/?api=1&amp;destination=36+Rue+Paul+Bousquet+34200+S%C3%A8te" target="_blank" rel="noopener">Itinéraire</a>
-        <a class="btn" href="tel:+33467535931">04 67 53 59 31</a>
+        <a class="btn btn--plein" href="https://www.google.com/maps/dir/?api=1&amp;destination=36+Rue+Paul+Bousquet+34200+S%C3%A8te" target="_blank" rel="noopener">Itinéraire</a>
+        <a class="btn btn--craie" href="tel:+33467535931">04 67 53 59 31</a>
       </div>
     </div>
 
@@ -961,71 +1191,38 @@
 
 <footer class="footer">
   <div class="container">
-    <div class="footer__grille">
-      <div class="footer__mot">
-        <a class="brand" href="#top">
-          <span class="brand__mark" aria-hidden="true">
-            <svg viewBox="0 0 64 64" width="30" height="30"><use href="#ic-baguette"/></svg>
-          </span>
-          <span class="brand__txt">
-            <strong>Au Bon Pain</strong>
-            <em>Sète</em>
-          </span>
-        </a>
-        <p class="lead">Pains de tradition, viennoiseries au beurre, sandwichs et salades préparés sur place. Ouvert du lundi au samedi, de 7 h à 13 h.</p>
+    <div class="footer__plaque reveal">
+      <div class="footer__g">
+        <span>© 1972 — 2026 · Tous droits réservés</span><br>
+        <a href="#carte">La carte</a> · <a href="#infos">Horaires</a> · <a href="../index.html">Site par MJ Agency</a>
       </div>
 
-      <div class="footer__col">
-        <h4>La carte</h4>
-        <ul>
-          <li><a href="#carte">Pains</a></li>
-          <li><a href="#carte">Viennoiseries</a></li>
-          <li><a href="#carte">Salé</a></li>
-          <li><a href="#carte">Sucré</a></li>
-          <li><a href="#carte">Boissons</a></li>
-        </ul>
-      </div>
+      <a class="brand" href="#top">
+        <span class="brand__ligne">
+          <svg class="brand__epi" viewBox="0 0 40 26" aria-hidden="true"><use href="#ic-epi-court"/></svg>
+          <span class="brand__nom">Au Bon Pain</span>
+          <svg class="brand__epi" viewBox="0 0 40 26" aria-hidden="true" style="transform:scaleX(-1)"><use href="#ic-epi-court"/></svg>
+        </span>
+        <span class="brand__sous">Sète</span>
+      </a>
 
-      <div class="footer__col">
-        <h4>La maison</h4>
-        <ul>
-          <li><a href="#four">Sortie du four</a></li>
-          <li><a href="#atelier">Composez votre sandwich</a></li>
-          <li><a href="#maison">Nos trois décisions</a></li>
-          <li><a href="#populaires">Les plus demandés</a></li>
-        </ul>
+      <div class="footer__d">
+        <span>Adresse : <b>36 rue Paul Bousquet, 34200 Sète</b></span><br>
+        <span>Téléphone : <a href="tel:+33467535931">04 67 53 59 31</a> · Lun — sam, 7 h à 13 h</span>
       </div>
-
-      <div class="footer__col">
-        <h4>Nous trouver</h4>
-        <address>
-          <span>36 rue Paul Bousquet<br>34200 Sète</span>
-          <a href="tel:+33467535931">04 67 53 59 31</a>
-          <a href="https://www.google.com/maps/dir/?api=1&amp;destination=36+Rue+Paul+Bousquet+34200+S%C3%A8te" target="_blank" rel="noopener">Itinéraire</a>
-          <span>Lun — sam · 7 h à 13 h</span>
-        </address>
-      </div>
-    </div>
-
-    <div class="footer__bas">
-      <span>© 2026 Au Bon Pain — Sète, Hérault</span>
-      <span>Site réalisé par <a href="../index.html">MJ Agency</a></span>
     </div>
   </div>
 </footer>
 
 <!-- ============================================================
-     LE SAC — quantités, créneau de retrait, puis envoi par SMS.
-     Pas de back-end, donc pas de paiement en ligne : le commerçant
-     reçoit un message lisible.
+     LE SAC — quantités, créneau de retrait, envoi par SMS.
      ============================================================ -->
-<!-- Sur téléphone, le sac reste à portée de pouce sans remonter la page -->
 <button class="barre-sac" id="barre-sac" hidden>
   <span class="barre-sac__g">
     <span class="barre-sac__n" id="barre-n">0 article</span>
     <span class="barre-sac__t" id="barre-total">0,00 €</span>
   </span>
-  <span class="barre-sac__go">Voir le sac <span aria-hidden="true">→</span></span>
+  <span class="barre-sac__go">Voir le sac</span>
 </button>
 
 <div class="voile" id="voile" hidden></div>

@@ -315,21 +315,25 @@ $('#lignes').addEventListener('click', e => {
   majPanier();
 });
 
-/* Boutons « + » — la carte et les cartes mises en avant partagent le même
-   contrat : data-id, data-nom, data-prix, et une illustration. */
-$$('[data-id][data-prix]').forEach(plat => {
-  const btn = $('.add', plat);
+/* Boutons d'ajout — les données sont portées par la fiche du produit,
+   ou par le bouton lui-même quand il est seul (le héro). */
+$$('.add').forEach(btn => {
+  const src = btn.closest('[data-id][data-prix]');
+  if (!src) return;
+  const libelle = btn.textContent;
+
   btn.addEventListener('click', () => {
+    const use = $('use', src);
     ajouter({
-      id:    plat.dataset.id,
-      nom:   plat.dataset.nom,
-      prix:  parseFloat(plat.dataset.prix),
+      id:    src.dataset.id,
+      nom:   src.dataset.nom,
+      prix:  parseFloat(src.dataset.prix),
       det:   '',
-      icone: $('use', plat).getAttribute('href').slice(1),
+      icone: src.dataset.icone || (use ? use.getAttribute('href').slice(1) : 'ic-baguette'),
     });
     btn.classList.add('fait');
-    btn.textContent = '✓';
-    setTimeout(() => { btn.classList.remove('fait'); btn.textContent = '+'; }, 900);
+    btn.textContent = 'Ajouté';
+    setTimeout(() => { btn.classList.remove('fait'); btn.textContent = libelle; }, 1100);
   });
 });
 
@@ -500,12 +504,19 @@ function majSandwich() {
   const s = litSandwich();
   $('#sandwich-prix').textContent = euro(s.prix);
 
-  /* Le choix relu en mots : on vérifie sa commande sans relire les cases */
-  const mots = $('#sandwich-mots');
-  if (mots) {
-    const crud = s.crud.length ? s.crud.join(', ').toLowerCase() : 'sans crudités';
-    mots.innerHTML = `<b>${s.gar}</b> sur ${s.pain.toLowerCase()}, ${crud}, `
-      + `${s.sauce.toLowerCase()}${s.formule ? ', en formule midi' : ''}.`;
+  /* Ce qu'il vous faut : la liste se réécrit à chaque choix */
+  const liste = $('#ingredients');
+  if (liste) {
+    const lignes = [
+      ['1 ×', s.pain],
+      ['1 ×', s.gar],
+      ['+', s.crud.length ? s.crud.join(', ').toLowerCase() : 'sans crudités'],
+      ['1 ×', s.sauce.toLowerCase()],
+    ];
+    if (s.formule) lignes.push(['+', 'formule midi : une boisson et une douceur']);
+    liste.innerHTML = lignes
+      .map(([q, t]) => `<li><b>${q}</b><i></i><span>${t}</span></li>`)
+      .join('');
   }
 
   /* Le dessin suit les choix : teinte de la garniture, sauce, crudités */
@@ -768,3 +779,41 @@ champRech.addEventListener('keydown', e => { if (e.key === 'Escape') fermerReche
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape' && !boiteRech.hidden) fermerRecherche();
 });
+
+/* ---------------------------------------------------------
+   14 · Le fournil du héro
+   Quatre vues, une par fournée. À l'arrivée, on montre celle
+   de l'heure qu'il est ; ensuite, le visiteur décide.
+   --------------------------------------------------------- */
+const vues = $$('.fournil__vue');
+const pastilles = $$('.rail button');
+let choixManuel = false;
+
+function montreVue(i) {
+  vues.forEach((v, k) => { v.hidden = k !== i; });
+  pastilles.forEach((b, k) => {
+    if (k === i) b.setAttribute('aria-current', 'true');
+    else b.removeAttribute('aria-current');
+  });
+}
+
+pastilles.forEach((b, i) => b.addEventListener('click', () => {
+  choixManuel = true;
+  montreVue(i);
+}));
+
+/* La vue qui correspond à l'heure : la dernière fournée sortie,
+   ou la première du jour avant l'ouverture. */
+function vueDeLHeure(now = new Date()) {
+  const h = decimal(now);
+  let i = 0;
+  FOURNEES.forEach((f, k) => { if (h >= f.h) i = k; });
+  return i;
+}
+
+function majFournil() {
+  if (choixManuel || !vues.length) return;
+  montreVue(vueDeLHeure());
+}
+majFournil();
+setInterval(majFournil, 60000);
