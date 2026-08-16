@@ -621,9 +621,60 @@ a.work-item:hover .work-item__title{color:var(--blue)}
   .steps,.stats{grid-template-columns:1fr 1fr}
   .zone{grid-template-columns:1fr;gap:var(--s4)}
   .footer__cols{grid-template-columns:1fr 1fr}
+
+  /* Le doigt n'a pas la précision du curseur : tout ce qui se touche fait
+     au moins 44 px de haut. Les liens tertiaires en faisaient 26, les
+     flèches du calendrier 38, les filtres du portfolio 41. */
+  .link-t,.footer__col a,.nav__logo,.nap a,.towns a,.dim a{
+    min-height:44px;display:inline-flex;align-items:center;
+  }
+  .footer__col a{padding-block:2px}
+  .cal__nav button{width:44px;height:44px}
+  .cal__day{min-height:44px}
+  .tag{min-height:44px;padding-block:0;display:inline-flex;align-items:center}
+
+  /* Un cadre décoratif vide coûte un écran de défilement pour rien. Sur
+     téléphone on ne garde que les visuels qui disent quelque chose : la
+     planche de charte et le gyroscope. */
+  .feature__viz:not(.feature__viz--board):not(.feature__viz--3d){display:none}
+
+  /* La page faisait 7 400 px de haut : on resserre sans tasser. */
+  .footer__bottom,.nap__horaires{font-size:14px}
+  /* Le grand lien de pied de page se touche comme un bouton. */
+  .footer__big a{min-height:44px;display:inline-flex;align-items:center}
+}
+
+@media (max-width:520px){
+  :root{--sec:clamp(56px,13vw,76px)}
+  .feature{padding:var(--s3) var(--s3) var(--s4)}
+  .features{gap:var(--s4)}
+  .hero__meta{gap:var(--s3)}
+  .sec-head{margin-bottom:var(--s4)}
+  .footer__cols{grid-template-columns:1fr;gap:var(--s4)}
+}
+
+/* Sur les écrans à encoche, la barre passait sous la découpe. */
+@supports (padding:max(0px)){
+  @media (max-width:900px){
+    .nav{padding-left:max(clamp(18px,4vw,44px),env(safe-area-inset-left));
+         padding-right:max(clamp(18px,4vw,44px),env(safe-area-inset-right))}
+    .footer{padding-bottom:max(var(--s4),env(safe-area-inset-bottom))}
+  }
 }
 @media (max-width:640px){
-  .hero{min-height:auto;padding-top:110px;padding-bottom:var(--s6)}
+  /* Le premier écran n'appartient qu'au hero : sans ça la section suivante
+     démarrait dans le même écran et l'objet 3D se retrouvait à cheval sur
+     un titre et un filet de séparation. Le bas libéré lui sert de scène.
+     (Cette règle est la dernière du fichier à toucher .hero — c'est elle qui
+     gagne la cascade, inutile d'en écrire une autre plus haut.) */
+  .hero{
+    min-height:100svh;justify-content:flex-start;
+    padding-top:108px;padding-bottom:0;
+  }
+  /* Les chiffres remontent pour dégager le bas de l'écran : c'est la scène
+     de l'objet, qu'on laisse volontairement mordre sur le bord — une forme
+     coupée par le pli donne envie de faire défiler. */
+  .hero .trust{margin-top:auto;padding-bottom:clamp(230px,34vh,300px)}
   .hero__meta .btn,.cta-band .btn{width:100%}
   .work-item{grid-template-columns:1fr;gap:6px;align-items:flex-start}
   .work-item__meta{white-space:normal}
@@ -636,7 +687,10 @@ a.work-item:hover .work-item__title{color:var(--blue)}
 }
 @media (max-width:400px){
   .cal{padding:var(--s2)}
-  .cal__day{min-height:36px;font-size:14px}
+  /* On resserre la typographie, pas la cible : 36 px, c'est sous le seuil
+     du doigt. (Dernière règle du fichier sur .cal__day — c'est elle qui
+     l'emporte sur celle du bloc 860 px.) */
+  .cal__day{min-height:44px;font-size:14px}
 }
 
 @media (prefers-reduced-motion:reduce){
@@ -1199,7 +1253,7 @@ a.work-item:hover .work-item__title{color:var(--blue)}
         <a href="tel:+33611718368">06 11 71 83 68</a>
         <a href="mailto:mjagency.officiel@gmail.com">mjagency.officiel@gmail.com</a>
       </address>
-      <p class="dim" style="font-size:13px">Lun — Ven · 9 h à 18 h</p>
+      <p class="dim nap__horaires">Lun — Ven · 9 h à 18 h</p>
     </div>
   </div>
 
@@ -1245,6 +1299,8 @@ a.work-item:hover .work-item__title{color:var(--blue)}
 
   const VERT = 'attribute vec2 p;void main(){gl_Position=vec4(p,0.,1.);}';
 
+  const PAS = petit ? 58 : 88;
+
   const FRAG = `
   precision highp float;
 
@@ -1254,6 +1310,7 @@ a.work-item:hover .work-item__title{color:var(--blue)}
   uniform float u_scroll;      // progression du défilement, en hauteurs d'écran
   uniform vec2  u_decal;       // position de l'objet à l'écran
   uniform float u_taille;      // échelle de l'objet
+  uniform float u_petit;       // 1 sur téléphone
 
   mat2 rot(float a){ float c = cos(a), s = sin(a); return mat2(c, -s, s, c); }
 
@@ -1355,6 +1412,7 @@ a.work-item:hover .work-item__title{color:var(--blue)}
     // qui donne à l'objet son assise sans dessiner de sol.
     float rayon = 0.78 * u_taille;
     float ombre = smoothstep(rayon, 0.0, length((p2 - vec2(0.06, -0.07)) * vec2(1.0, 1.15)));
+    ombre *= mix(1.0, 1.0 - smoothstep(0.22, 0.80, u_scroll), u_petit);
     col = mix(col, vec3(0.878, 0.890, 0.914), ombre * 0.55);
 
     g_ay = t * 0.16 + u_scroll * 1.05 + m.x * 0.40;
@@ -1378,7 +1436,7 @@ a.work-item:hover .work-item__title{color:var(--blue)}
       float rd_ = sqrt(delta);
       float t0 = max(-b - rd_, 0.0), t1 = -b + rd_;
       dist = t0;
-      for (int i = 0; i < 88; i++){
+      for (int i = 0; i < ${PAS}; i++){
         h = objet(ro + rd * dist);
         if (h < 0.0012 || dist > t1) break;
         dist += h * 0.55;                     // la torsion casse la lipschitzianité
@@ -1411,6 +1469,11 @@ a.work-item:hover .work-item__title{color:var(--blue)}
       // Bord adouci : la couverture retombe quand le rayon n'a fait
       // que frôler la surface, ce qui évite l'escalier sans multi-échantillon.
       float couv = 1.0 - smoothstep(0.0012, 0.005, h);
+
+      // Sur téléphone, l'objet est un moment d'ouverture, pas un décor
+      // permanent : passé le premier écran il s'efface, au lieu de passer
+      // derrière chaque titre sur sept mille pixels de défilement.
+      couv *= mix(1.0, 1.0 - smoothstep(0.22, 0.80, u_scroll), u_petit);
       col = mix(col, min(o, vec3(1.0)), couv * 0.94);
     }
 
@@ -1461,8 +1524,10 @@ a.work-item:hover .work-item__title{color:var(--blue)}
   const uScroll = gl.getUniformLocation(prog, 'u_scroll');
   const uDecal  = gl.getUniformLocation(prog, 'u_decal');
   const uTaille = gl.getUniformLocation(prog, 'u_taille');
+  const uPetit  = gl.getUniformLocation(prog, 'u_petit');
 
-  gl.uniform1f(uTaille, petit ? 0.24 : 0.40);
+  gl.uniform1f(uTaille, petit ? 0.22 : 0.40);
+  gl.uniform1f(uPetit, petit ? 1 : 0);
 
   let souris = [0.5, 0.5], cible = [0.5, 0.5];
   let defile = 0, defileCible = 0;
@@ -1474,9 +1539,12 @@ a.work-item:hover .work-item__title{color:var(--blue)}
     cible = [e.clientX / innerWidth, 1 - e.clientY / innerHeight];
   }, { passive: true });
 
-  // Le lancer de rayons coûte cher au pixel : on rend sous la résolution
-  // native et on laisse l'affichage étirer. La forme est lisse, ça ne se voit pas.
-  const DPR = Math.min(devicePixelRatio || 1, petit ? 0.75 : 1.0);
+  // Le lancer de rayons coûte cher au pixel. On rend sous la définition
+  // native — mais pas trop : à 0.75 l'objet ressortait crénelé sur les écrans
+  // de téléphone, les plus denses de tous. La marche y est raccourcie en
+  // compensation (voir PAS), ce qui se voit beaucoup moins qu'un escalier
+  // sur une silhouette.
+  const DPR = Math.min(devicePixelRatio || 1, petit ? 1.15 : 1.0);
   function redimensionner(){
     const w = Math.max(1, Math.floor(innerWidth * DPR));
     const h = Math.max(1, Math.floor(innerHeight * DPR));
@@ -1506,7 +1574,7 @@ a.work-item:hover .work-item__title{color:var(--blue)}
     // il reste présent d'un bout à l'autre de la page au lieu de sortir
     // du cadre après le premier écran.
     const x = (petit ? 0.00 : 0.45) + Math.sin(defile * 0.42) * (petit ? 0.03 : 0.10);
-    const y = (petit ? -0.30 : 0.04) - Math.sin(defile * 0.58) * (petit ? 0.16 : 0.26);
+    const y = (petit ? -0.40 : 0.04) - Math.sin(defile * 0.58) * (petit ? 0.10 : 0.26);
 
     gl.uniform1f(uTime, (now - t0) / 1000);
     gl.uniform2f(uMouse, souris[0], souris[1]);

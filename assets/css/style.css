@@ -586,9 +586,60 @@ a.work-item:hover .work-item__title{color:var(--blue)}
   .steps,.stats{grid-template-columns:1fr 1fr}
   .zone{grid-template-columns:1fr;gap:var(--s4)}
   .footer__cols{grid-template-columns:1fr 1fr}
+
+  /* Le doigt n'a pas la précision du curseur : tout ce qui se touche fait
+     au moins 44 px de haut. Les liens tertiaires en faisaient 26, les
+     flèches du calendrier 38, les filtres du portfolio 41. */
+  .link-t,.footer__col a,.nav__logo,.nap a,.towns a,.dim a{
+    min-height:44px;display:inline-flex;align-items:center;
+  }
+  .footer__col a{padding-block:2px}
+  .cal__nav button{width:44px;height:44px}
+  .cal__day{min-height:44px}
+  .tag{min-height:44px;padding-block:0;display:inline-flex;align-items:center}
+
+  /* Un cadre décoratif vide coûte un écran de défilement pour rien. Sur
+     téléphone on ne garde que les visuels qui disent quelque chose : la
+     planche de charte et le gyroscope. */
+  .feature__viz:not(.feature__viz--board):not(.feature__viz--3d){display:none}
+
+  /* La page faisait 7 400 px de haut : on resserre sans tasser. */
+  .footer__bottom,.nap__horaires{font-size:14px}
+  /* Le grand lien de pied de page se touche comme un bouton. */
+  .footer__big a{min-height:44px;display:inline-flex;align-items:center}
+}
+
+@media (max-width:520px){
+  :root{--sec:clamp(56px,13vw,76px)}
+  .feature{padding:var(--s3) var(--s3) var(--s4)}
+  .features{gap:var(--s4)}
+  .hero__meta{gap:var(--s3)}
+  .sec-head{margin-bottom:var(--s4)}
+  .footer__cols{grid-template-columns:1fr;gap:var(--s4)}
+}
+
+/* Sur les écrans à encoche, la barre passait sous la découpe. */
+@supports (padding:max(0px)){
+  @media (max-width:900px){
+    .nav{padding-left:max(clamp(18px,4vw,44px),env(safe-area-inset-left));
+         padding-right:max(clamp(18px,4vw,44px),env(safe-area-inset-right))}
+    .footer{padding-bottom:max(var(--s4),env(safe-area-inset-bottom))}
+  }
 }
 @media (max-width:640px){
-  .hero{min-height:auto;padding-top:110px;padding-bottom:var(--s6)}
+  /* Le premier écran n'appartient qu'au hero : sans ça la section suivante
+     démarrait dans le même écran et l'objet 3D se retrouvait à cheval sur
+     un titre et un filet de séparation. Le bas libéré lui sert de scène.
+     (Cette règle est la dernière du fichier à toucher .hero — c'est elle qui
+     gagne la cascade, inutile d'en écrire une autre plus haut.) */
+  .hero{
+    min-height:100svh;justify-content:flex-start;
+    padding-top:108px;padding-bottom:0;
+  }
+  /* Les chiffres remontent pour dégager le bas de l'écran : c'est la scène
+     de l'objet, qu'on laisse volontairement mordre sur le bord — une forme
+     coupée par le pli donne envie de faire défiler. */
+  .hero .trust{margin-top:auto;padding-bottom:clamp(230px,34vh,300px)}
   .hero__meta .btn,.cta-band .btn{width:100%}
   .work-item{grid-template-columns:1fr;gap:6px;align-items:flex-start}
   .work-item__meta{white-space:normal}
@@ -601,7 +652,10 @@ a.work-item:hover .work-item__title{color:var(--blue)}
 }
 @media (max-width:400px){
   .cal{padding:var(--s2)}
-  .cal__day{min-height:36px;font-size:14px}
+  /* On resserre la typographie, pas la cible : 36 px, c'est sous le seuil
+     du doigt. (Dernière règle du fichier sur .cal__day — c'est elle qui
+     l'emporte sur celle du bloc 860 px.) */
+  .cal__day{min-height:44px;font-size:14px}
 }
 
 @media (prefers-reduced-motion:reduce){
