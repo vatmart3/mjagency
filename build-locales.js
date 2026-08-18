@@ -26,9 +26,9 @@ const VILLES = [
     slug: 'creation-site-internet-sete',
     ville: 'Sète',
     lienPied: 'Site internet à Sète',
-    titre: 'Création de site internet à Sète — MJ Agency',
-    desc: "Création de site internet à Sète (34200) : sites vitrines, e-commerce et refonte. Studio installé sur place, déplacement gratuit dans le bassin de Thau.",
-    h1: 'Création de<br>site internet<br>à Sète',
+    titre: 'Création de site internet à Sète — agence web | MJ Agency',
+    desc: "Agence web et digitale à Sète (34200) : création de site internet, refonte et e-commerce. Studio installé sur place, déplacement gratuit dans le bassin de Thau.",
+    h1: 'Agence web à Sète,<br>création de<br>site internet',
     intro: "Nous sommes installés à Sète. Pas de plateforme à distance ni de commercial de passage : on se voit, on regarde votre activité, et on construit un site qui vous ressemble.",
     geo: [43.4053, 3.6969],
     contexte: [
@@ -46,14 +46,18 @@ const VILLES = [
       ["Vous vous déplacez dans Sète&nbsp;?",
        "Oui, sans frais. Nous préférons même commencer par un rendez-vous chez vous : voir votre local, vos produits et votre façon de travailler change tout au moment de concevoir le site."],
       ["Le référencement est-il compris&nbsp;?",
-       "Les bases le sont toujours : structure, vitesse, balises, données locales, et l'aide à la mise en place de votre fiche Google Business Profile. Le référencement local se gagne surtout là, plus que dans le code."]
+       "Les bases le sont toujours : structure, vitesse, balises, données locales, et l'aide à la mise en place de votre fiche Google Business Profile. Le référencement local se gagne surtout là, plus que dans le code."],
+      ["Agence web, agence digitale, agence de communication : laquelle êtes-vous&nbsp;?",
+       "Les trois mots désignent le même métier, et chacun est tapé par des gens différents. Ce qui compte est le périmètre : nous faisons les sites internet, l'identité de marque, le design d'interface, le motion et la 3D. Nous ne faisons pas d'achat publicitaire ni de gestion de réseaux sociaux — nous préférons le dire que le sous-traiter."],
+      ["Reprenez-vous un site existant&nbsp;?",
+       "Oui, la refonte représente une bonne moitié de notre activité à Sète. Nous récupérons vos contenus, redirigeons les anciennes adresses vers les nouvelles pour ne perdre aucun positionnement acquis, et remettons le site aux standards de vitesse et de mobile."]
     ]
   },
   {
     slug: 'agence-web-montpellier',
     ville: 'Montpellier',
     lienPied: 'Agence web Montpellier',
-    titre: 'Agence web à Montpellier — création de site internet | MJ Agency',
+    titre: 'Agence web à Montpellier — site internet | MJ Agency',
     desc: "Agence web pour Montpellier : création de site internet, refonte et identité de marque. Studio basé à Sète, à 30 minutes, déplacement sur rendez-vous.",
     h1: 'Agence web<br>à Montpellier',
     intro: "Montpellier est à trente minutes. Nous y intervenons avec un avantage simple : les tarifs d'un studio indépendant, et un interlocuteur unique qui répond au téléphone.",
@@ -81,7 +85,7 @@ const VILLES = [
     ville: 'Frontignan et le bassin de Thau',
     lienPied: 'Frontignan &amp; bassin de Thau',
     villeCourt: 'Frontignan',
-    titre: 'Création de site internet à Frontignan et autour du bassin de Thau | MJ Agency',
+    titre: 'Site internet à Frontignan et bassin de Thau | MJ Agency',
     desc: "Site internet pour les vignerons, conchyliculteurs, artisans et commerces de Frontignan, Balaruc, Bouzigues, Mèze et Marseillan. Studio à Sète, à dix minutes.",
     h1: 'Sites internet<br>autour du<br>bassin de Thau',
     intro: "Frontignan, Balaruc, Bouzigues, Mèze, Marseillan : nous sommes à dix minutes de chez vous. Le bassin vit de produits qui se voient et se goûtent — votre site doit leur rendre justice.",
@@ -109,7 +113,7 @@ const VILLES = [
     ville: "Agde et le Cap d'Agde",
     lienPied: "Agde &amp; Cap d'Agde",
     villeCourt: 'Agde',
-    titre: "Agence web à Agde et au Cap d'Agde — création de site internet | MJ Agency",
+    titre: "Agence web à Agde et Cap d'Agde — site internet | MJ Agency",
     desc: "Création de site internet à Agde et au Cap d'Agde : hôtels, campings, restaurants, locations saisonnières. Site multilingue et réservation en ligne.",
     h1: "Sites internet<br>à Agde et<br>au Cap d'Agde",
     intro: "Agde vit du tourisme, et le tourisme se décide en ligne, souvent des mois à l'avance et depuis un autre pays. Votre site est votre première impression — parfois la seule.",
@@ -370,14 +374,28 @@ const urls = [
   ...VILLES.map(v => ['/' + v.slug, 'monthly', '0.8']),
   ['/au-bon-pain', 'monthly', '0.6'],        /* site client hébergé ici */
 ];
+/* La date de dernière modification aide Google à hiérarchiser ses passages.
+   On prend celle du fichier lui-même : une date inventée, ou remise à
+   aujourd'hui à chaque génération, perd toute valeur de signal. */
+function dateFichier(u) {
+  const nom = u === '/' ? 'index.html'
+            : u === '/au-bon-pain' ? 'au-bon-pain/index.html'
+            : u.slice(1) + '.html';
+  try { return fs.statSync(path.join(__dirname, nom)).mtime.toISOString().slice(0, 10); }
+  catch { return null; }
+}
+
 fs.writeFileSync(path.join(__dirname, 'sitemap.xml'),
   `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-${urls.map(([u, f, p]) => `  <url>
-    <loc>${SITE}${u}</loc>
+${urls.map(([u, f, p]) => {
+  const d = dateFichier(u);
+  return `  <url>
+    <loc>${SITE}${u}</loc>${d ? `\n    <lastmod>${d}</lastmod>` : ''}
     <changefreq>${f}</changefreq>
     <priority>${p}</priority>
-  </url>`).join('\n')}
+  </url>`;
+}).join('\n')}
 </urlset>
 `);
 

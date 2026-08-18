@@ -414,9 +414,34 @@ a.work-item:hover .work-item__title{color:var(--blue)}
 
 /* ---------- Questions fréquentes ---------- */
 .faq{max-width:820px;margin-inline:auto;border-top:1px solid var(--rule)}
-.faq__item{border-bottom:1px solid var(--rule);padding:var(--s4) 0}
-.faq__q{font-size:21px;font-weight:600;letter-spacing:-.018em;color:var(--black);margin-bottom:10px;line-height:1.3}
-.faq__a{color:var(--gray);font-size:17px;line-height:1.6}
+.faq__item{border-bottom:1px solid var(--rule)}
+/* Repliable en HTML natif : accessible au clavier, fonctionne sans
+   JavaScript, et le texte reste dans le document — un contenu derrière un
+   accordéon est indexé, pas ignoré. */
+.faq__q{
+  list-style:none;cursor:pointer;
+  display:flex;align-items:flex-start;gap:var(--s3);
+  padding:var(--s3) 0;min-height:44px;
+}
+.faq__q::-webkit-details-marker{display:none}
+.faq__q h3{
+  font-size:clamp(18px,1.7vw,21px);font-weight:600;letter-spacing:-.018em;
+  color:var(--black);line-height:1.35;flex:1;
+}
+/* Le signe se contente de deux traits : le vertical disparaît à l'ouverture */
+.faq__q::after{
+  content:"";flex:none;position:relative;width:13px;height:13px;margin-top:6px;
+  background:
+    linear-gradient(var(--gray),var(--gray)) center/13px 1.5px no-repeat,
+    linear-gradient(var(--gray),var(--gray)) center/1.5px 13px no-repeat;
+  transition:transform .3s var(--ease),opacity .3s var(--ease);
+}
+.faq__item[open] .faq__q::after{
+  background:linear-gradient(var(--blue),var(--blue)) center/13px 1.5px no-repeat;
+  transform:rotate(180deg);
+}
+.faq__q:hover h3{color:var(--blue)}
+.faq__a{color:var(--gray);font-size:17px;line-height:1.6;padding-bottom:var(--s3);max-width:70ch}
 
 /* ---------- Coordonnées ---------- */
 .nap{font-style:normal;display:flex;flex-direction:column;gap:4px;margin-bottom:var(--s2)}
@@ -474,6 +499,117 @@ a.work-item:hover .work-item__title{color:var(--blue)}
 .feature__d{margin-top:var(--s2);color:var(--gray);font-size:18px;line-height:1.55;max-width:42ch}
 .feature__viz{aspect-ratio:16/10;border-radius:var(--radius-s);overflow:hidden}
 .feature__viz .ph{width:100%;height:100%}
+
+/* ---------- Maquette de navigateur ----------
+   Illustration du livrable « site internet ». Comme la planche de charte
+   et le gyroscope, elle est construite en HTML plutôt qu'en image : nette
+   à toutes les définitions, elle suit le design system et pèse trois fois
+   rien. Le téléphone à côté dit la seule chose qui compte vraiment ici —
+   le site est pensé pour le mobile d'abord. */
+.feature__viz--nav{
+  aspect-ratio:16/10;position:relative;overflow:hidden;
+  display:grid;place-items:center;padding:clamp(18px,3vw,32px);
+  background:
+    radial-gradient(120% 90% at 30% 0%, #FFFFFF 0%, rgba(255,255,255,0) 60%),
+    linear-gradient(160deg, #EEF3FB 0%, #F5F5F7 55%, #E7EBF2 100%);
+}
+.nave{
+  width:100%;max-width:400px;margin-right:12%;
+  background:var(--white);border-radius:10px;
+  box-shadow:0 2px 6px rgba(0,0,0,.06), 0 18px 40px rgba(0,0,0,.10);
+  overflow:hidden;
+}
+.nave__barre{
+  display:flex;align-items:center;gap:8px;
+  padding:7px 9px;background:var(--off-white);border-bottom:1px solid var(--rule);
+}
+.nave__pastilles{display:flex;gap:4px;flex:none}
+.nave__pastilles i{width:7px;height:7px;border-radius:50%;background:rgba(0,0,0,.14)}
+.nave__url{
+  flex:1;height:15px;border-radius:999px;background:var(--white);
+  border:1px solid var(--rule);display:flex;align-items:center;
+  padding:0 8px;font-size:8px;color:var(--gray);letter-spacing:.01em;
+  white-space:nowrap;overflow:hidden;
+}
+/* La fenêtre est plus courte que sa page : c'est ce décalage qui permet
+   au contenu de défiler doucement à l'intérieur. */
+.nave__ecran{height:150px;overflow:hidden;position:relative}
+.nave__page{display:flex;flex-direction:column;gap:9px;padding:11px 12px}
+/* Le défilement ne démarre qu'à l'apparition du bloc : le visiteur voit
+   toujours le haut de la page d'abord, jamais un état intermédiaire.
+   Sans JavaScript, la classe n'arrive jamais et la maquette reste fixe —
+   c'est le bon repli. */
+.feature.in .nave__page{animation:nave-defile 13s var(--ease) infinite}
+@keyframes nave-defile{
+  0%,40%    {transform:translateY(0)}
+  58%,76%   {transform:translateY(-60px)}
+  94%,100%  {transform:translateY(0)}
+}
+.nave__tete{display:flex;align-items:center;gap:5px;padding-bottom:8px;border-bottom:1px solid var(--rule)}
+.nave__tete i{width:5px;height:5px;border-radius:50%;background:var(--blue);flex:none}
+.nave__tete b{font-size:8px;font-weight:600;color:var(--black);letter-spacing:-.01em}
+.nave__tete span{margin-left:auto;display:flex;gap:5px}
+.nave__tete span em{display:block;width:14px;height:3px;border-radius:2px;background:var(--light-gray)}
+.nave__titre{height:9px;border-radius:3px;background:var(--dark-gray);width:78%}
+.nave__titre + .nave__titre{width:52%}
+.nave__ligne{height:4px;border-radius:2px;background:var(--light-gray)}
+.nave__ligne--court{width:62%}
+.nave__cta{
+  width:74px;height:17px;border-radius:999px;background:var(--blue);
+  display:flex;align-items:center;justify-content:center;
+  font-size:7px;color:#fff;letter-spacing:.01em;
+}
+.nave__cartes{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:2px}
+.nave__carte{
+  border:1px solid var(--rule);border-radius:6px;padding:7px 6px;
+  display:flex;flex-direction:column;gap:4px;
+}
+.nave__carte i{display:block;height:20px;border-radius:4px;background:linear-gradient(160deg,#E7EDF7,#D6DFEC)}
+.nave__carte em{display:block;height:3px;border-radius:2px;background:var(--light-gray)}
+.nave__carte em:last-child{width:66%}
+
+/* Le téléphone, posé devant : la même page, à la bonne largeur. */
+.tel-mini{
+  position:absolute;right:6%;bottom:9%;width:19%;max-width:80px;
+  aspect-ratio:9/18;background:var(--white);
+  border:1px solid rgba(0,0,0,.10);border-radius:11px;
+  box-shadow:0 3px 10px rgba(0,0,0,.08), 0 16px 34px rgba(0,0,0,.14);
+  padding:6px 5px;display:flex;flex-direction:column;gap:5px;
+}
+.tel-mini::before{
+  content:"";position:absolute;top:4px;left:50%;translate:-50% 0;
+  width:22px;height:3px;border-radius:2px;background:rgba(0,0,0,.10);
+}
+.tel-mini u{
+  display:flex;align-items:center;gap:3px;margin-top:6px;
+  padding-bottom:4px;border-bottom:1px solid var(--rule);text-decoration:none;
+}
+.tel-mini u s{display:block;width:3px;height:3px;border-radius:50%;background:var(--blue);text-decoration:none}
+.tel-mini u q{display:block;height:3px;width:22px;border-radius:2px;background:var(--light-gray)}
+.tel-mini q::before,.tel-mini q::after{content:none}
+.tel-mini i{display:block;height:5px;border-radius:2px;background:var(--dark-gray);width:84%}
+.tel-mini i + i{width:58%}
+.tel-mini em{display:block;height:3px;border-radius:2px;background:var(--light-gray)}
+.tel-mini em:nth-of-type(2){width:70%}
+.tel-mini b{
+  display:block;height:11px;border-radius:999px;background:var(--blue);
+  margin-top:auto;
+}
+
+@media (prefers-reduced-motion: reduce){ .feature.in .nave__page{animation:none} }
+@media (max-width:860px){
+  /* Sans plafond de largeur, « width:100% » et une marge en pourcentage
+     s'additionnent et dépassent le cadre : la fenêtre sortait par la
+     gauche. On répartit les deux pour qu'ils fassent exactement 100 %. */
+  .feature__viz--nav{aspect-ratio:4/3;padding:clamp(14px,4vw,26px)}
+  .nave{width:78%;margin-right:22%;max-width:none}
+  .nave__ecran{height:135px}
+  .tel-mini{right:3%;width:23%;bottom:12%}
+}
+@media (max-width:420px){
+  .nave__ecran{height:118px}
+  .nave__page{padding:9px 10px;gap:7px}
+}
 
 /* ---------- Planche de charte graphique ----------
    Illustration du livrable « identité de marque », construite en HTML
@@ -621,9 +757,55 @@ a.work-item:hover .work-item__title{color:var(--blue)}
   .steps,.stats{grid-template-columns:1fr 1fr}
   .zone{grid-template-columns:1fr;gap:var(--s4)}
   .footer__cols{grid-template-columns:1fr 1fr}
+
+  /* Le doigt n'a pas la précision du curseur : tout ce qui se touche fait
+     au moins 44 px de haut. Les liens tertiaires en faisaient 26, les
+     flèches du calendrier 38, les filtres du portfolio 41. */
+  .link-t,.footer__col a,.nav__logo,.nap a,.towns a,.dim a{
+    min-height:44px;display:inline-flex;align-items:center;
+  }
+  .footer__col a{padding-block:2px}
+  .cal__nav button{width:44px;height:44px}
+  .cal__day{min-height:44px}
+  .tag{min-height:44px;padding-block:0;display:inline-flex;align-items:center}
+
+  /* La page faisait 7 400 px de haut : on resserre sans tasser. */
+  .footer__bottom,.nap__horaires{font-size:14px}
+  /* Le grand lien de pied de page se touche comme un bouton. */
+  .footer__big a{min-height:44px;display:inline-flex;align-items:center}
+}
+
+@media (max-width:520px){
+  :root{--sec:clamp(56px,13vw,76px)}
+  .feature{padding:var(--s3) var(--s3) var(--s4)}
+  .features{gap:var(--s4)}
+  .hero__meta{gap:var(--s3)}
+  .sec-head{margin-bottom:var(--s4)}
+  .footer__cols{grid-template-columns:1fr;gap:var(--s4)}
+}
+
+/* Sur les écrans à encoche, la barre passait sous la découpe. */
+@supports (padding:max(0px)){
+  @media (max-width:900px){
+    .nav{padding-left:max(clamp(18px,4vw,44px),env(safe-area-inset-left));
+         padding-right:max(clamp(18px,4vw,44px),env(safe-area-inset-right))}
+    .footer{padding-bottom:max(var(--s4),env(safe-area-inset-bottom))}
+  }
 }
 @media (max-width:640px){
-  .hero{min-height:auto;padding-top:110px;padding-bottom:var(--s6)}
+  /* Le premier écran n'appartient qu'au hero : sans ça la section suivante
+     démarrait dans le même écran et l'objet 3D se retrouvait à cheval sur
+     un titre et un filet de séparation. Le bas libéré lui sert de scène.
+     (Cette règle est la dernière du fichier à toucher .hero — c'est elle qui
+     gagne la cascade, inutile d'en écrire une autre plus haut.) */
+  .hero{
+    min-height:100svh;justify-content:flex-start;
+    padding-top:108px;padding-bottom:0;
+  }
+  /* Les chiffres remontent pour dégager le bas de l'écran : c'est la scène
+     de l'objet, qu'on laisse volontairement mordre sur le bord — une forme
+     coupée par le pli donne envie de faire défiler. */
+  .hero .trust{margin-top:auto;padding-bottom:clamp(230px,34vh,300px)}
   .hero__meta .btn,.cta-band .btn{width:100%}
   .work-item{grid-template-columns:1fr;gap:6px;align-items:flex-start}
   .work-item__meta{white-space:normal}
@@ -636,7 +818,10 @@ a.work-item:hover .work-item__title{color:var(--blue)}
 }
 @media (max-width:400px){
   .cal{padding:var(--s2)}
-  .cal__day{min-height:36px;font-size:14px}
+  /* On resserre la typographie, pas la cible : 36 px, c'est sous le seuil
+     du doigt. (Dernière règle du fichier sur .cal__day — c'est elle qui
+     l'emporte sur celle du bloc 860 px.) */
+  .cal__day{min-height:44px;font-size:14px}
 }
 
 @media (prefers-reduced-motion:reduce){
@@ -682,12 +867,12 @@ a.work-item:hover .work-item__title{color:var(--blue)}
 
   <!-- HERO -->
   <section class="hero container">
-    <span class="eyebrow hero__eyebrow">Studio créatif · Sète, Hérault</span>
     <h1 class="hero__title display">
+      <span class="eyebrow hero__eyebrow">Agence web à Sète · Hérault</span>
       <span class="line"><span>Conçu pour durer.</span></span>
     </h1>
     <div class="hero__meta">
-      <p class="lead">Nous concevons des sites internet et des identités de marque pour les entreprises qui veulent une image à la hauteur de leur travail. Une seule équipe, du premier croquis à la mise en ligne.</p>
+      <p class="lead">Agence web et digitale installée à Sète, nous faisons la création de sites internet et d'identités de marque pour les entreprises de l'Hérault. Une seule équipe, du premier croquis à la mise en ligne.</p>
       <div class="hero__actions">
         <a href="#" data-go="contact" class="btn btn--glow">Réserver un appel</a>
         <a href="#" data-go="work" class="link-t">Voir nos réalisations <span class="arw" aria-hidden="true">↗</span></a>
@@ -705,7 +890,7 @@ a.work-item:hover .work-item__title{color:var(--blue)}
   <section class="container pad-y sep">
     <div class="sec-head reveal">
       <span class="eyebrow">Nos métiers</span>
-      <h2 class="h2">Trois savoir-faire,<br>un seul interlocuteur.</h2>
+      <h2 class="h2">Site internet, marque et motion<br>— un seul interlocuteur à Sète.</h2>
       <p class="lead">Tout ce qu’il faut pour exister en ligne, sans passer par cinq prestataires qui ne se parlent pas.</p>
     </div>
 
@@ -720,7 +905,37 @@ a.work-item:hover .work-item__title{color:var(--blue)}
             <li>Vous modifiez vos textes vous-même</li>
           </ul>
         </div>
-        <div class="feature__viz"><div class="ph ph-1"></div></div>
+        <div class="feature__viz feature__viz--nav" aria-hidden="true">
+          <div class="nave">
+            <div class="nave__barre">
+              <span class="nave__pastilles"><i></i><i></i><i></i></span>
+              <span class="nave__url">mjagency.eu</span>
+            </div>
+            <div class="nave__ecran">
+              <div class="nave__page">
+                <div class="nave__tete"><i></i><b>Votre marque</b><span><em></em><em></em><em></em></span></div>
+                <div class="nave__titre"></div>
+                <div class="nave__titre"></div>
+                <div class="nave__ligne"></div>
+                <div class="nave__ligne nave__ligne--court"></div>
+                <div class="nave__cta">Nous contacter</div>
+                <div class="nave__cartes">
+                  <div class="nave__carte"><i></i><em></em><em></em></div>
+                  <div class="nave__carte"><i></i><em></em><em></em></div>
+                  <div class="nave__carte"><i></i><em></em><em></em></div>
+                </div>
+                <div class="nave__ligne"></div>
+                <div class="nave__ligne nave__ligne--court"></div>
+              </div>
+            </div>
+          </div>
+          <div class="tel-mini">
+            <u><s></s><q></q></u>
+            <i></i><i></i>
+            <em></em><em></em>
+            <b></b>
+          </div>
+        </div>
       </article>
 
       <article class="feature feature--rev reveal">
@@ -813,7 +1028,9 @@ a.work-item:hover .work-item__title{color:var(--blue)}
       <a href="#" data-go="work" class="btn">Tout voir</a>
     </div>
     <div class="work-list reveal">
-      <a href="https://www.mjagency.eu/au-bon-pain" target="_blank" rel="noopener" class="work-item">
+      <!-- Provisoire : à remettre sur href="https://www.mjagency.eu/au-bon-pain" target="_blank" rel="noopener" (et retirer
+           target/rel) quand le site client sera en ligne. Même chose dans work.html. -->
+      <a href="https://www.apple.com" target="_blank" rel="noopener" class="work-item">
         <span class="work-item__title">Au Bon Pain — Sète</span>
         <span class="work-item__meta">Boulangerie, site &amp; commande en ligne — 2026</span>
       </a>
@@ -862,12 +1079,51 @@ a.work-item:hover .work-item__title{color:var(--blue)}
       </div>
       <div>
         <ul class="towns">
-          <li>Sète</li><li>Frontignan</li><li>Balaruc-les-Bains</li><li>Bouzigues</li>
+          <li><a href="creation-site-internet-sete.html">Sète</a></li>
+          <li><a href="creation-site-internet-frontignan-bassin-de-thau.html">Frontignan</a></li>
+          <li>Balaruc-les-Bains</li><li>Bouzigues</li>
           <li>Mèze</li><li>Marseillan</li><li>Poussan</li><li>Gigean</li>
-          <li>Agde</li><li>Pézenas</li><li>Montpellier</li><li>Béziers</li>
+          <li><a href="agence-web-agde-cap-d-agde.html">Agde</a></li>
+          <li>Pézenas</li>
+          <li><a href="agence-web-montpellier.html">Montpellier</a></li>
+          <li>Béziers</li>
         </ul>
         <p class="zone__note">Ailleurs en France ou à l’étranger&nbsp;? Nous travaillons aussi entièrement à distance.</p>
       </div>
+    </div>
+  </section>
+
+  <!-- QUESTIONS FRÉQUENTES -->
+  <section class="container pad-y sep" id="questions">
+    <div class="sec-head reveal">
+      <span class="eyebrow">Questions fréquentes</span>
+      <h2 class="h2">Ce qu'on nous demande<br>avant de se lancer.</h2>
+    </div>
+    <div class="faq reveal">
+      <details class="faq__item">
+        <summary class="faq__q"><h3>Combien coûte un site internet à Sète&nbsp;?</h3></summary>
+        <p class="faq__a">Cela dépend de trois choses&nbsp;: le nombre de pages, la présence ou non d'une boutique en ligne, et si l'identité de marque est à créer. Un site vitrine d'artisan et une boutique de cinquante produits n'ont rien à voir. Nous donnons un chiffre ferme, écrit, sous 48&nbsp;heures après le premier appel — et ce chiffre ne bouge plus.</p>
+      </details>
+      <details class="faq__item">
+        <summary class="faq__q"><h3>Quelle différence entre une agence web et une agence digitale&nbsp;?</h3></summary>
+        <p class="faq__a">Dans les faits, aucune&nbsp;: les deux termes désignent la même chose et les gens tapent l'un ou l'autre. Ce qui compte, c'est le périmètre réel. Le nôtre&nbsp;: sites internet, identité de marque, design d'interface, motion et 3D. Nous ne faisons ni achat de publicité ni gestion de réseaux sociaux — et nous préférons vous le dire tout de suite plutôt que de le sous-traiter.</p>
+      </details>
+      <details class="faq__item">
+        <summary class="faq__q"><h3>Le référencement sur Google est-il compris&nbsp;?</h3></summary>
+        <p class="faq__a">Les fondations le sont toujours&nbsp;: structure des pages, vitesse de chargement, balises, données locales, plan de site. Nous vous aidons aussi à créer et remplir votre fiche Google Business Profile, qui pèse plus lourd que le site lui-même sur les recherches du type «&nbsp;agence web près de moi&nbsp;». Le suivi mensuel du positionnement, en revanche, est une prestation à part.</p>
+      </details>
+      <details class="faq__item">
+        <summary class="faq__q"><h3>En combien de temps le site est-il en ligne&nbsp;?</h3></summary>
+        <p class="faq__a">Trois à quatre semaines pour un site vitrine, à partir du moment où nous avons vos textes et vos photos. Six à huit semaines pour une boutique en ligne ou une refonte complète. Le délai qui dérape est presque toujours celui des contenus&nbsp;: nous vous accompagnons pour les rassembler.</p>
+      </details>
+      <details class="faq__item">
+        <summary class="faq__q"><h3>Travaillez-vous avec les commerçants et artisans de Sète&nbsp;?</h3></summary>
+        <p class="faq__a">C'est même l'essentiel de notre activité locale&nbsp;: restaurants des quais, artisans, indépendants, entreprises du port. Nous nous déplaçons sans frais dans tout le bassin de Thau. Voir votre local et votre façon de travailler change tout au moment de concevoir le site.</p>
+      </details>
+      <details class="faq__item">
+        <summary class="faq__q"><h3>Faut-il être à Sète pour travailler avec vous&nbsp;?</h3></summary>
+        <p class="faq__a">Non. Nous intervenons sur place à Sète, Frontignan, Mèze, Agde, Montpellier et Béziers, et entièrement à distance partout ailleurs. La moitié de nos projets se mènent en visioconférence, sans que la qualité en souffre.</p>
+      </details>
     </div>
   </section>
 
@@ -913,7 +1169,9 @@ a.work-item:hover .work-item__title{color:var(--blue)}
 
       <!-- Seul projet consultable en ligne : la carte est donc un vrai lien,
            mis en avant sur toute la largeur. -->
-      <a href="https://www.mjagency.eu/au-bon-pain" target="_blank" rel="noopener" class="card card--large col-12" data-cat="web product" data-cursor="Voir le site">
+      <!-- Provisoire : à remettre sur href="https://www.mjagency.eu/au-bon-pain" target="_blank" rel="noopener" (et retirer
+           target/rel) quand le site client sera en ligne. Même chose dans index.html. -->
+      <a href="https://www.apple.com" target="_blank" rel="noopener" class="card card--large col-12" data-cat="web product" data-cursor="Voir le site">
         <div class="thumb">
           <div class="ph ph-pain"></div>
           <svg class="thumb__viz" viewBox="0 -12 260 216" aria-hidden="true">
@@ -1199,7 +1457,7 @@ a.work-item:hover .work-item__title{color:var(--blue)}
         <a href="tel:+33611718368">06 11 71 83 68</a>
         <a href="mailto:mjagency.officiel@gmail.com">mjagency.officiel@gmail.com</a>
       </address>
-      <p class="dim" style="font-size:13px">Lun — Ven · 9 h à 18 h</p>
+      <p class="dim nap__horaires">Lun — Ven · 9 h à 18 h</p>
     </div>
   </div>
 
@@ -1245,6 +1503,8 @@ a.work-item:hover .work-item__title{color:var(--blue)}
 
   const VERT = 'attribute vec2 p;void main(){gl_Position=vec4(p,0.,1.);}';
 
+  const PAS = petit ? 58 : 88;
+
   const FRAG = `
   precision highp float;
 
@@ -1254,6 +1514,7 @@ a.work-item:hover .work-item__title{color:var(--blue)}
   uniform float u_scroll;      // progression du défilement, en hauteurs d'écran
   uniform vec2  u_decal;       // position de l'objet à l'écran
   uniform float u_taille;      // échelle de l'objet
+  uniform float u_petit;       // 1 sur téléphone
 
   mat2 rot(float a){ float c = cos(a), s = sin(a); return mat2(c, -s, s, c); }
 
@@ -1355,6 +1616,7 @@ a.work-item:hover .work-item__title{color:var(--blue)}
     // qui donne à l'objet son assise sans dessiner de sol.
     float rayon = 0.78 * u_taille;
     float ombre = smoothstep(rayon, 0.0, length((p2 - vec2(0.06, -0.07)) * vec2(1.0, 1.15)));
+    ombre *= mix(1.0, 1.0 - smoothstep(0.22, 0.80, u_scroll), u_petit);
     col = mix(col, vec3(0.878, 0.890, 0.914), ombre * 0.55);
 
     g_ay = t * 0.16 + u_scroll * 1.05 + m.x * 0.40;
@@ -1378,7 +1640,7 @@ a.work-item:hover .work-item__title{color:var(--blue)}
       float rd_ = sqrt(delta);
       float t0 = max(-b - rd_, 0.0), t1 = -b + rd_;
       dist = t0;
-      for (int i = 0; i < 88; i++){
+      for (int i = 0; i < ${PAS}; i++){
         h = objet(ro + rd * dist);
         if (h < 0.0012 || dist > t1) break;
         dist += h * 0.55;                     // la torsion casse la lipschitzianité
@@ -1411,6 +1673,11 @@ a.work-item:hover .work-item__title{color:var(--blue)}
       // Bord adouci : la couverture retombe quand le rayon n'a fait
       // que frôler la surface, ce qui évite l'escalier sans multi-échantillon.
       float couv = 1.0 - smoothstep(0.0012, 0.005, h);
+
+      // Sur téléphone, l'objet est un moment d'ouverture, pas un décor
+      // permanent : passé le premier écran il s'efface, au lieu de passer
+      // derrière chaque titre sur sept mille pixels de défilement.
+      couv *= mix(1.0, 1.0 - smoothstep(0.22, 0.80, u_scroll), u_petit);
       col = mix(col, min(o, vec3(1.0)), couv * 0.94);
     }
 
@@ -1461,8 +1728,10 @@ a.work-item:hover .work-item__title{color:var(--blue)}
   const uScroll = gl.getUniformLocation(prog, 'u_scroll');
   const uDecal  = gl.getUniformLocation(prog, 'u_decal');
   const uTaille = gl.getUniformLocation(prog, 'u_taille');
+  const uPetit  = gl.getUniformLocation(prog, 'u_petit');
 
-  gl.uniform1f(uTaille, petit ? 0.24 : 0.40);
+  gl.uniform1f(uTaille, petit ? 0.22 : 0.40);
+  gl.uniform1f(uPetit, petit ? 1 : 0);
 
   let souris = [0.5, 0.5], cible = [0.5, 0.5];
   let defile = 0, defileCible = 0;
@@ -1474,9 +1743,12 @@ a.work-item:hover .work-item__title{color:var(--blue)}
     cible = [e.clientX / innerWidth, 1 - e.clientY / innerHeight];
   }, { passive: true });
 
-  // Le lancer de rayons coûte cher au pixel : on rend sous la résolution
-  // native et on laisse l'affichage étirer. La forme est lisse, ça ne se voit pas.
-  const DPR = Math.min(devicePixelRatio || 1, petit ? 0.75 : 1.0);
+  // Le lancer de rayons coûte cher au pixel. On rend sous la définition
+  // native — mais pas trop : à 0.75 l'objet ressortait crénelé sur les écrans
+  // de téléphone, les plus denses de tous. La marche y est raccourcie en
+  // compensation (voir PAS), ce qui se voit beaucoup moins qu'un escalier
+  // sur une silhouette.
+  const DPR = Math.min(devicePixelRatio || 1, petit ? 1.15 : 1.0);
   function redimensionner(){
     const w = Math.max(1, Math.floor(innerWidth * DPR));
     const h = Math.max(1, Math.floor(innerHeight * DPR));
@@ -1506,7 +1778,7 @@ a.work-item:hover .work-item__title{color:var(--blue)}
     // il reste présent d'un bout à l'autre de la page au lieu de sortir
     // du cadre après le premier écran.
     const x = (petit ? 0.00 : 0.45) + Math.sin(defile * 0.42) * (petit ? 0.03 : 0.10);
-    const y = (petit ? -0.30 : 0.04) - Math.sin(defile * 0.58) * (petit ? 0.16 : 0.26);
+    const y = (petit ? -0.40 : 0.04) - Math.sin(defile * 0.58) * (petit ? 0.10 : 0.26);
 
     gl.uniform1f(uTime, (now - t0) / 1000);
     gl.uniform2f(uMouse, souris[0], souris[1]);

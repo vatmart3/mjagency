@@ -33,6 +33,8 @@
 
   const VERT = 'attribute vec2 p;void main(){gl_Position=vec4(p,0.,1.);}';
 
+  const PAS = petit ? 58 : 88;
+
   const FRAG = `
   precision highp float;
 
@@ -42,6 +44,7 @@
   uniform float u_scroll;      // progression du défilement, en hauteurs d'écran
   uniform vec2  u_decal;       // position de l'objet à l'écran
   uniform float u_taille;      // échelle de l'objet
+  uniform float u_petit;       // 1 sur téléphone
 
   mat2 rot(float a){ float c = cos(a), s = sin(a); return mat2(c, -s, s, c); }
 
@@ -143,6 +146,7 @@
     // qui donne à l'objet son assise sans dessiner de sol.
     float rayon = 0.78 * u_taille;
     float ombre = smoothstep(rayon, 0.0, length((p2 - vec2(0.06, -0.07)) * vec2(1.0, 1.15)));
+    ombre *= mix(1.0, 1.0 - smoothstep(0.22, 0.80, u_scroll), u_petit);
     col = mix(col, vec3(0.878, 0.890, 0.914), ombre * 0.55);
 
     g_ay = t * 0.16 + u_scroll * 1.05 + m.x * 0.40;
@@ -166,7 +170,7 @@
       float rd_ = sqrt(delta);
       float t0 = max(-b - rd_, 0.0), t1 = -b + rd_;
       dist = t0;
-      for (int i = 0; i < 88; i++){
+      for (int i = 0; i < ${PAS}; i++){
         h = objet(ro + rd * dist);
         if (h < 0.0012 || dist > t1) break;
         dist += h * 0.55;                     // la torsion casse la lipschitzianité
@@ -199,6 +203,11 @@
       // Bord adouci : la couverture retombe quand le rayon n'a fait
       // que frôler la surface, ce qui évite l'escalier sans multi-échantillon.
       float couv = 1.0 - smoothstep(0.0012, 0.005, h);
+
+      // Sur téléphone, l'objet est un moment d'ouverture, pas un décor
+      // permanent : passé le premier écran il s'efface, au lieu de passer
+      // derrière chaque titre sur sept mille pixels de défilement.
+      couv *= mix(1.0, 1.0 - smoothstep(0.22, 0.80, u_scroll), u_petit);
       col = mix(col, min(o, vec3(1.0)), couv * 0.94);
     }
 
@@ -249,8 +258,10 @@
   const uScroll = gl.getUniformLocation(prog, 'u_scroll');
   const uDecal  = gl.getUniformLocation(prog, 'u_decal');
   const uTaille = gl.getUniformLocation(prog, 'u_taille');
+  const uPetit  = gl.getUniformLocation(prog, 'u_petit');
 
-  gl.uniform1f(uTaille, petit ? 0.24 : 0.40);
+  gl.uniform1f(uTaille, petit ? 0.22 : 0.40);
+  gl.uniform1f(uPetit, petit ? 1 : 0);
 
   let souris = [0.5, 0.5], cible = [0.5, 0.5];
   let defile = 0, defileCible = 0;
@@ -262,9 +273,12 @@
     cible = [e.clientX / innerWidth, 1 - e.clientY / innerHeight];
   }, { passive: true });
 
-  // Le lancer de rayons coûte cher au pixel : on rend sous la résolution
-  // native et on laisse l'affichage étirer. La forme est lisse, ça ne se voit pas.
-  const DPR = Math.min(devicePixelRatio || 1, petit ? 0.75 : 1.0);
+  // Le lancer de rayons coûte cher au pixel. On rend sous la définition
+  // native — mais pas trop : à 0.75 l'objet ressortait crénelé sur les écrans
+  // de téléphone, les plus denses de tous. La marche y est raccourcie en
+  // compensation (voir PAS), ce qui se voit beaucoup moins qu'un escalier
+  // sur une silhouette.
+  const DPR = Math.min(devicePixelRatio || 1, petit ? 1.15 : 1.0);
   function redimensionner(){
     const w = Math.max(1, Math.floor(innerWidth * DPR));
     const h = Math.max(1, Math.floor(innerHeight * DPR));
@@ -294,7 +308,7 @@
     // il reste présent d'un bout à l'autre de la page au lieu de sortir
     // du cadre après le premier écran.
     const x = (petit ? 0.00 : 0.45) + Math.sin(defile * 0.42) * (petit ? 0.03 : 0.10);
-    const y = (petit ? -0.30 : 0.04) - Math.sin(defile * 0.58) * (petit ? 0.16 : 0.26);
+    const y = (petit ? -0.40 : 0.04) - Math.sin(defile * 0.58) * (petit ? 0.10 : 0.26);
 
     gl.uniform1f(uTime, (now - t0) / 1000);
     gl.uniform2f(uMouse, souris[0], souris[1]);
