@@ -916,3 +916,74 @@ body.scrolled .brand__sous{color:var(--rose)}
    pied ne s'aligne pas d'une carte à l'autre. */
 .top__bas{margin-top:auto;padding-top:16px}
 .top h3{min-height:2.4em;display:flex;align-items:center;justify-content:center}
+
+
+/* ---------------------------------------------------------
+   Les photos
+   L'image est posée par-dessus l'illustration. Tant qu'un
+   fichier manque, app.js retire l'image et le dessin reprend
+   sa place : la page ne montre jamais de vignette cassée.
+   --------------------------------------------------------- */
+.photo{position:relative;overflow:hidden;border-radius:var(--r-s);background:var(--rose-pale)}
+.photo img{
+  position:absolute;inset:0;width:100%;height:100%;object-fit:cover;
+  z-index:2;border-radius:inherit;
+}
+.photo__dessin{
+  position:absolute;inset:12%;width:76%;height:76%;z-index:1;
+  filter:drop-shadow(0 10px 16px rgba(43,27,77,.2));
+}
+/* Sans photo, le rond de couleur derrière le dessin reste celui de la famille */
+.plat[data-cat="pains"] .photo{background:#FFE9C9}
+.plat[data-cat="viennoiseries"] .photo{background:#FFF1CC}
+.plat[data-cat="salé"] .photo{background:#E2F2DC}
+.plat[data-cat="sucré"] .photo{background:#FFDFEC}
+.plat[data-cat="boissons"] .photo{background:#DDEBFF}
+
+/* La photo prend toute la largeur de la carte, bord à bord */
+.plat .plat__img.photo{
+  width:calc(100% + 36px);margin:-22px -18px 14px;aspect-ratio:4/3;
+  border-radius:calc(var(--r) - 2px) calc(var(--r) - 2px) 0 0;
+}
+.plat .plat__img.photo::before{display:none}
+.plat:hover .plat__img.photo{transform:none}
+.plat .plat__img.photo img{transition:transform .5s var(--ease-out)}
+.plat:hover .plat__img.photo img{transform:scale(1.06)}
+
+.top .top__img.photo{
+  width:calc(100% + 36px);margin:-22px -18px 14px;aspect-ratio:4/3;
+  border-radius:calc(var(--r) - 2px) calc(var(--r) - 2px) 0 0;
+}
+.top:hover .top__img.photo{transform:none}
+.top .top__img.photo img{transition:transform .5s var(--ease-out)}
+.top:hover .top__img.photo img{transform:scale(1.06)}
+
+.fournil__img.photo{
+  width:100%;margin:14px 0 4px;aspect-ratio:4/3;border-radius:var(--r-s);
+}
+
+@media (min-width:920px){
+  /* Sur la carte en vedette, la photo occupe la colonne de gauche */
+  .plat--vedette .plat__img.photo{
+    width:36%;max-width:210px;margin:-24px 0 -24px -24px;aspect-ratio:3/4;
+    border-radius:calc(var(--r) - 2px) 0 0 calc(var(--r) - 2px);
+  }
+}
+@media (max-width:919px){
+  .plat--vedette .plat__img.photo{aspect-ratio:4/3}
+}
+
+/* Sur la carte en vedette, la photo occupe toute la hauteur du bloc :
+   centrée, elle laissait deux bandes vides au-dessus et en dessous. */
+@media (min-width:920px){
+  .plat--vedette .plat__img.photo{align-self:stretch;aspect-ratio:auto;height:auto}
+}
+
+
+/* La devanture — visible seulement si la photo existe */
+.devanture{
+  margin:18px 0 4px;border-radius:var(--r);overflow:hidden;
+  border:2px solid var(--encre);box-shadow:0 6px 0 var(--encre);
+  aspect-ratio:3/2;
+}
+.devanture img{width:100%;height:100%;object-fit:cover;display:block}

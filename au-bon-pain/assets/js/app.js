@@ -817,3 +817,21 @@ function majFournil() {
 }
 majFournil();
 setInterval(majFournil, 60000);
+
+/* ---------------------------------------------------------
+   15 · Photos manquantes
+   Les fichiers de assets/img/produits/ ne sont pas tous là au
+   même moment. Une image qui ne charge pas est retirée : le
+   dessin qu'elle recouvrait redevient visible, et le visiteur
+   ne voit jamais de vignette cassée.
+   L'événement « error » ne remonte pas : on l'écoute à la capture.
+   --------------------------------------------------------- */
+document.addEventListener('error', e => {
+  const img = e.target;
+  if (!(img instanceof HTMLImageElement)) return;
+  /* Dans un cadre à repli, on retire l'image et le dessin réapparaît.
+     Seule (la devanture), c'est la figure entière qui s'efface. */
+  const seule = img.closest('.photo-seule');
+  if (seule) { seule.remove(); return; }
+  if (img.closest('.photo')) img.remove();
+}, true);

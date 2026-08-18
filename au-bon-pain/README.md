@@ -59,6 +59,25 @@ L'information qui compte dans une boulangerie n'est pas « artisan depuis 1930 �
 - **La barre du sac** — sur téléphone, le total et l'accès au sac restent sous le pouce
   dès qu'il y a quelque chose dedans.
 
+## Les photos
+
+**Le site attend de vraies photos, et il est déjà câblé pour les recevoir.** Déposez les
+fichiers dans `assets/img/produits/`, nommés comme l'identifiant du produit
+(`tradition.jpg`, `croissant.jpg`…) : rien d'autre à faire, le site les prend au
+rechargement. `assets/img/README.md` donne la liste exacte, le format et quelques
+conseils de prise de vue.
+
+Tant qu'un fichier manque, la fiche affiche l'illustration dessinée à la main à sa place.
+Le visiteur ne voit jamais de vignette cassée — mais il ne voit pas non plus le produit.
+**Sur un site de bouche, la photo n'est pas une décoration : c'est l'argument de vente.**
+Les seize photos se font en une demi-heure un jour de fournée, avec un téléphone près
+d'une fenêtre.
+
+Un mot sur les photos de banque : une baguette trouvée sur une banque d'images est libre
+de droits, mais ce n'est pas *votre* baguette. Le client qui vient chercher le pain de la
+photo et repart avec un autre s'en aperçoit. À utiliser en dépannage seulement, en notant
+source et licence dans `assets/img/README.md`.
+
 ## Comment la commande arrive au commerçant
 
 Le site n'a pas de back-end : **il n'y a donc pas de paiement en ligne**. Le bouton
