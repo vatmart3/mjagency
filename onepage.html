@@ -299,6 +299,33 @@ a.work-item:hover .work-item__title{color:var(--blue)}
 .ph-6{background:linear-gradient(160deg,#EDF3F7 0%,#DAE5EC 55%,#C6D6E0 100%)}
 /* Au Bon Pain : violet et rose, comme le site */
 .ph-pain{background:linear-gradient(150deg,#5E36AE 0%,#4A2A8C 55%,#F2559B 100%)}
+.ph-fidelite{background:linear-gradient(160deg,#2A1416 0%,#190D0F 56%,#28151A 100%)}
+
+/* ---------- Carte de fidélité ----------
+   Vignette du site de fidélité de la boucherie. Comme le reste des visuels
+   du site, elle est dessinée en HTML : les tampons sont de vrais éléments,
+   pas une image — donc nets à toutes les définitions. */
+.fid{
+  position:absolute;left:50%;top:50%;translate:-50% -50%;
+  width:min(60%,420px);background:rgba(255,255,255,.06);
+  border:1px solid rgba(245,236,221,.16);border-radius:12px;
+  padding:14px 16px;display:flex;flex-direction:column;gap:11px;
+  backdrop-filter:blur(2px);
+}
+.fid__tete{display:flex;align-items:baseline;justify-content:space-between;gap:10px}
+.fid__nom{font-size:12px;font-weight:600;letter-spacing:.02em;color:#F5ECDD}
+.fid__compte{font-size:11px;color:#C98A73;font-variant-numeric:tabular-nums}
+.fid__tampons{display:grid;grid-template-columns:repeat(10,1fr);gap:6px}
+.fid__tampons i{
+  display:block;aspect-ratio:1;border-radius:50%;
+  border:1px solid rgba(245,236,221,.22);
+}
+.fid__tampons i.plein{background:#C4593F;border-color:#C4593F}
+.fid__pied{height:3px;border-radius:2px;background:rgba(245,236,221,.14);overflow:hidden}
+.fid__pied span{display:block;height:100%;width:70%;background:#C4593F;border-radius:2px}
+
+@media (max-width:860px){ .fid{width:min(80%,300px);padding:11px 12px;gap:9px} }
+@media (max-width:420px){ .fid__tampons{gap:4px} .fid__nom{font-size:11px} }
 .ph-grid{background-image:linear-gradient(rgba(0,0,0,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(0,0,0,.05) 1px,transparent 1px);background-size:32px 32px}
 
 /* ---------- Savoir-faire ---------- */
@@ -1028,6 +1055,10 @@ a.work-item:hover .work-item__title{color:var(--blue)}
       <a href="#" data-go="work" class="btn">Tout voir</a>
     </div>
     <div class="work-list reveal">
+      <a href="https://boucherievatuonefidelite.fr" target="_blank" rel="noopener" class="work-item">
+        <span class="work-item__title">Boucherie Vatuone — fidélité</span>
+        <span class="work-item__meta">Programme de fidélité en ligne — 2026</span>
+      </a>
       <!-- Provisoire : à remettre sur href="https://www.mjagency.eu/au-bon-pain" target="_blank" rel="noopener" (et retirer
            target/rel) quand le site client sera en ligne. Même chose dans work.html. -->
       <a href="https://www.apple.com" target="_blank" rel="noopener" class="work-item">
@@ -1167,8 +1198,34 @@ a.work-item:hover .work-item__title{color:var(--blue)}
   <section class="container sep" style="padding-top:var(--sec);padding-bottom:var(--sec)">
     <div class="grid-cards reveal">
 
-      <!-- Seul projet consultable en ligne : la carte est donc un vrai lien,
-           mis en avant sur toute la largeur. -->
+      <!-- Dernier projet livré, consultable en ligne : carte pleine largeur. -->
+      <a href="https://boucherievatuonefidelite.fr" target="_blank" rel="noopener"
+         class="card card--large col-12" data-cat="web product" data-cursor="Voir le site">
+        <div class="thumb">
+          <div class="ph ph-fidelite"></div>
+          <div class="fid" aria-hidden="true">
+            <div class="fid__tete">
+              <span class="fid__nom">Carte de fidélité</span>
+              <span class="fid__compte">7 / 10</span>
+            </div>
+            <div class="fid__tampons">
+              <i class="plein"></i><i class="plein"></i><i class="plein"></i><i class="plein"></i>
+              <i class="plein"></i><i class="plein"></i><i class="plein"></i><i></i><i></i><i></i>
+            </div>
+            <div class="fid__pied"><span></span></div>
+          </div>
+        </div>
+        <div class="card__body">
+          <div>
+            <div class="card__meta">Boucherie · Programme de fidélité — 2026 · en ligne</div>
+            <h3 class="card__title">Boucherie Vatuone — fidélité</h3>
+          </div>
+          <span class="card__go">↗</span>
+        </div>
+      </a>
+
+      <!-- Projet client consultable en ligne : la carte est un vrai lien,
+           mise en avant sur toute la largeur. -->
       <!-- Provisoire : à remettre sur href="https://www.mjagency.eu/au-bon-pain" target="_blank" rel="noopener" (et retirer
            target/rel) quand le site client sera en ligne. Même chose dans index.html. -->
       <a href="https://www.apple.com" target="_blank" rel="noopener" class="card card--large col-12" data-cat="web product" data-cursor="Voir le site">
