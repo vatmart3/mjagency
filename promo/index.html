@@ -582,6 +582,15 @@ body.is-recording .overlay,body.is-recording .toast{display:none}
 .stage[data-fmt="1:1"] .points{margin-top:22px;gap:12px 20px}
 .stage[data-fmt="1:1"] .point{font-size:19px}
 
+/* ==========================================================================
+   Version pleine image : sans onglets ni réglette, la composition se
+   recentre verticalement.
+   ========================================================================== */
+.stage.no-hud .hud{display:none}
+.stage.no-hud .beat{padding:150px 90px 150px}
+.stage.no-hud[data-fmt="9:16"] .beat{padding:240px 46px 300px}
+.stage.no-hud[data-fmt="1:1"] .beat{padding:150px 44px 150px}
+
 @media (prefers-reduced-motion:reduce){
   .ticker__row{transform:none!important}
 }
@@ -886,7 +895,13 @@ const CONFIG = {
     tail     : 0.6         // marge après la dernière image (s)
   },
 
-  ui: { overlayTitle: 'Promo Engine', grain: true }
+  ui: {
+    overlayTitle : 'Promo Engine',
+    grain        : true,
+    /* false, ou ?hud=0 dans l'URL : plus d'onglets ni de réglette, la
+       composition se recentre. Version « pleine image » pour publication. */
+    hud          : true
+  }
 };
 
 /* ==========================================================================
@@ -1807,7 +1822,7 @@ addEventListener('keydown', e => {
   if (k === '0') { start(0); e.preventDefault(); return; }
   if (k === ' ') { toggle(); e.preventDefault(); return; }
   if (k === 'r') { record(); return; }
-  if (k === 'h') { document.body.classList.toggle('is-hidden-ui'); return; }
+  if (k === 'h') { stage.classList.toggle('no-hud'); measureHUD(); return; }
   if (k === 'm') { toast(AUDIO.mute() ? 'Son activé' : 'Son coupé'); return; }
   if (k === 's') {
     SFX.on = !SFX.on;
@@ -1915,6 +1930,7 @@ PROMO.timeline = () => master;
 PROMO.beats = () => BEATS;
 
 const qs = new URLSearchParams(location.search);
+if (qs.get('hud') === '0' || CONFIG.ui.hud === false) stage.classList.add('no-hud');
 buildMontage(qs.get('cut') || CONFIG.cut || 'long');
 applyFormat(qs.get('format') || CONFIG.format || '16:9');
 requestAnimationFrame(fit);
@@ -2045,7 +2061,10 @@ PROMO.initScene = function (THREE) {
     m.rotation.set(rnd(0, 6.3), rnd(0, 6.3), rnd(0, 6.3));
     m.userData = {
       x0: rnd(-11, 11), y0: rnd(-5, 5), z0: rnd(-18, -6),
-      sp: rnd(.10, .22), ph: rnd(0, 6.3), rx: rnd(-.03, .03), ry: rnd(-.04, .04)
+      sp: rnd(.10, .22), ph: rnd(0, 6.3), rx: rnd(-.03, .03), ry: rnd(-.04, .04),
+      /* état initial mémorisé : tout se calcule à partir du temps absolu,
+         donc une image rendue hors ligne est identique à sa lecture */
+      rx0: m.rotation.x, ry0: m.rotation.y, t0: mat.uniforms.uTime.value
     };
     m.position.set(m.userData.x0, m.userData.y0, m.userData.z0);
     world.add(m);
@@ -2119,9 +2138,9 @@ PROMO.initScene = function (THREE) {
         u.y0 + Math.sin(t * u.sp + u.ph) * .30,
         u.z0
       );
-      m.rotation.x += u.rx * dt * S.speed * 4;
-      m.rotation.y += u.ry * dt * S.speed * 4;
-      m.material.uniforms.uTime.value += dt * S.speed * 3;
+      m.rotation.x = u.rx0 + u.rx * t * S.speed * 4;
+      m.rotation.y = u.ry0 + u.ry * t * S.speed * 4;
+      m.material.uniforms.uTime.value = u.t0 + t * S.speed * 3;
       m.material.uniforms.uOpacity.value = m.material.userData.base * state.op;
     }
     renderer.render(scene, camera);
