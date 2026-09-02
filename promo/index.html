@@ -67,17 +67,16 @@ body.is-recording{cursor:none}
 .layer{position:absolute;inset:0;pointer-events:none}
 .bg-violet{
   background:
-    radial-gradient(115% 88% at 52% 38%, var(--violet) 0%, rgba(20,4,48,0) 58%),
-    radial-gradient(62% 58% at 8% 92%,  var(--violet-2) 0%, rgba(20,4,48,0) 58%),
-    radial-gradient(58% 55% at 94% 6%,  var(--violet-3) 0%, rgba(20,4,48,0) 55%),
-    radial-gradient(140% 120% at 50% 50%, #14082c 0%, #05030b 62%, #020106 100%);
+    radial-gradient(90% 62% at 50% 30%, rgba(109,43,255,.42) 0%, rgba(12,6,26,0) 62%),
+    radial-gradient(70% 60% at 12% 96%, rgba(58,18,168,.30) 0%, rgba(12,6,26,0) 60%),
+    radial-gradient(150% 130% at 50% 45%, #0d0720 0%, #060310 60%, #030108 100%);
 }
 .bg-sky{
   inset:-8%;opacity:0;will-change:opacity;
-  background:linear-gradient(178deg,#071a44 0%,#1c47a8 24%,#5f94e6 48%,#a8c8f2 66%,#e7dcf0 82%,#f7e6d6 100%);
+  background:linear-gradient(178deg,#05091d 0%,#0e1c42 30%,#1e3163 52%,#39416f 72%,#5b4d6e 88%,#7a5c6a 100%);
 }
-.cloud{position:absolute;border-radius:50%;background:rgba(255,255,255,.82);filter:blur(42px);will-change:transform}
-.sky__floor{position:absolute;inset:0;background:linear-gradient(to top,rgba(3,5,20,.68) 0%,rgba(3,5,20,.18) 26%,rgba(3,5,20,0) 46%)}
+.cloud{position:absolute;border-radius:50%;background:rgba(210,200,235,.20);filter:blur(56px)}
+.sky__floor{position:absolute;inset:0;background:linear-gradient(to top,rgba(3,4,14,.72) 0%,rgba(3,4,14,.24) 30%,rgba(3,4,14,0) 52%)}
 #gl{position:absolute;inset:0;width:1920px;height:1080px;display:block}
 .vignette{
   background:radial-gradient(80% 74% at 50% 46%,rgba(0,0,0,0) 46%,rgba(0,0,0,.60) 100%);
@@ -85,7 +84,7 @@ body.is-recording{cursor:none}
 }
 .scrim{background:radial-gradient(56% 52% at 50% 46%,rgba(4,2,10,.74) 0%,rgba(4,2,10,.40) 56%,rgba(4,2,10,0) 100%)}
 .grain{
-  inset:-25%;width:150%;height:150%;opacity:.14;mix-blend-mode:overlay;will-change:transform;
+  inset:-25%;width:150%;height:150%;opacity:.09;mix-blend-mode:overlay;
   background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/><feColorMatrix type='saturate' values='0'/></filter><rect width='240' height='240' filter='url(%23n)' opacity='.6'/></svg>");
 }
 .blackout{background:#020105;opacity:0;will-change:opacity;z-index:60}
@@ -108,15 +107,9 @@ body.is-recording{cursor:none}
 }
 .bug__name{font-family:var(--font-display);font-weight:800;font-size:20px;letter-spacing:.02em}
 .bug__dot{width:8px;height:8px;border-radius:50%;background:var(--accent);box-shadow:0 0 14px 3px var(--glow)}
-.ticker{
-  flex:1;overflow:hidden;position:relative;height:22px;
-  -webkit-mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent);
-          mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent);
-}
-.ticker__row{position:absolute;left:0;top:0;display:flex;white-space:nowrap;will-change:transform}
-.ticker__row span{
-  font-size:14px;letter-spacing:.3em;text-transform:uppercase;color:rgba(255,255,255,.42);
-  padding-right:36px;
+.topline{
+  margin-left:auto;font-size:14px;letter-spacing:.28em;text-transform:uppercase;
+  color:rgba(255,255,255,.38);white-space:nowrap;
 }
 
 /* ---------- plans ---------- */
@@ -207,6 +200,25 @@ body.is-recording{cursor:none}
   white-space:nowrap;will-change:transform,opacity;
 }
 .chip b{color:var(--accent);font-weight:700;margin-right:10px}
+
+/* ---------- plan « services » : six cartes qui expliquent ---------- */
+.svcs{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;width:1660px;text-align:left}
+.svc{
+  padding:34px 32px;border-radius:22px;border:1px solid rgba(255,255,255,.13);
+  background:rgba(255,255,255,.042);-webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px);
+  will-change:transform,opacity;
+}
+.svc b{font-family:var(--font-display);font-weight:800;font-size:14px;letter-spacing:.18em;color:var(--accent)}
+.svc h3{margin:14px 0 10px;font-family:var(--font-display);font-weight:800;font-size:31px;letter-spacing:-.032em}
+.svc p{margin:0;font-size:17px;line-height:1.45;color:rgba(255,255,255,.6)}
+
+/* ---------- plan « étapes » : le déroulé du projet ---------- */
+.steps{display:flex;gap:26px;width:1700px;text-align:left}
+.step{flex:1;padding-top:26px;border-top:2px solid rgba(255,255,255,.16);will-change:transform,opacity}
+.step:first-child{border-top-color:var(--accent)}
+.step b{font-size:14px;letter-spacing:.2em;text-transform:uppercase;color:var(--accent)}
+.step h3{margin:16px 0 12px;font-family:var(--font-display);font-weight:800;font-size:38px;letter-spacing:-.035em}
+.step p{margin:0;font-size:17px;line-height:1.5;color:rgba(255,255,255,.6)}
 
 /* ---------- plans « chiffres » ---------- */
 .stats{display:flex;gap:24px;width:1640px}
@@ -410,7 +422,7 @@ body.is-recording .overlay,body.is-recording .toast{display:none}
         <span class="bug__name" id="bugName"></span>
         <span class="bug__dot"></span>
       </div>
-      <div class="ticker"><div class="ticker__row" id="tickerRow"></div></div>
+      <p class="topline" id="topline"></p>
     </div>
 
     <div class="chapters" id="chapters"></div>
@@ -468,11 +480,8 @@ const CONFIG = {
     phone    : '06 11 71 83 68'
   },
 
-  /* bandeau défilant, en haut de l'image */
-  ticker: [
-    'Création de site internet', 'Identité de marque', 'SEO local', 'Motion design',
-    'E-commerce', 'Refonte', 'Sète', 'Montpellier', 'Agde', 'Frontignan'
-  ],
+  /* ligne fixe en haut à droite de l'image */
+  topline: 'Création de site internet · Sète · Montpellier',
 
   colors: {
     violet   : '#6d2bff',
@@ -481,7 +490,7 @@ const CONFIG = {
     ink      : '#050409',
     accent   : '#c9a7ff',
     glow     : 'rgba(201,167,255,.55)',
-    scene    : ['#7a3bff', '#ff7ad9', '#8ce8ff']
+    scene    : ['#6a34e0', '#a85ad6', '#6fa8d6']
   },
 
   fonts: {
@@ -496,101 +505,103 @@ const CONFIG = {
   chapters: [
     {
       tab: 'Studio', beats: [
-        { type:'logo',  t:2.4, shot:'hero', name:'MJ Agency', line:'Studio web & design — Sète',
-          note:'Sites internet · Marque · Motion' },
+        { type:'logo', t:2.6, name:'MJ Agency', line:'Studio web & design — Sète',
+          note:'Sites internet · Identité de marque · Motion' },
 
-        { type:'hero',  t:4.2, shot:'wall', eyebrow:'Ce qu\'on livre',
+        { type:'hero', t:4.4, eyebrow:'Ce qu\'on livre',
           title:'Sites web<br><em>sur-mesure.</em>',
-          lede:'Design, développement et image de marque, sous le même toit.',
+          lede:'Design, développement et image de marque sous le même toit. Pas de template acheté, pas de sous-traitance.',
           meta:'Livré en 3 à 5 semaines' },
 
-        { type:'chips', t:3.4, shot:'orbit', eyebrow:'Ce qu\'on fait', flash:true,
-          title:'Six métiers.<br><em>Une seule équipe.</em>',
+        { type:'services', t:4.0, eyebrow:'Six métiers, une seule équipe',
           items:[
-            { k:'01', v:'Site vitrine' }, { k:'02', v:'E-commerce' },
-            { k:'03', v:'Identité de marque' }, { k:'04', v:'SEO local' },
-            { k:'05', v:'Motion design' }, { k:'06', v:'Refonte' }
+            { k:'01', t:'Site vitrine',       d:'5 à 12 pages, écrites et pensées pour convertir.' },
+            { k:'02', t:'E-commerce',         d:'Catalogue, paiement, livraison, suivi des ventes.' },
+            { k:'03', t:'Identité de marque', d:'Logo, charte, déclinaisons print et réseaux.' },
+            { k:'04', t:'SEO local',          d:'Pages villes, fiche Google, données structurées.' },
+            { k:'05', t:'Motion design',      d:'Vidéos courtes et animations de marque.' },
+            { k:'06', t:'Refonte',            d:'On repart de vos contenus, pas de la page blanche.' }
           ] }
       ]
     },
     {
       tab: 'Le constat', beats: [
-        { type:'punch', t:2.6, shot:'swarm', eyebrow:'Le constat',
+        { type:'punch', t:2.4, eyebrow:'Le constat',
           lines:['Votre site', 'ne raconte rien.'] },
 
-        { type:'stats', t:3.6, shot:'wide', eyebrow:'Ce que ça coûte', flash:true,
+        { type:'stats', t:3.4, eyebrow:'Ce que ça coûte',
           items:[
             { n:87,  dec:0, suffix:' %', lab:'des visiteurs partent avant la deuxième section' },
             { n:2.4, dec:1, suffix:' s', lab:'pour décider de rester — ou de fermer l\'onglet' },
             { n:53,  dec:0, suffix:' %', lab:'d\'abandon au-delà de 3 s de chargement sur mobile' }
           ] },
 
-        { type:'punch', t:3.4, shot:'tunnel', eyebrow:'Notre travail', hi:true,
+        { type:'punch', t:3.0, eyebrow:'Notre travail',
           lines:['On règle', 'les trois.'],
           lede:'Message, parcours, performance — dans cet ordre.' }
       ]
     },
     {
       tab: 'En production', beats: [
-        { type:'browser', t:5.4, shot:'wall', eyebrow:'En production',
+        { type:'browser', t:4.6, eyebrow:'En production',
           title:'Une page.<br>Un parcours.',
           url:'mjagency.eu/studio',
-          lede:'Chaque section a un rôle : convaincre, rassurer, faire agir.' },
+          lede:'Chaque section a un rôle : convaincre, rassurer, faire agir. Rien n\'est là pour remplir.' },
 
-        { type:'rows', t:3.6, shot:'wide', eyebrow:'Dans chaque projet',
+        { type:'rows', t:4.0, eyebrow:'Dans chaque projet',
           items:[
             { k:'01', t:'Direction artistique', d:'Une identité qui ne ressemble à aucun concurrent.' },
             { k:'02', t:'Parcours pensé',       d:'Chaque section pousse vers la prise de contact.' },
-            { k:'03', t:'SEO local structuré',  d:'Pages villes, données riches, fiche Google.' },
-            { k:'04', t:'Suivi après livraison', d:'Mises à jour, mesures, ajustements.' }
+            { k:'03', t:'SEO local structuré',  d:'Pages villes, données riches, fiche Google à jour.' },
+            { k:'04', t:'Suivi après livraison', d:'Mises à jour, mesures, ajustements pendant 3 mois.' }
           ] },
 
-        { type:'stats', t:3.4, shot:'orbit', eyebrow:'Résultats mesurés', flash:true,
+        { type:'steps', t:4.0, eyebrow:'Comment ça se passe',
           items:[
-            { n:100, dec:0, suffix:'/100', lab:'PageSpeed mobile sur nos dernières livraisons', hi:true },
-            { n:0.8, dec:1, suffix:' s',   lab:'de chargement moyen, fibre ou 4G' },
-            { n:2.4, dec:1, suffix:' ×',   lab:'de demandes de devis après refonte' }
+            { k:'Semaine 1',    t:'Cadrage',       d:'Objectifs, contenus, arborescence. On écrit avant de dessiner.' },
+            { k:'Semaines 2-3', t:'Design',        d:'Maquettes validées écran par écran, sur mobile comme sur desktop.' },
+            { k:'Semaines 4-5', t:'Développement', d:'Intégration, contenus réels, tests de vitesse et de formulaires.' },
+            { k:'Jour J',       t:'Mise en ligne', d:'Transfert, mesures, et une formation pour reprendre la main.' }
           ] },
 
-        { type:'devices', t:4.0, shot:'column', eyebrow:'Mobile d\'abord',
+        { type:'devices', t:4.0, eyebrow:'Mobile d\'abord',
           title:'Le même soin sur chaque écran.',
           url:'mjagency.eu' }
       ]
     },
     {
-      tab: 'On y va', beats: [
-        { type:'cta', t:4.2, shot:'hero', title:'On construit<br>la vôtre ?' },
-
-        { type:'offer', t:4.8, shot:'halo', url:'mjagency.eu',
+      tab: 'Résultats', beats: [
+        { type:'stats', t:3.8, eyebrow:'Résultats mesurés',
           items:[
-            { k:'Devis',   v:'Sous 24 h',        s:'Gratuit, sans engagement' },
-            { k:'Écrire',  v:'mjagency.officiel@gmail.com', s:'Réponse le jour même' },
-            { k:'Appeler', v:'06 11 71 83 68',   s:'Du lundi au vendredi, 9 h – 18 h' }
+            { n:100, dec:0, suffix:'/100', lab:'PageSpeed mobile sur nos dernières livraisons', hi:true },
+            { n:0.8, dec:1, suffix:' s',   lab:'de chargement moyen, en fibre comme en 4G' },
+            { n:2.4, dec:1, suffix:' ×',   lab:'de demandes de devis après refonte' }
+          ] },
+
+        { type:'offer', t:4.8, title:'On construit la vôtre ?', url:'mjagency.eu',
+          items:[
+            { k:'Devis',   v:'Sous 24 h',                     s:'Gratuit, sans engagement' },
+            { k:'Écrire',  v:'mjagency.officiel@gmail.com',   s:'Réponse le jour même' },
+            { k:'Appeler', v:'06 11 71 83 68',                s:'Du lundi au vendredi, 9 h – 18 h' }
           ],
           note:'Sète · Montpellier · Occitanie' }
       ]
     }
   ],
 
-  /* --- décor 3D : un « plan de caméra » par plan de montage -------------- */
+  /* --- décor 3D : volontairement discret. Un mouvement par chapitre. ------ */
   scene: {
-    count     : 14,      // formes organiques translucides
-    amp       : 0.34,    // amplitude de déformation
-    speed     : 0.26,    // vitesse de flottaison
-    fog       : 0.026,   // profondeur atmosphérique (0 = aucune)
-    grid      : true,    // sol et plafond en grille qui défilent
-    particles : 1700,    // poussière lumineuse en mouvement
-    /* form = disposition des formes, camZ/camY = position caméra, fov = focale */
-    shots: {
-      hero   : { camZ: 10.5, camY:  0.4, rotY:  0.00, fov: 40, form: 'hero',    opacity: 1.10 },
-      wall   : { camZ: 13.0, camY:  0.0, rotY: -0.18, fov: 42, form: 'wall',    opacity: 0.78 },
-      orbit  : { camZ: 12.0, camY:  0.6, rotY:  0.35, fov: 44, form: 'orbit',   opacity: 1.00 },
-      swarm  : { camZ:  7.0, camY:  0.0, rotY:  0.55, fov: 48, form: 'swarm',   opacity: 1.25 },
-      wide   : { camZ: 18.0, camY:  1.2, rotY: -0.40, fov: 40, form: 'scatter', opacity: 0.72 },
-      tunnel : { camZ:  5.5, camY:  0.0, rotY:  0.00, fov: 56, form: 'tunnel',  opacity: 1.15 },
-      column : { camZ: 11.0, camY: -0.5, rotY:  0.28, fov: 43, form: 'column',  opacity: 0.88 },
-      halo   : { camZ:  8.5, camY:  0.3, rotY:  0.80, fov: 46, form: 'halo',    opacity: 0.95 }
-    }
+    count : 7,        // formes translucides, lentes
+    amp   : 0.30,     // amplitude de déformation
+    speed : 0.11,     // vitesse de flottaison
+    fog   : 0.022,    // profondeur atmosphérique (0 = aucune)
+    /* une disposition et un cadrage par chapitre */
+    moods : [
+      { camZ: 15.0, camY:  0.0, rotY:  0.00, form: 'wall',    opacity: 0.55 },
+      { camZ: 12.0, camY:  0.3, rotY:  0.18, form: 'orbit',   opacity: 0.70 },
+      { camZ: 16.5, camY: -0.2, rotY: -0.14, form: 'scatter', opacity: 0.45 },
+      { camZ: 13.0, camY:  0.2, rotY:  0.30, form: 'halo',    opacity: 0.60, blend: 'normal' }
+    ]
   },
 
   record: {
@@ -637,6 +648,7 @@ if (!CONFIG.ui.grain) $('#grain').style.display = 'none';
 $('#ovTitle').textContent = CONFIG.ui.overlayTitle;
 $('#bugMark').textContent = CONFIG.brand.monogram;
 $('#bugName').textContent = CONFIG.brand.name;
+$('#topline').textContent = CONFIG.topline || '';
 
 /* ---------- découpage : chapitres → plans ---------- */
 const CH = CONFIG.chapters.map(c => Object.assign({}, c));
@@ -748,12 +760,21 @@ const RENDER = {
       ${phoneEl()}
     </div>`,
 
-  chips: b => `
+  services: b => `
     <div class="plain" data-card data-iris>
       ${eyebrow(b.eyebrow, true)}
-      <h2 class="display" style="font-size:104px" data-in>${b.title}</h2>
-      <div class="chips" style="margin:52px auto 0">
-        ${b.items.map(i => `<span class="chip" data-chip><b>${i.k}</b>${i.v}</span>`).join('')}
+      <div class="svcs" style="margin:38px auto 0">
+        ${b.items.map(i => `
+          <div class="svc" data-stat><b>${i.k}</b><h3>${i.t}</h3><p>${i.d}</p></div>`).join('')}
+      </div>
+    </div>`,
+
+  steps: b => `
+    <div class="plain" data-card data-iris>
+      ${eyebrow(b.eyebrow, true)}
+      <div class="steps" style="margin:44px auto 0">
+        ${b.items.map(i => `
+          <div class="step" data-stat><b>${i.k}</b><h3>${i.t}</h3><p>${i.d}</p></div>`).join('')}
       </div>
     </div>`,
 
@@ -803,15 +824,10 @@ const RENDER = {
       <div class="devices">${browserEl(b.url)}${phoneEl()}</div>
     </div>`,
 
-  cta: b => `
-    <div class="plain cta" data-card data-iris>
-      <div class="logomark" data-in style="margin:0 auto"><span>${CONFIG.brand.monogram}</span></div>
-      <h2 class="display" style="margin-top:44px" data-in>${b.title}</h2>
-    </div>`,
-
   offer: b => `
     <div class="plain cta" data-card data-iris>
-      <p class="cta__url" data-in style="margin:0 auto 46px">${b.url}</p>
+      <h2 class="display" style="font-size:104px;margin-bottom:34px" data-in>${b.title}</h2>
+      <p class="cta__url" data-in style="margin:0 auto 44px">${b.url}</p>
       <div class="offer" style="margin:0 auto">
         ${b.items.map(i => `
           <div class="offer__item" data-stat>
@@ -844,11 +860,7 @@ el('[data-screen]').forEach(h => {
   requestAnimationFrame(() => { measure(); setTimeout(measure, 600); });
 });
 
-/* ---------- bandeau défilant ---------- */
-const row = $('#tickerRow');
-const words = CONFIG.ticker.map(w => `<span>${w} ✦</span>`).join('');
-row.innerHTML = words + words;
-gsap.to(row, { xPercent: -50, duration: CONFIG.ticker.length * 2.6, ease: 'none', repeat: -1 });
+
 
 /* ==========================================================================
    HUD : onglets, réglette film, repères de coupe
@@ -883,20 +895,10 @@ for (let i = 0; i < 7; i++) {
                     `left:${-20 + Math.random() * 110}%;top:${20 + Math.random() * 62}%;` +
                     `opacity:${.32 + Math.random() * .45}`;
   sky.appendChild(d);
-  gsap.to(d, { x: 220 + Math.random() * 260, duration: 26 + Math.random() * 22,
-               repeat: -1, yoyo: true, ease: 'sine.inOut', delay: -Math.random() * 20 });
 }
 sky.insertAdjacentHTML('beforeend', '<span class="sky__floor"></span>');
 
-/* grain : une écriture de transform, une image sur quatre */
-if (CONFIG.ui.grain) {
-  const g = $('#grain'); let f = 0;
-  gsap.ticker.add(() => {
-    if ((f++ & 3) === 0) {
-      g.style.transform = `translate3d(${(Math.random() * 26 - 13) | 0}px,${(Math.random() * 26 - 13) | 0}px,0)`;
-    }
-  });
-}
+
 
 /* ==========================================================================
    Timeline maître : un sous-montage par plan
@@ -969,13 +971,8 @@ function beatTimeline(b) {
 
   if (phone) tl.fromTo(phone, { yPercent: 32, rotateX: 22, opacity: 0 },
     { yPercent: 0, rotateX: 0, opacity: 1, duration: 1.25, ease: 'expo.out' }, .18);
-  if (browser) {
-    tl.fromTo(browser, { yPercent: 4, rotateY: -15, rotateX: 6, scale: .96, opacity: 0 },
-      { yPercent: 0, rotateY: 0, rotateX: 0, scale: 1, opacity: 1, duration: 1.1, ease: 'expo.out' }, .08);
-    /* respiration 3D pendant la tenue du plan */
-    tl.to(browser, { rotateY: 7, rotateX: -2, duration: Math.max(1.4, dur - 1.4), ease: 'sine.inOut' }, .9);
-    if (phone) tl.to(phone, { rotateY: -9, duration: Math.max(1.4, dur - 1.4), ease: 'sine.inOut' }, .9);
-  }
+  if (browser) tl.fromTo(browser, { yPercent: 3, rotateY: -9, scale: .975, opacity: 0 },
+    { yPercent: 0, rotateY: 0, scale: 1, opacity: 1, duration: 1.05, ease: 'expo.out' }, .08);
 
   el('[data-screen]', root).forEach(s => {
     const cap = s.dataset.screen === 'mobile' ? 760 : 1500;
@@ -1030,6 +1027,7 @@ function setChapter(i) {
     t.classList.toggle('is-on', k === i);
     t.classList.toggle('is-done', k < i);
   });
+  if (PROMO.scene) PROMO.scene.chapter(i);
 }
 
 function indexAt(t) {
@@ -1051,10 +1049,7 @@ function sync() {
   }
 
   const bi = beatAt(t);
-  if (bi !== curBeat) {
-    curBeat = bi;
-    if (PROMO.scene) PROMO.scene.cut(BEATS[bi], BEATS[bi].ci === CH.length - 1);
-  }
+  if (bi !== curBeat) curBeat = bi;
 
   const i = indexAt(t);
   setChapter(i);
@@ -1176,8 +1171,9 @@ master.pause();
 sync();
 
 /* ==========================================================================
-   Décor 3D — espace réel : grille, brouillard, poussière, formes organiques.
-   Un « plan de caméra » par plan de montage (CONFIG.scene.shots).
+   Décor 3D — volontairement discret : quelques formes translucides qui
+   flottent lentement et se recomposent une fois par chapitre. Aucun
+   mouvement à la coupe : c'est le contenu qui rythme, pas le fond.
    Chargé en module séparé : si le CDN tombe, l'animation continue sans lui.
    ========================================================================== */
 PROMO.initScene = function (THREE) {
@@ -1192,71 +1188,12 @@ PROMO.initScene = function (THREE) {
   renderer.setClearColor(0x000000, 0);
 
   const rnd = (a, b) => a + Math.random() * (b - a);
-  const scene  = new THREE.Scene();
-  if (S.fog) scene.fog = new THREE.FogExp2(0x0a0620, S.fog);
-  const camera = new THREE.PerspectiveCamera(42, 16 / 9, .1, 220);
+  const scene = new THREE.Scene();
+  if (S.fog) scene.fog = new THREE.FogExp2(0x07040f, S.fog);
+  const camera = new THREE.PerspectiveCamera(42, 16 / 9, .1, 200);
   const world  = new THREE.Group();
   scene.add(world);
 
-  /* ---------- sol et plafond : deux grilles qui défilent vers la caméra ---- */
-  const grids = [];
-  if (S.grid) {
-    const gridMat = new THREE.LineBasicMaterial({
-      color: 0xa78bff, transparent: true, opacity: .55, depthWrite: false, fog: true
-    });
-    [-7.2, 9.4].forEach((y, k) => {
-      const g = new THREE.GridHelper(180, 90);
-      g.material = gridMat;
-      g.position.set(0, y, 0);
-      if (k) g.rotation.x = Math.PI;
-      world.add(g);
-      grids.push(g);
-    });
-  }
-
-  /* ---------- poussière lumineuse ---------- */
-  let points = null, pPos = null;
-  if (S.particles) {
-    const n = S.particles | 0;
-    pPos = new Float32Array(n * 3);
-    for (let i = 0; i < n; i++) {
-      pPos[i * 3]     = rnd(-46, 46);
-      pPos[i * 3 + 1] = rnd(-15, 15);
-      pPos[i * 3 + 2] = rnd(-72, 6);
-    }
-    const geo = new THREE.BufferGeometry();
-    geo.setAttribute('position', new THREE.BufferAttribute(pPos, 3));
-    points = new THREE.Points(geo, new THREE.PointsMaterial({
-      size: .13, color: 0xe4d9ff, transparent: true, opacity: .9,
-      blending: THREE.AdditiveBlending, depthWrite: false, sizeAttenuation: true, fog: true
-    }));
-    world.add(points);
-  }
-
-  /* ---------- ondes de choc lâchées sur les coupes ---------- */
-  const rings = [];
-  for (let i = 0; i < 3; i++) {
-    const m = new THREE.Mesh(
-      new THREE.RingGeometry(1, 1.045, 128),
-      new THREE.MeshBasicMaterial({ color: 0xc9a7ff, transparent: true, opacity: 0,
-        blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide, fog: false })
-    );
-    m.visible = false;
-    world.add(m);
-    rings.push(m);
-  }
-  let ringI = 0;
-  function shockwave() {
-    const r = rings[ringI++ % rings.length];
-    r.visible = true;
-    r.position.set(0, 0, -2.5);
-    r.rotation.set(rnd(-.5, .5), rnd(-.5, .5), rnd(0, 3));
-    gsap.fromTo(r.scale, { x: .4, y: .4, z: .4 }, { x: 17, y: 17, z: 17, duration: 1.05, ease: 'power3.out', overwrite: true });
-    gsap.fromTo(r.material, { opacity: .6 }, { opacity: 0, duration: 1.05, ease: 'power2.out', overwrite: true,
-      onComplete() { r.visible = false; } });
-  }
-
-  /* ---------- formes organiques ---------- */
   const NOISE = `
     vec3 mod289(vec3 x){return x-floor(x*(1.0/289.0))*289.0;}
     vec4 mod289(vec4 x){return x-floor(x*(1.0/289.0))*289.0;}
@@ -1313,13 +1250,13 @@ PROMO.initScene = function (THREE) {
     varying vec3 vN,vV; varying float vNo,vDepth;
     void main(){
       float f=1.0-clamp(dot(normalize(vN),normalize(vV)),0.0,1.0);
-      float rim=pow(f,2.3);
-      float band=sin(vNo*9.0+f*7.0+uTime*0.5+uSeed)*0.5+0.5;
+      float rim=pow(f,2.6);
+      float band=sin(vNo*7.0+f*5.0+uTime*0.35+uSeed)*0.5+0.5;
       vec3 col=mix(uA,uB,band);
-      col=mix(col,uC,rim*0.5);
-      /* fondu de profondeur : les formes lointaines se dissolvent dans la brume */
-      float far=1.0-smoothstep(14.0,46.0,vDepth);
-      float a=uOpacity*(0.06+rim*0.80)*far;
+      col=mix(col,uC,rim*0.4);
+      /* les formes lointaines se dissolvent : de la profondeur, pas du bruit */
+      float far=1.0-smoothstep(16.0,44.0,vDepth);
+      float a=uOpacity*(0.05+rim*0.70)*far;
       gl_FragColor=vec4(col,clamp(a,0.0,1.0));
     }`;
 
@@ -1331,7 +1268,7 @@ PROMO.initScene = function (THREE) {
     () => new THREE.TorusKnotGeometry(.82, .27, 150, 26)
   ];
   const meshes = [], mats = [];
-  const N = Math.max(8, Math.min(16, S.count | 0));
+  const N = Math.max(4, Math.min(12, S.count | 0));
 
   for (let i = 0; i < N; i++) {
     const mat = new THREE.ShaderMaterial({
@@ -1340,80 +1277,67 @@ PROMO.initScene = function (THREE) {
       blending: THREE.AdditiveBlending,
       uniforms: {
         uTime:    { value: rnd(0, 40) },
-        uAmp:     { value: S.amp * rnd(.6, 1.5) },
-        uFreq:    { value: rnd(.7, 1.8) },
+        uAmp:     { value: S.amp * rnd(.7, 1.3) },
+        uFreq:    { value: rnd(.7, 1.6) },
         uSeed:    { value: rnd(0, 10) },
         uOpacity: { value: 1 },
         uA: { value: c3[0].clone() }, uB: { value: c3[1].clone() }, uC: { value: c3[2].clone() }
       }
     });
-    mat.userData.base = rnd(.34, .70);
+    mat.userData.base = rnd(.5, .9);
     mats.push(mat);
 
     const m = new THREE.Mesh(shapes[i % shapes.length](), mat);
-    const sc = rnd(.6, 1.5);
+    const sc = rnd(.75, 1.6);
     m.scale.setScalar(sc);
     m.rotation.set(rnd(0, 6.3), rnd(0, 6.3), rnd(0, 6.3));
     m.userData = {
-      x0: rnd(-11, 11), y0: rnd(-5, 5), z0: rnd(-16, -2), baseScale: sc,
-      sp: rnd(.16, .42), ph: rnd(0, 6.3), rx: rnd(-.05, .05), ry: rnd(-.07, .07), spin: 0
+      x0: rnd(-11, 11), y0: rnd(-5, 5), z0: rnd(-18, -6),
+      sp: rnd(.10, .22), ph: rnd(0, 6.3), rx: rnd(-.03, .03), ry: rnd(-.04, .04)
     };
     m.position.set(m.userData.x0, m.userData.y0, m.userData.z0);
     world.add(m);
     meshes.push(m);
   }
 
-  /* ---------- dispositions : chaque plan recompose l'espace ---------- */
+  /* dispositions : une par chapitre, atteinte en 2,4 s */
   const TAU = Math.PI * 2;
   const FORMS = {
-    scatter: (i, n) => [((i * 7) % 11 - 5) * 2.3, ((i * 5) % 9 - 4) * 1.5, -4 - (i * 5.3) % 15],
-    orbit:   (i, n) => { const a = i / n * TAU; return [Math.cos(a) * 9.2, Math.sin(a) * 5.1, -4 + Math.sin(a * 2) * 3.4]; },
-    wall:    (i, n) => { const c = 5, x = (i % c) - (c - 1) / 2, y = Math.floor(i / c) - 1.2;
-                         return [x * 5.6, y * 4.4, -10 + (i * 3) % 3]; },
-    column:  (i, n) => [(i % 2 ? 1 : -1) * (5.8 + (i * 1.7) % 3), (i / n - .5) * 14, -6 + (i * 2.3) % 5],
-    swarm:   (i, n) => { const a = i * 2.399; return [Math.cos(a) * (2.6 + (i % 4) * .9), Math.sin(a) * (2 + (i % 3) * .8), -1.2 - (i * 1.9) % 7]; },
-    tunnel:  (i, n) => { const a = i * 1.15; return [Math.cos(a) * 6.4, Math.sin(a) * 4.2, -1.5 - i * 2.4]; },
-    halo:    (i, n) => { const a = i / n * TAU; return [Math.cos(a) * 11.5, Math.sin(a) * 6.6, -7]; },
-    hero:    (i, n) => { if (i === 0) return [0, 0, -1.0];
-                         const a = (i - 1) / (n - 1) * TAU; return [Math.cos(a) * 11, Math.sin(a) * 6.2, -9]; }
+    scatter: (i, n) => [((i * 7) % 11 - 5) * 2.4, ((i * 5) % 9 - 4) * 1.5, -9 - (i * 5.3) % 11],
+    orbit:   (i, n) => { const a = i / n * TAU; return [Math.cos(a) * 10.5, Math.sin(a) * 5.8, -10 + Math.sin(a * 2) * 2.5]; },
+    wall:    (i, n) => { const c = 4, x = (i % c) - (c - 1) / 2, y = Math.floor(i / c) - .5;
+                         return [x * 7.0, y * 5.4, -13 + (i * 3) % 3]; },
+    halo:    (i, n) => { const a = i / n * TAU; return [Math.cos(a) * 12, Math.sin(a) * 6.8, -11]; }
   };
 
-  const cam = { z: 13, y: 0, fov: 42, kick: 0 };
-  const state = { op: 1 };
-  let blendNormal = false;
-
-  function applyShot(name, last) {
-    const sh = (S.shots && S.shots[name]) || (S.shots && S.shots.orbit) || { camZ: 13, form: 'scatter' };
-    gsap.to(cam,   { z: sh.camZ, y: sh.camY || 0, fov: sh.fov || 42, duration: 1.35, ease: 'power3.inOut', overwrite: 'auto' });
-    gsap.to(world.rotation, { y: sh.rotY || 0, duration: 1.5, ease: 'power3.inOut', overwrite: 'auto' });
-    gsap.to(state, { op: sh.opacity == null ? 1 : sh.opacity, duration: 1.1, ease: 'power2.inOut', overwrite: 'auto' });
-
-    const form = FORMS[sh.form] || FORMS.scatter;
-    meshes.forEach((m, i) => {
-      const t = form(i, meshes.length);
-      gsap.to(m.userData, { x0: t[0], y0: t[1], z0: t[2], duration: 1.5,
-        ease: 'power3.inOut', delay: (i % 6) * .035, overwrite: 'auto' });
-      const target = (sh.form === 'hero' && i === 0) ? 3.3 : m.userData.baseScale * (sh.scale || 1);
-      gsap.to(m.scale, { x: target, y: target, z: target, duration: 1.5, ease: 'power3.inOut', overwrite: 'auto' });
-      /* impulsion de rotation : les formes repartent à chaque coupe */
-      gsap.fromTo(m.userData, { spin: 1.6 }, { spin: 0, duration: 1.6, ease: 'power2.out', overwrite: 'auto' });
-    });
-
-    /* sur le ciel du dernier chapitre, le verre passe en mélange normal */
-    if (last !== blendNormal) {
-      blendNormal = last;
-      const bl = last ? THREE.NormalBlending : THREE.AdditiveBlending;
-      mats.forEach(mt => { mt.blending = bl; mt.needsUpdate = true; });
-    }
-    if (grids.length) gsap.to(grids[0].material, { opacity: last ? 0 : .55, duration: 1.2, overwrite: 'auto' });
-  }
+  const cam = { z: 15, y: 0 };
+  const state = { op: .55 };
+  let blendNormal = false, curMood = -1;
 
   PROMO.scene = {
-    /* appelé à chaque coupe du montage */
-    cut(beat, last) {
-      applyShot(beat && beat.shot, !!last);
-      gsap.fromTo(cam, { kick: .9 }, { kick: 0, duration: 1.1, ease: 'power2.out', overwrite: 'auto' });
-      shockwave();
+    /* appelé une seule fois par chapitre */
+    chapter(i) {
+      if (i === curMood) return;
+      curMood = i;
+      const moods = S.moods || [];
+      const m = moods[Math.min(i, moods.length - 1)] || {};
+      gsap.to(cam, { z: m.camZ == null ? 15 : m.camZ, y: m.camY || 0, duration: 2.4, ease: 'power2.inOut', overwrite: 'auto' });
+      gsap.to(world.rotation, { y: m.rotY || 0, duration: 2.6, ease: 'power2.inOut', overwrite: 'auto' });
+      gsap.to(state, { op: m.opacity == null ? .55 : m.opacity, duration: 2.0, ease: 'power2.inOut', overwrite: 'auto' });
+
+      const form = FORMS[m.form] || FORMS.scatter;
+      meshes.forEach((mesh, k) => {
+        const t = form(k, meshes.length);
+        gsap.to(mesh.userData, { x0: t[0], y0: t[1], z0: t[2],
+          duration: 2.6, ease: 'power2.inOut', delay: k * .05, overwrite: 'auto' });
+      });
+
+      const normal = m.blend === 'normal';
+      if (normal !== blendNormal) {
+        blendNormal = normal;
+        const bl = normal ? THREE.NormalBlending : THREE.AdditiveBlending;
+        mats.forEach(mt => { mt.blending = bl; mt.needsUpdate = true; });
+      }
     }
   };
 
@@ -1423,44 +1347,25 @@ PROMO.initScene = function (THREE) {
     const dt = Math.min(.05, (now - last) / 1000); last = now;
     const t = now / 1000;
 
-    camera.position.set(Math.sin(t * .11) * 1.15, cam.y + Math.cos(t * .09) * .45, cam.z - cam.kick * 1.4);
-    camera.fov = cam.fov + cam.kick * 5;
-    camera.updateProjectionMatrix();
-    camera.lookAt(0, cam.y * .35, -3);
-
-    if (grids.length) {
-      const z = (t * 2.1) % 2;
-      grids.forEach(g => { g.position.z = z; });
-    }
-    if (points) {
-      const n = pPos.length / 3;
-      const step = dt * (5 + cam.kick * 26);
-      for (let i = 0; i < n; i++) {
-        const k = i * 3 + 2;
-        pPos[k] += step;
-        if (pPos[k] > 6) pPos[k] -= 78;
-      }
-      points.geometry.attributes.position.needsUpdate = true;
-    }
+    camera.position.set(0, cam.y, cam.z);
+    camera.lookAt(0, cam.y * .3, -3);
 
     for (const m of meshes) {
       const u = m.userData;
       m.position.set(
-        u.x0 + Math.cos(t * u.sp * .7 + u.ph) * .38,
-        u.y0 + Math.sin(t * u.sp + u.ph) * .55,
+        u.x0 + Math.cos(t * u.sp * .6 + u.ph) * .22,
+        u.y0 + Math.sin(t * u.sp + u.ph) * .30,
         u.z0
       );
-      const w = dt * S.speed * 4 * (1 + u.spin * 3);
-      m.rotation.x += u.rx * w;
-      m.rotation.y += u.ry * w;
+      m.rotation.x += u.rx * dt * S.speed * 4;
+      m.rotation.y += u.ry * dt * S.speed * 4;
       m.material.uniforms.uTime.value += dt * S.speed * 3;
       m.material.uniforms.uOpacity.value = m.material.userData.base * state.op;
     }
-
     renderer.render(scene, camera);
   });
 
-  if (curBeat >= 0) PROMO.scene.cut(BEATS[curBeat], BEATS[curBeat].ci === CH.length - 1);
+  if (curCh >= 0) PROMO.scene.chapter(curCh);
 };
 
 })();
