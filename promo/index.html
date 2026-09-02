@@ -17,9 +17,12 @@
   · Screenshots : renseigner CONFIG.shots.mobile / .desktop. Laissés vides
     (ou en erreur), une maquette de site est générée en DOM : le fichier
     fonctionne hors ligne.
-  · Capture : « Record » utilise la capture d'onglet du navigateur puis
-    exporte un WebM ; arrêt automatique en fin de boucle. Choisir
-    « Cet onglet » dans la fenêtre de partage.
+  · Capture : « Record » utilise la capture d'onglet du navigateur et exporte
+    un MP4 (repli WebM si le navigateur ne sait pas encoder en MP4) ; arrêt
+    automatique en fin de boucle. Choisir « Cet onglet » dans la fenêtre de
+    partage. Le nom du fichier reprend la durée et le format.
+  · Montages : CONFIG.cut et CONFIG.cuts — 'long' 45 s, 'court' 15 s.
+    Touche C, ou ?cut=court dans l'URL.
   · Son : CONFIG.audio.music, une piste en boucle mixée dans l'export, et
     CONFIG.audio.sfx pour les effets (souffles de transition, clics
     d'apparition, défilement, impacts) — synthétisés, aucun fichier requis.
@@ -628,7 +631,8 @@ body.is-recording .overlay,body.is-recording .toast{display:none}
       </div>
       <div class="hints">
         <kbd>1</kbd><kbd>2</kbd><kbd>3</kbd><kbd>4</kbd> aller au chapitre · <kbd>espace</kbd> play / pause<br>
-        <kbd>R</kbd> enregistrer · <kbd>F</kbd> format · <kbd>H</kbd> interface · <kbd>M</kbd> son · <kbd>S</kbd> effets · <kbd>0</kbd> début
+        <kbd>C</kbd> durée 15 s / 45 s · <kbd>F</kbd> format · <kbd>R</kbd> enregistrer<br>
+        <kbd>H</kbd> interface · <kbd>M</kbd> son · <kbd>S</kbd> effets · <kbd>0</kbd> début
       </div>
     </div>
   </div>
@@ -681,7 +685,15 @@ const CONFIG = {
      window, cart, spark, pin, play, refresh, compass, pen, code, send, clock,
      gauge, trend, mail, phone, doc, check, mobile, monitor, eye, target, shield,
      server, book. */
-  chapters: [
+  /* --- montages : deux durées, un seul fichier --------------------------
+     'long'  45 s — YouTube, page d'accueil, présentation client.
+     'court' 15 s — Reels, TikTok, Shorts : on ouvre sur l'accroche et le
+     logo arrive à la fin, là où le spectateur décide de vous suivre.
+     Touche C pour passer de l'un à l'autre, ou ?cut=court dans l'URL. --- */
+  cut  : 'long',
+  cuts : {
+
+  long: { chapters: [
     {
       tab: 'Studio', icon: 'spark', beats: [
         { type:'logo', t:2.6, name:'MJ Agency', line:'Studio web & design — Sète' },
@@ -769,7 +781,61 @@ const CONFIG = {
           note:'Sète · Montpellier · Occitanie' }
       ]
     }
-  ],
+  ] },
+
+  court: { chapters: [
+    {
+      tab: 'Le constat', icon: 'eye', beats: [
+        { type:'punch', t:2.4, eyebrow:'Le constat',
+          lines:['Votre site', 'ne raconte rien.'] },
+
+        { type:'stats', t:2.8, eyebrow:'Ce que ça coûte',
+          items:[
+            { i:'eye',   n:87,  dec:0, suffix:' %', lab:'partent avant la 2ᵉ section' },
+            { i:'clock', n:2.4, dec:1, suffix:' s', lab:'pour décider de rester' },
+            { i:'gauge', n:53,  dec:0, suffix:' %', lab:'d\'abandon après 3 s' }
+          ] }
+      ]
+    },
+    {
+      tab: 'Ce qu\'on fait', icon: 'code', beats: [
+        { type:'browser', t:2.8, eyebrow:'En production',
+          title:'Une page.<br>Un parcours.',
+          url:'mjagency.eu/studio',
+          points:[
+            { i:'target', t:'Convaincre' },
+            { i:'check',  t:'Rassurer' },
+            { i:'send',   t:'Faire agir' }
+          ] },
+
+        { type:'services', t:2.4, eyebrow:'Six métiers, une seule équipe',
+          items:[
+            { i:'window',  t:'Site vitrine' },
+            { i:'cart',    t:'E-commerce' },
+            { i:'spark',   t:'Identité de marque' },
+            { i:'pin',     t:'SEO local' },
+            { i:'play',    t:'Motion design' },
+            { i:'refresh', t:'Refonte' }
+          ] }
+      ]
+    },
+    {
+      tab: 'On y va', icon: 'trend', beats: [
+        { type:'devices', t:2.2, eyebrow:'Mobile d\'abord',
+          title:'Le même soin<br>sur chaque écran.',
+          url:'mjagency.eu' },
+
+        { type:'offer', t:2.4, mark:true, title:'On construit la vôtre ?', url:'mjagency.eu',
+          items:[
+            { i:'doc',   k:'Devis',   v:'Sous 24 h',       s:'Gratuit' },
+            { i:'phone', k:'Appeler', v:'06 11 71 83 68',  s:'9 h – 18 h' }
+          ],
+          note:'Sète · Montpellier · Occitanie' }
+      ]
+    }
+  ] }
+
+  },
 
   /* --- décor 3D : volontairement discret. Un mouvement par chapitre. ------ */
   scene: {
@@ -807,11 +873,14 @@ const CONFIG = {
   formats : { '16:9': [1920, 1080], '9:16': [1080, 1920], '1:1': [1080, 1080] },
 
   record: {
-    filename : 'mjagency-promo-1920x1080.webm',
-    bitrate  : 24000000,
-    loops    : 1,
-    lead     : 0.8,
-    tail     : 0.6
+    /* nom de base : la durée, le format et l'extension sont ajoutés
+       automatiquement — mjagency-promo-45s-1920x1080.mp4 */
+    filename : 'mjagency-promo',
+    format   : 'mp4',      // 'mp4' si le navigateur sait, sinon WebM automatiquement
+    bitrate  : 24000000,   // ~24 Mbps
+    loops    : 1,          // nombre de boucles enregistrées
+    lead     : 0.8,        // silence avant le départ (s)
+    tail     : 0.6         // marge après la dernière image (s)
   },
 
   ui: { overlayTitle: 'Promo Engine', grain: true }
@@ -852,26 +921,32 @@ $('#bugMark').textContent = CONFIG.brand.monogram;
 $('#bugName').textContent = CONFIG.brand.name;
 $('#topline').textContent = CONFIG.topline || '';
 
-/* ---------- découpage : chapitres → plans ---------- */
-const CH = CONFIG.chapters.map(c => Object.assign({}, c));
-const BEATS = [];
-let acc = 0;
-CH.forEach((c, ci) => {
-  c.start = acc;
-  let off = 0;
-  c.beats = c.beats.map((b, bi) => {
-    const beat = Object.assign({}, b, { ci, bi, dur: b.t, start: acc + off, first: bi === 0 });
-    off += b.t;
-    BEATS.push(beat);
-    return beat;
-  });
-  c.dur = off;
-  acc += off;
-});
-const TOTAL = acc;
-BEATS.forEach((b, i) => { b.last = i === BEATS.length - 1; b.tail = b.last ? 0 : .02; });
+/* ---------- découpage : chapitres → plans (reconstruit à chaque montage) --- */
+let CH = [], BEATS = [], TOTAL = 0, CUT = 'long';
 const mmss = t => Math.floor(t / 60) + ':' + String(Math.round(t % 60)).padStart(2, '0');
-$('#ovMeta').textContent = TOTAL.toFixed(0) + ' s · ' + BEATS.length + ' plans · boucle · 16:9, 9:16, 1:1';
+
+function sliceMontage(name) {
+  const cuts = CONFIG.cuts || {};
+  CUT = cuts[name] ? name : Object.keys(cuts)[0];
+  CH = (cuts[CUT].chapters || []).map(c => Object.assign({}, c));
+  BEATS = [];
+  let acc = 0;
+  CH.forEach((c, ci) => {
+    c.start = acc;
+    let off = 0;
+    c.beats = c.beats.map((b, bi) => {
+      const beat = Object.assign({}, b, { ci, bi, dur: b.t, start: acc + off, first: bi === 0 });
+      off += b.t;
+      BEATS.push(beat);
+      return beat;
+    });
+    c.dur = off;
+    acc += off;
+  });
+  TOTAL = acc;
+  BEATS.forEach((b, i) => { b.last = i === BEATS.length - 1; b.tail = b.last ? 0 : .02; });
+  $('#ovMeta').textContent = TOTAL.toFixed(0) + ' s · ' + BEATS.length + ' plans · boucle · 16:9, 9:16, 1:1';
+}
 
 /* ==========================================================================
    Maquette de site générée (aucune URL de screenshot fournie, ou image KO)
@@ -1070,7 +1145,8 @@ const RENDER = {
 
   offer: b => `
     <div class="plain cta" data-card data-iris>
-      <h2 class="display" style="font-size:104px;margin-bottom:34px" data-in>${b.title}</h2>
+      ${b.mark ? `<div class="logomark" data-in style="margin:0 auto 30px"><span>${CONFIG.brand.monogram}</span></div>` : ''}
+      <h2 class="display" style="font-size:${b.mark ? 88 : 104}px;margin-bottom:30px" data-in>${b.title}</h2>
       <p class="cta__url" data-in style="margin:0 auto 44px">${b.url}</p>
       <div class="offer" style="margin:0 auto">
         ${b.items.map(i => `
@@ -1086,24 +1162,29 @@ const RENDER = {
 
 /* ---------- construction du DOM ---------- */
 const host = $('#chapters');
-host.innerHTML = CH.map(c =>
-  `<section class="chapter">${c.beats.map(b =>
-    `<div class="beat" data-type="${b.type}">${(RENDER[b.type] || RENDER.logo)(b)}</div>`).join('')}</section>`
-).join('');
-CH.forEach((c, ci) => {
-  const sec = host.children[ci];
-  c.beats.forEach((b, bi) => { b.el = sec.children[bi]; });
-});
 
-/* écrans de mockup + mesure de la course de défilement */
-el('[data-screen]').forEach(h => {
-  const kind = h.dataset.screen;
-  const box  = fillScreen(h, CONFIG.shots[kind], kind);
-  h.__scroller = box;
-  h.__travel = 0;
-  const measure = () => { h.__travel = Math.max(0, box.scrollHeight - h.clientHeight); };
-  requestAnimationFrame(() => { measure(); setTimeout(measure, 600); });
-});
+function buildDOM() {
+  host.innerHTML = CH.map(c =>
+    `<section class="chapter">${c.beats.map(b =>
+      `<div class="beat" data-type="${b.type}">${(RENDER[b.type] || RENDER.logo)(b)}</div>`).join('')}</section>`
+  ).join('');
+  CH.forEach((c, ci) => {
+    const sec = host.children[ci];
+    c.beats.forEach((b, bi) => { b.el = sec.children[bi]; });
+  });
+
+  /* écrans de mockup + mesure de la course de défilement */
+  el('[data-screen]').forEach(h => {
+    const kind = h.dataset.screen;
+    const box  = fillScreen(h, CONFIG.shots[kind], kind);
+    h.__scroller = box;
+    h.__travel = 0;
+    requestAnimationFrame(() => {
+      h.__travel = Math.max(0, box.scrollHeight - h.clientHeight);
+      setTimeout(() => { h.__travel = Math.max(0, box.scrollHeight - h.clientHeight); }, 600);
+    });
+  });
+}
 
 
 
@@ -1111,23 +1192,27 @@ el('[data-screen]').forEach(h => {
    HUD : onglets, réglette film, repères de coupe
    ========================================================================== */
 const tabsHost = $('#tabs');
-tabsHost.innerHTML = CH.map((c, i) => `
-  <div class="tab" data-tab="${i}">
-    ${icon(c.icon, 'tab__ico')}
-    <span class="tab__idx">${String(i + 1).padStart(2, '0')}</span>
-    <span class="tab__label">${c.tab}</span>
-    <span class="tab__time">${mmss(c.start)}</span>
-    <i class="tab__cursor"></i>
-  </div>`).join('');
-const TABS = el('.tab', tabsHost);
-TABS.forEach((t, i) => t.addEventListener('click', () => goto(i)));
+let TABS = [];
 
-const TICKS = 121;
-const ticksHtml = Array.from({ length: TICKS }, (_, i) =>
-  `<i class="${i % 10 === 0 ? 't10' : (i % 5 === 0 ? 't5' : '')}"></i>`).join('');
-$('#ticksBase').innerHTML = ticksHtml;
-$('#ticksLit').innerHTML  = ticksHtml;
-$('#cuts').innerHTML = BEATS.map(b => `<i style="left:${(b.start / TOTAL * 100).toFixed(3)}%"></i>`).join('');
+function buildHUD() {
+  tabsHost.innerHTML = CH.map((c, i) => `
+    <div class="tab" data-tab="${i}">
+      ${icon(c.icon, 'tab__ico')}
+      <span class="tab__idx">${String(i + 1).padStart(2, '0')}</span>
+      <span class="tab__label">${c.tab}</span>
+      <span class="tab__time">${mmss(c.start)}</span>
+      <i class="tab__cursor"></i>
+    </div>`).join('');
+  TABS = el('.tab', tabsHost);
+  TABS.forEach((t, i) => t.addEventListener('click', () => goto(i)));
+
+  const TICKS = 121;
+  const ticksHtml = Array.from({ length: TICKS }, (_, i) =>
+    `<i class="${i % 10 === 0 ? 't10' : (i % 5 === 0 ? 't5' : '')}"></i>`).join('');
+  $('#ticksBase').innerHTML = ticksHtml;
+  $('#ticksLit').innerHTML  = ticksHtml;
+  $('#cuts').innerHTML = BEATS.map(b => `<i style="left:${(b.start / TOTAL * 100).toFixed(3)}%"></i>`).join('');
+}
 
 const lit = $('#lit'), playhead = $('#playhead'), ring = $('#ring'), flash = $('#flash');
 
@@ -1277,33 +1362,62 @@ function beatTimeline(b) {
   return tl;
 }
 
-const master = gsap.timeline({ paused: true, repeat: -1, onUpdate: sync });
-BEATS.forEach(b => master.add(beatTimeline(b), b.start));
-
-/* ciel du dernier chapitre + voiles ouverts pendant le CTA */
-const lastCh = CH[CH.length - 1];
 const veils = [$('.vignette'), $('.scrim')];
-master.fromTo(sky, { opacity: 0 }, { opacity: 1, duration: 1.4, ease: 'power2.inOut', immediateRender: false }, lastCh.start);
-master.fromTo(veils, { opacity: 1 }, { opacity: .3, duration: 1.4, ease: 'power2.inOut', immediateRender: false }, lastCh.start);
-master.to(sky,   { opacity: 0, duration: 1.0, ease: 'power2.in' }, TOTAL - 1.05);
-master.to(veils, { opacity: 1, duration: 1.0, ease: 'power2.in' }, TOTAL - 1.05);
-
-/* éclats blancs sur les coupes marquées */
-BEATS.filter(b => b.flash).forEach(b => {
-  master.fromTo(flash, { opacity: 0 }, { opacity: .16, duration: .06, ease: 'none', immediateRender: false }, b.start)
-        .to(flash, { opacity: 0, duration: .22, ease: 'power2.out' }, b.start + .06);
-});
-
-/* raccord de boucle */
 const blackout = $('#blackout');
-master.fromTo(blackout, { opacity: 1 }, { opacity: 0, duration: .8, ease: 'power2.out', immediateRender: false }, 0);
-master.to(blackout, { opacity: 1, duration: .6, ease: 'power2.in' }, TOTAL - .6);
+let master = null;
+
+function buildTimeline() {
+  master = gsap.timeline({ paused: true, repeat: -1, onUpdate: sync });
+  BEATS.forEach(b => master.add(beatTimeline(b), b.start));
+
+  /* ciel du dernier chapitre + voiles ouverts pendant le CTA */
+  const lastCh = CH[CH.length - 1];
+  master.fromTo(sky, { opacity: 0 }, { opacity: 1, duration: 1.4, ease: 'power2.inOut', immediateRender: false }, lastCh.start);
+  master.fromTo(veils, { opacity: 1 }, { opacity: .3, duration: 1.4, ease: 'power2.inOut', immediateRender: false }, lastCh.start);
+  master.to(sky,   { opacity: 0, duration: 1.0, ease: 'power2.in' }, TOTAL - 1.05);
+  master.to(veils, { opacity: 1, duration: 1.0, ease: 'power2.in' }, TOTAL - 1.05);
+
+  /* éclats blancs sur les coupes marquées */
+  BEATS.filter(b => b.flash).forEach(b => {
+    master.fromTo(flash, { opacity: 0 }, { opacity: .16, duration: .06, ease: 'none', immediateRender: false }, b.start)
+          .to(flash, { opacity: 0, duration: .22, ease: 'power2.out' }, b.start + .06);
+  });
+
+  /* raccord de boucle */
+  master.fromTo(blackout, { opacity: 1 }, { opacity: 0, duration: .8, ease: 'power2.out', immediateRender: false }, 0);
+  master.to(blackout, { opacity: 1, duration: .6, ease: 'power2.in' }, TOTAL - .6);
+}
+
+/* Change de montage : 15 s ou 45 s, sans recharger la page. */
+function buildMontage(name) {
+  const wasPlaying = master && !master.paused();
+  seeking = true;
+  if (master) { master.pause(); master.kill(); }
+  gsap.set([sky, blackout, flash], { clearProps: 'opacity' });
+  gsap.set(veils, { opacity: 1 });
+  sliceMontage(name);
+  buildDOM();
+  buildHUD();
+  buildTimeline();
+  curCh = -1; curBeat = -1;
+  measureHUD();
+  master.time(0, false);
+  sync();
+  requestAnimationFrame(() => {
+    measureScreens();
+    master.invalidate();
+    sync();
+    seeking = false;
+    if (wasPlaying) { master.play(); AUDIO.play(0); }
+  });
+}
 
 /* ==========================================================================
    Synchronisation HUD + décor (quelques écritures de style par image)
    ========================================================================== */
 let curCh = -1, curBeat = -1;
 let tabW = 1, rulerW = 1;
+let seeking = false;
 function measureHUD() {
   tabW   = TABS[0] ? TABS[0].getBoundingClientRect().width / _scale : 1;
   rulerW = $('.ruler').getBoundingClientRect().width / _scale || 1;
@@ -1329,6 +1443,7 @@ function beatAt(t) {
 }
 
 function sync() {
+  if (!master) return;
   const t = master.time();
 
   /* visibilité des plans : le plan sortant reste affiché le temps du chevauchement */
@@ -1640,7 +1755,6 @@ const SFX = {
 };
 
 /* Déclencheur : rien ne sonne pendant un saut de lecture ni à l'arrêt. */
-let seeking = false;
 function fx(name, a, b2) {
   if (seeking || !SFX.on || master.paused()) return;
   const f = SFX[name];
@@ -1696,6 +1810,12 @@ addEventListener('keydown', e => {
     toast(SFX.on ? 'Effets sonores activés' : 'Effets sonores coupés');
     return;
   }
+  if (k === 'c') {
+    const keys = Object.keys(CONFIG.cuts || {});
+    buildMontage(keys[(keys.indexOf(CUT) + 1) % keys.length]);
+    toast('Montage ' + CUT + ' — ' + TOTAL.toFixed(0) + ' s');
+    return;
+  }
   if (k === 'f') {
     const keys = Object.keys(CONFIG.formats || { '16:9': 1 });
     applyFormat(keys[(keys.indexOf(FORMAT) + 1) % keys.length]);
@@ -1732,22 +1852,41 @@ async function record() {
                   ...((mix ? mix : stream).getAudioTracks())];
   const capture = new MediaStream(tracks);
 
-  const mime = ['video/webm;codecs=vp9,opus', 'video/webm;codecs=vp8,opus', 'video/webm', 'video/mp4']
-    .find(m => window.MediaRecorder && MediaRecorder.isTypeSupported(m)) || '';
+  /* MP4 d'abord : c'est ce qu'Instagram, TikTok et YouTube recompressent le
+     mieux. Repli automatique en WebM si le navigateur ne sait pas encoder. */
+  const wantMp4 = (CONFIG.record.format || 'mp4') === 'mp4';
+  const candidates = [
+    'video/mp4;codecs=avc1.42E01E,mp4a.40.2',
+    'video/mp4;codecs=avc1.4d002a,mp4a.40.2',
+    'video/mp4',
+    'video/webm;codecs=vp9,opus',
+    'video/webm;codecs=vp8,opus',
+    'video/webm'
+  ].filter(m => wantMp4 || !m.startsWith('video/mp4'));
+  const mime = candidates.find(m => window.MediaRecorder && MediaRecorder.isTypeSupported(m)) || '';
+  const isMp4 = mime.startsWith('video/mp4');
+  const ext = isMp4 ? 'mp4' : 'webm';
+  const base = (CONFIG.record.filename || 'promo').replace(/\.(mp4|webm)$/i, '');
+  const name = `${base}-${TOTAL.toFixed(0)}s-${STAGE_W}x${STAGE_H}.${ext}`;
+
   const chunks = [];
   recorder = new MediaRecorder(capture, { mimeType: mime || undefined, videoBitsPerSecond: CONFIG.record.bitrate });
   recorder.ondataavailable = e => { if (e.data && e.data.size) chunks.push(e.data); };
+  recorder.onerror = e => { toast('Erreur d\'enregistrement : ' + (e.error && e.error.name || 'inconnue')); };
   recorder.onstop = () => {
     stream.getTracks().forEach(t => t.stop());
     document.body.classList.remove('is-recording');
     recorder = null;
+    if (!chunks.length) { toast('Aucune image capturée — relancez la capture.'); return; }
     const blob = new Blob(chunks, { type: mime.split(';')[0] || 'video/webm' });
+    const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = CONFIG.record.filename;
+    a.href = url; a.download = name; a.style.display = 'none';
+    document.body.appendChild(a);
     a.click();
-    setTimeout(() => URL.revokeObjectURL(a.href), 6000);
-    toast('Vidéo exportée (' + (blob.size / 1048576).toFixed(1) + ' Mo)');
+    setTimeout(() => { URL.revokeObjectURL(url); a.remove(); }, 8000);
+    toast(name + ' — ' + (blob.size / 1048576).toFixed(1) + ' Mo'
+          + (isMp4 ? '' : ' · MP4 non supporté ici, fichier WebM'));
   };
   stream.getVideoTracks()[0].addEventListener('ended', () => {
     if (recorder && recorder.state !== 'inactive') recorder.stop();
@@ -1763,15 +1902,12 @@ async function record() {
 }
 
 const qs = new URLSearchParams(location.search);
+buildMontage(qs.get('cut') || CONFIG.cut || 'long');
 applyFormat(qs.get('format') || CONFIG.format || '16:9');
 requestAnimationFrame(fit);
+master.pause();
 if (qs.has('autoplay')) start(0);
 if (qs.has('record')) setTimeout(record, 300);
-
-/* état initial : premier plan prêt, figé sous l'overlay */
-master.time(0, false);
-master.pause();
-sync();
 
 /* ==========================================================================
    Décor 3D — volontairement discret : quelques formes translucides qui
