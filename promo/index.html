@@ -10,6 +10,10 @@
   · Pour un nouveau client : ne modifier QUE l'objet CONFIG (en tête du
     premier bloc de script) — marque, couleurs, polices, plans, chiffres,
     URLs des screenshots, réglages de capture.
+  · Icônes : chaque élément de CONFIG porte un champ « i » (window, cart,
+    spark, pin, play, refresh, compass, pen, code, send, clock, gauge, trend,
+    mail, phone, doc, check, mobile, monitor, eye, target, shield, server,
+    book). Le jeu SVG vit dans le moteur, sous la constante ICONS.
   · Screenshots : renseigner CONFIG.shots.mobile / .desktop. Laissés vides
     (ou en erreur), une maquette de site est générée en DOM : le fichier
     fonctionne hors ligne.
@@ -201,24 +205,50 @@ body.is-recording{cursor:none}
 }
 .chip b{color:var(--accent);font-weight:700;margin-right:10px}
 
-/* ---------- plan « services » : six cartes qui expliquent ---------- */
-.svcs{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;width:1660px;text-align:left}
+/* ---------- icônes : un seul jeu, tracé fin, couleur héritée ---------- */
+.ico{display:block;flex:none;width:100%;height:100%}
+.ico-box{display:block;width:56px;height:56px;color:var(--accent)}
+
+/* ---------- plan « services » : six cartes, une icône, un mot ---------- */
+.svcs{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;width:1560px;text-align:left}
 .svc{
-  padding:34px 32px;border-radius:22px;border:1px solid rgba(255,255,255,.13);
+  padding:40px 36px;border-radius:24px;border:1px solid rgba(255,255,255,.13);
   background:rgba(255,255,255,.042);-webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px);
-  will-change:transform,opacity;
+  display:flex;align-items:center;gap:26px;will-change:transform,opacity;
 }
-.svc b{font-family:var(--font-display);font-weight:800;font-size:14px;letter-spacing:.18em;color:var(--accent)}
-.svc h3{margin:14px 0 10px;font-family:var(--font-display);font-weight:800;font-size:31px;letter-spacing:-.032em}
-.svc p{margin:0;font-size:17px;line-height:1.45;color:rgba(255,255,255,.6)}
+.svc h3{margin:0;font-family:var(--font-display);font-weight:800;font-size:34px;letter-spacing:-.035em}
 
 /* ---------- plan « étapes » : le déroulé du projet ---------- */
-.steps{display:flex;gap:26px;width:1700px;text-align:left}
-.step{flex:1;padding-top:26px;border-top:2px solid rgba(255,255,255,.16);will-change:transform,opacity}
+.steps{display:flex;gap:26px;width:1660px;text-align:left}
+.step{flex:1;padding-top:28px;border-top:2px solid rgba(255,255,255,.16);will-change:transform,opacity}
 .step:first-child{border-top-color:var(--accent)}
+.step .ico-box{width:44px;height:44px;margin-bottom:22px}
 .step b{font-size:14px;letter-spacing:.2em;text-transform:uppercase;color:var(--accent)}
-.step h3{margin:16px 0 12px;font-family:var(--font-display);font-weight:800;font-size:38px;letter-spacing:-.035em}
-.step p{margin:0;font-size:17px;line-height:1.5;color:rgba(255,255,255,.6)}
+.step h3{margin:12px 0 0;font-family:var(--font-display);font-weight:800;font-size:40px;letter-spacing:-.035em}
+
+/* ---------- plan « toujours inclus » : six icônes, six mots ---------- */
+.incl{display:flex;gap:0;width:1700px}
+.incl__i{
+  flex:1;display:flex;flex-direction:column;align-items:center;gap:20px;padding:0 18px;
+  border-left:1px solid rgba(255,255,255,.12);will-change:transform,opacity;
+}
+.incl__i:first-child{border-left:0}
+.incl__i span{font-family:var(--font-display);font-weight:700;font-size:26px;letter-spacing:-.025em;text-align:center}
+.incl .ico-box{width:62px;height:62px}
+.incl__i{padding:12px 18px 14px}
+
+/* ---------- petites lignes d'icônes sous un titre ---------- */
+.points{display:flex;flex-wrap:wrap;gap:18px 26px;margin-top:34px}
+.point{
+  display:flex;align-items:center;gap:12px;white-space:nowrap;
+  font-family:var(--font-display);font-weight:700;font-size:22px;letter-spacing:-.02em;
+}
+.point .ico-box{width:28px;height:28px}
+.dev-tag{
+  display:flex;align-items:center;justify-content:center;gap:12px;margin-top:26px;
+  font-size:15px;letter-spacing:.22em;text-transform:uppercase;color:rgba(255,255,255,.55);
+}
+.dev-tag .ico-box{width:22px;height:22px;color:rgba(255,255,255,.55)}
 
 /* ---------- plans « chiffres » ---------- */
 .stats{display:flex;gap:24px;width:1640px}
@@ -229,6 +259,9 @@ body.is-recording{cursor:none}
   will-change:transform,opacity;
 }
 .stat{text-align:left}
+.stat .ico-box{width:38px;height:38px;margin-bottom:26px}
+.offer__item .ico-box{width:34px;height:34px;margin-bottom:22px}
+.tab__ico{width:24px;height:24px;flex:none;opacity:.85}
 .stat__num{
   margin:0;font-family:var(--font-display);font-weight:900;font-size:116px;line-height:.9;
   letter-spacing:-.055em;font-variant-numeric:tabular-nums;
@@ -502,87 +535,96 @@ const CONFIG = {
   /* screenshots — laisser '' pour la maquette générée automatiquement */
   shots: { mobile: '', desktop: '' },
 
+  /* Les noms d'icônes renvoient au jeu SVG défini dans le moteur (ICONS) :
+     window, cart, spark, pin, play, refresh, compass, pen, code, send, clock,
+     gauge, trend, mail, phone, doc, check, mobile, monitor, eye, target, shield,
+     server, book. */
   chapters: [
     {
-      tab: 'Studio', beats: [
+      tab: 'Studio', icon: 'spark', beats: [
         { type:'logo', t:2.6, name:'MJ Agency', line:'Studio web & design — Sète',
-          note:'Sites internet · Identité de marque · Motion' },
+          note:'Depuis 2019' },
 
         { type:'hero', t:4.4, eyebrow:'Ce qu\'on livre',
           title:'Sites web<br><em>sur-mesure.</em>',
-          lede:'Design, développement et image de marque sous le même toit. Pas de template acheté, pas de sous-traitance.',
+          lede:'Design, code et image de marque, sous le même toit.',
           meta:'Livré en 3 à 5 semaines' },
 
         { type:'services', t:4.0, eyebrow:'Six métiers, une seule équipe',
           items:[
-            { k:'01', t:'Site vitrine',       d:'5 à 12 pages, écrites et pensées pour convertir.' },
-            { k:'02', t:'E-commerce',         d:'Catalogue, paiement, livraison, suivi des ventes.' },
-            { k:'03', t:'Identité de marque', d:'Logo, charte, déclinaisons print et réseaux.' },
-            { k:'04', t:'SEO local',          d:'Pages villes, fiche Google, données structurées.' },
-            { k:'05', t:'Motion design',      d:'Vidéos courtes et animations de marque.' },
-            { k:'06', t:'Refonte',            d:'On repart de vos contenus, pas de la page blanche.' }
+            { i:'window',  t:'Site vitrine' },
+            { i:'cart',    t:'E-commerce' },
+            { i:'spark',   t:'Identité de marque' },
+            { i:'pin',     t:'SEO local' },
+            { i:'play',    t:'Motion design' },
+            { i:'refresh', t:'Refonte' }
           ] }
       ]
     },
     {
-      tab: 'Le constat', beats: [
+      tab: 'Le constat', icon: 'eye', beats: [
         { type:'punch', t:2.4, eyebrow:'Le constat',
           lines:['Votre site', 'ne raconte rien.'] },
 
         { type:'stats', t:3.4, eyebrow:'Ce que ça coûte',
           items:[
-            { n:87,  dec:0, suffix:' %', lab:'des visiteurs partent avant la deuxième section' },
-            { n:2.4, dec:1, suffix:' s', lab:'pour décider de rester — ou de fermer l\'onglet' },
-            { n:53,  dec:0, suffix:' %', lab:'d\'abandon au-delà de 3 s de chargement sur mobile' }
+            { i:'eye',   n:87,  dec:0, suffix:' %', lab:'partent avant la 2ᵉ section' },
+            { i:'clock', n:2.4, dec:1, suffix:' s', lab:'pour décider de rester' },
+            { i:'gauge', n:53,  dec:0, suffix:' %', lab:'d\'abandon après 3 s de chargement' }
           ] },
 
         { type:'punch', t:3.0, eyebrow:'Notre travail',
-          lines:['On règle', 'les trois.'],
-          lede:'Message, parcours, performance — dans cet ordre.' }
+          lines:['On règle', 'les trois.'] }
       ]
     },
     {
-      tab: 'En production', beats: [
+      tab: 'En production', icon: 'code', beats: [
         { type:'browser', t:4.6, eyebrow:'En production',
           title:'Une page.<br>Un parcours.',
           url:'mjagency.eu/studio',
-          lede:'Chaque section a un rôle : convaincre, rassurer, faire agir. Rien n\'est là pour remplir.' },
-
-        { type:'rows', t:4.0, eyebrow:'Dans chaque projet',
-          items:[
-            { k:'01', t:'Direction artistique', d:'Une identité qui ne ressemble à aucun concurrent.' },
-            { k:'02', t:'Parcours pensé',       d:'Chaque section pousse vers la prise de contact.' },
-            { k:'03', t:'SEO local structuré',  d:'Pages villes, données riches, fiche Google à jour.' },
-            { k:'04', t:'Suivi après livraison', d:'Mises à jour, mesures, ajustements pendant 3 mois.' }
+          points:[
+            { i:'target', t:'Convaincre' },
+            { i:'check',  t:'Rassurer' },
+            { i:'send',   t:'Faire agir' }
           ] },
 
-        { type:'steps', t:4.0, eyebrow:'Comment ça se passe',
+        { type:'steps', t:4.2, eyebrow:'Comment ça se passe',
           items:[
-            { k:'Semaine 1',    t:'Cadrage',       d:'Objectifs, contenus, arborescence. On écrit avant de dessiner.' },
-            { k:'Semaines 2-3', t:'Design',        d:'Maquettes validées écran par écran, sur mobile comme sur desktop.' },
-            { k:'Semaines 4-5', t:'Développement', d:'Intégration, contenus réels, tests de vitesse et de formulaires.' },
-            { k:'Jour J',       t:'Mise en ligne', d:'Transfert, mesures, et une formation pour reprendre la main.' }
+            { i:'compass', k:'Semaine 1',    t:'Cadrage' },
+            { i:'pen',     k:'Semaines 2-3', t:'Design' },
+            { i:'code',    k:'Semaines 4-5', t:'Développement' },
+            { i:'send',    k:'Jour J',       t:'Mise en ligne' }
+          ] },
+
+        { type:'included', t:3.8, eyebrow:'Toujours inclus',
+          items:[
+            { i:'server', t:'Hébergement' },
+            { i:'shield', t:'Certificat SSL' },
+            { i:'pin',    t:'Fiche Google' },
+            { i:'trend',  t:'Mesures' },
+            { i:'book',   t:'Formation' },
+            { i:'check',  t:'Suivi 3 mois' }
           ] },
 
         { type:'devices', t:4.0, eyebrow:'Mobile d\'abord',
-          title:'Le même soin sur chaque écran.',
+          title:'Le même soin<br>sur chaque écran.',
           url:'mjagency.eu' }
       ]
     },
     {
-      tab: 'Résultats', beats: [
+      tab: 'Résultats', icon: 'trend', beats: [
         { type:'stats', t:3.8, eyebrow:'Résultats mesurés',
           items:[
-            { n:100, dec:0, suffix:'/100', lab:'PageSpeed mobile sur nos dernières livraisons', hi:true },
-            { n:0.8, dec:1, suffix:' s',   lab:'de chargement moyen, en fibre comme en 4G' },
-            { n:2.4, dec:1, suffix:' ×',   lab:'de demandes de devis après refonte' }
+            { i:'gauge', n:100, dec:0, suffix:'/100', lab:'PageSpeed mobile', hi:true },
+            { i:'clock', n:0.8, dec:1, suffix:' s',   lab:'de chargement moyen' },
+            { i:'trend', n:2.4, dec:1, suffix:' ×',   lab:'de demandes de devis' }
           ] },
 
         { type:'offer', t:4.8, title:'On construit la vôtre ?', url:'mjagency.eu',
           items:[
-            { k:'Devis',   v:'Sous 24 h',                     s:'Gratuit, sans engagement' },
-            { k:'Écrire',  v:'mjagency.officiel@gmail.com',   s:'Réponse le jour même' },
-            { k:'Appeler', v:'06 11 71 83 68',                s:'Du lundi au vendredi, 9 h – 18 h' }
+            { i:'doc',   k:'Devis',   v:'Sous 24 h',                   s:'Gratuit' },
+            { i:'mail',  k:'Écrire',  v:'mjagency.officiel@gmail.com', s:'Réponse le jour même' },
+            { i:'phone', k:'Appeler', v:'06 11 71 83 68',              s:'9 h – 18 h, du lundi au vendredi' }
           ],
           note:'Sète · Montpellier · Occitanie' }
       ]
@@ -724,6 +766,40 @@ function fillScreen(hostEl, url, kind) {
 /* ==========================================================================
    Gabarits de plans — tout le markup vient de CONFIG
    ========================================================================== */
+/* Jeu d'icônes : tracé fin sur une grille de 24, couleur héritée du contexte.
+   Ajouter une entrée ici suffit pour l'utiliser depuis CONFIG (champ « i »). */
+const ICONS = {
+  window : '<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18"/><path d="M6.5 6.5h.01M9 6.5h.01"/>',
+  cart   : '<circle cx="9.5" cy="20" r="1.3"/><circle cx="18" cy="20" r="1.3"/><path d="M2.5 3.5h2.8l2.5 11a1.6 1.6 0 0 0 1.6 1.2h8.1a1.6 1.6 0 0 0 1.6-1.2L21 7.5H6"/>',
+  spark  : '<path d="M12 2.5l2.2 6.4 6.3 2.1-6.3 2.1L12 21.5l-2.2-8.4L3.5 11l6.3-2.1z"/>',
+  pin    : '<path d="M12 21.5s7-6.2 7-11.1a7 7 0 1 0-14 0c0 4.9 7 11.1 7 11.1z"/><circle cx="12" cy="10.4" r="2.6"/>',
+  play   : '<circle cx="12" cy="12" r="9.2"/><path d="M10 8.3l6.2 3.7L10 15.7z"/>',
+  refresh: '<path d="M20.5 12a8.5 8.5 0 1 1-2.5-6"/><path d="M20.5 3.5v5h-5"/>',
+  compass: '<circle cx="12" cy="12" r="9.2"/><path d="M15.8 8.2l-2.2 5.4-5.4 2.2 2.2-5.4z"/>',
+  pen    : '<path d="M4 20l4.5-1.2L20.1 7.2a1.9 1.9 0 0 0 0-2.7l-.6-.6a1.9 1.9 0 0 0-2.7 0L5.2 15.5z"/><path d="M14.6 6.6l2.8 2.8"/>',
+  code   : '<path d="M8.6 8L4.2 12l4.4 4"/><path d="M15.4 8l4.4 4-4.4 4"/><path d="M13.2 5.5l-2.4 13"/>',
+  send   : '<path d="M21 3.2L10.4 13.8"/><path d="M21 3.2l-6.7 17.9-3.9-7.3-7.3-3.9z"/>',
+  clock  : '<circle cx="12" cy="12" r="9.2"/><path d="M12 6.4V12l3.7 2.2"/>',
+  gauge  : '<path d="M3.6 17.5a9 9 0 1 1 16.8 0"/><path d="M12 17.2l4.2-5.4"/><circle cx="12" cy="17.6" r="1.4"/>',
+  trend  : '<path d="M3 17.2l6.2-6.2 3.8 3.8L21 6.8"/><path d="M15.2 6.8H21v5.8"/>',
+  mail   : '<rect x="2.8" y="5" width="18.4" height="14" rx="2.2"/><path d="M3.4 7.2l8.6 6 8.6-6"/>',
+  phone  : '<path d="M6.8 3.4h3l1.7 4.1-2.1 1.5a12.4 12.4 0 0 0 5.6 5.6l1.5-2.1 4.1 1.7v3a2 2 0 0 1-2.2 2A16.7 16.7 0 0 1 5.6 5.6a2 2 0 0 1 2-2.2z"/>',
+  doc    : '<path d="M6.2 2.8h7l4.8 4.8v13.6H6.2z"/><path d="M13.2 2.8v4.8H18"/><path d="M9 13h6M9 16.4h4"/>',
+  check  : '<circle cx="12" cy="12" r="9.2"/><path d="M7.8 12.3l2.9 2.8 5.5-6"/>',
+  mobile : '<rect x="7" y="2.4" width="10" height="19.2" rx="2.4"/><path d="M10.8 5.2h2.4"/>',
+  monitor: '<rect x="2.6" y="4" width="18.8" height="12.6" rx="2"/><path d="M9 20.4h6M12 16.6v3.8"/>',
+  eye    : '<path d="M2.4 12S6 5.6 12 5.6 21.6 12 21.6 12 18 18.4 12 18.4 2.4 12 2.4 12z"/><circle cx="12" cy="12" r="3"/>',
+  target : '<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4.8"/><circle cx="12" cy="12" r="1.2"/>',
+  shield : '<path d="M12 2.6l7.4 3v5.6c0 4.6-3.1 8.4-7.4 10.2-4.3-1.8-7.4-5.6-7.4-10.2V5.6z"/><path d="M8.8 12.2l2.3 2.3 4.1-4.4"/>',
+  server : '<rect x="3" y="4" width="18" height="6.4" rx="1.8"/><rect x="3" y="13.6" width="18" height="6.4" rx="1.8"/><path d="M6.8 7.2h.01M6.8 16.8h.01"/>',
+  book   : '<path d="M4 4.4a2 2 0 0 1 2-2h13.4v17.2H6a2 2 0 0 0-2 2z"/><path d="M4 19.6a2 2 0 0 1 2-2h13.4"/>'
+};
+const icon = (n, cls) => (n && ICONS[n])
+  ? `<svg class="ico ${cls || ''}" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+       stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONS[n]}</svg>`
+  : '';
+const iconBox = n => n ? `<span class="ico-box">${icon(n)}</span>` : '';
+
 const eyebrow  = (txt, c) => txt ? `<p class="eyebrow${c ? ' eyebrow--c' : ''}" data-in><b></b>${txt}</p>` : '';
 const phoneEl  = () => `
   <div class="phone-wrap"><div class="phone" data-phone data-iris>
@@ -763,18 +839,27 @@ const RENDER = {
   services: b => `
     <div class="plain" data-card data-iris>
       ${eyebrow(b.eyebrow, true)}
-      <div class="svcs" style="margin:38px auto 0">
+      <div class="svcs" style="margin:44px auto 0">
         ${b.items.map(i => `
-          <div class="svc" data-stat><b>${i.k}</b><h3>${i.t}</h3><p>${i.d}</p></div>`).join('')}
+          <div class="svc" data-stat>${iconBox(i.i)}<h3>${i.t}</h3></div>`).join('')}
       </div>
     </div>`,
 
   steps: b => `
     <div class="plain" data-card data-iris>
       ${eyebrow(b.eyebrow, true)}
-      <div class="steps" style="margin:44px auto 0">
+      <div class="steps" style="margin:52px auto 0">
         ${b.items.map(i => `
-          <div class="step" data-stat><b>${i.k}</b><h3>${i.t}</h3><p>${i.d}</p></div>`).join('')}
+          <div class="step" data-stat>${iconBox(i.i)}<b>${i.k}</b><h3>${i.t}</h3></div>`).join('')}
+      </div>
+    </div>`,
+
+  included: b => `
+    <div class="plain" data-card data-iris>
+      ${eyebrow(b.eyebrow, true)}
+      <div class="incl" style="margin:56px auto 0">
+        ${b.items.map(i => `
+          <div class="incl__i" data-stat>${iconBox(i.i)}<span>${i.t}</span></div>`).join('')}
       </div>
     </div>`,
 
@@ -793,6 +878,7 @@ const RENDER = {
       <div class="stats" style="margin:40px auto 0">
         ${b.items.map(i => `
           <div class="stat${i.hi ? ' stat--hi' : ''}" data-stat>
+            ${iconBox(i.i)}
             <p class="stat__num"><span data-count="${i.n}" data-dec="${i.dec}">${String(i.n).replace('.', ',')}</span><small>${i.suffix}</small></p>
             <p class="stat__lab">${i.lab}</p>
           </div>`).join('')}
@@ -805,23 +891,22 @@ const RENDER = {
       <div class="col" style="flex:1">
         ${eyebrow(b.eyebrow)}
         <h2 class="display" style="font-size:74px" data-in>${b.title}</h2>
-        <p class="lede" data-in>${b.lede}</p>
+        <div class="points" data-in>
+          ${(b.points || []).map(pt => `<span class="point">${iconBox(pt.i)}${pt.t}</span>`).join('')}
+        </div>
         <p class="meta" data-in><i></i>${b.url}</p>
       </div>
-    </div>`,
-
-  rows: b => `
-    <div class="card rows" data-card data-iris>
-      ${eyebrow(b.eyebrow)}
-      ${b.items.map(i => `
-        <div class="row" data-row><b>${i.k}</b><h3>${i.t}</h3><p>${i.d}</p></div>`).join('')}
     </div>`,
 
   devices: b => `
     <div class="plain" data-card data-iris>
       ${eyebrow(b.eyebrow, true)}
-      <h2 class="display" style="font-size:66px;margin-bottom:44px" data-in>${b.title}</h2>
+      <h2 class="display" style="font-size:66px;margin-bottom:40px" data-in>${b.title}</h2>
       <div class="devices">${browserEl(b.url)}${phoneEl()}</div>
+      <div class="points" style="justify-content:center;margin-top:30px" data-in>
+        <span class="point">${iconBox('monitor')}Desktop</span>
+        <span class="point">${iconBox('mobile')}Mobile</span>
+      </div>
     </div>`,
 
   offer: b => `
@@ -831,6 +916,7 @@ const RENDER = {
       <div class="offer" style="margin:0 auto">
         ${b.items.map(i => `
           <div class="offer__item" data-stat>
+            ${iconBox(i.i)}
             <p class="offer__k">${i.k}</p>
             <p class="offer__v" style="font-size:${i.v.length > 20 ? 26 : 34}px">${i.v}<small>${i.s}</small></p>
           </div>`).join('')}
@@ -868,6 +954,7 @@ el('[data-screen]').forEach(h => {
 const tabsHost = $('#tabs');
 tabsHost.innerHTML = CH.map((c, i) => `
   <div class="tab" data-tab="${i}">
+    ${icon(c.icon, 'tab__ico')}
     <span class="tab__idx">${String(i + 1).padStart(2, '0')}</span>
     <span class="tab__label">${c.tab}</span>
     <span class="tab__time">${mmss(c.start)}</span>
