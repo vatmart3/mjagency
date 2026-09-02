@@ -947,7 +947,7 @@ function sliceMontage(name) {
     acc += off;
   });
   TOTAL = acc;
-  BEATS.forEach((b, i) => { b.last = i === BEATS.length - 1; b.tail = b.last ? 0 : .02; });
+  BEATS.forEach((b, i) => { b.last = i === BEATS.length - 1; b.tail = b.last ? 0 : .18; });
   $('#ovMeta').textContent = TOTAL.toFixed(0) + ' s · ' + BEATS.length + ' plans · boucle · 16:9, 9:16, 1:1';
 }
 
@@ -1353,15 +1353,15 @@ function beatTimeline(b) {
     if (s.dataset.screen === 'desktop') tl.call(fx, ['scroll', sd], .5);
   });
 
-  /* Sortie : le plan est entièrement effacé au moment où le suivant entre.
-     Aucun recouvrement — deux textes ne se superposent jamais. */
   if (b.type === 'offer') tl.call(fx, ['confirm'], .45);
 
-  const outDur = b.last ? .5 : .36;
+  /* Sortie : fondu court et rectiligne, qui déborde de 0,15 s sur le plan
+     suivant. Assez long pour qu'aucune image ne soit vide à l'instant de la
+     coupe, assez rapide pour qu'on ne lise jamais deux textes à la fois. */
   tl.to(card, {
     x: -X.x * .5, y: -X.y * .45, scale: X.s > 1 ? .985 : 1, opacity: 0,
-    duration: outDur, ease: 'power2.in'
-  }, dur - outDur);
+    duration: b.last ? .5 : .45, ease: b.last ? 'power2.in' : 'power1.in'
+  }, dur - (b.last ? .5 : .30));
   return tl;
 }
 
@@ -1759,7 +1759,8 @@ const SFX = {
 
 /* Déclencheur : rien ne sonne pendant un saut de lecture ni à l'arrêt. */
 function fx(name, a, b2) {
-  if (seeking || !SFX.on || master.paused()) return;
+  if (seeking || !SFX.on) return;
+  if (master.paused() && !PROMO.render) return;
   const f = SFX[name];
   if (f) f.call(SFX, a, b2);
 }
@@ -1903,6 +1904,15 @@ async function record() {
   setTimeout(() => { if (recorder && recorder.state !== 'inactive') recorder.stop(); },
              (r.lead + TOTAL * r.loops + r.tail) * 1000);
 }
+
+/* Crochets pour un rendu hors ligne (export image par image et piste
+   sonore) : PROMO.render force les effets alors que la timeline est
+   déplacée à la main. Sans effet en lecture normale. */
+PROMO.audio = AUDIO;
+PROMO.sfx = SFX;
+PROMO.render = false;
+PROMO.timeline = () => master;
+PROMO.beats = () => BEATS;
 
 const qs = new URLSearchParams(location.search);
 buildMontage(qs.get('cut') || CONFIG.cut || 'long');
