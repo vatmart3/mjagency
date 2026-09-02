@@ -20,7 +20,9 @@
   · Capture : « Record » utilise la capture d'onglet du navigateur puis
     exporte un WebM ; arrêt automatique en fin de boucle. Choisir
     « Cet onglet » dans la fenêtre de partage.
-  · Son : CONFIG.audio.music, une piste en boucle mixée dans l'export.
+  · Son : CONFIG.audio.music, une piste en boucle mixée dans l'export, et
+    CONFIG.audio.sfx pour les effets (souffles de transition, clics
+    d'apparition, défilement, impacts) — synthétisés, aucun fichier requis.
   · Formats : CONFIG.format et CONFIG.formats — 16:9 (YouTube), 9:16 (Reels,
     TikTok, Shorts), 1:1 (fil Instagram). La mise en page se réorganise.
   · Clavier : 1-4 chapitre · espace play/pause · R record · F format ·
@@ -563,11 +565,11 @@ body.is-recording .overlay,body.is-recording .toast{display:none}
 .stage[data-fmt="1:1"] .offer{gap:8px}
 .stage[data-fmt="1:1"] .offer__item{padding:13px 20px}
 .stage[data-fmt="1:1"] .offer__v{font-size:26px!important}
-.stage[data-fmt="1:1"] .offer__v small{font-size:15px;margin-top:6px}
+.stage[data-fmt="1:1"] .offer__v small{font-size:15px;margin-top:3px}
 .stage[data-fmt="1:1"] .offer__item .ico-box{width:24px;height:24px;margin-bottom:10px}
-.stage[data-fmt="1:1"] .cta .display{font-size:56px}
+.stage[data-fmt="1:1"] .cta .display{font-size:52px}
 .stage[data-fmt="1:1"] .cta__url{font-size:23px;padding:11px 24px;margin:16px auto 30px!important}
-.stage[data-fmt="1:1"] .offer__k{margin-bottom:8px;font-size:12px}
+.stage[data-fmt="1:1"] .offer__k{margin-bottom:5px;font-size:12px}
 .stage[data-fmt="1:1"] .cta__note{margin-top:16px;font-size:13px}
 .stage[data-fmt="1:1"] .lockup__name{font-size:62px}
 .stage[data-fmt="1:1"] .logomark{width:96px;height:96px;font-size:36px;border-radius:28px}
@@ -626,7 +628,7 @@ body.is-recording .overlay,body.is-recording .toast{display:none}
       </div>
       <div class="hints">
         <kbd>1</kbd><kbd>2</kbd><kbd>3</kbd><kbd>4</kbd> aller au chapitre · <kbd>espace</kbd> play / pause<br>
-        <kbd>R</kbd> enregistrer · <kbd>F</kbd> format · <kbd>H</kbd> interface · <kbd>M</kbd> son · <kbd>0</kbd> début
+        <kbd>R</kbd> enregistrer · <kbd>F</kbd> format · <kbd>H</kbd> interface · <kbd>M</kbd> son · <kbd>S</kbd> effets · <kbd>0</kbd> début
       </div>
     </div>
   </div>
@@ -788,9 +790,13 @@ const CONFIG = {
      Laisser '' pour aucun son. Touche M pour couper pendant la lecture. --- */
   audio: {
     music   : '',    // ex : 'assets/audio/musique.mp3'
-    volume  : 0.55,  // 0 à 1
+    volume  : 0.55,  // volume de la musique, 0 à 1
     fadeIn  : 1.2,   // fondu d'entrée, en secondes
-    fadeOut : 1.6    // fondu de sortie en fin de boucle
+    fadeOut : 1.6,   // fondu de sortie en fin de boucle
+    /* Effets sonores générés à la volée (aucun fichier) : souffles de
+       transition, clics d'apparition, défilement, impacts de chapitre.
+       0 pour les couper, touche S pendant la lecture. */
+    sfx     : 0.5
   },
 
   /* --- formats de sortie -------------------------------------------------
@@ -863,7 +869,7 @@ CH.forEach((c, ci) => {
   acc += off;
 });
 const TOTAL = acc;
-BEATS.forEach((b, i) => { b.last = i === BEATS.length - 1; b.tail = b.last ? 0 : .14; });
+BEATS.forEach((b, i) => { b.last = i === BEATS.length - 1; b.tail = b.last ? 0 : .02; });
 const mmss = t => Math.floor(t / 60) + ':' + String(Math.round(t % 60)).padStart(2, '0');
 $('#ovMeta').textContent = TOTAL.toFixed(0) + ' s · ' + BEATS.length + ' plans · boucle · 16:9, 9:16, 1:1';
 
@@ -1200,19 +1206,32 @@ function beatTimeline(b) {
   const E = CUTS[b.cut] || CUTS.up;
   const nx = BEATS[BEATS.indexOf(b) + 1];
   const X = (nx && CUTS[nx.cut]) || CUTS.zoom;
+  const dir = b.cut === 'side' ? 1 : (b.cut === 'back' ? -1 : 0);
+
+  /* son : souffle sur la coupe, impact sur l'ouverture de chapitre */
+  tl.call(fx, ['whoosh', dir, b.first ? .7 : .45], 0);
+  if (b.first) tl.call(fx, ['impact'], 0);
+  /* montée annonçant le chapitre suivant */
+  if (nx && nx.first) tl.call(fx, ['riser', .8], dur - .8);
 
   tl.fromTo(card,
     { x: E.x, y: E.y, scale: E.s, opacity: 0 },
     { x: 0, y: 0, scale: 1, opacity: 1, duration: b.first ? 1.0 : .62, ease: 'expo.out' }, 0);
 
-  if (items.length) tl.fromTo(items, { x: E.x ? E.x * .45 : 0, y: E.x ? 0 : 28, opacity: 0 },
-    { x: 0, y: 0, opacity: 1, duration: .6, stagger: .05, ease: 'expo.out' }, .08);
+  if (items.length) {
+    tl.fromTo(items, { x: E.x ? E.x * .45 : 0, y: E.x ? 0 : 28, opacity: 0 },
+      { x: 0, y: 0, opacity: 1, duration: .6, stagger: .05, ease: 'expo.out' }, .08);
+    items.slice(0, 5).forEach((_, k) => tl.call(fx, ['click', k, .14], .09 + k * .05));
+  }
   if (lines.length) tl.fromTo(lines, { yPercent: 118, rotate: 2 },
     { yPercent: 0, rotate: 0, duration: .85, stagger: .1, ease: 'expo.out' }, .1);
   if (chips.length) tl.fromTo(chips, { y: 24, scale: .93, opacity: 0 },
     { y: 0, scale: 1, opacity: 1, duration: .5, stagger: .045, ease: 'back.out(1.7)' }, .16);
-  if (stats.length) tl.fromTo(stats, { y: 46, opacity: 0 },
-    { y: 0, opacity: 1, duration: .7, stagger: .1, ease: 'expo.out' }, .12);
+  if (stats.length) {
+    tl.fromTo(stats, { y: 46, opacity: 0 },
+      { y: 0, opacity: 1, duration: .7, stagger: .1, ease: 'expo.out' }, .12);
+    stats.forEach((_, k) => tl.call(fx, ['click', k + 2, .2], .13 + k * .1));
+  }
   if (rows.length) tl.fromTo(rows, { y: 32, opacity: 0 },
     { y: 0, opacity: 1, duration: .55, stagger: .08, ease: 'expo.out' }, .14);
 
@@ -1220,30 +1239,41 @@ function beatTimeline(b) {
   el('[data-count]', root).forEach((n, k) => {
     const to = parseFloat(n.dataset.count), dec = +n.dataset.dec || 0;
     const o = { v: 0 };
+    const cd = Math.min(1.5, dur * .5);
     tl.fromTo(o, { v: 0 }, {
-      v: to, duration: Math.min(1.5, dur * .5), ease: 'power2.out',
+      v: to, duration: cd, ease: 'power2.out',
       onUpdate() { n.textContent = o.v.toFixed(dec).replace('.', ','); }
     }, .2 + k * .1);
+    if (k === 0) tl.call(fx, ['count', cd], .2);
   });
 
-  if (phone) tl.fromTo(phone, { yPercent: 32, rotateX: 22, opacity: 0 },
-    { yPercent: 0, rotateX: 0, opacity: 1, duration: 1.25, ease: 'expo.out' }, .18);
+  if (phone) {
+    tl.fromTo(phone, { yPercent: 32, rotateX: 22, opacity: 0 },
+      { yPercent: 0, rotateX: 0, opacity: 1, duration: 1.25, ease: 'expo.out' }, .18);
+    tl.call(fx, ['whoosh', 0, .55, ], .16);
+  }
   if (browser) tl.fromTo(browser, { yPercent: 3, rotateY: -9, scale: .975, opacity: 0 },
     { yPercent: 0, rotateY: 0, scale: 1, opacity: 1, duration: 1.05, ease: 'expo.out' }, .08);
 
   el('[data-screen]', root).forEach(s => {
     const cap = s.dataset.screen === 'mobile' ? 760 : 1500;
+    const sd = Math.max(1.2, dur - .9);
     tl.to(s.__scroller, {
-      y: () => -Math.min(s.__travel, cap), duration: Math.max(1.2, dur - .9),
+      y: () => -Math.min(s.__travel, cap), duration: sd,
       ease: 'power1.inOut', immediateRender: false
     }, .45);
+    if (s.dataset.screen === 'desktop') tl.call(fx, ['scroll', sd], .5);
   });
 
-  /* sortie : le plan s'échappe dans la direction d'entrée du suivant */
+  /* Sortie : le plan est entièrement effacé au moment où le suivant entre.
+     Aucun recouvrement — deux textes ne se superposent jamais. */
+  if (b.type === 'offer') tl.call(fx, ['confirm'], .45);
+
+  const outDur = b.last ? .5 : .36;
   tl.to(card, {
     x: -X.x * .5, y: -X.y * .45, scale: X.s > 1 ? .985 : 1, opacity: 0,
-    duration: b.last ? .5 : .42, ease: 'power2.in'
-  }, dur - (b.last ? .5 : .3));
+    duration: outDur, ease: 'power2.in'
+  }, dur - outDur);
   return tl;
 }
 
@@ -1437,6 +1467,187 @@ const AUDIO = {
 };
 
 /* ==========================================================================
+   Effets sonores — synthétisés en Web Audio, aucun fichier à fournir.
+   Souffle de transition (panoramique dans le sens de la coupe), clic à
+   chaque apparition, texture de défilement, impact d'ouverture de chapitre.
+   Tout passe par le même bus que la musique : c'est donc dans l'export.
+   ========================================================================== */
+const SFX = {
+  on: (CONFIG.audio && CONFIG.audio.sfx > 0),
+  vol: (CONFIG.audio && CONFIG.audio.sfx != null) ? CONFIG.audio.sfx : .5,
+  _noise: null,
+
+  ready() { return !!(AUDIO.ctx && AUDIO.master && this.on && this.vol > 0); },
+  noise() {
+    if (this._noise) return this._noise;
+    const ctx = AUDIO.ctx, n = Math.floor(ctx.sampleRate * 1.2);
+    const b = ctx.createBuffer(1, n, ctx.sampleRate), d = b.getChannelData(0);
+    for (let i = 0; i < n; i++) d[i] = Math.random() * 2 - 1;
+    this._noise = b;
+    return b;
+  },
+  src() {
+    const s = AUDIO.ctx.createBufferSource();
+    s.buffer = this.noise(); s.loop = true;
+    return s;
+  },
+  out(node, pan) {
+    if (pan != null && AUDIO.ctx.createStereoPanner) {
+      const p = AUDIO.ctx.createStereoPanner();
+      p.pan.value = pan;
+      node.connect(p).connect(AUDIO.master);
+      return p;
+    }
+    node.connect(AUDIO.master);
+    return null;
+  },
+
+  /* souffle d'aspiration : bruit filtré qui balaie le spectre et l'espace */
+  whoosh(dir = 0, dur = .5, peak = .55) {
+    if (!this.ready()) return;
+    const ctx = AUDIO.ctx, t = ctx.currentTime;
+    const src = this.src();
+    const bp = ctx.createBiquadFilter();
+    bp.type = 'bandpass'; bp.Q.value = 1.2;
+    const up = dir >= 0;
+    bp.frequency.setValueAtTime(up ? 380 : 2600, t);
+    bp.frequency.exponentialRampToValueAtTime(up ? 2900 : 360, t + dur);
+    const g = ctx.createGain();
+    g.gain.setValueAtTime(.0001, t);
+    g.gain.exponentialRampToValueAtTime(peak * this.vol, t + dur * .38);
+    g.gain.exponentialRampToValueAtTime(.0001, t + dur);
+    src.connect(bp).connect(g);
+    const p = this.out(g, dir ? -dir * .55 : 0);
+    if (p) p.pan.linearRampToValueAtTime(dir ? dir * .55 : 0, t + dur);
+    src.start(t); src.stop(t + dur + .06);
+  },
+
+  /* clic sec : chaque élément qui apparaît */
+  click(k = 0, gain = .18) {
+    if (!this.ready()) return;
+    const ctx = AUDIO.ctx, t = ctx.currentTime;
+    const o = ctx.createOscillator();
+    o.type = 'triangle';
+    o.frequency.setValueAtTime(760 + k * 55, t);
+    o.frequency.exponentialRampToValueAtTime(240, t + .07);
+    const g = ctx.createGain();
+    g.gain.setValueAtTime(.0001, t);
+    g.gain.exponentialRampToValueAtTime(gain * this.vol, t + .004);
+    g.gain.exponentialRampToValueAtTime(.0001, t + .10);
+    o.connect(g);
+    this.out(g, ((k % 3) - 1) * .25);
+    o.start(t); o.stop(t + .12);
+  },
+
+  /* impact grave : ouverture de chapitre */
+  impact() {
+    if (!this.ready()) return;
+    const ctx = AUDIO.ctx, t = ctx.currentTime;
+    const o = ctx.createOscillator();
+    o.type = 'sine';
+    o.frequency.setValueAtTime(130, t);
+    o.frequency.exponentialRampToValueAtTime(42, t + .5);
+    const g = ctx.createGain();
+    g.gain.setValueAtTime(.0001, t);
+    g.gain.exponentialRampToValueAtTime(.6 * this.vol, t + .02);
+    g.gain.exponentialRampToValueAtTime(.0001, t + .6);
+    o.connect(g); this.out(g, 0);
+    o.start(t); o.stop(t + .65);
+
+    const src = this.src();
+    const lp = ctx.createBiquadFilter();
+    lp.type = 'lowpass'; lp.frequency.setValueAtTime(600, t);
+    const gn = ctx.createGain();
+    gn.gain.setValueAtTime(.35 * this.vol, t);
+    gn.gain.exponentialRampToValueAtTime(.0001, t + .22);
+    src.connect(lp).connect(gn); this.out(gn, 0);
+    src.start(t); src.stop(t + .28);
+  },
+
+  /* montée avant l'ouverture du chapitre */
+  riser(dur = .8) {
+    if (!this.ready()) return;
+    const ctx = AUDIO.ctx, t = ctx.currentTime;
+    const src = this.src();
+    const hp = ctx.createBiquadFilter();
+    hp.type = 'highpass';
+    hp.frequency.setValueAtTime(260, t);
+    hp.frequency.exponentialRampToValueAtTime(5200, t + dur);
+    const g = ctx.createGain();
+    g.gain.setValueAtTime(.0001, t);
+    g.gain.exponentialRampToValueAtTime(.3 * this.vol, t + dur * .85);
+    g.gain.exponentialRampToValueAtTime(.0001, t + dur);
+    src.connect(hp).connect(g); this.out(g, 0);
+    src.start(t); src.stop(t + dur + .05);
+  },
+
+  /* texture de défilement : la page qui file dans la maquette */
+  scroll(dur = 3) {
+    if (!this.ready()) return;
+    const ctx = AUDIO.ctx, t0 = ctx.currentTime;
+    const step = .09, n = Math.min(48, Math.floor(dur / step));
+    for (let i = 0; i < n; i++) {
+      const t = t0 + i * step + Math.random() * .012;
+      const o = ctx.createOscillator();
+      o.type = 'square';
+      o.frequency.setValueAtTime(2200 + Math.random() * 900, t);
+      const g = ctx.createGain();
+      /* fondu aux deux bouts pour que la texture ne démarre pas net */
+      const edge = Math.min(1, Math.min(i, n - i) / 6);
+      g.gain.setValueAtTime(.0001, t);
+      g.gain.exponentialRampToValueAtTime(.035 * this.vol * edge + .0001, t + .002);
+      g.gain.exponentialRampToValueAtTime(.0001, t + .03);
+      o.connect(g); g.connect(AUDIO.master);
+      o.start(t); o.stop(t + .04);
+    }
+  },
+
+  /* les chiffres qui défilent */
+  count(dur = 1.2) {
+    if (!this.ready()) return;
+    const ctx = AUDIO.ctx, t0 = ctx.currentTime;
+    const n = 10;
+    for (let i = 0; i < n; i++) {
+      const t = t0 + (i / n) * dur;
+      const o = ctx.createOscillator();
+      o.type = 'sine';
+      o.frequency.setValueAtTime(900 + i * 90, t);
+      const g = ctx.createGain();
+      g.gain.setValueAtTime(.0001, t);
+      g.gain.exponentialRampToValueAtTime(.06 * this.vol, t + .003);
+      g.gain.exponentialRampToValueAtTime(.0001, t + .06);
+      o.connect(g); g.connect(AUDIO.master);
+      o.start(t); o.stop(t + .07);
+    }
+  },
+
+  /* accord final sur le plan de contact */
+  confirm() {
+    if (!this.ready()) return;
+    const ctx = AUDIO.ctx, t = ctx.currentTime;
+    [523.25, 784, 1046.5].forEach((f, i) => {
+      const o = ctx.createOscillator();
+      o.type = 'sine';
+      o.frequency.setValueAtTime(f, t + i * .07);
+      const g = ctx.createGain();
+      g.gain.setValueAtTime(.0001, t + i * .07);
+      g.gain.exponentialRampToValueAtTime(.16 * this.vol, t + i * .07 + .02);
+      g.gain.exponentialRampToValueAtTime(.0001, t + i * .07 + .7);
+      o.connect(g); g.connect(AUDIO.master);
+      o.start(t + i * .07); o.stop(t + i * .07 + .75);
+    });
+  }
+};
+
+/* Déclencheur : rien ne sonne pendant un saut de lecture ni à l'arrêt. */
+let seeking = false;
+function fx(name, a, b2) {
+  if (seeking || !SFX.on || master.paused()) return;
+  const f = SFX[name];
+  if (f) f.call(SFX, a, b2);
+}
+
+/* ==========================================================================
    Commandes
    ========================================================================== */
 const overlay = $('#overlay'), toastEl = $('#toast');
@@ -1449,18 +1660,20 @@ function toast(msg) {
 }
 const hideOverlay = () => gsap.to(overlay, { autoAlpha: 0, duration: .45, ease: 'power2.out' });
 
+function unseek() { requestAnimationFrame(() => { seeking = false; }); }
+
 function start(from = 0) {
-  hideOverlay(); clearIris();
+  hideOverlay(); clearIris(); seeking = true;
   master.pause(); master.time(from, false); master.play();
   AUDIO.play(from);
-  sync();
+  sync(); unseek();
 }
 function goto(i) {
-  hideOverlay(); clearIris();
+  hideOverlay(); clearIris(); seeking = true;
   master.time(CH[i].start + .001, false);
   if (master.paused()) master.play();
   AUDIO.play(CH[i].start);
-  sync();
+  sync(); unseek();
 }
 function toggle() {
   if (master.paused() || !master.isActive()) { hideOverlay(); master.play(); AUDIO.play(master.time()); }
@@ -1478,6 +1691,11 @@ addEventListener('keydown', e => {
   if (k === 'r') { record(); return; }
   if (k === 'h') { document.body.classList.toggle('is-hidden-ui'); return; }
   if (k === 'm') { toast(AUDIO.mute() ? 'Son activé' : 'Son coupé'); return; }
+  if (k === 's') {
+    SFX.on = !SFX.on;
+    toast(SFX.on ? 'Effets sonores activés' : 'Effets sonores coupés');
+    return;
+  }
   if (k === 'f') {
     const keys = Object.keys(CONFIG.formats || { '16:9': 1 });
     applyFormat(keys[(keys.indexOf(FORMAT) + 1) % keys.length]);

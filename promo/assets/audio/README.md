@@ -25,3 +25,13 @@ la durée du chapitre et celle de la vidéo se recalculent seules.
 
 Les fichiers doivent être servis depuis la même origine que la page
 (ou avec un en-tête CORS) pour être mixés dans l'export.
+
+## Effets sonores
+Ils ne sont pas des fichiers : le moteur les synthétise en Web Audio
+(souffle de transition panoramiqué dans le sens de la coupe, clic à chaque
+apparition, texture de défilement dans les maquettes, impact grave à
+l'ouverture d'un chapitre, accord sur le plan de contact).
+
+Réglage : `CONFIG.audio.sfx` entre 0 et 1 — `0` les coupe.
+Touche `S` pendant la lecture pour les couper à la volée.
+Ils passent par le même bus que la musique : ils sont donc dans l'export.
