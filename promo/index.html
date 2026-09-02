@@ -20,7 +20,12 @@
   · Capture : « Record » utilise la capture d'onglet du navigateur puis
     exporte un WebM ; arrêt automatique en fin de boucle. Choisir
     « Cet onglet » dans la fenêtre de partage.
-  · Clavier : 1-4 chapitre · espace play/pause · R record · H interface · 0 début.
+  · Son : CONFIG.audio (musique + volumes) et, sur chaque plan, vo:{ src, text, at }.
+    Sans fichier audio, la voix de synthèse du navigateur lit le texte —
+    aperçu seulement, elle n'est pas capturée à l'enregistrement. Le texte
+    sert aussi de sous-titre.
+  · Clavier : 1-4 chapitre · espace play/pause · R record · H interface ·
+    M couper le son · 0 début.
   · Dépendances : GSAP et Three.js via CDN. Si Three.js n'est pas joignable,
     l'animation tourne à l'identique, sans le décor 3D.
   ============================================================================
@@ -333,6 +338,20 @@ body.is-recording{cursor:none}
 .offer__v small{display:block;font-size:18px;font-weight:500;letter-spacing:0;color:rgba(255,255,255,.66);margin-top:10px}
 .cta__note{margin-top:34px;font-size:18px;letter-spacing:.16em;color:rgba(255,255,255,.92);text-shadow:0 2px 22px rgba(4,8,28,.7)}
 
+/* ---------- sous-titres de la voix off ---------- */
+.subs{
+  position:absolute;left:50%;bottom:206px;z-index:48;width:1440px;
+  transform:translateX(-50%);text-align:center;pointer-events:none;
+  opacity:0;will-change:opacity;
+}
+.subs span{
+  display:inline-block;padding:16px 34px;border-radius:16px;
+  background:rgba(6,4,14,.72);border:1px solid rgba(255,255,255,.12);
+  -webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px);
+  font-family:var(--font-display);font-weight:600;font-size:32px;line-height:1.3;
+  letter-spacing:-.02em;text-wrap:balance;
+}
+
 /* ---------- HUD persistante ---------- */
 .hud{position:absolute;left:70px;right:70px;bottom:56px;z-index:50;will-change:opacity}
 .tabs{display:flex;gap:12px}
@@ -462,6 +481,8 @@ body.is-recording .overlay,body.is-recording .toast{display:none}
 
     <div class="iris-ring" id="ring"></div>
 
+    <div class="subs" id="subs"><span></span></div>
+
     <div class="hud" id="hud">
       <div class="tabs" id="tabs"></div>
       <div class="ruler">
@@ -486,7 +507,7 @@ body.is-recording .overlay,body.is-recording .toast{display:none}
       </div>
       <div class="hints">
         <kbd>1</kbd><kbd>2</kbd><kbd>3</kbd><kbd>4</kbd> aller au chapitre · <kbd>espace</kbd> play / pause<br>
-        <kbd>R</kbd> enregistrer · <kbd>H</kbd> masquer l'interface · <kbd>0</kbd> revenir au début
+        <kbd>R</kbd> enregistrer · <kbd>H</kbd> masquer l'interface · <kbd>0</kbd> revenir au début · <kbd>M</kbd> couper le son
       </div>
     </div>
   </div>
@@ -542,15 +563,18 @@ const CONFIG = {
   chapters: [
     {
       tab: 'Studio', icon: 'spark', beats: [
-        { type:'logo', t:2.6, name:'MJ Agency', line:'Studio web & design — Sète',
+        { type:'logo', t:2.6,
+          vo:{ at:0.25, src:'', text:'M J Agency, studio web et design, à Sète.' }, name:'MJ Agency', line:'Studio web & design — Sète',
           note:'Depuis 2019' },
 
-        { type:'hero', t:4.4, eyebrow:'Ce qu\'on livre',
+        { type:'hero', t:4.4,
+          vo:{ at:0.25, src:'', text:'On crée des sites sur-mesure. Design, développement et image de marque, sous le même toit.' }, eyebrow:'Ce qu\'on livre',
           title:'Sites web<br><em>sur-mesure.</em>',
           lede:'Design, code et image de marque, sous le même toit.',
           meta:'Livré en 3 à 5 semaines' },
 
-        { type:'services', t:4.0, eyebrow:'Six métiers, une seule équipe',
+        { type:'services', t:4.0,
+          vo:{ at:0.25, src:'', text:'Vitrine, e-commerce, identité, référencement local, motion design, refonte.' }, eyebrow:'Six métiers, une seule équipe',
           items:[
             { i:'window',  t:'Site vitrine' },
             { i:'cart',    t:'E-commerce' },
@@ -563,23 +587,27 @@ const CONFIG = {
     },
     {
       tab: 'Le constat', icon: 'eye', beats: [
-        { type:'punch', t:2.4, eyebrow:'Le constat',
+        { type:'punch', t:2.4,
+          vo:{ at:0.25, src:'', text:'Le problème ? Votre site ne raconte rien.' }, eyebrow:'Le constat',
           lines:['Votre site', 'ne raconte rien.'] },
 
-        { type:'stats', t:3.4, eyebrow:'Ce que ça coûte',
+        { type:'stats', t:3.4,
+          vo:{ at:0.25, src:'', text:'87 % des visiteurs partent avant la deuxième section.' }, eyebrow:'Ce que ça coûte',
           items:[
             { i:'eye',   n:87,  dec:0, suffix:' %', lab:'partent avant la 2ᵉ section' },
             { i:'clock', n:2.4, dec:1, suffix:' s', lab:'pour décider de rester' },
             { i:'gauge', n:53,  dec:0, suffix:' %', lab:'d\'abandon après 3 s de chargement' }
           ] },
 
-        { type:'punch', t:3.0, eyebrow:'Notre travail',
+        { type:'punch', t:3.0,
+          vo:{ at:0.25, src:'', text:'Message, parcours, performance : on règle les trois.' }, eyebrow:'Notre travail',
           lines:['On règle', 'les trois.'] }
       ]
     },
     {
       tab: 'En production', icon: 'code', beats: [
-        { type:'browser', t:4.6, eyebrow:'En production',
+        { type:'browser', t:4.6,
+          vo:{ at:0.25, src:'', text:'Une page, un parcours. Chaque section convainc, rassure, puis fait agir.' }, eyebrow:'En production',
           title:'Une page.<br>Un parcours.',
           url:'mjagency.eu/studio',
           points:[
@@ -588,7 +616,8 @@ const CONFIG = {
             { i:'send',   t:'Faire agir' }
           ] },
 
-        { type:'steps', t:4.2, eyebrow:'Comment ça se passe',
+        { type:'steps', t:4.2,
+          vo:{ at:0.25, src:'', text:'Cadrage, design, développement, mise en ligne : trois à cinq semaines.' }, eyebrow:'Comment ça se passe',
           items:[
             { i:'compass', k:'Semaine 1',    t:'Cadrage' },
             { i:'pen',     k:'Semaines 2-3', t:'Design' },
@@ -596,7 +625,8 @@ const CONFIG = {
             { i:'send',    k:'Jour J',       t:'Mise en ligne' }
           ] },
 
-        { type:'included', t:3.8, eyebrow:'Toujours inclus',
+        { type:'included', t:3.8,
+          vo:{ at:0.25, src:'', text:'Hébergement, certificat, fiche Google, mesures, formation, suivi.' }, eyebrow:'Toujours inclus',
           items:[
             { i:'server', t:'Hébergement' },
             { i:'shield', t:'Certificat SSL' },
@@ -606,21 +636,24 @@ const CONFIG = {
             { i:'check',  t:'Suivi 3 mois' }
           ] },
 
-        { type:'devices', t:4.0, eyebrow:'Mobile d\'abord',
+        { type:'devices', t:4.0,
+          vo:{ at:0.25, src:'', text:'Le même soin sur chaque écran, du grand format au mobile.' }, eyebrow:'Mobile d\'abord',
           title:'Le même soin<br>sur chaque écran.',
           url:'mjagency.eu' }
       ]
     },
     {
       tab: 'Résultats', icon: 'trend', beats: [
-        { type:'stats', t:3.8, eyebrow:'Résultats mesurés',
+        { type:'stats', t:3.8,
+          vo:{ at:0.25, src:'', text:'Cent sur cent au PageSpeed, moins d\'une seconde de chargement.' }, eyebrow:'Résultats mesurés',
           items:[
             { i:'gauge', n:100, dec:0, suffix:'/100', lab:'PageSpeed mobile', hi:true },
             { i:'clock', n:0.8, dec:1, suffix:' s',   lab:'de chargement moyen' },
             { i:'trend', n:2.4, dec:1, suffix:' ×',   lab:'de demandes de devis' }
           ] },
 
-        { type:'offer', t:4.8, title:'On construit la vôtre ?', url:'mjagency.eu',
+        { type:'offer', t:4.8,
+          vo:{ at:0.25, src:'', text:'On construit la vôtre ? Devis gratuit sous 24 heures, sur mjagency point e u.' }, title:'On construit la vôtre ?', url:'mjagency.eu',
           items:[
             { i:'doc',   k:'Devis',   v:'Sous 24 h',                   s:'Gratuit' },
             { i:'mail',  k:'Écrire',  v:'mjagency.officiel@gmail.com', s:'Réponse le jour même' },
@@ -644,6 +677,27 @@ const CONFIG = {
       { camZ: 16.5, camY: -0.2, rotY: -0.14, form: 'scatter', opacity: 0.45 },
       { camZ: 13.0, camY:  0.2, rotY:  0.30, form: 'halo',    opacity: 0.60, blend: 'normal' }
     ]
+  },
+
+  /* --- son : musique + voix off ------------------------------------------
+     · music     : un fichier local (assets/audio/…) ou une URL autorisant le
+                   partage d'origine. Laisser '' pour aucune musique.
+     · vo.src    : le fichier de voix off du plan. Sans fichier, le navigateur
+                   lit le texte avec sa voix de synthèse (aperçu uniquement :
+                   cette voix n'est PAS capturée à l'enregistrement).
+     · vo.text   : sert aussi de sous-titre.
+     · vo.at     : décalage en secondes depuis le début du plan.
+     ---------------------------------------------------------------------- */
+  audio: {
+    music      : '',      // ex : 'assets/audio/musique.mp3'
+    musicVol   : 0.5,     // volume de la musique, 0 à 1
+    duck       : 0.18,    // volume de la musique pendant la voix
+    voiceVol   : 1,
+    fadeIn     : 1.2,     // fondu d'entrée de la musique, en secondes
+    fadeOut    : 1.6,     // fondu de sortie en fin de boucle
+    subtitles  : true,    // afficher le texte de la voix off
+    draftVoice : true,    // voix de synthèse tant qu'il n'y a pas de fichier
+    rate       : 1.02     // débit de la voix de synthèse
   },
 
   record: {
@@ -1147,6 +1201,8 @@ function sync() {
   const gp = t / TOTAL;
   playhead.style.transform = 'translate3d(' + (gp * rulerW).toFixed(1) + 'px,0,0)';
   lit.style.clipPath = 'inset(0 ' + ((1 - gp) * 100).toFixed(2) + '% 0 0)';
+
+  AUDIO.tick(t, !master.paused());
 }
 
 /* ---------- mise à l'échelle 1920×1080 → fenêtre ---------- */
@@ -1159,6 +1215,151 @@ function fit() {
 addEventListener('resize', fit);
 fit();
 requestAnimationFrame(fit);
+
+/* ==========================================================================
+   Son : musique de fond, voix off calée sur les plans, sous-titres.
+   Tout passe par un graphe Web Audio dont la sortie est mixée directement
+   dans l'enregistrement : pas besoin de cocher « partager l'audio ».
+   ========================================================================== */
+const AK = CONFIG.audio || {};
+const subsEl = $('#subs'), subsTxt = subsEl.firstElementChild;
+
+/* une ligne de voix off par plan qui en déclare une */
+const VOS = BEATS.filter(b => b.vo && (b.vo.text || b.vo.src)).map(b => ({
+  start: b.start + (b.vo.at == null ? .25 : b.vo.at),
+  end:   b.start + b.dur,
+  text:  b.vo.text || '',
+  src:   b.vo.src || ''
+}));
+
+const AUDIO = {
+  on: true, ready: false, mixed: false, cur: -1, ducked: false,
+  ctx: null, dest: null, master: null, musicGain: null, voGain: null,
+  music: null, clips: [],
+
+  /* créé au premier geste de l'utilisateur (politique d'autoplay) */
+  init() {
+    if (this.ready) return;
+    this.ready = true;
+    const AC = window.AudioContext || window.webkitAudioContext;
+    try {
+      this.ctx = new AC();
+      this.dest = this.ctx.createMediaStreamDestination();
+      this.master = this.ctx.createGain();
+      this.master.connect(this.ctx.destination);
+      this.master.connect(this.dest);
+      this.musicGain = this.ctx.createGain();
+      this.voGain = this.ctx.createGain();
+      this.musicGain.gain.value = 0;
+      this.voGain.gain.value = AK.voiceVol == null ? 1 : AK.voiceVol;
+      this.musicGain.connect(this.master);
+      this.voGain.connect(this.master);
+    } catch (e) { this.ctx = null; }
+
+    if (AK.music) {
+      this.music = new Audio(AK.music);
+      this.music.crossOrigin = 'anonymous';
+      this.music.loop = true;
+      this.music.preload = 'auto';
+      this.route(this.music, this.musicGain);
+    }
+    VOS.forEach(v => {
+      if (!v.src) return;
+      v.el = new Audio(v.src);
+      v.el.crossOrigin = 'anonymous';
+      v.el.preload = 'auto';
+      this.route(v.el, this.voGain);
+      this.clips.push(v.el);
+    });
+    if (this.ctx && this.ctx.state === 'suspended') this.ctx.resume();
+  },
+
+  /* branche un <audio> sur le graphe ; en cas d'échec CORS on garde la
+     lecture normale, seul le mixage de l'export est perdu */
+  route(el, node) {
+    if (!this.ctx || !node) return;
+    try {
+      this.ctx.createMediaElementSource(el).connect(node);
+      this.mixed = true;
+    } catch (e) { el.volume = 1; }
+  },
+
+  hasMix() { return this.mixed && this.dest; },
+  stream()  { return this.dest ? this.dest.stream : null; },
+
+  play(t) {
+    this.init();
+    if (this.music) { this.syncMusic(t, true); this.music.play().catch(() => {}); }
+  },
+  pause() {
+    if (this.music) this.music.pause();
+    this.clips.forEach(c => c.pause());
+    if (window.speechSynthesis) speechSynthesis.cancel();
+  },
+  syncMusic(t, force) {
+    const m = this.music;
+    if (!m || !m.duration || !isFinite(m.duration)) return;
+    const want = t % m.duration;
+    if (force || Math.abs(m.currentTime - want) > .35) m.currentTime = want;
+  },
+
+  /* appelé à chaque image par sync() */
+  tick(t, playing) {
+    if (!this.ready) return;
+
+    let i = -1;
+    for (let k = VOS.length - 1; k >= 0; k--) {
+      if (t >= VOS[k].start && t < VOS[k].end) { i = k; break; }
+    }
+    if (i !== this.cur) {
+      this.cur = i;
+      if (window.speechSynthesis) speechSynthesis.cancel();
+      this.clips.forEach(c => { c.pause(); });
+      if (i < 0) {
+        subsEl.style.opacity = 0;
+      } else {
+        const v = VOS[i];
+        if (AK.subtitles !== false && v.text) {
+          subsTxt.textContent = v.text;
+          subsEl.style.opacity = 1;
+        }
+        if (playing && this.on) this.speak(v);
+      }
+      this.ducked = i >= 0;
+    }
+
+    if (this.music) {
+      this.syncMusic(t, false);
+      const fi = AK.fadeIn || 0, fo = AK.fadeOut || 0;
+      let env = 1;
+      if (fi && t < fi) env = t / fi;
+      else if (fo && t > TOTAL - fo) env = Math.max(0, (TOTAL - t) / fo);
+      const base = this.ducked ? (AK.duck == null ? .18 : AK.duck)
+                               : (AK.musicVol == null ? .5 : AK.musicVol);
+      const vol = this.on ? base * env : 0;
+      if (this.musicGain && this.ctx) this.musicGain.gain.setTargetAtTime(vol, this.ctx.currentTime, .12);
+      else this.music.volume = Math.max(0, Math.min(1, vol));
+    }
+  },
+
+  speak(v) {
+    if (v.el) { try { v.el.currentTime = 0; v.el.play().catch(() => {}); } catch (e) {} return; }
+    if (AK.draftVoice === false || !window.speechSynthesis || !v.text) return;
+    const u = new SpeechSynthesisUtterance(v.text);
+    u.lang = 'fr-FR';
+    u.rate = AK.rate || 1;
+    const fr = speechSynthesis.getVoices().find(x => /fr[-_]/i.test(x.lang));
+    if (fr) u.voice = fr;
+    speechSynthesis.speak(u);
+  },
+
+  mute() {
+    this.on = !this.on;
+    if (this.master && this.ctx) this.master.gain.setTargetAtTime(this.on ? 1 : 0, this.ctx.currentTime, .08);
+    if (!this.on) { this.clips.forEach(c => c.pause()); if (window.speechSynthesis) speechSynthesis.cancel(); }
+    return this.on;
+  }
+};
 
 /* ==========================================================================
    Commandes
@@ -1175,20 +1376,23 @@ const hideOverlay = () => gsap.to(overlay, { autoAlpha: 0, duration: .45, ease: 
 
 function start(from = 0) {
   hideOverlay(); clearIris();
-  master.pause(); master.time(from, false); master.play(); sync();
+  master.pause(); master.time(from, false); master.play();
+  AUDIO.cur = -1; AUDIO.play(from);
+  sync();
 }
 function goto(i) {
   hideOverlay(); clearIris();
   master.time(CH[i].start + .001, false);
   if (master.paused()) master.play();
+  AUDIO.cur = -1; AUDIO.play(CH[i].start);
   sync();
 }
 function toggle() {
-  if (master.paused() || !master.isActive()) { hideOverlay(); master.play(); }
-  else master.pause();
+  if (master.paused() || !master.isActive()) { hideOverlay(); master.play(); AUDIO.play(master.time()); }
+  else { master.pause(); AUDIO.pause(); }
 }
 
-$('#btnPlay').addEventListener('click', () => start(0));
+$('#btnPlay').addEventListener('click', () => { AUDIO.init(); start(0); });
 $('#btnRec').addEventListener('click', record);
 
 addEventListener('keydown', e => {
@@ -1197,7 +1401,8 @@ addEventListener('keydown', e => {
   if (k === '0') { start(0); e.preventDefault(); return; }
   if (k === ' ') { toggle(); e.preventDefault(); return; }
   if (k === 'r') { record(); return; }
-  if (k === 'h') { document.body.classList.toggle('is-hidden-ui'); }
+  if (k === 'h') { document.body.classList.toggle('is-hidden-ui'); return; }
+  if (k === 'm') { toast(AUDIO.mute() ? 'Son activé' : 'Son coupé'); }
 });
 
 /* ==========================================================================
@@ -1210,18 +1415,29 @@ async function record() {
     toast("Capture non supportée ici — utilisez un enregistreur d'écran.");
     return;
   }
+  AUDIO.init();
+  const mix = AUDIO.hasMix() ? AUDIO.stream() : null;
+
   let stream;
   try {
     stream = await navigator.mediaDevices.getDisplayMedia({
       video: { frameRate: { ideal: 60, max: 60 }, width: 1920, height: 1080 },
-      audio: false, preferCurrentTab: true
+      /* sans graphe mixable, on retombe sur l'audio de l'onglet
+         (cocher « partager l'audio » dans la fenêtre de partage) */
+      audio: !mix, preferCurrentTab: true
     });
   } catch (err) { toast('Capture annulée.'); return; }
 
-  const mime = ['video/webm;codecs=vp9', 'video/webm;codecs=vp8', 'video/webm', 'video/mp4']
+  /* la vidéo vient de la capture, le son du graphe Web Audio : pas de
+     micro, pas de bruit système, pas de case à cocher */
+  const tracks = [...stream.getVideoTracks(),
+                  ...((mix ? mix : stream).getAudioTracks())];
+  const capture = new MediaStream(tracks);
+
+  const mime = ['video/webm;codecs=vp9,opus', 'video/webm;codecs=vp8,opus', 'video/webm', 'video/mp4']
     .find(m => window.MediaRecorder && MediaRecorder.isTypeSupported(m)) || '';
   const chunks = [];
-  recorder = new MediaRecorder(stream, { mimeType: mime || undefined, videoBitsPerSecond: CONFIG.record.bitrate });
+  recorder = new MediaRecorder(capture, { mimeType: mime || undefined, videoBitsPerSecond: CONFIG.record.bitrate });
   recorder.ondataavailable = e => { if (e.data && e.data.size) chunks.push(e.data); };
   recorder.onstop = () => {
     stream.getTracks().forEach(t => t.stop());
@@ -1241,6 +1457,9 @@ async function record() {
 
   document.body.classList.add('is-recording');
   hideOverlay();
+  if (!mix && CONFIG.audio && CONFIG.audio.draftVoice && !VOS.some(v => v.src)) {
+    toast("Voix de synthèse : elle ne sera pas enregistrée. Fournissez des fichiers audio.");
+  }
   recorder.start(200);
   const r = CONFIG.record;
   setTimeout(() => start(0), r.lead * 1000);
