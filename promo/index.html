@@ -20,12 +20,11 @@
   · Capture : « Record » utilise la capture d'onglet du navigateur puis
     exporte un WebM ; arrêt automatique en fin de boucle. Choisir
     « Cet onglet » dans la fenêtre de partage.
-  · Son : CONFIG.audio (musique + volumes) et, sur chaque plan, vo:{ src, text, at }.
-    Sans fichier audio, la voix de synthèse du navigateur lit le texte —
-    aperçu seulement, elle n'est pas capturée à l'enregistrement. Le texte
-    sert aussi de sous-titre.
-  · Clavier : 1-4 chapitre · espace play/pause · R record · H interface ·
-    M couper le son · 0 début.
+  · Son : CONFIG.audio.music, une piste en boucle mixée dans l'export.
+  · Formats : CONFIG.format et CONFIG.formats — 16:9 (YouTube), 9:16 (Reels,
+    TikTok, Shorts), 1:1 (fil Instagram). La mise en page se réorganise.
+  · Clavier : 1-4 chapitre · espace play/pause · R record · F format ·
+    H interface · M couper le son · 0 début.
   · Dépendances : GSAP et Three.js via CDN. Si Three.js n'est pas joignable,
     l'animation tourne à l'identique, sans le décor 3D.
   ============================================================================
@@ -86,7 +85,7 @@ body.is-recording{cursor:none}
 }
 .cloud{position:absolute;border-radius:50%;background:rgba(210,200,235,.20);filter:blur(56px)}
 .sky__floor{position:absolute;inset:0;background:linear-gradient(to top,rgba(3,4,14,.72) 0%,rgba(3,4,14,.24) 30%,rgba(3,4,14,0) 52%)}
-#gl{position:absolute;inset:0;width:1920px;height:1080px;display:block}
+#gl{position:absolute;inset:0;width:100%;height:100%;display:block}
 .vignette{
   background:radial-gradient(80% 74% at 50% 46%,rgba(0,0,0,0) 46%,rgba(0,0,0,.60) 100%);
   mix-blend-mode:multiply;
@@ -189,7 +188,7 @@ body.is-recording{cursor:none}
 .split .col{flex:1;min-width:0}
 .phone-wrap{flex:0 0 340px;display:flex;justify-content:center;perspective:1600px}
 .phone{
-  width:340px;height:700px;border-radius:52px;padding:10px;
+  width:326px;height:640px;border-radius:50px;padding:10px;
   background:linear-gradient(155deg,#3a3a46 0%,#0a0a10 34%,#191922 68%,#08080d 100%);
   box-shadow:0 90px 140px -50px #000,0 0 0 1px rgba(255,255,255,.14),inset 0 0 0 1px rgba(255,255,255,.08);
   transform-style:preserve-3d;will-change:transform;
@@ -312,9 +311,9 @@ body.is-recording{cursor:none}
 
 /* ---------- plan « deux écrans » ---------- */
 .devices{display:flex;align-items:center;justify-content:center;gap:56px;width:100%}
-.devices .browser{height:530px}
-.devices .browser__view{height:480px}
-.devices .phone{width:280px;height:580px;border-radius:44px}
+.devices .browser{height:452px}
+.devices .browser__view{height:402px}
+.devices .phone{width:246px;height:492px;border-radius:40px}
 .devices .phone__screen{border-radius:36px}
 .devices .phone__notch{width:84px;height:23px;top:17px}
 
@@ -337,20 +336,6 @@ body.is-recording{cursor:none}
 .offer__v{margin:0;font-family:var(--font-display);font-weight:800;font-size:34px;letter-spacing:-.03em;overflow-wrap:anywhere}
 .offer__v small{display:block;font-size:18px;font-weight:500;letter-spacing:0;color:rgba(255,255,255,.66);margin-top:10px}
 .cta__note{margin-top:34px;font-size:18px;letter-spacing:.16em;color:rgba(255,255,255,.92);text-shadow:0 2px 22px rgba(4,8,28,.7)}
-
-/* ---------- sous-titres de la voix off ---------- */
-.subs{
-  position:absolute;left:50%;bottom:206px;z-index:48;width:1440px;
-  transform:translateX(-50%);text-align:center;pointer-events:none;
-  opacity:0;will-change:opacity;
-}
-.subs span{
-  display:inline-block;padding:16px 34px;border-radius:16px;
-  background:rgba(6,4,14,.72);border:1px solid rgba(255,255,255,.12);
-  -webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px);
-  font-family:var(--font-display);font-weight:600;font-size:32px;line-height:1.3;
-  letter-spacing:-.02em;text-wrap:balance;
-}
 
 /* ---------- HUD persistante ---------- */
 .hud{position:absolute;left:70px;right:70px;bottom:56px;z-index:50;will-change:opacity}
@@ -453,6 +438,142 @@ body.is-recording .overlay,body.is-recording .toast{display:none}
 .faux__cell u{display:block;height:9px;border-radius:5px;background:rgba(10,4,30,.13);margin-bottom:9px}
 .faux__band{margin:0 40px;border-radius:22px;background:linear-gradient(140deg,#120a26,#3a12a8)}
 
+
+/* ==========================================================================
+   FORMATS VERTICAL ET CARRÉ — 9:16 (Reels, TikTok, Shorts) et 1:1.
+   Tout ce qui est large se met en colonne ; rien ne change en 16:9.
+   ========================================================================== */
+.stage:not([data-fmt="16:9"]) .topline{display:none}
+.stage:not([data-fmt="16:9"]) .topbar{height:92px;padding:0 46px}
+.stage:not([data-fmt="16:9"]) .beat{padding:150px 46px 320px}
+.stage:not([data-fmt="16:9"]) .display{font-size:104px}
+.stage:not([data-fmt="16:9"]) .lede{font-size:30px;max-width:none}
+.stage:not([data-fmt="16:9"]) .card{padding:40px;border-radius:28px}
+.stage:not([data-fmt="16:9"]) .eyebrow{font-size:15px;margin-bottom:24px}
+
+/* intro : le texte au-dessus, l'iPhone en dessous */
+.stage:not([data-fmt="16:9"]) .split{flex-direction:column;width:100%;gap:36px}
+.stage:not([data-fmt="16:9"]) .phone-wrap{flex:0 0 auto}
+.stage:not([data-fmt="16:9"]) .phone{width:340px;height:680px;margin:0}
+.stage:not([data-fmt="16:9"]) .phone__screen{border-radius:40px}
+
+/* services : une colonne */
+.stage:not([data-fmt="16:9"]) .svcs{grid-template-columns:1fr;width:100%;gap:14px}
+.stage:not([data-fmt="16:9"]) .svc{padding:34px 34px;gap:26px}
+.stage:not([data-fmt="16:9"]) .svc h3{font-size:38px}
+.stage:not([data-fmt="16:9"]) .ico-box{width:54px;height:54px}
+
+/* étapes : icône à gauche, période et titre à droite */
+.stage:not([data-fmt="16:9"]) .steps{flex-direction:column;width:100%;gap:18px}
+.stage:not([data-fmt="16:9"]) .step{
+  display:grid;grid-template-columns:auto 1fr;column-gap:22px;align-items:center;padding-top:18px;
+}
+.stage:not([data-fmt="16:9"]) .step .ico-box{grid-row:1/3;margin:0;width:50px;height:50px}
+.stage:not([data-fmt="16:9"]) .step b{align-self:end}
+.stage:not([data-fmt="16:9"]) .step h3{margin:2px 0 0;font-size:40px;align-self:start}
+
+/* toujours inclus : grille 2 × 3 */
+.stage:not([data-fmt="16:9"]) .incl{display:grid;grid-template-columns:repeat(2,1fr);gap:38px 0;width:100%}
+.stage:not([data-fmt="16:9"]) .incl__i{border-left:0;padding:0 12px}
+.stage:not([data-fmt="16:9"]) .incl .ico-box{width:66px;height:66px}
+.stage:not([data-fmt="16:9"]) .incl__i span{font-size:27px}
+
+/* chiffres : empilés, icône à gauche */
+.stage:not([data-fmt="16:9"]) .stats{flex-direction:column;width:100%;gap:14px}
+.stage:not([data-fmt="16:9"]) .stat{
+  display:grid;grid-template-columns:auto 1fr;column-gap:28px;align-items:center;padding:34px 34px;
+}
+.stage:not([data-fmt="16:9"]) .stat .ico-box{grid-row:1/3;margin:0;width:40px;height:40px}
+.stage:not([data-fmt="16:9"]) .stat__num{font-size:92px}
+.stage:not([data-fmt="16:9"]) .stat__num small{font-size:32px}
+.stage:not([data-fmt="16:9"]) .stat__lab{margin:6px 0 0;font-size:17px}
+
+/* navigateur : titre au-dessus, écran en dessous */
+.stage:not([data-fmt="16:9"]) .use{flex-direction:column;width:100%;gap:30px;padding:36px}
+.stage:not([data-fmt="16:9"]) .use .col{order:1;width:100%}
+.stage:not([data-fmt="16:9"]) .use .persp{order:2;flex:0 0 auto;width:100%}
+.stage:not([data-fmt="16:9"]) .use .display{font-size:64px}
+.stage:not([data-fmt="16:9"]) .browser{height:560px}
+.stage:not([data-fmt="16:9"]) .browser__view{height:510px}
+.stage:not([data-fmt="16:9"]) .points{justify-content:flex-start}
+
+/* deux écrans : l'un sous l'autre */
+.stage:not([data-fmt="16:9"]) .devices{flex-direction:column;gap:26px}
+.stage:not([data-fmt="16:9"]) .devices .persp{flex:0 0 auto;width:100%}
+.stage:not([data-fmt="16:9"]) .devices .browser{height:440px}
+.stage:not([data-fmt="16:9"]) .devices .browser__view{height:390px}
+.stage:not([data-fmt="16:9"]) .devices .phone{width:260px;height:520px}
+.stage:not([data-fmt="16:9"]) .devices .phone__screen{border-radius:34px}
+
+/* contact */
+.stage:not([data-fmt="16:9"]) .offer{flex-direction:column;width:100%;gap:14px}
+.stage:not([data-fmt="16:9"]) .offer__item{padding:28px 30px}
+.stage:not([data-fmt="16:9"]) .cta .display{font-size:92px}
+.stage:not([data-fmt="16:9"]) .cta__url{font-size:30px;padding:18px 34px;margin-top:34px}
+.stage:not([data-fmt="16:9"]) .cta__note{font-size:16px}
+.stage:not([data-fmt="16:9"]) .lockup__name{font-size:74px}
+.stage:not([data-fmt="16:9"]) .logomark{width:112px;height:112px;font-size:42px}
+
+/* HUD compacte */
+.stage[data-fmt="9:16"] .hud{left:46px;right:46px;bottom:250px}
+.stage[data-fmt="9:16"] .beat{padding:190px 46px 470px}
+.stage[data-fmt="1:1"] .hud{left:46px;right:46px;bottom:64px}
+.stage:not([data-fmt="16:9"]) .tab{height:62px;padding:0 14px;gap:10px;border-radius:14px}
+.stage:not([data-fmt="16:9"]) .tab__label{font-size:16px}
+.stage:not([data-fmt="16:9"]) .tab__time{display:none}
+.stage:not([data-fmt="16:9"]) .tab__ico{width:20px;height:20px}
+.stage:not([data-fmt="16:9"]) .tab__idx{font-size:12px}
+.stage:not([data-fmt="16:9"]) .ruler{height:30px;margin-top:14px}
+
+/* le carré : moins de hauteur que le vertical, tout est resserré */
+.stage[data-fmt="1:1"] .beat{padding:116px 44px 236px}
+.stage[data-fmt="1:1"] .display{font-size:76px}
+.stage[data-fmt="1:1"] .lede{font-size:25px}
+.stage[data-fmt="1:1"] .eyebrow{margin-bottom:18px}
+.stage[data-fmt="1:1"] .card{padding:32px}
+.stage[data-fmt="1:1"] .split{gap:26px}
+.stage[data-fmt="1:1"] .phone{width:214px;height:428px;border-radius:38px}
+.stage[data-fmt="1:1"] .phone__screen{border-radius:30px}
+.stage[data-fmt="1:1"] .browser{height:330px}
+.stage[data-fmt="1:1"] .browser__view{height:280px}
+.stage[data-fmt="1:1"] .use{gap:22px;padding:28px}
+.stage[data-fmt="1:1"] .use .display{font-size:52px}
+.stage[data-fmt="1:1"] .devices{gap:18px}
+.stage[data-fmt="1:1"] .devices .browser{height:224px}
+.stage[data-fmt="1:1"] .devices .browser__view{height:174px}
+.stage[data-fmt="1:1"] .devices .phone{width:146px;height:292px;border-radius:26px}
+.stage[data-fmt="1:1"] .devices .phone__screen{border-radius:22px}
+.stage[data-fmt="1:1"] .devices .phone__notch{width:60px;height:17px;top:12px}
+.stage[data-fmt="1:1"] .stat{padding:22px 26px}
+.stage[data-fmt="1:1"] .stat__num{font-size:62px}
+.stage[data-fmt="1:1"] .stat__lab{font-size:15px}
+.stage[data-fmt="1:1"] .stats{gap:10px}
+.stage[data-fmt="1:1"] .incl{gap:24px 0}
+.stage[data-fmt="1:1"] .incl .ico-box{width:44px;height:44px}
+.stage[data-fmt="1:1"] .incl__i{gap:12px}
+.stage[data-fmt="1:1"] .incl__i span{font-size:20px}
+.stage[data-fmt="1:1"] .svcs{gap:10px}
+.stage[data-fmt="1:1"] .svc{padding:18px 24px;gap:18px}
+.stage[data-fmt="1:1"] .svc h3{font-size:27px}
+.stage[data-fmt="1:1"] .ico-box{width:40px;height:40px}
+.stage[data-fmt="1:1"] .steps{gap:10px}
+.stage[data-fmt="1:1"] .step{padding-top:12px}
+.stage[data-fmt="1:1"] .step h3{font-size:30px}
+.stage[data-fmt="1:1"] .step .ico-box{width:36px;height:36px}
+.stage[data-fmt="1:1"] .offer{gap:8px}
+.stage[data-fmt="1:1"] .offer__item{padding:13px 20px}
+.stage[data-fmt="1:1"] .offer__v{font-size:26px!important}
+.stage[data-fmt="1:1"] .offer__v small{font-size:15px;margin-top:6px}
+.stage[data-fmt="1:1"] .offer__item .ico-box{width:24px;height:24px;margin-bottom:10px}
+.stage[data-fmt="1:1"] .cta .display{font-size:56px}
+.stage[data-fmt="1:1"] .cta__url{font-size:23px;padding:11px 24px;margin:16px auto 30px!important}
+.stage[data-fmt="1:1"] .offer__k{margin-bottom:8px;font-size:12px}
+.stage[data-fmt="1:1"] .cta__note{margin-top:16px;font-size:13px}
+.stage[data-fmt="1:1"] .lockup__name{font-size:62px}
+.stage[data-fmt="1:1"] .logomark{width:96px;height:96px;font-size:36px;border-radius:28px}
+.stage[data-fmt="1:1"] .points{margin-top:22px;gap:12px 20px}
+.stage[data-fmt="1:1"] .point{font-size:19px}
+
 @media (prefers-reduced-motion:reduce){
   .ticker__row{transform:none!important}
 }
@@ -481,8 +602,6 @@ body.is-recording .overlay,body.is-recording .toast{display:none}
 
     <div class="iris-ring" id="ring"></div>
 
-    <div class="subs" id="subs"><span></span></div>
-
     <div class="hud" id="hud">
       <div class="tabs" id="tabs"></div>
       <div class="ruler">
@@ -507,7 +626,7 @@ body.is-recording .overlay,body.is-recording .toast{display:none}
       </div>
       <div class="hints">
         <kbd>1</kbd><kbd>2</kbd><kbd>3</kbd><kbd>4</kbd> aller au chapitre · <kbd>espace</kbd> play / pause<br>
-        <kbd>R</kbd> enregistrer · <kbd>H</kbd> masquer l'interface · <kbd>0</kbd> revenir au début · <kbd>M</kbd> couper le son
+        <kbd>R</kbd> enregistrer · <kbd>F</kbd> format · <kbd>H</kbd> interface · <kbd>M</kbd> son · <kbd>0</kbd> début
       </div>
     </div>
   </div>
@@ -563,18 +682,13 @@ const CONFIG = {
   chapters: [
     {
       tab: 'Studio', icon: 'spark', beats: [
-        { type:'logo', t:2.6,
-          vo:{ at:0.25, src:'', text:'M J Agency, studio web et design, à Sète.' }, name:'MJ Agency', line:'Studio web & design — Sète',
-          note:'Depuis 2019' },
+        { type:'logo', t:2.6, name:'MJ Agency', line:'Studio web & design — Sète' },
 
-        { type:'hero', t:4.4,
-          vo:{ at:0.25, src:'', text:'On crée des sites sur-mesure. Design, développement et image de marque, sous le même toit.' }, eyebrow:'Ce qu\'on livre',
+        { type:'hero', t:4.4, eyebrow:'Ce qu\'on livre',
           title:'Sites web<br><em>sur-mesure.</em>',
-          lede:'Design, code et image de marque, sous le même toit.',
-          meta:'Livré en 3 à 5 semaines' },
+          lede:'Design, code et marque, sous le même toit.' },
 
-        { type:'services', t:4.0,
-          vo:{ at:0.25, src:'', text:'Vitrine, e-commerce, identité, référencement local, motion design, refonte.' }, eyebrow:'Six métiers, une seule équipe',
+        { type:'services', t:4.0, eyebrow:'Six métiers, une seule équipe',
           items:[
             { i:'window',  t:'Site vitrine' },
             { i:'cart',    t:'E-commerce' },
@@ -587,27 +701,23 @@ const CONFIG = {
     },
     {
       tab: 'Le constat', icon: 'eye', beats: [
-        { type:'punch', t:2.4,
-          vo:{ at:0.25, src:'', text:'Le problème ? Votre site ne raconte rien.' }, eyebrow:'Le constat',
+        { type:'punch', t:2.4, eyebrow:'Le constat',
           lines:['Votre site', 'ne raconte rien.'] },
 
-        { type:'stats', t:3.4,
-          vo:{ at:0.25, src:'', text:'87 % des visiteurs partent avant la deuxième section.' }, eyebrow:'Ce que ça coûte',
+        { type:'stats', t:3.4, eyebrow:'Ce que ça coûte',
           items:[
             { i:'eye',   n:87,  dec:0, suffix:' %', lab:'partent avant la 2ᵉ section' },
             { i:'clock', n:2.4, dec:1, suffix:' s', lab:'pour décider de rester' },
-            { i:'gauge', n:53,  dec:0, suffix:' %', lab:'d\'abandon après 3 s de chargement' }
+            { i:'gauge', n:53,  dec:0, suffix:' %', lab:'d\'abandon après 3 s' }
           ] },
 
-        { type:'punch', t:3.0,
-          vo:{ at:0.25, src:'', text:'Message, parcours, performance : on règle les trois.' }, eyebrow:'Notre travail',
+        { type:'punch', t:3.0, eyebrow:'Notre travail',
           lines:['On règle', 'les trois.'] }
       ]
     },
     {
       tab: 'En production', icon: 'code', beats: [
-        { type:'browser', t:4.6,
-          vo:{ at:0.25, src:'', text:'Une page, un parcours. Chaque section convainc, rassure, puis fait agir.' }, eyebrow:'En production',
+        { type:'browser', t:4.6, eyebrow:'En production',
           title:'Une page.<br>Un parcours.',
           url:'mjagency.eu/studio',
           points:[
@@ -616,8 +726,7 @@ const CONFIG = {
             { i:'send',   t:'Faire agir' }
           ] },
 
-        { type:'steps', t:4.2,
-          vo:{ at:0.25, src:'', text:'Cadrage, design, développement, mise en ligne : trois à cinq semaines.' }, eyebrow:'Comment ça se passe',
+        { type:'steps', t:4.2, eyebrow:'Comment ça se passe',
           items:[
             { i:'compass', k:'Semaine 1',    t:'Cadrage' },
             { i:'pen',     k:'Semaines 2-3', t:'Design' },
@@ -625,8 +734,7 @@ const CONFIG = {
             { i:'send',    k:'Jour J',       t:'Mise en ligne' }
           ] },
 
-        { type:'included', t:3.8,
-          vo:{ at:0.25, src:'', text:'Hébergement, certificat, fiche Google, mesures, formation, suivi.' }, eyebrow:'Toujours inclus',
+        { type:'included', t:3.8, eyebrow:'Toujours inclus',
           items:[
             { i:'server', t:'Hébergement' },
             { i:'shield', t:'Certificat SSL' },
@@ -636,24 +744,21 @@ const CONFIG = {
             { i:'check',  t:'Suivi 3 mois' }
           ] },
 
-        { type:'devices', t:4.0,
-          vo:{ at:0.25, src:'', text:'Le même soin sur chaque écran, du grand format au mobile.' }, eyebrow:'Mobile d\'abord',
+        { type:'devices', t:4.0, eyebrow:'Mobile d\'abord',
           title:'Le même soin<br>sur chaque écran.',
           url:'mjagency.eu' }
       ]
     },
     {
       tab: 'Résultats', icon: 'trend', beats: [
-        { type:'stats', t:3.8,
-          vo:{ at:0.25, src:'', text:'Cent sur cent au PageSpeed, moins d\'une seconde de chargement.' }, eyebrow:'Résultats mesurés',
+        { type:'stats', t:3.8, eyebrow:'Résultats mesurés',
           items:[
             { i:'gauge', n:100, dec:0, suffix:'/100', lab:'PageSpeed mobile', hi:true },
             { i:'clock', n:0.8, dec:1, suffix:' s',   lab:'de chargement moyen' },
             { i:'trend', n:2.4, dec:1, suffix:' ×',   lab:'de demandes de devis' }
           ] },
 
-        { type:'offer', t:4.8,
-          vo:{ at:0.25, src:'', text:'On construit la vôtre ? Devis gratuit sous 24 heures, sur mjagency point e u.' }, title:'On construit la vôtre ?', url:'mjagency.eu',
+        { type:'offer', t:4.8, title:'On construit la vôtre ?', url:'mjagency.eu',
           items:[
             { i:'doc',   k:'Devis',   v:'Sous 24 h',                   s:'Gratuit' },
             { i:'mail',  k:'Écrire',  v:'mjagency.officiel@gmail.com', s:'Réponse le jour même' },
@@ -679,26 +784,21 @@ const CONFIG = {
     ]
   },
 
-  /* --- son : musique + voix off ------------------------------------------
-     · music     : un fichier local (assets/audio/…) ou une URL autorisant le
-                   partage d'origine. Laisser '' pour aucune musique.
-     · vo.src    : le fichier de voix off du plan. Sans fichier, le navigateur
-                   lit le texte avec sa voix de synthèse (aperçu uniquement :
-                   cette voix n'est PAS capturée à l'enregistrement).
-     · vo.text   : sert aussi de sous-titre.
-     · vo.at     : décalage en secondes depuis le début du plan.
-     ---------------------------------------------------------------------- */
+  /* --- musique : un fichier local (assets/audio/…) ou une URL avec CORS.
+     Laisser '' pour aucun son. Touche M pour couper pendant la lecture. --- */
   audio: {
-    music      : '',      // ex : 'assets/audio/musique.mp3'
-    musicVol   : 0.5,     // volume de la musique, 0 à 1
-    duck       : 0.18,    // volume de la musique pendant la voix
-    voiceVol   : 1,
-    fadeIn     : 1.2,     // fondu d'entrée de la musique, en secondes
-    fadeOut    : 1.6,     // fondu de sortie en fin de boucle
-    subtitles  : true,    // afficher le texte de la voix off
-    draftVoice : true,    // voix de synthèse tant qu'il n'y a pas de fichier
-    rate       : 1.02     // débit de la voix de synthèse
+    music   : '',    // ex : 'assets/audio/musique.mp3'
+    volume  : 0.55,  // 0 à 1
+    fadeIn  : 1.2,   // fondu d'entrée, en secondes
+    fadeOut : 1.6    // fondu de sortie en fin de boucle
   },
+
+  /* --- formats de sortie -------------------------------------------------
+     '16:9' YouTube · '9:16' Reels, TikTok, Shorts · '1:1' fil Instagram.
+     Touche F pour passer de l'un à l'autre, ou ?format=9:16 dans l'URL.
+     La mise en page se réorganise, l'enregistrement suit le format. ------ */
+  format  : '16:9',
+  formats : { '16:9': [1920, 1080], '9:16': [1080, 1920], '1:1': [1080, 1080] },
 
   record: {
     filename : 'mjagency-promo-1920x1080.webm',
@@ -765,7 +865,7 @@ CH.forEach((c, ci) => {
 const TOTAL = acc;
 BEATS.forEach((b, i) => { b.last = i === BEATS.length - 1; b.tail = b.last ? 0 : .14; });
 const mmss = t => Math.floor(t / 60) + ':' + String(Math.round(t % 60)).padStart(2, '0');
-$('#ovMeta').textContent = '1920 × 1080 · ' + TOTAL.toFixed(0) + ' s · ' + BEATS.length + ' plans · boucle';
+$('#ovMeta').textContent = TOTAL.toFixed(0) + ' s · ' + BEATS.length + ' plans · boucle · 16:9, 9:16, 1:1';
 
 /* ==========================================================================
    Maquette de site générée (aucune URL de screenshot fournie, ou image KO)
@@ -885,7 +985,6 @@ const RENDER = {
         ${eyebrow(b.eyebrow)}
         <h2 class="display" data-in>${b.title}</h2>
         <p class="lede" data-in>${b.lede}</p>
-        <p class="meta" data-in><i></i>${b.meta}</p>
       </div>
       ${phoneEl()}
     </div>`,
@@ -955,9 +1054,9 @@ const RENDER = {
   devices: b => `
     <div class="plain" data-card data-iris>
       ${eyebrow(b.eyebrow, true)}
-      <h2 class="display" style="font-size:66px;margin-bottom:40px" data-in>${b.title}</h2>
+      <h2 class="display" style="font-size:62px;margin-bottom:30px" data-in>${b.title}</h2>
       <div class="devices">${browserEl(b.url)}${phoneEl()}</div>
-      <div class="points" style="justify-content:center;margin-top:30px" data-in>
+      <div class="points" style="justify-content:center;margin-top:22px" data-in>
         <span class="point">${iconBox('monitor')}Desktop</span>
         <span class="point">${iconBox('mobile')}Mobile</span>
       </div>
@@ -1046,13 +1145,26 @@ sky.insertAdjacentHTML('beforeend', '<span class="sky__floor"></span>');
    ========================================================================== */
 gsap.defaults({ ease: 'power2.out' });
 
-const IRIS_X = 960, IRIS_Y = 545;
+let IRIS_X = 960, IRIS_Y = 545;
 function localCenter(node) {
   let x = 0, y = 0, n = node;
   while (n && n !== stage) { x += n.offsetLeft; y += n.offsetTop; n = n.offsetParent; }
   return [IRIS_X - x, IRIS_Y - y];
 }
 const clearIris = () => el('[data-iris]').forEach(n => { n.style.clipPath = 'none'; });
+
+/* Styles de coupe : chaque plan entre depuis une direction, et le plan
+   précédent sort dans cette même direction — le mouvement se poursuit d'un
+   plan à l'autre au lieu de deux fondus qui se croisent. */
+const CUTS = {
+  iris: { x:   0, y:  26, s: 1.03 },
+  up:   { x:   0, y:  70, s: 1.00 },
+  side: { x:  90, y:   0, s: 1.00 },
+  back: { x: -90, y:   0, s: 1.00 },
+  zoom: { x:   0, y:   0, s: 1.09 }
+};
+const CUT_CYCLE = ['up', 'side', 'zoom', 'back'];
+BEATS.forEach((b, i) => { b.cut = b.first ? 'iris' : (b.cut || CUT_CYCLE[i % CUT_CYCLE.length]); });
 
 function beatTimeline(b) {
   const root = b.el, dur = b.dur;
@@ -1085,12 +1197,16 @@ function beatTimeline(b) {
     tl.fromTo(ring, { scale: .05, opacity: .95 }, { scale: 16, opacity: 0, duration: 1.1, ease: 'power2.inOut' }, 0);
   }
 
-  tl.fromTo(card,
-    { y: b.first ? 34 : 26, scale: b.first ? 1.04 : .995, opacity: 0 },
-    { y: 0, scale: 1, opacity: 1, duration: b.first ? 1.0 : .5, ease: 'expo.out' }, 0);
+  const E = CUTS[b.cut] || CUTS.up;
+  const nx = BEATS[BEATS.indexOf(b) + 1];
+  const X = (nx && CUTS[nx.cut]) || CUTS.zoom;
 
-  if (items.length) tl.fromTo(items, { y: 26, opacity: 0 },
-    { y: 0, opacity: 1, duration: .55, stagger: .055, ease: 'expo.out' }, .08);
+  tl.fromTo(card,
+    { x: E.x, y: E.y, scale: E.s, opacity: 0 },
+    { x: 0, y: 0, scale: 1, opacity: 1, duration: b.first ? 1.0 : .62, ease: 'expo.out' }, 0);
+
+  if (items.length) tl.fromTo(items, { x: E.x ? E.x * .45 : 0, y: E.x ? 0 : 28, opacity: 0 },
+    { x: 0, y: 0, opacity: 1, duration: .6, stagger: .05, ease: 'expo.out' }, .08);
   if (lines.length) tl.fromTo(lines, { yPercent: 118, rotate: 2 },
     { yPercent: 0, rotate: 0, duration: .85, stagger: .1, ease: 'expo.out' }, .1);
   if (chips.length) tl.fromTo(chips, { y: 24, scale: .93, opacity: 0 },
@@ -1123,9 +1239,11 @@ function beatTimeline(b) {
     }, .45);
   });
 
-  /* sortie : coupe rapide, légèrement chevauchée sur le plan suivant */
-  const outDur = b.last ? .5 : .44;
-  tl.to(card, { y: -22, scale: .992, opacity: 0, duration: outDur, ease: 'power2.in' }, dur - (b.last ? .5 : .32));
+  /* sortie : le plan s'échappe dans la direction d'entrée du suivant */
+  tl.to(card, {
+    x: -X.x * .5, y: -X.y * .45, scale: X.s > 1 ? .985 : 1, opacity: 0,
+    duration: b.last ? .5 : .42, ease: 'power2.in'
+  }, dur - (b.last ? .5 : .3));
   return tl;
 }
 
@@ -1202,40 +1320,55 @@ function sync() {
   playhead.style.transform = 'translate3d(' + (gp * rulerW).toFixed(1) + 'px,0,0)';
   lit.style.clipPath = 'inset(0 ' + ((1 - gp) * 100).toFixed(2) + '% 0 0)';
 
-  AUDIO.tick(t, !master.paused());
+  AUDIO.tick(t);
 }
 
-/* ---------- mise à l'échelle 1920×1080 → fenêtre ---------- */
-let _scale = 1;
+/* ---------- format de sortie et mise à l'échelle ---------- */
+let _scale = 1, STAGE_W = 1920, STAGE_H = 1080;
+let FORMAT = '16:9';
+
+function measureScreens() {
+  el('[data-screen]').forEach(h => {
+    if (h.__scroller) h.__travel = Math.max(0, h.__scroller.scrollHeight - h.clientHeight);
+  });
+}
+
+function applyFormat(f) {
+  const map = CONFIG.formats || {};
+  const size = map[f] || map['16:9'] || [1920, 1080];
+  FORMAT = map[f] ? f : '16:9';
+  STAGE_W = size[0]; STAGE_H = size[1];
+  stage.dataset.fmt = FORMAT;
+  stage.style.width  = STAGE_W + 'px';
+  stage.style.height = STAGE_H + 'px';
+  IRIS_X = STAGE_W / 2;
+  IRIS_Y = STAGE_H * .5;
+  el('[data-iris]').forEach(n => { n.__c = null; n.style.clipPath = 'none'; });
+  fit();
+  if (PROMO.scene) PROMO.scene.resize(STAGE_W, STAGE_H);
+  requestAnimationFrame(() => {
+    measureScreens();
+    master.invalidate();   // les courses de défilement dépendent du format
+    sync();
+  });
+}
+
 function fit() {
-  _scale = Math.min(innerWidth / 1920, innerHeight / 1080);
+  _scale = Math.min(innerWidth / STAGE_W, innerHeight / STAGE_H);
   stage.style.transform = 'translate(-50%,-50%) scale(' + _scale + ')';
   measureHUD();
 }
 addEventListener('resize', fit);
-fit();
-requestAnimationFrame(fit);
 
 /* ==========================================================================
-   Son : musique de fond, voix off calée sur les plans, sous-titres.
-   Tout passe par un graphe Web Audio dont la sortie est mixée directement
-   dans l'enregistrement : pas besoin de cocher « partager l'audio ».
+   Son : une piste de musique calée sur la timeline, mixée directement dans
+   l'enregistrement via Web Audio (pas de « partager l'audio » à cocher).
    ========================================================================== */
 const AK = CONFIG.audio || {};
-const subsEl = $('#subs'), subsTxt = subsEl.firstElementChild;
-
-/* une ligne de voix off par plan qui en déclare une */
-const VOS = BEATS.filter(b => b.vo && (b.vo.text || b.vo.src)).map(b => ({
-  start: b.start + (b.vo.at == null ? .25 : b.vo.at),
-  end:   b.start + b.dur,
-  text:  b.vo.text || '',
-  src:   b.vo.src || ''
-}));
 
 const AUDIO = {
-  on: true, ready: false, mixed: false, cur: -1, ducked: false,
-  ctx: null, dest: null, master: null, musicGain: null, voGain: null,
-  music: null, clips: [],
+  on: true, ready: false, mixed: false,
+  ctx: null, dest: null, master: null, gain: null, music: null,
 
   /* créé au premier geste de l'utilisateur (politique d'autoplay) */
   init() {
@@ -1248,115 +1381,57 @@ const AUDIO = {
       this.master = this.ctx.createGain();
       this.master.connect(this.ctx.destination);
       this.master.connect(this.dest);
-      this.musicGain = this.ctx.createGain();
-      this.voGain = this.ctx.createGain();
-      this.musicGain.gain.value = 0;
-      this.voGain.gain.value = AK.voiceVol == null ? 1 : AK.voiceVol;
-      this.musicGain.connect(this.master);
-      this.voGain.connect(this.master);
+      this.gain = this.ctx.createGain();
+      this.gain.gain.value = 0;
+      this.gain.connect(this.master);
     } catch (e) { this.ctx = null; }
 
-    if (AK.music) {
-      this.music = new Audio(AK.music);
-      this.music.crossOrigin = 'anonymous';
-      this.music.loop = true;
-      this.music.preload = 'auto';
-      this.route(this.music, this.musicGain);
+    if (!AK.music) return;
+    this.music = new Audio(AK.music);
+    this.music.crossOrigin = 'anonymous';
+    this.music.loop = true;
+    this.music.preload = 'auto';
+    if (this.ctx && this.gain) {
+      /* en cas d'échec CORS on garde la lecture, seul le mixage est perdu */
+      try { this.ctx.createMediaElementSource(this.music).connect(this.gain); this.mixed = true; }
+      catch (e) { this.music.volume = AK.volume == null ? .55 : AK.volume; }
     }
-    VOS.forEach(v => {
-      if (!v.src) return;
-      v.el = new Audio(v.src);
-      v.el.crossOrigin = 'anonymous';
-      v.el.preload = 'auto';
-      this.route(v.el, this.voGain);
-      this.clips.push(v.el);
-    });
     if (this.ctx && this.ctx.state === 'suspended') this.ctx.resume();
   },
 
-  /* branche un <audio> sur le graphe ; en cas d'échec CORS on garde la
-     lecture normale, seul le mixage de l'export est perdu */
-  route(el, node) {
-    if (!this.ctx || !node) return;
-    try {
-      this.ctx.createMediaElementSource(el).connect(node);
-      this.mixed = true;
-    } catch (e) { el.volume = 1; }
-  },
-
-  hasMix() { return this.mixed && this.dest; },
+  hasMix() { return this.mixed && !!this.dest; },
   stream()  { return this.dest ? this.dest.stream : null; },
 
   play(t) {
     this.init();
-    if (this.music) { this.syncMusic(t, true); this.music.play().catch(() => {}); }
+    if (!this.music) return;
+    this.sync(t, true);
+    this.music.play().catch(() => {});
   },
-  pause() {
-    if (this.music) this.music.pause();
-    this.clips.forEach(c => c.pause());
-    if (window.speechSynthesis) speechSynthesis.cancel();
-  },
-  syncMusic(t, force) {
+  pause() { if (this.music) this.music.pause(); },
+  sync(t, force) {
     const m = this.music;
     if (!m || !m.duration || !isFinite(m.duration)) return;
     const want = t % m.duration;
     if (force || Math.abs(m.currentTime - want) > .35) m.currentTime = want;
   },
 
-  /* appelé à chaque image par sync() */
-  tick(t, playing) {
-    if (!this.ready) return;
-
-    let i = -1;
-    for (let k = VOS.length - 1; k >= 0; k--) {
-      if (t >= VOS[k].start && t < VOS[k].end) { i = k; break; }
-    }
-    if (i !== this.cur) {
-      this.cur = i;
-      if (window.speechSynthesis) speechSynthesis.cancel();
-      this.clips.forEach(c => { c.pause(); });
-      if (i < 0) {
-        subsEl.style.opacity = 0;
-      } else {
-        const v = VOS[i];
-        if (AK.subtitles !== false && v.text) {
-          subsTxt.textContent = v.text;
-          subsEl.style.opacity = 1;
-        }
-        if (playing && this.on) this.speak(v);
-      }
-      this.ducked = i >= 0;
-    }
-
-    if (this.music) {
-      this.syncMusic(t, false);
-      const fi = AK.fadeIn || 0, fo = AK.fadeOut || 0;
-      let env = 1;
-      if (fi && t < fi) env = t / fi;
-      else if (fo && t > TOTAL - fo) env = Math.max(0, (TOTAL - t) / fo);
-      const base = this.ducked ? (AK.duck == null ? .18 : AK.duck)
-                               : (AK.musicVol == null ? .5 : AK.musicVol);
-      const vol = this.on ? base * env : 0;
-      if (this.musicGain && this.ctx) this.musicGain.gain.setTargetAtTime(vol, this.ctx.currentTime, .12);
-      else this.music.volume = Math.max(0, Math.min(1, vol));
-    }
-  },
-
-  speak(v) {
-    if (v.el) { try { v.el.currentTime = 0; v.el.play().catch(() => {}); } catch (e) {} return; }
-    if (AK.draftVoice === false || !window.speechSynthesis || !v.text) return;
-    const u = new SpeechSynthesisUtterance(v.text);
-    u.lang = 'fr-FR';
-    u.rate = AK.rate || 1;
-    const fr = speechSynthesis.getVoices().find(x => /fr[-_]/i.test(x.lang));
-    if (fr) u.voice = fr;
-    speechSynthesis.speak(u);
+  /* appelé à chaque image : recalage et enveloppe de volume */
+  tick(t) {
+    if (!this.ready || !this.music) return;
+    this.sync(t, false);
+    const fi = AK.fadeIn || 0, fo = AK.fadeOut || 0;
+    let env = 1;
+    if (fi && t < fi) env = t / fi;
+    else if (fo && t > TOTAL - fo) env = Math.max(0, (TOTAL - t) / fo);
+    const vol = this.on ? (AK.volume == null ? .55 : AK.volume) * env : 0;
+    if (this.gain && this.ctx) this.gain.gain.setTargetAtTime(vol, this.ctx.currentTime, .12);
+    else this.music.volume = Math.max(0, Math.min(1, vol));
   },
 
   mute() {
     this.on = !this.on;
     if (this.master && this.ctx) this.master.gain.setTargetAtTime(this.on ? 1 : 0, this.ctx.currentTime, .08);
-    if (!this.on) { this.clips.forEach(c => c.pause()); if (window.speechSynthesis) speechSynthesis.cancel(); }
     return this.on;
   }
 };
@@ -1377,14 +1452,14 @@ const hideOverlay = () => gsap.to(overlay, { autoAlpha: 0, duration: .45, ease: 
 function start(from = 0) {
   hideOverlay(); clearIris();
   master.pause(); master.time(from, false); master.play();
-  AUDIO.cur = -1; AUDIO.play(from);
+  AUDIO.play(from);
   sync();
 }
 function goto(i) {
   hideOverlay(); clearIris();
   master.time(CH[i].start + .001, false);
   if (master.paused()) master.play();
-  AUDIO.cur = -1; AUDIO.play(CH[i].start);
+  AUDIO.play(CH[i].start);
   sync();
 }
 function toggle() {
@@ -1402,7 +1477,12 @@ addEventListener('keydown', e => {
   if (k === ' ') { toggle(); e.preventDefault(); return; }
   if (k === 'r') { record(); return; }
   if (k === 'h') { document.body.classList.toggle('is-hidden-ui'); return; }
-  if (k === 'm') { toast(AUDIO.mute() ? 'Son activé' : 'Son coupé'); }
+  if (k === 'm') { toast(AUDIO.mute() ? 'Son activé' : 'Son coupé'); return; }
+  if (k === 'f') {
+    const keys = Object.keys(CONFIG.formats || { '16:9': 1 });
+    applyFormat(keys[(keys.indexOf(FORMAT) + 1) % keys.length]);
+    toast('Format ' + FORMAT + ' — ' + STAGE_W + ' × ' + STAGE_H);
+  }
 });
 
 /* ==========================================================================
@@ -1421,7 +1501,7 @@ async function record() {
   let stream;
   try {
     stream = await navigator.mediaDevices.getDisplayMedia({
-      video: { frameRate: { ideal: 60, max: 60 }, width: 1920, height: 1080 },
+      video: { frameRate: { ideal: 60, max: 60 }, width: STAGE_W, height: STAGE_H },
       /* sans graphe mixable, on retombe sur l'audio de l'onglet
          (cocher « partager l'audio » dans la fenêtre de partage) */
       audio: !mix, preferCurrentTab: true
@@ -1457,9 +1537,6 @@ async function record() {
 
   document.body.classList.add('is-recording');
   hideOverlay();
-  if (!mix && CONFIG.audio && CONFIG.audio.draftVoice && !VOS.some(v => v.src)) {
-    toast("Voix de synthèse : elle ne sera pas enregistrée. Fournissez des fichiers audio.");
-  }
   recorder.start(200);
   const r = CONFIG.record;
   setTimeout(() => start(0), r.lead * 1000);
@@ -1468,6 +1545,8 @@ async function record() {
 }
 
 const qs = new URLSearchParams(location.search);
+applyFormat(qs.get('format') || CONFIG.format || '16:9');
+requestAnimationFrame(fit);
 if (qs.has('autoplay')) start(0);
 if (qs.has('record')) setTimeout(record, 300);
 
@@ -1620,7 +1699,17 @@ PROMO.initScene = function (THREE) {
   const state = { op: .55 };
   let blendNormal = false, curMood = -1;
 
+  let zMul = 1;
+
   PROMO.scene = {
+    /* le rendu suit le format de sortie */
+    resize(w, h) {
+      renderer.setSize(w, h, false);
+      camera.aspect = w / h;
+      zMul = w >= h ? 1 : 1.55;   // en vertical, on recule pour garder le cadre
+      camera.updateProjectionMatrix();
+    },
+
     /* appelé une seule fois par chapitre */
     chapter(i) {
       if (i === curMood) return;
@@ -1653,7 +1742,7 @@ PROMO.initScene = function (THREE) {
     const dt = Math.min(.05, (now - last) / 1000); last = now;
     const t = now / 1000;
 
-    camera.position.set(0, cam.y, cam.z);
+    camera.position.set(0, cam.y, cam.z * zMul);
     camera.lookAt(0, cam.y * .3, -3);
 
     for (const m of meshes) {
@@ -1671,6 +1760,7 @@ PROMO.initScene = function (THREE) {
     renderer.render(scene, camera);
   });
 
+  PROMO.scene.resize(STAGE_W, STAGE_H);
   if (curCh >= 0) PROMO.scene.chapter(curCh);
 };
 
