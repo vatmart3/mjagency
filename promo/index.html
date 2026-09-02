@@ -80,7 +80,7 @@ body.is-recording{cursor:none}
 .sky__floor{position:absolute;inset:0;background:linear-gradient(to top,rgba(3,5,20,.68) 0%,rgba(3,5,20,.18) 26%,rgba(3,5,20,0) 46%)}
 #gl{position:absolute;inset:0;width:1920px;height:1080px;display:block}
 .vignette{
-  background:radial-gradient(78% 70% at 50% 46%,rgba(0,0,0,0) 42%,rgba(0,0,0,.72) 100%);
+  background:radial-gradient(80% 74% at 50% 46%,rgba(0,0,0,0) 46%,rgba(0,0,0,.60) 100%);
   mix-blend-mode:multiply;
 }
 .scrim{background:radial-gradient(56% 52% at 50% 46%,rgba(4,2,10,.74) 0%,rgba(4,2,10,.40) 56%,rgba(4,2,10,0) 100%)}
@@ -227,8 +227,11 @@ body.is-recording{cursor:none}
 
 /* ---------- plan « navigateur » ---------- */
 .use{display:flex;align-items:center;gap:56px;width:1740px;padding:44px}
+.persp{perspective:1800px}
+.use .persp{flex:0 0 1060px}
+.devices .persp{flex:0 0 940px}
 .browser{
-  flex:0 0 1080px;height:600px;border-radius:20px;overflow:hidden;background:#0c0c12;
+  width:100%;height:600px;border-radius:20px;overflow:hidden;background:#0c0c12;
   box-shadow:0 70px 120px -46px #000,0 0 0 1px rgba(255,255,255,.13);will-change:transform;
 }
 .browser__bar{
@@ -259,7 +262,7 @@ body.is-recording{cursor:none}
 
 /* ---------- plan « deux écrans » ---------- */
 .devices{display:flex;align-items:center;justify-content:center;gap:56px;width:100%}
-.devices .browser{flex:0 0 940px;height:530px}
+.devices .browser{height:530px}
 .devices .browser__view{height:480px}
 .devices .phone{width:280px;height:580px;border-radius:44px}
 .devices .phone__screen{border-radius:36px}
@@ -493,15 +496,15 @@ const CONFIG = {
   chapters: [
     {
       tab: 'Studio', beats: [
-        { type:'logo',  t:2.4, name:'MJ Agency', line:'Studio web & design — Sète',
+        { type:'logo',  t:2.4, shot:'hero', name:'MJ Agency', line:'Studio web & design — Sète',
           note:'Sites internet · Marque · Motion' },
 
-        { type:'hero',  t:4.2, eyebrow:'Ce qu\'on livre',
+        { type:'hero',  t:4.2, shot:'wall', eyebrow:'Ce qu\'on livre',
           title:'Sites web<br><em>sur-mesure.</em>',
           lede:'Design, développement et image de marque, sous le même toit.',
           meta:'Livré en 3 à 5 semaines' },
 
-        { type:'chips', t:3.4, eyebrow:'Ce qu\'on fait', flash:true,
+        { type:'chips', t:3.4, shot:'orbit', eyebrow:'Ce qu\'on fait', flash:true,
           title:'Six métiers.<br><em>Une seule équipe.</em>',
           items:[
             { k:'01', v:'Site vitrine' }, { k:'02', v:'E-commerce' },
@@ -512,29 +515,29 @@ const CONFIG = {
     },
     {
       tab: 'Le constat', beats: [
-        { type:'punch', t:2.6, eyebrow:'Le constat',
+        { type:'punch', t:2.6, shot:'swarm', eyebrow:'Le constat',
           lines:['Votre site', 'ne raconte rien.'] },
 
-        { type:'stats', t:3.6, eyebrow:'Ce que ça coûte', flash:true,
+        { type:'stats', t:3.6, shot:'wide', eyebrow:'Ce que ça coûte', flash:true,
           items:[
             { n:87,  dec:0, suffix:' %', lab:'des visiteurs partent avant la deuxième section' },
             { n:2.4, dec:1, suffix:' s', lab:'pour décider de rester — ou de fermer l\'onglet' },
             { n:53,  dec:0, suffix:' %', lab:'d\'abandon au-delà de 3 s de chargement sur mobile' }
           ] },
 
-        { type:'punch', t:3.4, eyebrow:'Notre travail', hi:true,
+        { type:'punch', t:3.4, shot:'tunnel', eyebrow:'Notre travail', hi:true,
           lines:['On règle', 'les trois.'],
           lede:'Message, parcours, performance — dans cet ordre.' }
       ]
     },
     {
       tab: 'En production', beats: [
-        { type:'browser', t:5.4, eyebrow:'En production',
+        { type:'browser', t:5.4, shot:'wall', eyebrow:'En production',
           title:'Une page.<br>Un parcours.',
           url:'mjagency.eu/studio',
           lede:'Chaque section a un rôle : convaincre, rassurer, faire agir.' },
 
-        { type:'rows', t:3.6, eyebrow:'Dans chaque projet',
+        { type:'rows', t:3.6, shot:'wide', eyebrow:'Dans chaque projet',
           items:[
             { k:'01', t:'Direction artistique', d:'Une identité qui ne ressemble à aucun concurrent.' },
             { k:'02', t:'Parcours pensé',       d:'Chaque section pousse vers la prise de contact.' },
@@ -542,23 +545,23 @@ const CONFIG = {
             { k:'04', t:'Suivi après livraison', d:'Mises à jour, mesures, ajustements.' }
           ] },
 
-        { type:'stats', t:3.4, eyebrow:'Résultats mesurés', flash:true,
+        { type:'stats', t:3.4, shot:'orbit', eyebrow:'Résultats mesurés', flash:true,
           items:[
             { n:100, dec:0, suffix:'/100', lab:'PageSpeed mobile sur nos dernières livraisons', hi:true },
             { n:0.8, dec:1, suffix:' s',   lab:'de chargement moyen, fibre ou 4G' },
             { n:2.4, dec:1, suffix:' ×',   lab:'de demandes de devis après refonte' }
           ] },
 
-        { type:'devices', t:4.0, eyebrow:'Mobile d\'abord',
+        { type:'devices', t:4.0, shot:'column', eyebrow:'Mobile d\'abord',
           title:'Le même soin sur chaque écran.',
           url:'mjagency.eu' }
       ]
     },
     {
       tab: 'On y va', beats: [
-        { type:'cta', t:4.2, title:'On construit<br>la vôtre ?' },
+        { type:'cta', t:4.2, shot:'hero', title:'On construit<br>la vôtre ?' },
 
-        { type:'offer', t:4.8, url:'mjagency.eu',
+        { type:'offer', t:4.8, shot:'halo', url:'mjagency.eu',
           items:[
             { k:'Devis',   v:'Sous 24 h',        s:'Gratuit, sans engagement' },
             { k:'Écrire',  v:'mjagency.officiel@gmail.com', s:'Réponse le jour même' },
@@ -569,16 +572,25 @@ const CONFIG = {
     }
   ],
 
+  /* --- décor 3D : un « plan de caméra » par plan de montage -------------- */
   scene: {
-    count : 11,
-    amp   : 0.34,
-    speed : 0.24,
-    moods : [
-      { camZ: 14.5, rotY:  0.00, y:  0.0, opacity: 1.00, blend: 'add'    },
-      { camZ:  9.0, rotY:  0.62, y:  0.7, opacity: 1.20, blend: 'add'    },
-      { camZ: 17.5, rotY: -0.48, y: -0.5, opacity: 0.62, blend: 'add'    },
-      { camZ:  7.0, rotY:  1.25, y:  0.2, opacity: 0.85, blend: 'normal' }
-    ]
+    count     : 14,      // formes organiques translucides
+    amp       : 0.34,    // amplitude de déformation
+    speed     : 0.26,    // vitesse de flottaison
+    fog       : 0.026,   // profondeur atmosphérique (0 = aucune)
+    grid      : true,    // sol et plafond en grille qui défilent
+    particles : 1700,    // poussière lumineuse en mouvement
+    /* form = disposition des formes, camZ/camY = position caméra, fov = focale */
+    shots: {
+      hero   : { camZ: 10.5, camY:  0.4, rotY:  0.00, fov: 40, form: 'hero',    opacity: 1.10 },
+      wall   : { camZ: 13.0, camY:  0.0, rotY: -0.18, fov: 42, form: 'wall',    opacity: 0.78 },
+      orbit  : { camZ: 12.0, camY:  0.6, rotY:  0.35, fov: 44, form: 'orbit',   opacity: 1.00 },
+      swarm  : { camZ:  7.0, camY:  0.0, rotY:  0.55, fov: 48, form: 'swarm',   opacity: 1.25 },
+      wide   : { camZ: 18.0, camY:  1.2, rotY: -0.40, fov: 40, form: 'scatter', opacity: 0.72 },
+      tunnel : { camZ:  5.5, camY:  0.0, rotY:  0.00, fov: 56, form: 'tunnel',  opacity: 1.15 },
+      column : { camZ: 11.0, camY: -0.5, rotY:  0.28, fov: 43, form: 'column',  opacity: 0.88 },
+      halo   : { camZ:  8.5, camY:  0.3, rotY:  0.80, fov: 46, form: 'halo',    opacity: 0.95 }
+    }
   },
 
   record: {
@@ -706,13 +718,13 @@ const phoneEl  = () => `
     <div class="phone__notch"></div><div class="phone__screen" data-screen="mobile"></div>
   </div></div>`;
 const browserEl = url => `
-  <div class="browser" data-browser data-iris>
+  <div class="persp"><div class="browser" data-browser data-iris>
     <div class="browser__bar">
       <u style="background:#ff5f57"></u><u style="background:#febc2e"></u><u style="background:#28c840"></u>
       <span class="browser__url">🔒 ${url}</span>
     </div>
     <div class="browser__view" data-screen="desktop"></div>
-  </div>`;
+  </div></div>`;
 
 const RENDER = {
 
@@ -957,8 +969,13 @@ function beatTimeline(b) {
 
   if (phone) tl.fromTo(phone, { yPercent: 32, rotateX: 22, opacity: 0 },
     { yPercent: 0, rotateX: 0, opacity: 1, duration: 1.25, ease: 'expo.out' }, .18);
-  if (browser) tl.fromTo(browser, { yPercent: 4, scale: .97, opacity: 0 },
-    { yPercent: 0, scale: 1, opacity: 1, duration: .95, ease: 'expo.out' }, .1);
+  if (browser) {
+    tl.fromTo(browser, { yPercent: 4, rotateY: -15, rotateX: 6, scale: .96, opacity: 0 },
+      { yPercent: 0, rotateY: 0, rotateX: 0, scale: 1, opacity: 1, duration: 1.1, ease: 'expo.out' }, .08);
+    /* respiration 3D pendant la tenue du plan */
+    tl.to(browser, { rotateY: 7, rotateX: -2, duration: Math.max(1.4, dur - 1.4), ease: 'sine.inOut' }, .9);
+    if (phone) tl.to(phone, { rotateY: -9, duration: Math.max(1.4, dur - 1.4), ease: 'sine.inOut' }, .9);
+  }
 
   el('[data-screen]', root).forEach(s => {
     const cap = s.dataset.screen === 'mobile' ? 760 : 1500;
@@ -1013,7 +1030,6 @@ function setChapter(i) {
     t.classList.toggle('is-on', k === i);
     t.classList.toggle('is-done', k < i);
   });
-  if (PROMO.scene) PROMO.scene.focus(i);
 }
 
 function indexAt(t) {
@@ -1035,7 +1051,10 @@ function sync() {
   }
 
   const bi = beatAt(t);
-  if (bi !== curBeat) { curBeat = bi; if (PROMO.scene) PROMO.scene.punch(); }
+  if (bi !== curBeat) {
+    curBeat = bi;
+    if (PROMO.scene) PROMO.scene.cut(BEATS[bi], BEATS[bi].ci === CH.length - 1);
+  }
 
   const i = indexAt(t);
   setChapter(i);
@@ -1157,11 +1176,13 @@ master.pause();
 sync();
 
 /* ==========================================================================
-   Décor 3D — appelé par le module Three.js ci-dessous (optionnel : si le CDN
-   tombe, l'animation tourne à l'identique, sans les formes).
+   Décor 3D — espace réel : grille, brouillard, poussière, formes organiques.
+   Un « plan de caméra » par plan de montage (CONFIG.scene.shots).
+   Chargé en module séparé : si le CDN tombe, l'animation continue sans lui.
    ========================================================================== */
 PROMO.initScene = function (THREE) {
   const canvas = document.getElementById('gl');
+  const S = CONFIG.scene;
   let renderer;
   try {
     renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true, powerPreference: 'high-performance' });
@@ -1170,11 +1191,72 @@ PROMO.initScene = function (THREE) {
   renderer.setSize(1920, 1080, false);
   renderer.setClearColor(0x000000, 0);
 
+  const rnd = (a, b) => a + Math.random() * (b - a);
   const scene  = new THREE.Scene();
-  const camera = new THREE.PerspectiveCamera(42, 16 / 9, .1, 120);
-  const group  = new THREE.Group();
-  scene.add(group);
+  if (S.fog) scene.fog = new THREE.FogExp2(0x0a0620, S.fog);
+  const camera = new THREE.PerspectiveCamera(42, 16 / 9, .1, 220);
+  const world  = new THREE.Group();
+  scene.add(world);
 
+  /* ---------- sol et plafond : deux grilles qui défilent vers la caméra ---- */
+  const grids = [];
+  if (S.grid) {
+    const gridMat = new THREE.LineBasicMaterial({
+      color: 0xa78bff, transparent: true, opacity: .55, depthWrite: false, fog: true
+    });
+    [-7.2, 9.4].forEach((y, k) => {
+      const g = new THREE.GridHelper(180, 90);
+      g.material = gridMat;
+      g.position.set(0, y, 0);
+      if (k) g.rotation.x = Math.PI;
+      world.add(g);
+      grids.push(g);
+    });
+  }
+
+  /* ---------- poussière lumineuse ---------- */
+  let points = null, pPos = null;
+  if (S.particles) {
+    const n = S.particles | 0;
+    pPos = new Float32Array(n * 3);
+    for (let i = 0; i < n; i++) {
+      pPos[i * 3]     = rnd(-46, 46);
+      pPos[i * 3 + 1] = rnd(-15, 15);
+      pPos[i * 3 + 2] = rnd(-72, 6);
+    }
+    const geo = new THREE.BufferGeometry();
+    geo.setAttribute('position', new THREE.BufferAttribute(pPos, 3));
+    points = new THREE.Points(geo, new THREE.PointsMaterial({
+      size: .13, color: 0xe4d9ff, transparent: true, opacity: .9,
+      blending: THREE.AdditiveBlending, depthWrite: false, sizeAttenuation: true, fog: true
+    }));
+    world.add(points);
+  }
+
+  /* ---------- ondes de choc lâchées sur les coupes ---------- */
+  const rings = [];
+  for (let i = 0; i < 3; i++) {
+    const m = new THREE.Mesh(
+      new THREE.RingGeometry(1, 1.045, 128),
+      new THREE.MeshBasicMaterial({ color: 0xc9a7ff, transparent: true, opacity: 0,
+        blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide, fog: false })
+    );
+    m.visible = false;
+    world.add(m);
+    rings.push(m);
+  }
+  let ringI = 0;
+  function shockwave() {
+    const r = rings[ringI++ % rings.length];
+    r.visible = true;
+    r.position.set(0, 0, -2.5);
+    r.rotation.set(rnd(-.5, .5), rnd(-.5, .5), rnd(0, 3));
+    gsap.fromTo(r.scale, { x: .4, y: .4, z: .4 }, { x: 17, y: 17, z: 17, duration: 1.05, ease: 'power3.out', overwrite: true });
+    gsap.fromTo(r.material, { opacity: .6 }, { opacity: 0, duration: 1.05, ease: 'power2.out', overwrite: true,
+      onComplete() { r.visible = false; } });
+  }
+
+  /* ---------- formes organiques ---------- */
   const NOISE = `
     vec3 mod289(vec3 x){return x-floor(x*(1.0/289.0))*289.0;}
     vec4 mod289(vec4 x){return x-floor(x*(1.0/289.0))*289.0;}
@@ -1202,7 +1284,7 @@ PROMO.initScene = function (THREE) {
 
   const VERT = NOISE + `
     uniform float uTime,uAmp,uFreq,uSeed;
-    varying vec3 vN,vV; varying float vNo;
+    varying vec3 vN,vV; varying float vNo,vDepth;
     vec3 displaced(vec3 p,vec3 n){
       float t=uTime*0.28+uSeed;
       float d=snoise(p*uFreq+vec3(t,t*0.7,-t*0.5));
@@ -1219,6 +1301,7 @@ PROMO.initScene = function (THREE) {
       n*=sign(dot(n,normal));
       vNo=length(p)-length(position);
       vec4 mv=modelViewMatrix*vec4(p,1.0);
+      vDepth=-mv.z;
       vN=normalize(normalMatrix*n);
       vV=normalize(-mv.xyz);
       gl_Position=projectionMatrix*mv;
@@ -1227,74 +1310,111 @@ PROMO.initScene = function (THREE) {
   const FRAG = `
     precision highp float;
     uniform vec3 uA,uB,uC; uniform float uOpacity,uTime,uSeed;
-    varying vec3 vN,vV; varying float vNo;
+    varying vec3 vN,vV; varying float vNo,vDepth;
     void main(){
       float f=1.0-clamp(dot(normalize(vN),normalize(vV)),0.0,1.0);
       float rim=pow(f,2.3);
       float band=sin(vNo*9.0+f*7.0+uTime*0.5+uSeed)*0.5+0.5;
       vec3 col=mix(uA,uB,band);
       col=mix(col,uC,rim*0.5);
-      float a=uOpacity*(0.06+rim*0.80);
+      /* fondu de profondeur : les formes lointaines se dissolvent dans la brume */
+      float far=1.0-smoothstep(14.0,46.0,vDepth);
+      float a=uOpacity*(0.06+rim*0.80)*far;
       gl_FragColor=vec4(col,clamp(a,0.0,1.0));
     }`;
 
   const c3 = CONFIG.colors.scene.map(h => new THREE.Color(h));
-  /* densité mesurée : le bruit est évalué 3 fois par sommet dans le vertex shader */
   const shapes = [
     () => new THREE.IcosahedronGeometry(1, 4),
     () => new THREE.SphereGeometry(1, 64, 44),
     () => new THREE.TorusGeometry(1, .36, 36, 110),
     () => new THREE.TorusKnotGeometry(.82, .27, 150, 26)
   ];
-  const mats = [];
-  const N = Math.max(8, Math.min(12, CONFIG.scene.count | 0));
-  const rnd = (a, b) => a + Math.random() * (b - a);
+  const meshes = [], mats = [];
+  const N = Math.max(8, Math.min(16, S.count | 0));
 
   for (let i = 0; i < N; i++) {
-    const geo = shapes[i % shapes.length]();
     const mat = new THREE.ShaderMaterial({
       vertexShader: VERT, fragmentShader: FRAG,
       transparent: true, depthWrite: false, side: THREE.DoubleSide,
       blending: THREE.AdditiveBlending,
       uniforms: {
         uTime:    { value: rnd(0, 40) },
-        uAmp:     { value: CONFIG.scene.amp * rnd(.6, 1.5) },
+        uAmp:     { value: S.amp * rnd(.6, 1.5) },
         uFreq:    { value: rnd(.7, 1.8) },
         uSeed:    { value: rnd(0, 10) },
         uOpacity: { value: 1 },
         uA: { value: c3[0].clone() }, uB: { value: c3[1].clone() }, uC: { value: c3[2].clone() }
       }
     });
-    mat.userData.base = rnd(.30, .62);
+    mat.userData.base = rnd(.34, .70);
     mats.push(mat);
 
-    const m = new THREE.Mesh(geo, mat);
-    m.scale.setScalar(rnd(.55, 1.55));
-    m.position.set(rnd(-11, 11), rnd(-5.5, 5.5), rnd(-15, -1.5));
+    const m = new THREE.Mesh(shapes[i % shapes.length](), mat);
+    const sc = rnd(.6, 1.5);
+    m.scale.setScalar(sc);
     m.rotation.set(rnd(0, 6.3), rnd(0, 6.3), rnd(0, 6.3));
     m.userData = {
-      y0: m.position.y, x0: m.position.x,
-      sp: rnd(.16, .42), ph: rnd(0, 6.3),
-      rx: rnd(-.05, .05), ry: rnd(-.07, .07)
+      x0: rnd(-11, 11), y0: rnd(-5, 5), z0: rnd(-16, -2), baseScale: sc,
+      sp: rnd(.16, .42), ph: rnd(0, 6.3), rx: rnd(-.05, .05), ry: rnd(-.07, .07), spin: 0
     };
-    group.add(m);
+    m.position.set(m.userData.x0, m.userData.y0, m.userData.z0);
+    world.add(m);
+    meshes.push(m);
   }
 
-  const moods = CONFIG.scene.moods;
-  const state = { op: moods[0].opacity, z: moods[0].camZ, kick: 0 };
+  /* ---------- dispositions : chaque plan recompose l'espace ---------- */
+  const TAU = Math.PI * 2;
+  const FORMS = {
+    scatter: (i, n) => [((i * 7) % 11 - 5) * 2.3, ((i * 5) % 9 - 4) * 1.5, -4 - (i * 5.3) % 15],
+    orbit:   (i, n) => { const a = i / n * TAU; return [Math.cos(a) * 9.2, Math.sin(a) * 5.1, -4 + Math.sin(a * 2) * 3.4]; },
+    wall:    (i, n) => { const c = 5, x = (i % c) - (c - 1) / 2, y = Math.floor(i / c) - 1.2;
+                         return [x * 5.6, y * 4.4, -10 + (i * 3) % 3]; },
+    column:  (i, n) => [(i % 2 ? 1 : -1) * (5.8 + (i * 1.7) % 3), (i / n - .5) * 14, -6 + (i * 2.3) % 5],
+    swarm:   (i, n) => { const a = i * 2.399; return [Math.cos(a) * (2.6 + (i % 4) * .9), Math.sin(a) * (2 + (i % 3) * .8), -1.2 - (i * 1.9) % 7]; },
+    tunnel:  (i, n) => { const a = i * 1.15; return [Math.cos(a) * 6.4, Math.sin(a) * 4.2, -1.5 - i * 2.4]; },
+    halo:    (i, n) => { const a = i / n * TAU; return [Math.cos(a) * 11.5, Math.sin(a) * 6.6, -7]; },
+    hero:    (i, n) => { if (i === 0) return [0, 0, -1.0];
+                         const a = (i - 1) / (n - 1) * TAU; return [Math.cos(a) * 11, Math.sin(a) * 6.2, -9]; }
+  };
+
+  const cam = { z: 13, y: 0, fov: 42, kick: 0 };
+  const state = { op: 1 };
+  let blendNormal = false;
+
+  function applyShot(name, last) {
+    const sh = (S.shots && S.shots[name]) || (S.shots && S.shots.orbit) || { camZ: 13, form: 'scatter' };
+    gsap.to(cam,   { z: sh.camZ, y: sh.camY || 0, fov: sh.fov || 42, duration: 1.35, ease: 'power3.inOut', overwrite: 'auto' });
+    gsap.to(world.rotation, { y: sh.rotY || 0, duration: 1.5, ease: 'power3.inOut', overwrite: 'auto' });
+    gsap.to(state, { op: sh.opacity == null ? 1 : sh.opacity, duration: 1.1, ease: 'power2.inOut', overwrite: 'auto' });
+
+    const form = FORMS[sh.form] || FORMS.scatter;
+    meshes.forEach((m, i) => {
+      const t = form(i, meshes.length);
+      gsap.to(m.userData, { x0: t[0], y0: t[1], z0: t[2], duration: 1.5,
+        ease: 'power3.inOut', delay: (i % 6) * .035, overwrite: 'auto' });
+      const target = (sh.form === 'hero' && i === 0) ? 3.3 : m.userData.baseScale * (sh.scale || 1);
+      gsap.to(m.scale, { x: target, y: target, z: target, duration: 1.5, ease: 'power3.inOut', overwrite: 'auto' });
+      /* impulsion de rotation : les formes repartent à chaque coupe */
+      gsap.fromTo(m.userData, { spin: 1.6 }, { spin: 0, duration: 1.6, ease: 'power2.out', overwrite: 'auto' });
+    });
+
+    /* sur le ciel du dernier chapitre, le verre passe en mélange normal */
+    if (last !== blendNormal) {
+      blendNormal = last;
+      const bl = last ? THREE.NormalBlending : THREE.AdditiveBlending;
+      mats.forEach(mt => { mt.blending = bl; mt.needsUpdate = true; });
+    }
+    if (grids.length) gsap.to(grids[0].material, { opacity: last ? 0 : .55, duration: 1.2, overwrite: 'auto' });
+  }
 
   PROMO.scene = {
-    focus(i) {
-      const m = moods[Math.min(i, moods.length - 1)];
-      gsap.to(state,           { z: m.camZ, duration: 1.4, ease: 'power3.inOut' });
-      gsap.to(group.rotation,  { y: m.rotY, duration: 1.6, ease: 'power3.inOut' });
-      gsap.to(group.position,  { y: m.y,    duration: 1.6, ease: 'power3.inOut' });
-      gsap.to(state,           { op: m.opacity, duration: 1.2, ease: 'power2.inOut' });
-      const blend = m.blend === 'normal' ? THREE.NormalBlending : THREE.AdditiveBlending;
-      mats.forEach(mt => { if (mt.blending !== blend) { mt.blending = blend; mt.needsUpdate = true; } });
-    },
-    /* petite poussée de caméra à chaque coupe : le montage respire */
-    punch() { gsap.fromTo(state, { kick: .55 }, { kick: 0, duration: .9, ease: 'power2.out', overwrite: true }); }
+    /* appelé à chaque coupe du montage */
+    cut(beat, last) {
+      applyShot(beat && beat.shot, !!last);
+      gsap.fromTo(cam, { kick: .9 }, { kick: 0, duration: 1.1, ease: 'power2.out', overwrite: 'auto' });
+      shockwave();
+    }
   };
 
   let last = performance.now();
@@ -1302,20 +1422,45 @@ PROMO.initScene = function (THREE) {
     const now = performance.now();
     const dt = Math.min(.05, (now - last) / 1000); last = now;
     const t = now / 1000;
-    camera.position.z = state.z - state.kick;
-    group.children.forEach(m => {
+
+    camera.position.set(Math.sin(t * .11) * 1.15, cam.y + Math.cos(t * .09) * .45, cam.z - cam.kick * 1.4);
+    camera.fov = cam.fov + cam.kick * 5;
+    camera.updateProjectionMatrix();
+    camera.lookAt(0, cam.y * .35, -3);
+
+    if (grids.length) {
+      const z = (t * 2.1) % 2;
+      grids.forEach(g => { g.position.z = z; });
+    }
+    if (points) {
+      const n = pPos.length / 3;
+      const step = dt * (5 + cam.kick * 26);
+      for (let i = 0; i < n; i++) {
+        const k = i * 3 + 2;
+        pPos[k] += step;
+        if (pPos[k] > 6) pPos[k] -= 78;
+      }
+      points.geometry.attributes.position.needsUpdate = true;
+    }
+
+    for (const m of meshes) {
       const u = m.userData;
-      m.position.y = u.y0 + Math.sin(t * u.sp + u.ph) * .55;
-      m.position.x = u.x0 + Math.cos(t * u.sp * .7 + u.ph) * .35;
-      m.rotation.x += u.rx * dt * CONFIG.scene.speed * 4;
-      m.rotation.y += u.ry * dt * CONFIG.scene.speed * 4;
-      m.material.uniforms.uTime.value += dt * CONFIG.scene.speed * 3;
+      m.position.set(
+        u.x0 + Math.cos(t * u.sp * .7 + u.ph) * .38,
+        u.y0 + Math.sin(t * u.sp + u.ph) * .55,
+        u.z0
+      );
+      const w = dt * S.speed * 4 * (1 + u.spin * 3);
+      m.rotation.x += u.rx * w;
+      m.rotation.y += u.ry * w;
+      m.material.uniforms.uTime.value += dt * S.speed * 3;
       m.material.uniforms.uOpacity.value = m.material.userData.base * state.op;
-    });
+    }
+
     renderer.render(scene, camera);
   });
 
-  if (curCh >= 0) PROMO.scene.focus(curCh);
+  if (curBeat >= 0) PROMO.scene.cut(BEATS[curBeat], BEATS[curBeat].ci === CH.length - 1);
 };
 
 })();
