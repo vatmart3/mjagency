@@ -1,0 +1,1141 @@
+<!doctype html>
+<!--
+  ============================================================================
+  MOTEUR DE VIDÉO PROMO — page unique, 1920×1080, boucle de 45 s
+  ----------------------------------------------------------------------------
+  · Ouvrir le fichier dans Chrome, cliquer sur « Play » (ou « Record »).
+  · Pour un nouveau client : ne modifier QUE l'objet CONFIG (en tête du
+    premier bloc de script). Titres, textes, couleurs, polices, durées des
+    chapitres, URLs des screenshots et réglages de capture y sont regroupés.
+  · Durée de la vidéo = somme des durées des chapitres. Les onglets, la
+    réglette, les repères temporels et la timeline GSAP en découlent.
+  · Screenshots : renseigner CONFIG.shots.mobile / .desktop. Laissés vides
+    (ou en erreur de chargement), une maquette de site est générée en DOM,
+    ce qui permet de travailler hors ligne.
+  · Capture : le bouton « Record » utilise la capture d'onglet du navigateur
+    (getDisplayMedia) puis exporte un WebM ; l'arrêt est automatique en fin
+    de boucle. Choisir « Cet onglet » dans la fenêtre de partage.
+  · Clavier : 1-4 chapitre · espace play/pause · R record · H interface · 0 début.
+  · Dépendances : GSAP et Three.js via CDN. Si Three.js n'est pas joignable,
+    l'animation tourne à l'identique, sans le décor 3D.
+  ============================================================================
+-->
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Promo Video Engine — 1920×1080 · 45s</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link id="fontLink" rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;800;900&family=JetBrains+Mono:wght@400;500&display=swap">
+
+<style>
+/* ==========================================================================
+   PROMO VIDEO ENGINE — feuille de style
+   Règle de perf : tout ce qui bouge pendant la lecture n'anime QUE
+   transform / opacity (+ clip-path, qui reste hors layout).
+   ========================================================================== */
+
+:root{
+  --violet:#6d2bff;  --violet-2:#b026ff; --violet-3:#3a12a8;
+  --ink:#050409;     --paper:#ffffff;    --accent:#c9a7ff;
+  --glow:rgba(201,167,255,.55);
+  --font-display:'Archivo','Archivo Expanded',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --font-ui:'JetBrains Mono',ui-monospace,'SFMono-Regular',Menlo,monospace;
+}
+
+*,*::before,*::after{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0;background:#000;color:#fff;overflow:hidden;
+  font-family:var(--font-ui);-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;
+}
+body.is-recording{cursor:none}
+
+/* ---------- scène 1920×1080, mise à l'échelle par transform ---------- */
+#viewport{position:fixed;inset:0;display:block;background:#000}
+.stage{
+  position:absolute;left:50%;top:50%;width:1920px;height:1080px;
+  transform-origin:50% 50%;transform:translate(-50%,-50%);
+  overflow:hidden;background:var(--ink);isolation:isolate;
+  contain:strict;
+}
+
+/* ---------- fonds ---------- */
+.layer{position:absolute;inset:0;pointer-events:none}
+.bg-violet{
+  background:
+    radial-gradient(115% 88% at 52% 38%, var(--violet) 0%, rgba(20,4,48,0) 58%),
+    radial-gradient(62% 58% at 8% 92%,  var(--violet-2) 0%, rgba(20,4,48,0) 58%),
+    radial-gradient(58% 55% at 94% 6%,  var(--violet-3) 0%, rgba(20,4,48,0) 55%),
+    radial-gradient(140% 120% at 50% 50%, #14082c 0%, #05030b 62%, #020106 100%);
+}
+.bg-sky{
+  inset:-8%;opacity:0;will-change:opacity;
+  background:linear-gradient(178deg,#071a44 0%,#1c47a8 24%,#5f94e6 48%,#a8c8f2 66%,#e7dcf0 82%,#f7e6d6 100%);
+}
+.cloud{position:absolute;border-radius:50%;background:rgba(255,255,255,.82);filter:blur(42px);will-change:transform}
+/* dégradé de pied : garde la typo et la HUD lisibles sur le ciel */
+.sky__floor{position:absolute;inset:0;background:linear-gradient(to top,rgba(3,5,20,.68) 0%,rgba(3,5,20,.18) 26%,rgba(3,5,20,0) 46%)}
+#gl{position:absolute;inset:0;width:1920px;height:1080px;display:block}
+.vignette{
+  background:radial-gradient(78% 70% at 50% 46%,rgba(0,0,0,0) 42%,rgba(0,0,0,.72) 100%);
+  mix-blend-mode:multiply;
+}
+.grain{
+  inset:-25%;width:150%;height:150%;opacity:.14;mix-blend-mode:overlay;will-change:transform;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/><feColorMatrix type='saturate' values='0'/></filter><rect width='240' height='240' filter='url(%23n)' opacity='.6'/></svg>");
+}
+.blackout{background:#020105;opacity:0;will-change:opacity;z-index:60}
+.iris-ring{
+  position:absolute;left:50%;top:52%;width:200px;height:200px;margin:-100px 0 0 -100px;
+  border-radius:50%;border:2px solid rgba(255,255,255,.5);
+  box-shadow:0 0 60px 8px var(--glow),inset 0 0 40px 4px var(--glow);
+  opacity:0;transform:scale(.02);will-change:transform,opacity;pointer-events:none;z-index:40;
+}
+
+/* ---------- chapitres ---------- */
+.chapters{position:absolute;inset:0;z-index:20}
+.chapter{
+  position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  padding:0 90px 210px;visibility:hidden;
+}
+/* Le masque circulaire est posé sur les blocs de contenu eux-mêmes (data-iris),
+   jamais sur un ancêtre : un clip-path parent annulerait le backdrop-filter
+   de la carte (il crée un "backdrop root"). */
+.scrim{
+  background:radial-gradient(56% 52% at 50% 46%,rgba(4,2,10,.74) 0%,rgba(4,2,10,.40) 56%,rgba(4,2,10,0) 100%);
+}
+
+/* ---------- carte verre ---------- */
+.card{
+  position:relative;border-radius:32px;padding:78px;
+  background:linear-gradient(158deg,rgba(255,255,255,.10) 0%,rgba(255,255,255,.028) 52%,rgba(255,255,255,.06) 100%);
+  border:1px solid rgba(255,255,255,.15);
+  -webkit-backdrop-filter:blur(26px) saturate(150%);backdrop-filter:blur(26px) saturate(150%);
+  box-shadow:0 80px 180px -50px rgba(0,0,0,.92),0 8px 40px -12px rgba(0,0,0,.55),
+             inset 0 1px 0 rgba(255,255,255,.16),inset 0 -1px 0 rgba(255,255,255,.05);
+}
+.card::after{
+  content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+  background:linear-gradient(140deg,rgba(255,255,255,.14),rgba(255,255,255,0) 34%);
+  mix-blend-mode:screen;
+}
+
+/* ---------- typo ---------- */
+.eyebrow{
+  font-size:17px;letter-spacing:.34em;text-transform:uppercase;color:rgba(255,255,255,.62);
+  display:flex;align-items:center;gap:14px;margin:0 0 34px;
+}
+.eyebrow b{width:38px;height:1px;background:var(--accent);display:block;opacity:.8}
+.display{
+  font-family:var(--font-display);font-weight:900;letter-spacing:-.052em;line-height:.88;
+  margin:0;font-size:124px;text-wrap:balance;
+}
+.display em{font-style:normal;color:var(--accent)}
+.lede{
+  margin:34px 0 0;font-family:var(--font-display);font-weight:500;font-size:27px;line-height:1.4;
+  letter-spacing:-.015em;color:rgba(255,255,255,.74);max-width:22ch;
+}
+.meta{margin-top:46px;display:flex;align-items:center;gap:14px;font-size:19px;letter-spacing:.12em;color:rgba(255,255,255,.85)}
+.meta i{width:9px;height:9px;border-radius:50%;background:var(--accent);box-shadow:0 0 16px 3px var(--glow);display:block}
+
+/* ---------- ch.1 intro ---------- */
+.card--intro{width:1460px;display:flex;align-items:center;gap:76px}
+.card--intro .col{flex:1;min-width:0}
+.logomark{
+  position:relative;width:126px;height:126px;border-radius:34px;margin-bottom:44px;
+  display:grid;place-items:center;
+  background:linear-gradient(150deg,#fff 0%,#d9c8ff 100%);color:#0a0416;
+  font-family:var(--font-display);font-weight:900;font-size:46px;letter-spacing:-.06em;
+  box-shadow:0 30px 70px -20px rgba(160,90,255,.8),inset 0 -2px 0 rgba(0,0,0,.12);
+}
+.logomark span{transform:translateY(1px)}
+.phone-wrap{flex:0 0 386px;display:flex;justify-content:center;perspective:1600px}
+.phone{
+  width:386px;height:790px;margin:-150px 0;border-radius:58px;padding:11px;
+  background:linear-gradient(155deg,#3a3a46 0%,#0a0a10 34%,#191922 68%,#08080d 100%);
+  box-shadow:0 90px 140px -50px #000,0 0 0 1px rgba(255,255,255,.14),inset 0 0 0 1px rgba(255,255,255,.08);
+  transform-style:preserve-3d;will-change:transform;
+}
+.phone__screen{position:relative;height:100%;border-radius:47px;overflow:hidden;background:#fff}
+.phone__notch{
+  position:absolute;left:50%;top:22px;width:112px;height:30px;border-radius:16px;
+  background:#07070c;transform:translateX(-50%);z-index:3;
+}
+
+/* ---------- ch.2 problème ---------- */
+.problem{width:1520px;text-align:center}
+.problem .display{font-size:152px}
+.mask{display:block;overflow:hidden;padding:0 .06em}
+.mask i{display:block;font-style:normal;will-change:transform}
+.problem .lede{max-width:none;margin:52px auto 0;font-size:27px;text-align:center}
+.stat{
+  margin:64px auto 0;display:inline-flex;align-items:center;gap:22px;padding:18px 30px;border-radius:999px;
+  border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.05);
+  -webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px);
+  font-size:19px;letter-spacing:.1em;color:rgba(255,255,255,.82);
+}
+.stat b{font-family:var(--font-display);font-weight:900;font-size:34px;letter-spacing:-.03em;color:#fff}
+
+/* ---------- ch.3 cas d'usage ---------- */
+.card--use{width:1720px;display:flex;align-items:center;gap:56px;padding:46px}
+.browser{
+  flex:0 0 1060px;height:626px;border-radius:22px;overflow:hidden;background:#0c0c12;
+  box-shadow:0 70px 120px -46px #000,0 0 0 1px rgba(255,255,255,.13);will-change:transform;
+}
+.browser__bar{
+  height:54px;display:flex;align-items:center;gap:10px;padding:0 20px;
+  background:linear-gradient(#1b1b25,#101017);border-bottom:1px solid rgba(255,255,255,.07);
+}
+.browser__bar u{width:12px;height:12px;border-radius:50%;background:#2f2f3c;display:block}
+.browser__url{
+  flex:1;margin-left:14px;height:32px;border-radius:9px;background:#191922;
+  display:flex;align-items:center;padding:0 16px;gap:10px;
+  font-size:14px;letter-spacing:.06em;color:rgba(255,255,255,.6);
+}
+.browser__view{position:relative;height:572px;overflow:hidden;background:#fff}
+.scroller{position:absolute;left:0;top:0;width:100%;will-change:transform}
+.uses{flex:1;min-width:0}
+.use{
+  display:flex;gap:20px;padding:19px 0;border-top:1px solid rgba(255,255,255,.12);will-change:transform,opacity;
+}
+.use:last-child{border-bottom:1px solid rgba(255,255,255,.12)}
+.use b{
+  font-family:var(--font-display);font-weight:800;font-size:15px;letter-spacing:.16em;
+  color:var(--accent);padding-top:6px;
+}
+.use h3{margin:0 0 6px;font-family:var(--font-display);font-weight:800;font-size:28px;letter-spacing:-.03em}
+.use p{margin:0;font-size:16px;line-height:1.45;color:rgba(255,255,255,.6)}
+
+/* ---------- ch.4 CTA ---------- */
+.cta{width:100%;text-align:center;display:flex;flex-direction:column;align-items:center}
+.cta .logomark{width:150px;height:150px;border-radius:42px;font-size:56px;margin-bottom:52px}
+.cta .display{font-size:168px;text-shadow:0 6px 60px rgba(4,8,28,.45)}
+.cta__url{
+  margin-top:56px;display:inline-flex;align-items:center;gap:20px;padding:24px 46px;border-radius:999px;
+  background:rgba(6,4,14,.62);border:1px solid rgba(255,255,255,.28);
+  -webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px);
+  font-family:var(--font-display);font-weight:800;font-size:38px;letter-spacing:-.02em;
+  box-shadow:0 40px 90px -34px rgba(0,0,0,.85);
+}
+.cta__note{
+  margin-top:34px;font-size:19px;letter-spacing:.16em;color:rgba(255,255,255,.92);
+  text-shadow:0 2px 22px rgba(4,8,28,.7);
+}
+
+/* ---------- HUD persistante ---------- */
+.hud{position:absolute;left:70px;right:70px;bottom:56px;z-index:50;will-change:opacity}
+.tabs{display:flex;gap:12px}
+.tab{
+  position:relative;flex:1;height:80px;border-radius:18px;overflow:hidden;display:flex;align-items:center;gap:16px;
+  padding:0 24px;border:1px solid rgba(255,255,255,.13);background:rgba(255,255,255,.045);
+  -webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);
+  color:rgba(255,255,255,.5);
+  transition:background-color .45s ease,border-color .45s ease,color .45s ease;
+}
+.tab.is-on{background:#07060c;border-color:rgba(255,255,255,.24);color:#fff}
+.tab.is-done{color:rgba(255,255,255,.34)}
+.tab__idx{font-family:var(--font-display);font-weight:800;font-size:15px;letter-spacing:.14em;opacity:.75}
+.tab__label{
+  font-family:var(--font-display);font-weight:800;font-size:23px;letter-spacing:-.02em;
+  text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.tab__time{margin-left:auto;font-size:14px;letter-spacing:.12em;opacity:.6}
+.tab__cursor{
+  position:absolute;left:0;top:0;bottom:0;width:2px;opacity:0;transform:translate3d(0,0,0);
+  background:linear-gradient(180deg,rgba(255,255,255,0),#fff 18%,#fff 82%,rgba(255,255,255,0));
+  box-shadow:0 0 26px 7px var(--glow);will-change:transform,opacity;
+}
+.tab.is-on .tab__cursor{opacity:1}
+.ruler{position:relative;height:38px;margin-top:20px}
+.ticks{position:absolute;inset:0;display:flex;align-items:flex-end;justify-content:space-between}
+.ticks i{width:2px;height:9px;background:currentColor;opacity:.3;display:block}
+.ticks i.t5{height:16px;opacity:.45}
+.ticks i.t10{height:26px;opacity:.6}
+.ticks--base{color:#fff}
+.lit{position:absolute;inset:0;clip-path:inset(0 100% 0 0);will-change:clip-path}
+.ticks--lit{color:var(--accent)}
+.ticks--lit i{opacity:.95}
+.playhead{
+  position:absolute;left:0;top:-8px;width:2px;height:46px;background:#fff;border-radius:2px;
+  box-shadow:0 0 22px 6px var(--glow);transform:translate3d(0,0,0);will-change:transform;
+}
+.playhead::before{
+  content:"";position:absolute;left:50%;top:-9px;width:9px;height:9px;margin-left:-4.5px;
+  border-radius:50%;background:#fff;box-shadow:0 0 18px 4px var(--glow);
+}
+
+/* ---------- overlay Play / Record ---------- */
+.overlay{
+  position:absolute;inset:0;z-index:80;display:grid;place-items:center;
+  background:radial-gradient(70% 60% at 50% 50%,rgba(6,3,14,.6),rgba(2,1,6,.94));
+  -webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);will-change:opacity;
+}
+.panel{
+  width:760px;padding:64px;border-radius:32px;text-align:center;
+  background:linear-gradient(158deg,rgba(255,255,255,.10),rgba(255,255,255,.03));
+  border:1px solid rgba(255,255,255,.16);
+  -webkit-backdrop-filter:blur(26px);backdrop-filter:blur(26px);
+  box-shadow:0 80px 160px -50px rgba(0,0,0,.9);
+}
+.panel h2{font-family:var(--font-display);font-weight:900;font-size:56px;letter-spacing:-.045em;margin:0 0 12px}
+.panel p{margin:0 0 40px;font-size:17px;letter-spacing:.06em;color:rgba(255,255,255,.6)}
+.btns{display:flex;gap:16px;justify-content:center}
+button{
+  font-family:var(--font-display);font-weight:800;font-size:21px;letter-spacing:-.01em;
+  padding:20px 40px;border-radius:999px;border:1px solid rgba(255,255,255,.22);
+  background:rgba(255,255,255,.06);color:#fff;cursor:pointer;
+  transition:transform .18s ease,background-color .25s ease,border-color .25s ease;
+}
+button:hover{transform:translateY(-2px);background:rgba(255,255,255,.12);border-color:rgba(255,255,255,.4)}
+button.primary{background:linear-gradient(150deg,#fff,#dcccff);color:#0a0416;border-color:transparent}
+button.primary:hover{background:#fff}
+.hints{margin-top:38px;font-size:14px;letter-spacing:.1em;color:rgba(255,255,255,.42);line-height:2}
+.hints kbd{
+  border:1px solid rgba(255,255,255,.22);border-radius:6px;padding:3px 9px;margin:0 3px;
+  font-family:inherit;font-size:13px;color:rgba(255,255,255,.72);
+}
+.toast{
+  position:fixed;left:50%;bottom:34px;transform:translate(-50%,20px);z-index:120;
+  padding:14px 26px;border-radius:999px;background:rgba(10,6,20,.9);border:1px solid rgba(255,255,255,.18);
+  font-size:14px;letter-spacing:.08em;opacity:0;pointer-events:none;transition:opacity .3s,transform .3s;
+}
+.toast.is-on{opacity:1;transform:translate(-50%,0)}
+body.is-recording .overlay,body.is-recording .toast{display:none}
+.is-hidden-ui .hud{opacity:0}
+
+/* ---------- faux site (fallback quand aucune URL de screenshot) ---------- */
+.faux{background:#fbfaff;color:#0b0718;font-family:var(--font-display);padding-bottom:60px}
+.faux__nav{display:flex;align-items:center;gap:18px;padding:26px 40px;border-bottom:1px solid rgba(10,4,30,.08)}
+.faux__logo{width:34px;height:34px;border-radius:11px;background:linear-gradient(150deg,#6d2bff,#b026ff)}
+.faux__nav u{height:9px;border-radius:5px;background:rgba(10,4,30,.16);display:block}
+.faux__hero{padding:64px 40px 44px}
+.faux__hero b{display:block;height:34px;border-radius:9px;background:#120a26;margin-bottom:16px}
+.faux__hero b.s{background:linear-gradient(90deg,#6d2bff,#b026ff)}
+.faux__hero u{display:block;height:12px;border-radius:6px;background:rgba(10,4,30,.14);margin-bottom:12px}
+.faux__cta{width:190px;height:48px;border-radius:999px;background:#120a26;margin-top:30px}
+.faux__img{margin:0 40px;border-radius:20px;background:linear-gradient(150deg,#2a0f6b,#6d2bff 46%,#ff9ad5);}
+.faux__grid{display:grid;gap:20px;padding:56px 40px}
+.faux__cell{border-radius:18px;background:#fff;border:1px solid rgba(10,4,30,.09);padding:26px;box-shadow:0 20px 40px -30px rgba(10,4,30,.5)}
+.faux__cell b{display:block;height:20px;width:62%;border-radius:6px;background:#170c2e;margin-bottom:14px}
+.faux__cell u{display:block;height:9px;border-radius:5px;background:rgba(10,4,30,.13);margin-bottom:9px}
+.faux__band{margin:0 40px;border-radius:22px;background:linear-gradient(140deg,#120a26,#3a12a8)}
+</style>
+</head>
+<body>
+<div id="viewport">
+  <div class="stage" id="stage">
+    <div class="layer bg-violet"></div>
+    <div class="layer bg-sky" id="sky"></div>
+    <canvas id="gl" width="1920" height="1080"></canvas>
+    <div class="layer vignette"></div>
+    <div class="layer grain" id="grain"></div>
+    <div class="layer scrim"></div>
+
+    <div class="chapters" id="chapters"></div>
+
+    <div class="iris-ring" id="ring"></div>
+
+    <div class="hud" id="hud">
+      <div class="tabs" id="tabs"></div>
+      <div class="ruler">
+        <div class="ticks ticks--base" id="ticksBase"></div>
+        <div class="lit" id="lit"><div class="ticks ticks--lit" id="ticksLit"></div></div>
+        <div class="playhead" id="playhead"></div>
+      </div>
+    </div>
+
+    <div class="layer blackout" id="blackout"></div>
+  </div>
+
+  <div class="overlay" id="overlay">
+    <div class="panel">
+      <h2 id="ovTitle">Promo Engine</h2>
+      <p id="ovMeta">1920 × 1080 · 45 s · boucle</p>
+      <div class="btns">
+        <button class="primary" id="btnPlay">▶ Play</button>
+        <button id="btnRec">● Record</button>
+      </div>
+      <div class="hints">
+        <kbd>1</kbd><kbd>2</kbd><kbd>3</kbd><kbd>4</kbd> aller au chapitre · <kbd>espace</kbd> play / pause<br>
+        <kbd>R</kbd> enregistrer · <kbd>H</kbd> masquer l'interface · <kbd>0</kbd> revenir au début
+      </div>
+    </div>
+  </div>
+  <div class="toast" id="toast"></div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+
+<script>
+/* ==========================================================================
+   1 · CONFIG — TOUT le contenu de la vidéo est ici.
+   Pour un autre client : ne modifier QUE cet objet.
+   ========================================================================== */
+const CONFIG = {
+
+  /* --- identité ------------------------------------------------------- */
+  brand: {
+    monogram : 'MJ',
+    name     : 'MJ Agency',
+    url      : 'mjagency.eu',
+    contact  : 'mjagency.officiel@gmail.com'
+  },
+
+  /* --- direction artistique ------------------------------------------- */
+  colors: {
+    violet   : '#6d2bff',                 // violet électrique (cœur du radial)
+    violet2  : '#b026ff',
+    violet3  : '#3a12a8',
+    ink      : '#050409',                 // noir profond
+    accent   : '#c9a7ff',                 // curseurs, traits, détails lumineux
+    glow     : 'rgba(201,167,255,.55)',
+    scene    : ['#7a3bff', '#ff7ad9', '#8ce8ff']   // iridescence des formes 3D
+  },
+
+  fonts: {
+    /* n'importe quelle URL Google Fonts : les deux familles ci-dessous
+       sont ensuite référencées par display / ui */
+    href    : 'https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;800;900&family=JetBrains+Mono:wght@400;500&display=swap',
+    display : "'Archivo','Archivo Expanded',system-ui,-apple-system,sans-serif",
+    ui      : "'JetBrains Mono',ui-monospace,Menlo,monospace"
+  },
+
+  /* --- screenshots : laisser '' pour la maquette de secours générée ----- */
+  shots: {
+    mobile  : '',   // ex : 'https://www.mjagency.eu/assets/img/shot-mobile.png'
+    desktop : ''    // ex : 'https://www.mjagency.eu/assets/img/shot-desktop.png'
+  },
+
+  /* --- les 4 chapitres (durées en secondes → total = durée de la vidéo) -- */
+  chapters: [
+    {
+      id: 'intro', dur: 12, tab: 'Intro',
+      eyebrow : 'Studio créatif — Sète',
+      title   : 'Sites web<br><em>sur-mesure.</em>',
+      lede    : 'Design, développement et image de marque, sous le même toit.',
+      note    : 'Depuis 2019 · Occitanie'
+    },
+    {
+      id: 'problem', dur: 10, tab: 'Le constat',
+      eyebrow : 'Le constat',
+      lines   : ['Votre site', 'ne raconte rien.'],
+      lede    : 'Un template propre ne suffit plus à convaincre.',
+      stat    : { value: '87 %', label: 'des visiteurs partent avant la 2ᵉ section' }
+    },
+    {
+      id: 'usecase', dur: 14, tab: "Cas d'usage",
+      eyebrow  : 'En production',
+      title    : 'Une page.<br>Un parcours.',
+      browser  : 'mjagency.eu/studio',
+      features : [
+        { k: '01', t: 'Direction artistique', d: 'Une identité qui ne ressemble à aucun concurrent.' },
+        { k: '02', t: 'Parcours pensé',       d: 'Chaque section pousse vers la prise de contact.' },
+        { k: '03', t: 'Performance réelle',   d: 'Chargement sous la seconde, 100/100 sur mobile.' },
+        { k: '04', t: 'Visible sur Google',   d: 'SEO local structuré, pages villes, données riches.' }
+      ]
+    },
+    {
+      id: 'cta', dur: 9, tab: 'On y va',
+      title  : 'On construit<br>la vôtre ?',
+      url    : 'mjagency.eu',
+      note   : 'Devis gratuit sous 24 h · mjagency.officiel@gmail.com'
+    }
+  ],
+
+  /* --- décor 3D --------------------------------------------------------- */
+  scene: {
+    count : 11,          // 8 à 12 formes organiques
+    amp   : 0.34,        // amplitude de déformation
+    speed : 0.24,        // vitesse de flottaison
+    /* une "humeur" de caméra par chapitre → parallaxe aux transitions */
+    moods : [
+      { camZ: 14.5, rotY:  0.00, y:  0.0, opacity: 1.00, blend: 'add'    },
+      { camZ:  9.0, rotY:  0.62, y:  0.7, opacity: 1.20, blend: 'add'    },
+      { camZ: 17.5, rotY: -0.48, y: -0.5, opacity: 0.62, blend: 'add'    },
+      { camZ:  7.0, rotY:  1.25, y:  0.2, opacity: 0.85, blend: 'normal' }
+    ]
+  },
+
+  /* --- capture ---------------------------------------------------------- */
+  record: {
+    filename : 'mjagency-promo-1920x1080.webm',
+    bitrate  : 24_000_000,   // ~24 Mbps
+    loops    : 1,            // nombre de boucles enregistrées
+    lead     : 0.8,          // silence avant le départ (s)
+    tail     : 0.6           // marge après la dernière image (s)
+  },
+
+  ui: {
+    overlayTitle : 'Promo Engine',
+    grain        : true
+  }
+};
+
+/* ==========================================================================
+   2 · MOTEUR — au-delà d'ici, rien à modifier pour changer de client.
+   ========================================================================== */
+window.PROMO = {};
+
+(function () {
+'use strict';
+
+const $  = (s, r = document) => r.querySelector(s);
+const el = (s, r = document) => Array.from(r.querySelectorAll(s));
+const stage = $('#stage');
+
+if (!window.gsap) {
+  document.body.innerHTML = '<p style="font:16px monospace;color:#fff;padding:40px">' +
+    'GSAP n\'a pas pu être chargé (CDN bloqué ?). La page a besoin d\'une connexion au premier chargement.</p>';
+  return;
+}
+
+/* ---------- thème depuis CONFIG ---------- */
+const C = CONFIG.colors, R = document.documentElement.style;
+R.setProperty('--violet',   C.violet);
+R.setProperty('--violet-2', C.violet2);
+R.setProperty('--violet-3', C.violet3);
+R.setProperty('--ink',      C.ink);
+R.setProperty('--accent',   C.accent);
+R.setProperty('--glow',     C.glow);
+R.setProperty('--font-display', CONFIG.fonts.display);
+R.setProperty('--font-ui',      CONFIG.fonts.ui);
+if (CONFIG.fonts.href) $('#fontLink').href = CONFIG.fonts.href;
+if (!CONFIG.ui.grain) $('#grain').style.display = 'none';
+$('#ovTitle').textContent = CONFIG.ui.overlayTitle;
+
+/* ---------- chronologie des chapitres ---------- */
+const CH = CONFIG.chapters.map(c => Object.assign({}, c));
+let acc = 0;
+CH.forEach(c => { c.start = acc; acc += c.dur; });
+const TOTAL = acc;
+const mmss = t => Math.floor(t / 60) + ':' + String(Math.floor(t % 60)).padStart(2, '0');
+$('#ovMeta').textContent = '1920 × 1080 · ' + TOTAL + ' s · boucle · ' + CH.length + ' chapitres';
+
+/* ==========================================================================
+   Faux site (utilisé quand aucune URL de screenshot n'est fournie,
+   ou quand l'image ne charge pas) — 100 % DOM, donc scrollable au transform.
+   ========================================================================== */
+function fauxMarkup(kind) {
+  const wide = kind === 'desktop';
+  const pad  = wide ? 40 : 22;
+  const cell = n => '<div class="faux__cell"><b></b><u style="width:100%"></u><u style="width:88%"></u><u style="width:64%"></u></div>';
+  return `
+  <div class="faux" style="padding-bottom:${pad}px">
+    <div class="faux__nav" style="padding:${wide ? '26px 40px' : '20px 22px'}">
+      <span class="faux__logo"></span>
+      <u style="width:${wide ? 70 : 46}px"></u><u style="width:${wide ? 64 : 40}px"></u>
+      <u style="width:${wide ? 58 : 36}px;margin-right:auto"></u>
+      <u style="width:${wide ? 92 : 54}px;background:#120a26;height:${wide ? 28 : 22}px;border-radius:999px"></u>
+    </div>
+    <div class="faux__hero" style="padding:${wide ? '64px 40px 44px' : '38px 22px 30px'}">
+      <b style="width:${wide ? 74 : 92}%;height:${wide ? 40 : 26}px"></b>
+      <b class="s" style="width:${wide ? 52 : 70}%;height:${wide ? 40 : 26}px"></b>
+      <u style="width:${wide ? 46 : 86}%;margin-top:26px"></u>
+      <u style="width:${wide ? 38 : 72}%"></u>
+      <div class="faux__cta" style="width:${wide ? 190 : 150}px;height:${wide ? 48 : 42}px"></div>
+    </div>
+    <div class="faux__img" style="margin:0 ${pad}px;height:${wide ? 380 : 260}px"></div>
+    <div class="faux__grid" style="grid-template-columns:repeat(${wide ? 3 : 1},1fr);padding:${wide ? '56px 40px' : '34px 22px'}">
+      ${cell()}${cell()}${cell()}${wide ? cell() + cell() + cell() : cell()}
+    </div>
+    <div class="faux__band" style="margin:0 ${pad}px;height:${wide ? 260 : 210}px"></div>
+    <div class="faux__grid" style="grid-template-columns:repeat(${wide ? 2 : 1},1fr);padding:${wide ? '56px 40px' : '34px 22px'}">
+      ${cell()}${cell()}
+    </div>
+    <div class="faux__img" style="margin:0 ${pad}px;height:${wide ? 300 : 230}px;background:linear-gradient(150deg,#0b0620,#3a12a8 60%,#b026ff)"></div>
+  </div>`;
+}
+
+/* remplit un écran de mockup : image si URL fournie, sinon faux site */
+function fillScreen(host, url, kind) {
+  const box = document.createElement('div');
+  box.className = 'scroller';
+  if (url) {
+    const img = new Image();
+    img.src = url;
+    img.alt = '';
+    img.style.cssText = 'width:100%;display:block';
+    img.onerror = () => { box.innerHTML = fauxMarkup(kind); };
+    box.appendChild(img);
+  } else {
+    box.innerHTML = fauxMarkup(kind);
+  }
+  host.appendChild(box);
+  return box;
+}
+
+/* ==========================================================================
+   Rendu des chapitres (markup 100 % généré depuis CONFIG)
+   ========================================================================== */
+const RENDER = {
+
+  intro: c => `
+    <div class="card card--intro" data-card data-iris>
+      <div class="col">
+        <div class="logomark" data-in><span>${CONFIG.brand.monogram}</span></div>
+        <p class="eyebrow" data-in><b></b>${c.eyebrow}</p>
+        <h1 class="display" data-in>${c.title}</h1>
+        <p class="lede" data-in>${c.lede}</p>
+        <p class="meta" data-in><i></i>${CONFIG.brand.url} &nbsp;·&nbsp; ${c.note}</p>
+      </div>
+      <div class="phone-wrap">
+        <div class="phone" data-phone data-iris>
+          <div class="phone__notch"></div>
+          <div class="phone__screen" data-screen="mobile"></div>
+        </div>
+      </div>
+    </div>`,
+
+  problem: c => `
+    <div class="problem" data-card data-iris>
+      <p class="eyebrow" style="justify-content:center" data-in><b></b>${c.eyebrow}</p>
+      <h2 class="display" data-mask>
+        ${c.lines.map(l => `<span class="mask"><i>${l}</i></span>`).join('')}
+      </h2>
+      <p class="lede" data-in>${c.lede}</p>
+      <p class="stat" data-in><b>${c.stat.value}</b>${c.stat.label}</p>
+    </div>`,
+
+  usecase: c => `
+    <div class="card card--use" data-card data-iris>
+      <div class="browser" data-browser>
+        <div class="browser__bar">
+          <u style="background:#ff5f57"></u><u style="background:#febc2e"></u><u style="background:#28c840"></u>
+          <span class="browser__url">🔒 ${c.browser}</span>
+        </div>
+        <div class="browser__view" data-screen="desktop"></div>
+      </div>
+      <div class="uses">
+        <p class="eyebrow" data-in><b></b>${c.eyebrow}</p>
+        <h2 class="display" style="font-size:60px;margin-bottom:22px" data-in>${c.title}</h2>
+        ${c.features.map(f => `
+          <div class="use" data-in><b>${f.k}</b><div><h3>${f.t}</h3><p>${f.d}</p></div></div>`).join('')}
+      </div>
+    </div>`,
+
+  cta: c => `
+    <div class="cta" data-card data-iris>
+      <div class="logomark" data-in><span>${CONFIG.brand.monogram}</span></div>
+      <h2 class="display" data-in>${c.title}</h2>
+      <p class="cta__url" data-in>${c.url}</p>
+      <p class="cta__note" data-in>${c.note}</p>
+    </div>`
+};
+
+const host = $('#chapters');
+host.innerHTML = CH.map(c =>
+  `<section class="chapter" data-ch="${c.id}">${(RENDER[c.id] || RENDER.cta)(c)}</section>`
+).join('');
+CH.forEach((c, i) => { c.el = host.children[i]; });
+
+/* écrans de mockup + mesure de la course de scroll */
+el('[data-screen]').forEach(h => {
+  const kind = h.dataset.screen;
+  const box  = fillScreen(h, CONFIG.shots[kind], kind);
+  h.__scroller = box;
+  h.__travel   = 0;
+  const measure = () => { h.__travel = Math.max(0, box.scrollHeight - h.clientHeight); };
+  requestAnimationFrame(() => { measure(); setTimeout(measure, 600); });
+});
+
+/* ==========================================================================
+   HUD : onglets + réglette film
+   ========================================================================== */
+const tabsHost = $('#tabs');
+tabsHost.innerHTML = CH.map((c, i) => `
+  <div class="tab" data-tab="${i}">
+    <span class="tab__idx">${String(i + 1).padStart(2, '0')}</span>
+    <span class="tab__label">${c.tab}</span>
+    <span class="tab__time">${mmss(c.start)}</span>
+    <i class="tab__cursor"></i>
+  </div>`).join('');
+const TABS = el('.tab', tabsHost);
+TABS.forEach((t, i) => t.addEventListener('click', () => goto(i)));
+
+const TICKS = 121;
+const ticksHtml = Array.from({ length: TICKS }, (_, i) =>
+  `<i class="${i % 10 === 0 ? 't10' : (i % 5 === 0 ? 't5' : '')}"></i>`).join('');
+$('#ticksBase').innerHTML = ticksHtml;
+$('#ticksLit').innerHTML  = ticksHtml;
+
+const lit = $('#lit'), playhead = $('#playhead'), ring = $('#ring');
+
+/* nuages du chapitre CTA */
+const sky = $('#sky');
+for (let i = 0; i < 7; i++) {
+  const d = document.createElement('span');
+  const w = 340 + Math.random() * 620;
+  d.className = 'cloud';
+  d.style.cssText = `width:${w}px;height:${w * (.34 + Math.random() * .2)}px;` +
+                    `left:${-20 + Math.random() * 110}%;top:${20 + Math.random() * 62}%;` +
+                    `opacity:${.32 + Math.random() * .45}`;
+  sky.appendChild(d);
+  gsap.to(d, { x: 220 + Math.random() * 260, duration: 26 + Math.random() * 22,
+               repeat: -1, yoyo: true, ease: 'sine.inOut', delay: -Math.random() * 20 });
+}
+sky.insertAdjacentHTML('beforeend', '<span class="sky__floor"></span>');
+
+/* grain animé : une seule écriture de transform, 1 image sur 4 */
+if (CONFIG.ui.grain) {
+  const g = $('#grain'); let f = 0;
+  gsap.ticker.add(() => {
+    if ((f++ & 3) === 0) {
+      g.style.transform = `translate3d(${(Math.random() * 26 - 13) | 0}px,${(Math.random() * 26 - 13) | 0}px,0)`;
+    }
+  });
+}
+
+/* ==========================================================================
+   Timeline maître
+   ========================================================================== */
+gsap.defaults({ ease: 'power2.out' });
+
+/* animations propres à chaque chapitre, ajoutées dans sa sous-timeline */
+const EXTRA = {
+
+  intro(tl, c, root) {
+    const phone  = $('[data-phone]', root);
+    const screen = $('[data-screen]', root);
+    tl.fromTo(phone,
+      { yPercent: 58, rotateX: 34, rotateZ: -4, opacity: 0 },
+      { yPercent: 0, rotateX: 0, rotateZ: 0, opacity: 1, duration: 2.1, ease: 'expo.out' }, 0.35);
+    tl.to(phone, { y: -16, duration: 2.6, yoyo: true, repeat: 2, ease: 'sine.inOut' }, 2.6);
+    tl.to(screen.__scroller,
+      { y: () => -Math.min(screen.__travel, 820), duration: c.dur - 5, ease: 'power1.inOut', immediateRender: false }, 2.6);
+  },
+
+  problem(tl, c, root) {
+    const lines = el('.mask i', root);
+    tl.fromTo(lines,
+      { yPercent: 118, rotate: 2.5, opacity: 0 },
+      { yPercent: 0, rotate: 0, opacity: 1, duration: 1.35, stagger: .13, ease: 'expo.out' }, .35);
+    tl.fromTo($('.display', root), { scale: .985 }, { scale: 1.03, duration: c.dur, ease: 'none' }, 0);
+  },
+
+  usecase(tl, c, root) {
+    const browser = $('[data-browser]', root);
+    const screen  = $('[data-screen]', root);
+    tl.fromTo(browser,
+      { xPercent: -4, yPercent: 6, scale: .965, opacity: 0, rotateY: 6 },
+      { xPercent: 0, yPercent: 0, scale: 1, opacity: 1, rotateY: 0, duration: 1.8, ease: 'expo.out' }, .15);
+    tl.to(screen.__scroller,
+      { y: () => -screen.__travel, duration: c.dur - 5.6, ease: 'power1.inOut', immediateRender: false }, 2.4);
+  },
+
+  cta(tl, c, root) {
+    const veils = [$('.vignette'), $('.scrim')];
+    tl.fromTo(sky, { opacity: 0 }, { opacity: 1, duration: 1.6, ease: 'power2.inOut' }, 0);
+    tl.fromTo(veils, { opacity: 1 }, { opacity: .3, duration: 1.6, ease: 'power2.inOut' }, 0);
+    tl.to(sky,   { opacity: 0, duration: 1.1, ease: 'power2.in' }, c.dur - 1.15);
+    tl.to(veils, { opacity: 1, duration: 1.1, ease: 'power2.in' }, c.dur - 1.15);
+    tl.fromTo($('.logomark', root), { scale: .78, rotate: -8 }, { scale: 1, rotate: 0, duration: 1.6, ease: 'back.out(1.6)' }, .25);
+    tl.fromTo($('.cta__url', root), { scale: .9 }, { scale: 1, duration: 1.4, ease: 'expo.out' }, .8);
+    tl.fromTo($('.display', root), { scale: .97 }, { scale: 1.04, duration: c.dur, ease: 'none' }, 0);
+  }
+};
+
+/* centre du masque circulaire exprimé dans le repère local de l'élément
+   (offsets de layout : insensibles aux transforms en cours) */
+const IRIS_X = 960, IRIS_Y = 561;
+function localCenter(node) {
+  let x = 0, y = 0, n = node;
+  while (n && n !== stage) { x += n.offsetLeft; y += n.offsetTop; n = n.offsetParent; }
+  return [IRIS_X - x, IRIS_Y - y];
+}
+const clearIris = () => el('[data-iris]').forEach(n => { n.style.clipPath = 'none'; });
+
+function chapterTimeline(i) {
+  const c = CH[i], root = c.el, dur = c.dur;
+  const card   = $('[data-card]', root);
+  const items  = el('[data-in]', root);
+  const irises = el('[data-iris]', root);
+  const tl = gsap.timeline();
+  const iris = { r: 0 };
+
+  /* transition : masque circulaire qui s'ouvre + léger scale + anneau lumineux */
+  tl.fromTo(iris, { r: 0 }, {
+    r: 1500, duration: 1.15, ease: 'power2.inOut',
+    onStart() { irises.forEach(n => { n.__c = localCenter(n); }); },
+    onUpdate() {
+      const r = iris.r.toFixed(0) + 'px';
+      for (const n of irises) {
+        if (!n.__c) n.__c = localCenter(n);
+        n.style.clipPath = 'circle(' + r + ' at ' + n.__c[0] + 'px ' + n.__c[1] + 'px)';
+      }
+    },
+    onComplete() { irises.forEach(n => { n.style.clipPath = 'none'; }); }
+  }, 0);
+  tl.fromTo(ring, { scale: .05, opacity: .95 }, { scale: 16, opacity: 0, duration: 1.25, ease: 'power2.inOut' }, 0);
+  tl.fromTo(card, { scale: 1.07, y: 30, opacity: 0 },
+                  { scale: 1, y: 0, opacity: 1, duration: 1.6, ease: 'expo.out' }, 0);
+  if (items.length) {
+    tl.fromTo(items, { y: 56, opacity: 0 },
+      { y: 0, opacity: 1, duration: 1.15, stagger: .075, ease: 'expo.out' }, .5);
+  }
+
+  if (EXTRA[c.id]) EXTRA[c.id](tl, c, root);
+
+  /* sortie : la carte recule et s'efface pendant que le masque suivant s'ouvre
+     (le dernier chapitre reste dans sa fenêtre pour un raccord de boucle net) */
+  const last = i === CH.length - 1;
+  tl.to(card, { scale: .955, y: -28, opacity: 0, duration: last ? 1.0 : 1.35, ease: 'power2.in' }, dur - 1.0);
+  return tl;
+}
+
+const master = gsap.timeline({ paused: true, repeat: -1, onUpdate: sync });
+CH.forEach((c, i) => master.add(chapterTimeline(i), c.start));
+
+/* raccord de boucle : fondu au noir sur la couture */
+const blackout = $('#blackout');
+master.fromTo(blackout, { opacity: 1 }, { opacity: 0, duration: .9, ease: 'power2.out', immediateRender: false }, 0);
+master.to(blackout, { opacity: 1, duration: .7, ease: 'power2.in' }, TOTAL - .7);
+
+/* ==========================================================================
+   Synchronisation HUD + parallaxe 3D (3 écritures de style par image)
+   ========================================================================== */
+let current = -1, overlapping = false;
+const OVERLAP = .42;   // durée pendant laquelle le chapitre précédent reste visible
+let tabW = 1, rulerW = 1;
+function measureHUD() {
+  tabW   = TABS[0] ? TABS[0].getBoundingClientRect().width / scaleNow() : 1;
+  rulerW = $('.ruler').getBoundingClientRect().width / scaleNow() || 1;
+}
+
+function showChapters(i, ov) {
+  CH.forEach((c, k) => {
+    c.el.style.visibility = (k === i || (ov && k === i - 1)) ? 'visible' : 'hidden';
+  });
+}
+
+function setChapter(i) {
+  if (i === current) return;
+  current = i;
+  TABS.forEach((t, k) => {
+    t.classList.toggle('is-on', k === i);
+    t.classList.toggle('is-done', k < i);
+  });
+  if (PROMO.scene) PROMO.scene.focus(i);
+}
+
+function indexAt(t) {
+  for (let i = CH.length - 1; i >= 0; i--) if (t >= CH[i].start) return i;
+  return 0;
+}
+
+function sync() {
+  const t = master.time();
+  const i = indexAt(t);
+  const ov = i > 0 && (t - CH[i].start) < OVERLAP;
+  if (i !== current || ov !== overlapping) { overlapping = ov; showChapters(i, ov); }
+  setChapter(i);
+  const c = CH[i];
+  const p = Math.min(1, Math.max(0, (t - c.start) / c.dur));
+  const cur = TABS[i].lastElementChild;
+  cur.style.transform = 'translate3d(' + (p * tabW).toFixed(1) + 'px,0,0)';
+  const gp = t / TOTAL;
+  playhead.style.transform = 'translate3d(' + (gp * rulerW).toFixed(1) + 'px,0,0)';
+  lit.style.clipPath = 'inset(0 ' + ((1 - gp) * 100).toFixed(2) + '% 0 0)';
+}
+
+/* ==========================================================================
+   Mise à l'échelle 1920×1080 → viewport (transform uniquement)
+   ========================================================================== */
+let _scale = 1;
+const scaleNow = () => _scale;
+function fit() {
+  _scale = Math.min(innerWidth / 1920, innerHeight / 1080);
+  stage.style.transform = 'translate(-50%,-50%) scale(' + _scale + ')';
+  measureHUD();
+}
+addEventListener('resize', fit);
+fit();
+requestAnimationFrame(fit);
+
+/* ==========================================================================
+   Commandes
+   ========================================================================== */
+const overlay = $('#overlay'), toastEl = $('#toast');
+let toastT;
+function toast(msg) {
+  toastEl.textContent = msg;
+  toastEl.classList.add('is-on');
+  clearTimeout(toastT);
+  toastT = setTimeout(() => toastEl.classList.remove('is-on'), 2600);
+}
+function hideOverlay() {
+  gsap.to(overlay, { autoAlpha: 0, duration: .5, ease: 'power2.out' });
+}
+function start(from = 0) {
+  hideOverlay();
+  clearIris();
+  master.pause();
+  master.time(from, false);
+  master.play();
+  sync();
+}
+function goto(i) {
+  hideOverlay();
+  clearIris();
+  master.time(CH[i].start + .001, false);
+  if (master.paused()) master.play();
+  sync();
+}
+function toggle() {
+  if (master.paused() || !master.isActive()) { hideOverlay(); master.play(); }
+  else master.pause();
+}
+
+$('#btnPlay').addEventListener('click', () => start(0));
+$('#btnRec').addEventListener('click', record);
+
+addEventListener('keydown', e => {
+  const k = e.key.toLowerCase();
+  if (k >= '1' && k <= String(Math.min(9, CH.length))) { goto(+k - 1); e.preventDefault(); return; }
+  if (k === '0') { start(0); e.preventDefault(); return; }
+  if (k === ' ') { toggle(); e.preventDefault(); return; }
+  if (k === 'r') { record(); return; }
+  if (k === 'h') { document.body.classList.toggle('is-hidden-ui'); return; }
+});
+
+/* ==========================================================================
+   Enregistrement : capture d'onglet → WebM, arrêt automatique en fin de boucle
+   ========================================================================== */
+let recorder = null;
+async function record() {
+  if (recorder) { recorder.stop(); return; }
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getDisplayMedia) {
+    toast("Capture non supportée par ce navigateur — utilisez un enregistreur d'écran.");
+    return;
+  }
+  let stream;
+  try {
+    stream = await navigator.mediaDevices.getDisplayMedia({
+      video: { frameRate: { ideal: 60, max: 60 }, width: 1920, height: 1080 },
+      audio: false, preferCurrentTab: true
+    });
+  } catch (err) { toast('Capture annulée.'); return; }
+
+  const mime = ['video/webm;codecs=vp9', 'video/webm;codecs=vp8', 'video/webm', 'video/mp4']
+    .find(m => window.MediaRecorder && MediaRecorder.isTypeSupported(m)) || '';
+  const chunks = [];
+  recorder = new MediaRecorder(stream, { mimeType: mime || undefined, videoBitsPerSecond: CONFIG.record.bitrate });
+  recorder.ondataavailable = e => { if (e.data && e.data.size) chunks.push(e.data); };
+  recorder.onstop = () => {
+    stream.getTracks().forEach(t => t.stop());
+    document.body.classList.remove('is-recording');
+    recorder = null;
+    const blob = new Blob(chunks, { type: mime.split(';')[0] || 'video/webm' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = CONFIG.record.filename;
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(a.href), 6000);
+    toast('Vidéo exportée (' + (blob.size / 1048576).toFixed(1) + ' Mo)');
+  };
+  stream.getVideoTracks()[0].addEventListener('ended', () => {
+    if (recorder && recorder.state !== 'inactive') recorder.stop();
+  });
+
+  document.body.classList.add('is-recording');
+  hideOverlay();
+  recorder.start(200);
+  const r = CONFIG.record;
+  setTimeout(() => start(0), r.lead * 1000);
+  setTimeout(() => {
+    if (recorder && recorder.state !== 'inactive') recorder.stop();
+  }, (r.lead + TOTAL * r.loops + r.tail) * 1000);
+}
+
+if (new URLSearchParams(location.search).has('autoplay')) start(0);
+if (new URLSearchParams(location.search).has('record')) setTimeout(record, 300);
+
+/* état initial : premier chapitre prêt, figé sous l'overlay */
+master.time(0, false);
+master.pause();
+sync();
+
+/* ==========================================================================
+   Décor 3D — appelé par le module Three.js ci-dessous (optionnel :
+   si le CDN tombe, la vidéo tourne quand même, sans les formes).
+   ========================================================================== */
+PROMO.initScene = function (THREE) {
+  const canvas = document.getElementById('gl');
+  let renderer;
+  try {
+    renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true, powerPreference: 'high-performance' });
+  } catch (e) { return; }
+  renderer.setPixelRatio(1);
+  renderer.setSize(1920, 1080, false);
+  renderer.setClearColor(0x000000, 0);
+
+  const scene  = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(42, 16 / 9, .1, 120);
+  const group  = new THREE.Group();
+  scene.add(group);
+
+  const NOISE = `
+    vec3 mod289(vec3 x){return x-floor(x*(1.0/289.0))*289.0;}
+    vec4 mod289(vec4 x){return x-floor(x*(1.0/289.0))*289.0;}
+    vec4 permute(vec4 x){return mod289(((x*34.0)+1.0)*x);}
+    vec4 taylorInvSqrt(vec4 r){return 1.79284291400159-0.85373472095314*r;}
+    float snoise(vec3 v){
+      const vec2 Cc=vec2(1.0/6.0,1.0/3.0); const vec4 D=vec4(0.0,0.5,1.0,2.0);
+      vec3 i=floor(v+dot(v,Cc.yyy)); vec3 x0=v-i+dot(i,Cc.xxx);
+      vec3 g=step(x0.yzx,x0.xyz); vec3 l=1.0-g; vec3 i1=min(g.xyz,l.zxy); vec3 i2=max(g.xyz,l.zxy);
+      vec3 x1=x0-i1+Cc.xxx; vec3 x2=x0-i2+Cc.yyy; vec3 x3=x0-D.yyy;
+      i=mod289(i);
+      vec4 p=permute(permute(permute(i.z+vec4(0.0,i1.z,i2.z,1.0))+i.y+vec4(0.0,i1.y,i2.y,1.0))+i.x+vec4(0.0,i1.x,i2.x,1.0));
+      float n_=0.142857142857; vec3 ns=n_*D.wyz-D.xzx;
+      vec4 j=p-49.0*floor(p*ns.z*ns.z); vec4 x_=floor(j*ns.z); vec4 y_=floor(j-7.0*x_);
+      vec4 x=x_*ns.x+ns.yyyy; vec4 y=y_*ns.x+ns.yyyy; vec4 h=1.0-abs(x)-abs(y);
+      vec4 b0=vec4(x.xy,y.xy); vec4 b1=vec4(x.zw,y.zw);
+      vec4 s0=floor(b0)*2.0+1.0; vec4 s1=floor(b1)*2.0+1.0; vec4 sh=-step(h,vec4(0.0));
+      vec4 a0=b0.xzyw+s0.xzyw*sh.xxyy; vec4 a1=b1.xzyw+s1.xzyw*sh.zzww;
+      vec3 p0=vec3(a0.xy,h.x); vec3 p1=vec3(a0.zw,h.y); vec3 p2=vec3(a1.xy,h.z); vec3 p3=vec3(a1.zw,h.w);
+      vec4 norm=taylorInvSqrt(vec4(dot(p0,p0),dot(p1,p1),dot(p2,p2),dot(p3,p3)));
+      p0*=norm.x;p1*=norm.y;p2*=norm.z;p3*=norm.w;
+      vec4 m=max(0.6-vec4(dot(x0,x0),dot(x1,x1),dot(x2,x2),dot(x3,x3)),0.0); m=m*m;
+      return 42.0*dot(m*m,vec4(dot(p0,x0),dot(p1,x1),dot(p2,x2),dot(p3,x3)));
+    }`;
+
+  const VERT = NOISE + `
+    uniform float uTime,uAmp,uFreq,uSeed;
+    varying vec3 vN,vV; varying float vNo;
+    vec3 displaced(vec3 p,vec3 n){
+      float t=uTime*0.28+uSeed;
+      float d=snoise(p*uFreq+vec3(t,t*0.7,-t*0.5));
+      d+=0.5*snoise(p*uFreq*2.1-vec3(t*0.6));
+      return p+n*d*uAmp;
+    }
+    void main(){
+      vec3 p=displaced(position,normal);
+      /* normale approchée par différences finies sur la surface déformée */
+      vec3 t1=normalize(abs(normal.y)<0.99?cross(normal,vec3(0.0,1.0,0.0)):vec3(1.0,0.0,0.0));
+      vec3 t2=cross(normal,t1);
+      float e=0.06;
+      vec3 pa=displaced(position+t1*e,normal), pb=displaced(position+t2*e,normal);
+      vec3 n=normalize(cross(pa-p,pb-p));
+      n*=sign(dot(n,normal));
+      vNo=length(p)-length(position);
+      vec4 mv=modelViewMatrix*vec4(p,1.0);
+      vN=normalize(normalMatrix*n);
+      vV=normalize(-mv.xyz);
+      gl_Position=projectionMatrix*mv;
+    }`;
+
+  const FRAG = `
+    precision highp float;
+    uniform vec3 uA,uB,uC; uniform float uOpacity,uTime,uSeed;
+    varying vec3 vN,vV; varying float vNo;
+    void main(){
+      float f=1.0-clamp(dot(normalize(vN),normalize(vV)),0.0,1.0);
+      float rim=pow(f,2.3);
+      /* bandes iridescentes : angle de vue + déformation */
+      float band=sin(vNo*9.0+f*7.0+uTime*0.5+uSeed)*0.5+0.5;
+      vec3 col=mix(uA,uB,band);
+      col=mix(col,uC,rim*0.5);
+      float a=uOpacity*(0.06+rim*0.80);
+      gl_FragColor=vec4(col,clamp(a,0.0,1.0));
+    }`;
+
+  const c3 = CONFIG.colors.scene.map(h => new THREE.Color(h));
+  /* densité volontairement mesurée : ~15 k sommets par forme suffisent,
+     le bruit est calculé dans le vertex shader (3 évaluations par sommet). */
+  const shapes = [
+    () => new THREE.IcosahedronGeometry(1, 4),
+    () => new THREE.SphereGeometry(1, 64, 44),
+    () => new THREE.TorusGeometry(1, .36, 36, 110),
+    () => new THREE.TorusKnotGeometry(.82, .27, 150, 26)
+  ];
+  const mats = [];
+  const N = Math.max(8, Math.min(12, CONFIG.scene.count | 0));
+  const rnd = (a, b) => a + Math.random() * (b - a);
+
+  for (let i = 0; i < N; i++) {
+    const geo = shapes[i % shapes.length]();
+    const mat = new THREE.ShaderMaterial({
+      vertexShader: VERT, fragmentShader: FRAG,
+      transparent: true, depthWrite: false, side: THREE.DoubleSide,
+      blending: THREE.AdditiveBlending,
+      uniforms: {
+        uTime:    { value: rnd(0, 40) },
+        uAmp:     { value: CONFIG.scene.amp * rnd(.6, 1.5) },
+        uFreq:    { value: rnd(.7, 1.8) },
+        uSeed:    { value: rnd(0, 10) },
+        uOpacity: { value: 1 },
+        uA: { value: c3[0].clone() }, uB: { value: c3[1].clone() }, uC: { value: c3[2].clone() }
+      }
+    });
+    mat.userData.base = rnd(.30, .62);
+    mats.push(mat);
+
+    const m = new THREE.Mesh(geo, mat);
+    m.scale.setScalar(rnd(.55, 1.55));
+    m.position.set(rnd(-11, 11), rnd(-5.5, 5.5), rnd(-15, -1.5));
+    m.rotation.set(rnd(0, 6.3), rnd(0, 6.3), rnd(0, 6.3));
+    m.userData = {
+      y0: m.position.y, x0: m.position.x,
+      sp: rnd(.16, .42), ph: rnd(0, 6.3),
+      rx: rnd(-.05, .05), ry: rnd(-.07, .07)
+    };
+    group.add(m);
+  }
+
+  const moods = CONFIG.scene.moods;
+  const state = { op: moods[0].opacity, camZ: moods[0].camZ };
+  camera.position.set(0, 0, state.camZ);
+
+  PROMO.scene = {
+    focus(i) {
+      const m = moods[Math.min(i, moods.length - 1)];
+      gsap.to(camera.position, { z: m.camZ, duration: 1.6, ease: 'power3.inOut' });
+      gsap.to(group.rotation,  { y: m.rotY, duration: 1.8, ease: 'power3.inOut' });
+      gsap.to(group.position,  { y: m.y, duration: 1.8, ease: 'power3.inOut' });
+      gsap.to(state, { op: m.opacity, duration: 1.4, ease: 'power2.inOut' });
+      const blend = m.blend === 'normal' ? THREE.NormalBlending : THREE.AdditiveBlending;
+      mats.forEach(mt => { if (mt.blending !== blend) { mt.blending = blend; mt.needsUpdate = true; } });
+    }
+  };
+
+  let last = performance.now();
+  gsap.ticker.add(() => {
+    const now = performance.now();
+    const dt = Math.min(.05, (now - last) / 1000); last = now;
+    const t = now / 1000;
+    group.children.forEach((m, k) => {
+      const u = m.userData;
+      m.position.y = u.y0 + Math.sin(t * u.sp + u.ph) * .55;
+      m.position.x = u.x0 + Math.cos(t * u.sp * .7 + u.ph) * .35;
+      m.rotation.x += u.rx * dt * CONFIG.scene.speed * 4;
+      m.rotation.y += u.ry * dt * CONFIG.scene.speed * 4;
+      m.material.uniforms.uTime.value += dt * CONFIG.scene.speed * 3;
+      m.material.uniforms.uOpacity.value = m.material.userData.base * state.op;
+    });
+    renderer.render(scene, camera);
+  });
+
+  if (current >= 0) PROMO.scene.focus(current);
+};
+
+})();
+</script>
+
+<script type="importmap">
+{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.js"}}
+</script>
+<script type="module">
+/* Three.js est chargé à part : s'il échoue, l'animation continue sans le décor. */
+try {
+  const THREE = await import('three');
+  if (window.PROMO && window.PROMO.initScene) window.PROMO.initScene(THREE);
+} catch (err) {
+  console.warn('[promo] Three.js indisponible — décor 3D désactivé.', err);
+}
+</script>
+</body>
+</html>
