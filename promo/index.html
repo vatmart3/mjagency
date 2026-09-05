@@ -170,6 +170,11 @@ body.is-recording{cursor:none}
 .lede--c{max-width:none;margin-left:auto;margin-right:auto;text-align:center}
 .meta{margin-top:38px;display:flex;align-items:center;gap:14px;font-size:18px;letter-spacing:.12em;color:rgba(255,255,255,.85)}
 .meta i{width:9px;height:9px;border-radius:50%;background:var(--accent);box-shadow:0 0 16px 3px var(--glow);display:block}
+.d-punch{font-size:148px}
+.use .d-mid{font-size:74px}
+.d-dev{font-size:62px}
+.cta .d-offer{font-size:104px}
+.cta .d-offer.mark{font-size:88px}
 .mask{
   display:block;overflow:hidden;
   padding:.14em .06em .22em;margin:-.14em 0 -.22em;
@@ -456,6 +461,11 @@ body.is-recording .overlay,body.is-recording .toast{display:none}
 .stage:not([data-fmt="16:9"]) .beat{padding:150px 46px 320px}
 .stage:not([data-fmt="16:9"]) .display{font-size:104px}
 .stage:not([data-fmt="16:9"]) .lede{font-size:30px;max-width:none}
+.stage:not([data-fmt="16:9"]) .d-punch{font-size:92px}
+.stage:not([data-fmt="16:9"]) .use .d-mid{font-size:62px}
+.stage:not([data-fmt="16:9"]) .d-dev{font-size:58px}
+.stage:not([data-fmt="16:9"]) .cta .d-offer{font-size:82px}
+.stage:not([data-fmt="16:9"]) .cta .d-offer.mark{font-size:70px}
 .stage:not([data-fmt="16:9"]) .card{padding:40px;border-radius:28px}
 .stage:not([data-fmt="16:9"]) .eyebrow{font-size:15px;margin-bottom:24px}
 
@@ -546,6 +556,11 @@ body.is-recording .overlay,body.is-recording .toast{display:none}
 .stage[data-fmt="1:1"] .browser__view{height:280px}
 .stage[data-fmt="1:1"] .use{gap:22px;padding:28px}
 .stage[data-fmt="1:1"] .use .display{font-size:52px}
+.stage[data-fmt="1:1"] .d-punch{font-size:74px}
+.stage[data-fmt="1:1"] .use .d-mid{font-size:50px}
+.stage[data-fmt="1:1"] .d-dev{font-size:44px}
+.stage[data-fmt="1:1"] .cta .d-offer{font-size:56px}
+.stage[data-fmt="1:1"] .cta .d-offer.mark{font-size:48px}
 .stage[data-fmt="1:1"] .devices{gap:18px}
 .stage[data-fmt="1:1"] .devices .browser{height:224px}
 .stage[data-fmt="1:1"] .devices .browser__view{height:174px}
@@ -786,7 +801,7 @@ const CONFIG = {
   topline: 'Création de site internet · Sète · Montpellier',
 
   /* --- thème : 'sombre' ou 'clair'. Touche T, ou ?theme=clair. ---------- */
-  theme : 'sombre',
+  theme : 'clair',
 
   colors: {
     violet   : '#6d2bff',
@@ -820,7 +835,7 @@ const CONFIG = {
      'court' 15 s — Reels, TikTok, Shorts : on ouvre sur l'accroche et le
      logo arrive à la fin, là où le spectateur décide de vous suivre.
      Touche C pour passer de l'un à l'autre, ou ?cut=court dans l'URL. --- */
-  cut  : 'long',
+  cut  : 'apporteur',
   cuts : {
 
   long: { chapters: [
@@ -905,6 +920,85 @@ const CONFIG = {
         { type:'offer', t:4.8, title:'On construit la vôtre ?', url:'mjagency.eu',
           items:[
             { i:'doc',   k:'Devis',   v:'Sous 24 h',                   s:'Gratuit' },
+            { i:'mail',  k:'Écrire',  v:'mjagency.officiel@gmail.com', s:'Réponse le jour même' },
+            { i:'phone', k:'Appeler', v:'06 11 71 83 68',              s:'9 h – 18 h, du lundi au vendredi' }
+          ],
+          note:'Sète · Montpellier · Occitanie' }
+      ]
+    }
+  ] },
+
+  apporteur: { chapters: [
+    {
+      tab: 'L\'offre', icon: 'trend', beats: [
+        { type:'punch', t:3.2, eyebrow:'Apporteur d\'affaires',
+          lines:['Votre réseau', 'vaut de l\'argent.'] },
+
+        { type:'steps', t:3.6, eyebrow:'Comment ça marche',
+          items:[
+            { i:'send', k:'Étape 1', t:'Vous présentez' },
+            { i:'pen',  k:'Étape 2', t:'On réalise' },
+            { i:'doc',  k:'Étape 3', t:'Vous êtes payé' }
+          ] },
+
+        { type:'stats', t:3.2, eyebrow:'Ce que ça rapporte',
+          items:[
+            { i:'trend', n:10,  dec:0, suffix:' %', lab:'du projet, sur chaque client apporté', hi:true },
+            { i:'doc',   n:350, dec:0, suffix:' €', lab:'en moyenne pour un site vitrine' },
+            { i:'check', n:0,   dec:0, suffix:' €', lab:'à avancer, aucun engagement' }
+          ] }
+      ]
+    },
+    {
+      tab: 'Pour qui', icon: 'eye', beats: [
+        { type:'services', t:4.0, eyebrow:'Ça marche si vous êtes…',
+          items:[
+            { i:'spark',  t:'Indépendant' },
+            { i:'cart',   t:'Commerçant' },
+            { i:'pin',    t:'Agent immobilier' },
+            { i:'doc',    t:'Comptable' },
+            { i:'pen',    t:'Graphiste' },
+            { i:'play',   t:'Créateur de contenu' }
+          ] },
+
+        { type:'punch', t:4.0, eyebrow:'Aucune contrainte',
+          lines:['Zéro technique.', 'Zéro vente.'],
+          lede:'Vous faites l\'introduction. On s\'occupe du reste, du devis à la mise en ligne.' }
+      ]
+    },
+    {
+      tab: 'Ce qu\'on livre', icon: 'code', beats: [
+        { type:'browser', t:4.0, eyebrow:'Ce que vous présentez',
+          title:'Des sites qui<br>font vendre.',
+          url:'mjagency.eu/studio',
+          points:[
+            { i:'target', t:'Sur-mesure' },
+            { i:'gauge',  t:'Rapides' },
+            { i:'pin',    t:'Visibles sur Google' }
+          ] },
+
+        { type:'included', t:3.0, eyebrow:'Le client repart avec',
+          items:[
+            { i:'server', t:'Hébergement' },
+            { i:'shield', t:'Certificat SSL' },
+            { i:'pin',    t:'Fiche Google' },
+            { i:'trend',  t:'Mesures' },
+            { i:'book',   t:'Formation' },
+            { i:'check',  t:'Suivi 3 mois' }
+          ] },
+
+        { type:'devices', t:3.0, eyebrow:'Mobile d\'abord',
+          title:'Le même soin<br>sur chaque écran.',
+          url:'mjagency.eu' }
+      ]
+    },
+    {
+      tab: 'On y va', icon: 'spark', beats: [
+        { type:'punch', t:3.0, eyebrow:'Prochaine étape',
+          lines:['On en parle', 'cinq minutes ?'] },
+
+        { type:'offer', t:5.0, mark:true, title:'Devenez apporteur.', url:'mjagency.eu',
+          items:[
             { i:'mail',  k:'Écrire',  v:'mjagency.officiel@gmail.com', s:'Réponse le jour même' },
             { i:'phone', k:'Appeler', v:'06 11 71 83 68',              s:'9 h – 18 h, du lundi au vendredi' }
           ],
@@ -1018,7 +1112,7 @@ const CONFIG = {
     grain        : true,
     /* false, ou ?hud=0 dans l'URL : plus d'onglets ni de réglette, la
        composition se recentre. Version « pleine image » pour publication. */
-    hud          : true
+    hud          : false
   }
 };
 
@@ -1236,7 +1330,7 @@ const RENDER = {
   punch: b => `
     <div class="plain" data-card data-iris>
       ${eyebrow(b.eyebrow, true)}
-      <h2 class="display" style="font-size:148px" data-mask>
+      <h2 class="display d-punch" data-mask>
         ${b.lines.map(l => `<span class="mask"><i>${l}</i></span>`).join('')}
       </h2>
       ${b.lede ? `<p class="lede lede--c" data-in style="margin-top:44px">${b.lede}</p>` : ''}
@@ -1260,7 +1354,7 @@ const RENDER = {
       ${browserEl(b.url)}
       <div class="col" style="flex:1">
         ${eyebrow(b.eyebrow)}
-        <h2 class="display" style="font-size:74px" data-in>${b.title}</h2>
+        <h2 class="display d-mid" data-in>${b.title}</h2>
         <div class="points" data-in>
           ${(b.points || []).map(pt => `<span class="point">${iconBox(pt.i)}${pt.t}</span>`).join('')}
         </div>
@@ -1271,7 +1365,7 @@ const RENDER = {
   devices: b => `
     <div class="plain" data-card data-iris>
       ${eyebrow(b.eyebrow, true)}
-      <h2 class="display" style="font-size:62px;margin-bottom:30px" data-in>${b.title}</h2>
+      <h2 class="display d-dev" style="margin-bottom:30px" data-in>${b.title}</h2>
       <div class="devices">${browserEl(b.url)}${phoneEl()}</div>
       <div class="points" style="justify-content:center;margin-top:22px" data-in>
         <span class="point">${iconBox('monitor')}Desktop</span>
@@ -1282,7 +1376,7 @@ const RENDER = {
   offer: b => `
     <div class="plain cta" data-card data-iris>
       ${b.mark ? `<div class="logomark" data-in style="margin:0 auto 30px"><span>${CONFIG.brand.monogram}</span></div>` : ''}
-      <h2 class="display" style="font-size:${b.mark ? 88 : 104}px;margin-bottom:30px" data-in>${b.title}</h2>
+      <h2 class="display d-offer${b.mark ? ' mark' : ''}" style="margin-bottom:30px" data-in>${b.title}</h2>
       <p class="cta__url" data-in style="margin:0 auto 44px">${b.url}</p>
       <div class="offer" style="margin:0 auto">
         ${b.items.map(i => `
