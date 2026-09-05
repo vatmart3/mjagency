@@ -243,6 +243,44 @@ body.is-recording{cursor:none}
 .step b{font-size:14px;letter-spacing:.2em;text-transform:uppercase;color:var(--accent)}
 .step h3{margin:12px 0 0;font-family:var(--font-display);font-weight:800;font-size:40px;letter-spacing:-.035em}
 
+/* ---------- plan « schéma » : étapes reliées, pièce qui circule ---------- */
+.flow{width:1680px}
+.flow__row{display:flex;align-items:stretch;justify-content:center;margin-top:44px}
+.node{
+  flex:1;padding:32px 30px;border-radius:24px;text-align:left;
+  border:1px solid rgba(255,255,255,.13);background:rgba(255,255,255,.045);
+  -webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px);
+  display:flex;flex-direction:column;gap:12px;position:relative;
+  will-change:transform,opacity;
+}
+.node .ico-box{width:46px;height:46px;margin-bottom:4px}
+.node b{font-family:var(--font-display);font-weight:800;font-size:14px;letter-spacing:.18em;color:var(--accent)}
+.node h3{margin:0;font-family:var(--font-display);font-weight:800;font-size:31px;letter-spacing:-.032em}
+.node p{margin:0;font-size:16px;line-height:1.45;color:rgba(255,255,255,.6)}
+.node--pay{border-color:rgba(201,167,255,.42);background:linear-gradient(150deg,rgba(176,38,255,.18),rgba(109,43,255,.07))}
+.pay{
+  position:absolute;top:26px;right:26px;padding:8px 16px;border-radius:999px;
+  background:var(--accent);color:#0a0416;
+  font-family:var(--font-display);font-weight:900;font-size:20px;letter-spacing:-.02em;
+  box-shadow:0 10px 30px -10px var(--glow);will-change:transform,opacity;
+}
+.link{flex:0 0 96px;position:relative}
+.link__tip{
+  position:absolute;right:0;top:calc(50% - 7px);width:13px;height:13px;opacity:0;
+  border-top:3px solid var(--accent);border-right:3px solid var(--accent);
+  transform:rotate(45deg);will-change:opacity;
+}
+.link__bar{
+  position:absolute;left:0;top:calc(50% - 1.5px);width:100%;height:3px;
+  background:linear-gradient(90deg,var(--accent),rgba(201,167,255,.35));
+  transform-origin:0 0;will-change:transform;
+}
+.link__dot{
+  position:absolute;left:0;top:calc(50% - 7px);width:14px;height:14px;border-radius:50%;
+  background:var(--accent);box-shadow:0 0 18px 5px var(--glow);opacity:0;
+  will-change:transform,opacity;
+}
+
 /* ---------- plan « toujours inclus » : six icônes, six mots ---------- */
 .incl{display:flex;gap:0;width:1700px}
 .incl__i{
@@ -490,6 +528,28 @@ body.is-recording .overlay,body.is-recording .toast{display:none}
 .stage:not([data-fmt="16:9"]) .step b{align-self:end}
 .stage:not([data-fmt="16:9"]) .step h3{margin:2px 0 0;font-size:40px;align-self:start}
 
+/* schéma : en colonne, le lien devient vertical */
+.stage:not([data-fmt="16:9"]) .flow{width:100%}
+.stage:not([data-fmt="16:9"]) .flow__row{flex-direction:column;margin-top:34px}
+.stage:not([data-fmt="16:9"]) .node{padding:26px 28px;gap:10px}
+.stage:not([data-fmt="16:9"]) .node h3{font-size:34px}
+.stage:not([data-fmt="16:9"]) .node .ico-box{width:44px;height:44px}
+.stage:not([data-fmt="16:9"]) .link{flex:0 0 64px;width:100%}
+.stage:not([data-fmt="16:9"]) .link__tip{
+  right:auto;left:calc(50% - 7px);top:auto;bottom:0;transform:rotate(135deg);
+}
+.stage:not([data-fmt="16:9"]) .link__bar{
+  left:calc(50% - 1.5px);top:0;width:3px;height:100%;
+  background:linear-gradient(180deg,var(--accent),rgba(201,167,255,.35));
+}
+.stage:not([data-fmt="16:9"]) .link__dot{left:calc(50% - 7px);top:0}
+.stage[data-fmt="1:1"] .link{flex:0 0 44px}
+.stage[data-fmt="1:1"] .node{padding:18px 24px;gap:8px}
+.stage[data-fmt="1:1"] .node h3{font-size:26px}
+.stage[data-fmt="1:1"] .node p{font-size:14px}
+.stage[data-fmt="1:1"] .node .ico-box{width:34px;height:34px}
+.stage[data-fmt="1:1"] .pay{font-size:16px;padding:6px 12px;top:18px;right:18px}
+
 /* toujours inclus : grille 2 × 3 */
 .stage:not([data-fmt="16:9"]) .incl{display:grid;grid-template-columns:repeat(2,1fr);gap:38px 0;width:100%}
 .stage:not([data-fmt="16:9"]) .incl__i{border-left:0;padding:0 12px}
@@ -627,6 +687,7 @@ body.clair{background:#e9e6f4}
 /* verre : blanc laiteux au lieu de blanc translucide */
 .stage.clair .card,
 .stage.clair .stat,
+.stage.clair .node,
 .stage.clair .svc,
 .stage.clair .offer__item,
 .stage.clair .chip,
@@ -648,6 +709,14 @@ body.clair{background:#e9e6f4}
 .stage.clair .lede{color:rgba(21,12,46,.72)}
 .stage.clair .meta{color:rgba(21,12,46,.78)}
 .stage.clair .stat__lab{color:rgba(21,12,46,.60)}
+.stage.clair .node p{color:rgba(21,12,46,.60)}
+.stage.clair .node--pay{
+  background:linear-gradient(150deg,rgba(109,43,255,.16),rgba(176,38,255,.07));
+  border-color:rgba(90,31,214,.26);
+}
+.stage.clair .pay{background:#2a1160;color:#fff;box-shadow:0 12px 30px -12px rgba(42,17,96,.6)}
+.stage.clair .link__bar{background:linear-gradient(90deg,var(--accent),rgba(90,31,214,.25))}
+.stage.clair:not([data-fmt="16:9"]) .link__bar{background:linear-gradient(180deg,var(--accent),rgba(90,31,214,.25))}
 .stage.clair .offer__k{color:rgba(21,12,46,.58)}
 .stage.clair .offer__v small{color:rgba(21,12,46,.62)}
 .stage.clair .cta__note{color:rgba(21,12,46,.72);text-shadow:none}
@@ -931,43 +1000,54 @@ const CONFIG = {
   apporteur: { chapters: [
     {
       tab: 'L\'offre', icon: 'trend', beats: [
-        { type:'punch', t:3.2, eyebrow:'Apporteur d\'affaires',
+        { type:'punch', t:3.0, eyebrow:'Apporteur d\'affaires',
           lines:['Votre réseau', 'vaut de l\'argent.'] },
 
-        { type:'steps', t:3.6, eyebrow:'Comment ça marche',
+        /* le schéma : trois étapes reliées, la pièce qui circule */
+        { type:'flow', t:4.4, eyebrow:'Comment ça marche',
           items:[
-            { i:'send', k:'Étape 1', t:'Vous présentez' },
-            { i:'pen',  k:'Étape 2', t:'On réalise' },
-            { i:'doc',  k:'Étape 3', t:'Vous êtes payé' }
+            { i:'users', k:'Étape 1', t:'Vous présentez',
+              d:'Un commerçant, un artisan, une entreprise qui a besoin d\'un site.' },
+            { i:'pen',   k:'Étape 2', t:'On fait tout',
+              d:'Devis, design, développement, mise en ligne. Vous n\'avez rien à gérer.' },
+            { i:'euro',  k:'Étape 3', t:'Vous encaissez',
+              d:'Votre commission part dès que le client a réglé.', pay:'350 €' }
           ] },
 
-        { type:'stats', t:3.2, eyebrow:'Ce que ça rapporte',
+        { type:'stats', t:3.0, eyebrow:'Ce que ça rapporte',
           items:[
-            { i:'trend', n:10,  dec:0, suffix:' %', lab:'du projet, sur chaque client apporté', hi:true },
-            { i:'doc',   n:350, dec:0, suffix:' €', lab:'en moyenne pour un site vitrine' },
-            { i:'check', n:0,   dec:0, suffix:' €', lab:'à avancer, aucun engagement' }
+            { i:'percent', n:10, dec:0, suffix:' %', lab:'du montant du projet', hi:true },
+            { i:'wallet',  n:0,  dec:0, suffix:' €', lab:'à avancer, aucun engagement' },
+            { i:'clock',   n:24, dec:0, suffix:' h', lab:'pour que votre contact ait son devis' }
           ] }
       ]
     },
     {
-      tab: 'Pour qui', icon: 'eye', beats: [
-        { type:'services', t:4.0, eyebrow:'Ça marche si vous êtes…',
+      tab: 'Combien', icon: 'euro', beats: [
+        { type:'steps', t:3.5, eyebrow:'Concrètement',
           items:[
-            { i:'spark',  t:'Indépendant' },
-            { i:'cart',   t:'Commerçant' },
-            { i:'pin',    t:'Agent immobilier' },
-            { i:'doc',    t:'Comptable' },
-            { i:'pen',    t:'Graphiste' },
-            { i:'play',   t:'Créateur de contenu' }
+            { i:'euro',  k:'1 client apporté', t:'350 €' },
+            { i:'coins', k:'1 client par mois', t:'4 200 € / an' },
+            { i:'bank',  k:'Versement',         t:'sous 15 jours' }
           ] },
 
-        { type:'punch', t:4.0, eyebrow:'Aucune contrainte',
+        { type:'punch', t:3.5, eyebrow:'Aucune contrainte',
           lines:['Zéro technique.', 'Zéro vente.'],
           lede:'Vous faites l\'introduction. On s\'occupe du reste, du devis à la mise en ligne.' }
       ]
     },
     {
-      tab: 'Ce qu\'on livre', icon: 'code', beats: [
+      tab: 'Pour qui', icon: 'users', beats: [
+        { type:'services', t:4.0, eyebrow:'Ça marche si vous êtes…',
+          items:[
+            { i:'users', t:'Indépendant' },
+            { i:'cart',  t:'Commerçant' },
+            { i:'pin',   t:'Agent immobilier' },
+            { i:'doc',   t:'Comptable' },
+            { i:'pen',   t:'Graphiste' },
+            { i:'play',  t:'Créateur de contenu' }
+          ] },
+
         { type:'browser', t:4.0, eyebrow:'Ce que vous présentez',
           title:'Des sites qui<br>font vendre.',
           url:'mjagency.eu/studio',
@@ -985,16 +1065,12 @@ const CONFIG = {
             { i:'trend',  t:'Mesures' },
             { i:'book',   t:'Formation' },
             { i:'check',  t:'Suivi 3 mois' }
-          ] },
-
-        { type:'devices', t:3.0, eyebrow:'Mobile d\'abord',
-          title:'Le même soin<br>sur chaque écran.',
-          url:'mjagency.eu' }
+          ] }
       ]
     },
     {
       tab: 'On y va', icon: 'spark', beats: [
-        { type:'punch', t:3.0, eyebrow:'Prochaine étape',
+        { type:'punch', t:2.6, eyebrow:'Prochaine étape',
           lines:['On en parle', 'cinq minutes ?'] },
 
         { type:'offer', t:5.0, mark:true, title:'Devenez apporteur.', url:'mjagency.eu',
@@ -1257,7 +1333,14 @@ const ICONS = {
   target : '<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4.8"/><circle cx="12" cy="12" r="1.2"/>',
   shield : '<path d="M12 2.6l7.4 3v5.6c0 4.6-3.1 8.4-7.4 10.2-4.3-1.8-7.4-5.6-7.4-10.2V5.6z"/><path d="M8.8 12.2l2.3 2.3 4.1-4.4"/>',
   server : '<rect x="3" y="4" width="18" height="6.4" rx="1.8"/><rect x="3" y="13.6" width="18" height="6.4" rx="1.8"/><path d="M6.8 7.2h.01M6.8 16.8h.01"/>',
-  book   : '<path d="M4 4.4a2 2 0 0 1 2-2h13.4v17.2H6a2 2 0 0 0-2 2z"/><path d="M4 19.6a2 2 0 0 1 2-2h13.4"/>'
+  book   : '<path d="M4 4.4a2 2 0 0 1 2-2h13.4v17.2H6a2 2 0 0 0-2 2z"/><path d="M4 19.6a2 2 0 0 1 2-2h13.4"/>',
+  euro   : '<circle cx="12" cy="12" r="9.2"/><path d="M15.6 8.2a4.6 4.6 0 1 0 0 7.6"/><path d="M6.6 10.8h6.6M6.6 13.4h6.6"/>',
+  coins  : '<ellipse cx="12" cy="6.6" rx="6.8" ry="2.6"/><path d="M5.2 6.6v4.2c0 1.4 3 2.6 6.8 2.6s6.8-1.2 6.8-2.6V6.6"/><path d="M5.2 10.8V15c0 1.4 3 2.6 6.8 2.6s6.8-1.2 6.8-2.6v-4.2"/>',
+  wallet : '<path d="M3.4 7.4A2 2 0 0 1 5.4 5.4h11.2a2 2 0 0 1 2 2v1.4"/><rect x="3.4" y="7.4" width="17.2" height="11.2" rx="2.2"/><circle cx="16.6" cy="13" r="1.3"/>',
+  users  : '<circle cx="9" cy="8.4" r="3.2"/><path d="M3.4 19.6a5.6 5.6 0 0 1 11.2 0"/><path d="M16 5.6a3.2 3.2 0 0 1 0 6.2"/><path d="M17.4 14.6a5.6 5.6 0 0 1 3.2 5"/>',
+  percent: '<circle cx="7.6" cy="7.6" r="2.6"/><circle cx="16.4" cy="16.4" r="2.6"/><path d="M18.4 5.6L5.6 18.4"/>',
+  bank   : '<path d="M3.4 9.6L12 4.4l8.6 5.2"/><path d="M5.6 9.6v8.2M10 9.6v8.2M14 9.6v8.2M18.4 9.6v8.2"/><path d="M3.4 20.4h17.2"/>',
+  arrow  : '<path d="M4 12h15"/><path d="M13.4 6.6L19 12l-5.6 5.4"/>'
 };
 const icon = (n, cls) => (n && ICONS[n])
   ? `<svg class="ico ${cls || ''}" viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -1315,6 +1398,23 @@ const RENDER = {
       <div class="steps" style="margin:52px auto 0">
         ${b.items.map(i => `
           <div class="step" data-stat>${iconBox(i.i)}<b>${i.k}</b><h3>${i.t}</h3></div>`).join('')}
+      </div>
+    </div>`,
+
+  /* schéma animé : les étapes, le lien qui se trace, la pièce qui circule */
+  flow: b => `
+    <div class="plain flow" data-card data-iris>
+      ${eyebrow(b.eyebrow, true)}
+      <div class="flow__row">
+        ${b.items.map((n, k) => `
+          ${k ? '<div class="link"><i class="link__bar" data-bar></i><u class="link__tip" data-tip></u><span class="link__dot" data-dot></span></div>' : ''}
+          <div class="node${n.pay ? ' node--pay' : ''}" data-node>
+            ${iconBox(n.i)}
+            <b>${n.k}</b>
+            <h3>${n.t}</h3>
+            <p>${n.d}</p>
+            ${n.pay ? `<span class="pay" data-pay>${n.pay}</span>` : ''}
+          </div>`).join('')}
       </div>
     </div>`,
 
@@ -1550,6 +1650,44 @@ function beatTimeline(b) {
   if (rows.length) tl.fromTo(rows, { y: 32, opacity: 0 },
     { y: 0, opacity: 1, duration: .55, stagger: .08, ease: 'expo.out' }, .14);
 
+  /* schéma : les étapes tombent une à une, le lien se trace, la pièce file
+     jusqu'à l'étape suivante, et la commission s'affiche à l'arrivée */
+  const nodes = el('[data-node]', root);
+  if (nodes.length) {
+    const bars = el('[data-bar]', root), dots = el('[data-dot]', root);
+    const pace = .62;
+    tl.fromTo(nodes, { y: 30, scale: .95, opacity: 0 },
+      { y: 0, scale: 1, opacity: 1, duration: .55, stagger: pace, ease: 'back.out(1.5)' }, .22);
+    nodes.forEach((_, k) => tl.call(fx, ['click', k + 1, .22], .24 + k * pace));
+
+    const tips = el('[data-tip]', root);
+    bars.forEach((bar, k) => {
+      tl.fromTo(bar,
+        { scaleX: () => narrow() ? 1 : 0, scaleY: () => narrow() ? 0 : 1 },
+        { scaleX: 1, scaleY: 1, duration: .42, ease: 'power2.inOut' }, .55 + k * pace);
+      if (tips[k]) tl.fromTo(tips[k], { opacity: 0, scale: .6 },
+        { opacity: 1, scale: 1, duration: .22, ease: 'back.out(2)' }, .9 + k * pace);
+    });
+    dots.forEach((dot, k) => {
+      const at = .62 + k * pace;
+      tl.fromTo(dot, { opacity: 0, x: 0, y: 0 }, { opacity: 1, duration: .1 }, at);
+      tl.to(dot, {
+        x: () => narrow() ? 0 : Math.max(0, dot.parentNode.clientWidth - 14),
+        y: () => narrow() ? Math.max(0, dot.parentNode.clientHeight - 14) : 0,
+        duration: .46, ease: 'power1.inOut'
+      }, at + .02);
+      tl.to(dot, { opacity: 0, duration: .12 }, at + .44);
+      tl.call(fx, ['whoosh', 1, .3, .3], at);
+    });
+
+    const pay = $('[data-pay]', root);
+    if (pay) {
+      tl.fromTo(pay, { scale: .5, opacity: 0 },
+        { scale: 1, opacity: 1, duration: .6, ease: 'back.out(2.2)' }, .3 + nodes.length * pace);
+      tl.call(fx, ['confirm'], .3 + nodes.length * pace);
+    }
+  }
+
   /* compteurs chiffrés */
   el('[data-count]', root).forEach((n, k) => {
     const to = parseFloat(n.dataset.count), dec = +n.dataset.dec || 0;
@@ -1557,7 +1695,10 @@ function beatTimeline(b) {
     const cd = Math.min(1.5, dur * .5);
     tl.fromTo(o, { v: 0 }, {
       v: to, duration: cd, ease: 'power2.out',
-      onUpdate() { n.textContent = o.v.toFixed(dec).replace('.', ','); }
+      onUpdate() {
+        const [ent, frac] = o.v.toFixed(dec).split('.');
+        n.textContent = ent.replace(/\B(?=(\d{3})+(?!\d))/g, '\u202f') + (frac ? ',' + frac : '');
+      }
     }, .2 + k * .1);
     if (k === 0) tl.call(fx, ['count', cd], .2);
   });
@@ -1700,6 +1841,8 @@ function sync() {
 
 /* ---------- format de sortie et mise à l'échelle ---------- */
 let _scale = 1, STAGE_W = 1920, STAGE_H = 1080;
+/* mise en page resserrée : vertical et carré */
+const narrow = () => STAGE_W < 1400;
 let FORMAT = '16:9';
 
 function measureScreens() {
