@@ -1232,7 +1232,11 @@ const CONFIG = {
     /* Effets sonores générés à la volée (aucun fichier) : souffles de
        transition, clics d'apparition, défilement, impacts de chapitre.
        0 pour les couper, touche S pendant la lecture. */
-    sfx     : 0.5
+    sfx     : 0.5,
+    /* Lit musical synthétisé (nappe, basse, arpège, rythme discret). Aucun
+       fichier, donc aucune question de droits. Il s'efface tout seul dès que
+       « music » pointe une vraie piste. */
+    bed     : { on: true, volume: 0.36, bpm: 100 }
   },
 
   /* --- formats de sortie -------------------------------------------------
@@ -2046,16 +2050,18 @@ const AUDIO = {
     if (this.ctx && this.ctx.state === 'suspended') this.ctx.resume();
   },
 
-  hasMix() { return this.mixed && !!this.dest; },
+  hasMix() { return !!(this.ctx && this.dest) && (!this.music || this.mixed); },
   stream()  { return this.dest ? this.dest.stream : null; },
 
   play(t) {
     this.init();
+    this._last = t;
+    if (this.ctx && BED.on) BED.schedule(this.ctx, this.master, t, this.ctx.currentTime, TOTAL);
     if (!this.music) return;
     this.sync(t, true);
     this.music.play().catch(() => {});
   },
-  pause() { if (this.music) this.music.pause(); },
+  pause() { BED.stop(); if (this.music) this.music.pause(); },
   sync(t, force) {
     const m = this.music;
     if (!m || !m.duration || !isFinite(m.duration)) return;
@@ -2065,7 +2071,12 @@ const AUDIO = {
 
   /* appelé à chaque image : recalage et enveloppe de volume */
   tick(t) {
-    if (!this.ready || !this.music) return;
+    if (!this.ready) return;
+    /* retour au début de la boucle : on reprogramme le lit musical */
+    if (this.ctx && BED.on && this._last != null && t < this._last - 1)
+      BED.schedule(this.ctx, this.master, 0, this.ctx.currentTime, TOTAL);
+    this._last = t;
+    if (!this.music) return;
     this.sync(t, false);
     const fi = AK.fadeIn || 0, fo = AK.fadeOut || 0;
     let env = 1;
@@ -2080,6 +2091,153 @@ const AUDIO = {
     this.on = !this.on;
     if (this.master && this.ctx) this.master.gain.setTargetAtTime(this.on ? 1 : 0, this.ctx.currentTime, .08);
     return this.on;
+  }
+};
+
+/* ==========================================================================
+   Musique de fond — synthétisée, aucun fichier, donc libre de droits.
+   Une nappe, une basse, un arpège et une percussion discrète, programmés en
+   une fois à des instants absolus : le rendu hors ligne donne exactement
+   ce qu'on entend dans le navigateur. Trois paliers d'intensité suivent
+   la montée du montage. Si CONFIG.audio.music pointe un vrai fichier,
+   ce lit s'efface et laisse la place.
+   ========================================================================== */
+const BED = {
+  cfg : AK.bed || {},
+  get on()  { return this.cfg.on !== false && !AK.music; },
+  get vol() { return this.cfg.volume == null ? .3 : this.cfg.volume; },
+  get bpm() { return this.cfg.bpm || 100; },
+  nodes: [], out: null,
+
+  /* La mineur : Am – F – C – G, une mesure chacun */
+  chords: [
+    { b: 55.00, n: [220.00, 261.63, 329.63] },   // Am
+    { b: 43.65, n: [174.61, 220.00, 261.63] },   // F
+    { b: 65.41, n: [196.00, 261.63, 329.63] },   // C
+    { b: 49.00, n: [196.00, 246.94, 293.66] }    // G
+  ],
+
+  /* enveloppe simple : montée, tenue, descente */
+  env(g, t, a, d, peak) {
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.linearRampToValueAtTime(peak, t + a);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + a + d);
+  },
+
+  /* enveloppe tenue : la nappe doit rester présente toute la mesure */
+  hold(g, t, a, h, r, peak) {
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.linearRampToValueAtTime(peak, t + a);
+    g.gain.setValueAtTime(peak, t + a + h);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + a + h + r);
+  },
+
+  pad(ctx, type, freq, t, len, peak, dest, detune) {
+    const o = ctx.createOscillator(), g = ctx.createGain();
+    o.type = type; o.frequency.setValueAtTime(freq, t);
+    if (detune) o.detune.setValueAtTime(detune, t);
+    this.hold(g, t, .5, Math.max(.1, len - 1.1), .6, peak);
+    o.connect(g).connect(dest);
+    o.start(t); o.stop(t + len + .1);
+    this.nodes.push(o);
+  },
+
+  osc(ctx, type, freq, t, a, d, peak, dest, detune) {
+    const o = ctx.createOscillator(), g = ctx.createGain();
+    o.type = type; o.frequency.setValueAtTime(freq, t);
+    if (detune) o.detune.setValueAtTime(detune, t);
+    this.env(g, t, a, d, peak);
+    o.connect(g).connect(dest);
+    o.start(t); o.stop(t + a + d + .05);
+    this.nodes.push(o);
+  },
+
+  /* programme toute la pièce : from = seconde du montage où l'on démarre,
+     at = instant du contexte audio correspondant */
+  schedule(ctx, master, from, at, total) {
+    if (!this.on || this.vol <= 0) return;
+    this.stop();
+
+    const out = ctx.createGain();
+    const lp  = ctx.createBiquadFilter();
+    lp.type = 'lowpass'; lp.frequency.setValueAtTime(2400, at);
+    out.connect(lp).connect(master);
+    this.out = out;
+
+    const beat = 60 / this.bpm, bar = beat * 4;
+    const bars = Math.ceil(total / bar) + 1;
+    const fi = 1.6, fo = 2.2;
+
+    /* enveloppe générale : entrée douce, sortie sur la fin du montage */
+    out.gain.setValueAtTime(0.0001, at);
+    out.gain.linearRampToValueAtTime(this.vol, at + Math.max(.2, fi - from));
+    if (total - from > fo) {
+      out.gain.setValueAtTime(this.vol, at + (total - from) - fo);
+      out.gain.linearRampToValueAtTime(0.0001, at + (total - from) - .05);
+    }
+
+    /* trois paliers : nappe seule, puis arpège, puis rythme */
+    const p2 = total * .38, p3 = total * .60;
+
+    for (let m = 0; m < bars; m++) {
+      const tb = m * bar;                     // seconde du montage
+      if (tb + bar < from) continue;
+      const T = at + (tb - from);             // instant du contexte
+      const ch = this.chords[m % this.chords.length];
+
+      /* nappe : trois voix légèrement désaccordées, tenues sur la mesure */
+      ch.n.forEach((f, k) => {
+        this.pad(ctx, 'triangle', f, T, bar, .085 - k * .012, out, k === 1 ? 7 : (k === 2 ? -6 : 0));
+        this.pad(ctx, 'sawtooth', f, T, bar, .022, out, k * 5 - 5);
+      });
+
+      /* basse : une note tenue par mesure */
+      this.pad(ctx, 'sine', ch.b, T, bar, .22, out);
+      this.osc(ctx, 'sine', ch.b * 2, T, .03, bar * .5, .07, out);
+
+      /* arpège : croches montantes, à partir du deuxième palier */
+      if (tb >= p2) {
+        for (let k = 0; k < 8; k++) {
+          const tn = T + k * beat / 2;
+          if (tn < at) continue;
+          const f = ch.n[k % 3] * (k >= 6 ? 2 : 1);
+          this.osc(ctx, 'triangle', f * 2, tn, .008, .34, .045, out);
+        }
+      }
+
+      /* rythme : grosse caisse sur 1 et 3, chapeau sur les contretemps */
+      if (tb >= p3) {
+        [0, 2].forEach(k => {
+          const tn = T + k * beat;
+          if (tn < at) return;
+          const o = ctx.createOscillator(), g = ctx.createGain();
+          o.type = 'sine';
+          o.frequency.setValueAtTime(120, tn);
+          o.frequency.exponentialRampToValueAtTime(46, tn + .09);
+          this.env(g, tn, .004, .22, .30);
+          o.connect(g).connect(out);
+          o.start(tn); o.stop(tn + .3);
+          this.nodes.push(o);
+        });
+        for (let k = 1; k < 8; k += 2) {
+          const tn = T + k * beat / 2;
+          if (tn < at || !SFX.noise) continue;
+          const src = ctx.createBufferSource(), hp = ctx.createBiquadFilter(), g = ctx.createGain();
+          src.buffer = SFX.noise();
+          hp.type = 'highpass'; hp.frequency.setValueAtTime(7200, tn);
+          this.env(g, tn, .003, .05, .05);
+          src.connect(hp).connect(g).connect(out);
+          src.start(tn); src.stop(tn + .09);
+          this.nodes.push(src);
+        }
+      }
+    }
+  },
+
+  stop() {
+    this.nodes.forEach(n => { try { n.stop(); } catch (e) {} });
+    this.nodes = [];
+    if (this.out) { try { this.out.disconnect(); } catch (e) {} this.out = null; }
   }
 };
 
@@ -2414,6 +2572,7 @@ async function record() {
    déplacée à la main. Sans effet en lecture normale. */
 PROMO.audio = AUDIO;
 PROMO.sfx = SFX;
+PROMO.bed = BED;
 PROMO.render = false;
 PROMO.timeline = () => master;
 PROMO.beats = () => BEATS;
