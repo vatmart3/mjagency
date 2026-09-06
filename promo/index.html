@@ -1232,11 +1232,11 @@ const CONFIG = {
     /* Effets sonores générés à la volée (aucun fichier) : souffles de
        transition, clics d'apparition, défilement, impacts de chapitre.
        0 pour les couper, touche S pendant la lecture. */
-    sfx     : 0.5,
+    sfx     : 0.34,
     /* Lit musical synthétisé (nappe, basse, arpège, rythme discret). Aucun
        fichier, donc aucune question de droits. Il s'efface tout seul dès que
        « music » pointe une vraie piste. */
-    bed     : { on: true, volume: 0.20, bpm: 76 }
+    bed     : { on: true, volume: 0.22, bpm: 104 }
   },
 
   /* --- formats de sortie -------------------------------------------------
@@ -2106,7 +2106,7 @@ const BED = {
   cfg : AK.bed || {},
   get on()  { return this.cfg.on !== false && !AK.music; },
   get vol() { return this.cfg.volume == null ? .2 : this.cfg.volume; },
-  get bpm() { return this.cfg.bpm || 76; },
+  get bpm() { return this.cfg.bpm || 104; },
   nodes: [], out: null,
 
   /* Fa majeur, accords de septième : Fmaj7 – Cmaj7 – Am7 – G6.
@@ -2161,7 +2161,7 @@ const BED = {
 
     const out = ctx.createGain();
     const lp  = ctx.createBiquadFilter();
-    lp.type = 'lowpass'; lp.frequency.setValueAtTime(1500, at);
+    lp.type = 'lowpass'; lp.frequency.setValueAtTime(2000, at);
     out.connect(lp).connect(master);
     this.out = out;
 
@@ -2177,8 +2177,9 @@ const BED = {
       out.gain.linearRampToValueAtTime(0.0001, at + (total - from) - .05);
     }
 
-    /* trois paliers : nappe seule, puis arpège, puis rythme */
-    const p2 = total * .38, p3 = total * .60;
+    /* trois paliers : la pulsation d'abord, puis la basse qui groove,
+       puis le contretemps. Peu d'éléments à la fois, mais toujours un appui. */
+    const p2 = total * .30, p3 = total * .56;
 
     for (let m = 0; m < bars; m++) {
       const tb = m * bar;                     // seconde du montage
@@ -2186,34 +2187,45 @@ const BED = {
       const T = at + (tb - from);             // instant du contexte
       const ch = this.chords[m % this.chords.length];
 
-      /* nappe : quatre voix rondes, à peine désaccordées */
-      ch.n.forEach((f, k) => {
-        this.pad(ctx, 'triangle', f, T, bar, .072 - k * .009, out, (k - 1) * 5);
+      /* nappe : deux voix seulement, pour laisser la place au rythme */
+      ch.n.slice(0, 2).forEach((f, k) => {
+        this.pad(ctx, 'triangle', f, T, bar, .055 - k * .012, out, (k - 1) * 6);
       });
 
-      /* basse : une note très tenue, sans attaque marquée */
-      this.pad(ctx, 'sine', ch.b, T, bar, .20, out);
+      /* grosse caisse : le premier et le troisième temps, dès le départ */
+      [0, 2].forEach(k => {
+        const tn = T + k * beat;
+        if (tn < at) return;
+        const o = ctx.createOscillator(), g = ctx.createGain();
+        o.type = 'sine';
+        o.frequency.setValueAtTime(105, tn);
+        o.frequency.exponentialRampToValueAtTime(44, tn + .11);
+        this.env(g, tn, .004, .26, .34);
+        o.connect(g).connect(out);
+        o.start(tn); o.stop(tn + .4);
+        this.nodes.push(o);
+      });
 
-      /* notes cristallines : deux par mesure, longue résonance */
-      if (tb >= p2) {
-        [0, 2.5].forEach((k, j) => {
+      /* basse : croches sur la fondamentale, l'élan vient de là */
+      const motif = tb >= p2 ? [0, 1.5, 2, 3, 3.5] : [0, 2];
+      motif.forEach(k => {
+        const tn = T + k * beat;
+        if (tn < at) return;
+        this.osc(ctx, 'sine', ch.b * (k >= 3 ? 2 : 1), tn, .012, beat * .78, .19, out);
+      });
+
+      /* contretemps : une pastille claire entre les temps */
+      if (tb >= p3) {
+        [1.5, 3.5].forEach(k => {
           const tn = T + k * beat;
           if (tn < at) return;
-          this.osc(ctx, 'sine', ch.n[(m + j) % ch.n.length] * 2, tn, .01, 1.6, .05, out);
+          this.osc(ctx, 'triangle', ch.n[1] * 4, tn, .004, .09, .028, out);
         });
       }
 
-      /* pas de batterie : juste une pulsation grave sur le premier temps,
-         qui donne l'appui sans casser le calme */
-      if (tb >= p3 && T >= at) {
-        const o = ctx.createOscillator(), g = ctx.createGain();
-        o.type = 'sine';
-        o.frequency.setValueAtTime(84, T);
-        o.frequency.exponentialRampToValueAtTime(44, T + .16);
-        this.env(g, T, .02, .5, .13);
-        o.connect(g).connect(out);
-        o.start(T); o.stop(T + .7);
-        this.nodes.push(o);
+      /* une note tenue par cycle, juste pour la couleur */
+      if (m % 2 === 1 && T + beat >= at) {
+        this.osc(ctx, 'sine', ch.n[2] * 2, T + beat, .01, 1.3, .042, out);
       }
     }
   },
