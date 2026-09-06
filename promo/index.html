@@ -1236,7 +1236,7 @@ const CONFIG = {
     /* Lit musical synthétisé (nappe, basse, arpège, rythme discret). Aucun
        fichier, donc aucune question de droits. Il s'efface tout seul dès que
        « music » pointe une vraie piste. */
-    bed     : { on: true, volume: 0.36, bpm: 100 }
+    bed     : { on: true, volume: 0.20, bpm: 76 }
   },
 
   /* --- formats de sortie -------------------------------------------------
@@ -2105,16 +2105,17 @@ const AUDIO = {
 const BED = {
   cfg : AK.bed || {},
   get on()  { return this.cfg.on !== false && !AK.music; },
-  get vol() { return this.cfg.volume == null ? .3 : this.cfg.volume; },
-  get bpm() { return this.cfg.bpm || 100; },
+  get vol() { return this.cfg.volume == null ? .2 : this.cfg.volume; },
+  get bpm() { return this.cfg.bpm || 76; },
   nodes: [], out: null,
 
-  /* La mineur : Am – F – C – G, une mesure chacun */
+  /* Fa majeur, accords de septième : Fmaj7 – Cmaj7 – Am7 – G6.
+     Une mesure chacun, voix larges pour rester en arrière-plan. */
   chords: [
-    { b: 55.00, n: [220.00, 261.63, 329.63] },   // Am
-    { b: 43.65, n: [174.61, 220.00, 261.63] },   // F
-    { b: 65.41, n: [196.00, 261.63, 329.63] },   // C
-    { b: 49.00, n: [196.00, 246.94, 293.66] }    // G
+    { b: 43.65, n: [174.61, 220.00, 261.63, 329.63] },  // Fmaj7
+    { b: 32.70, n: [196.00, 246.94, 261.63, 329.63] },  // Cmaj7
+    { b: 55.00, n: [164.81, 220.00, 261.63, 329.63] },  // Am7
+    { b: 49.00, n: [196.00, 246.94, 293.66, 329.63] }   // G6
   ],
 
   /* enveloppe simple : montée, tenue, descente */
@@ -2160,7 +2161,7 @@ const BED = {
 
     const out = ctx.createGain();
     const lp  = ctx.createBiquadFilter();
-    lp.type = 'lowpass'; lp.frequency.setValueAtTime(2400, at);
+    lp.type = 'lowpass'; lp.frequency.setValueAtTime(1500, at);
     out.connect(lp).connect(master);
     this.out = out;
 
@@ -2185,51 +2186,34 @@ const BED = {
       const T = at + (tb - from);             // instant du contexte
       const ch = this.chords[m % this.chords.length];
 
-      /* nappe : trois voix légèrement désaccordées, tenues sur la mesure */
+      /* nappe : quatre voix rondes, à peine désaccordées */
       ch.n.forEach((f, k) => {
-        this.pad(ctx, 'triangle', f, T, bar, .085 - k * .012, out, k === 1 ? 7 : (k === 2 ? -6 : 0));
-        this.pad(ctx, 'sawtooth', f, T, bar, .022, out, k * 5 - 5);
+        this.pad(ctx, 'triangle', f, T, bar, .072 - k * .009, out, (k - 1) * 5);
       });
 
-      /* basse : une note tenue par mesure */
-      this.pad(ctx, 'sine', ch.b, T, bar, .22, out);
-      this.osc(ctx, 'sine', ch.b * 2, T, .03, bar * .5, .07, out);
+      /* basse : une note très tenue, sans attaque marquée */
+      this.pad(ctx, 'sine', ch.b, T, bar, .20, out);
 
-      /* arpège : croches montantes, à partir du deuxième palier */
+      /* notes cristallines : deux par mesure, longue résonance */
       if (tb >= p2) {
-        for (let k = 0; k < 8; k++) {
-          const tn = T + k * beat / 2;
-          if (tn < at) continue;
-          const f = ch.n[k % 3] * (k >= 6 ? 2 : 1);
-          this.osc(ctx, 'triangle', f * 2, tn, .008, .34, .045, out);
-        }
-      }
-
-      /* rythme : grosse caisse sur 1 et 3, chapeau sur les contretemps */
-      if (tb >= p3) {
-        [0, 2].forEach(k => {
+        [0, 2.5].forEach((k, j) => {
           const tn = T + k * beat;
           if (tn < at) return;
-          const o = ctx.createOscillator(), g = ctx.createGain();
-          o.type = 'sine';
-          o.frequency.setValueAtTime(120, tn);
-          o.frequency.exponentialRampToValueAtTime(46, tn + .09);
-          this.env(g, tn, .004, .22, .30);
-          o.connect(g).connect(out);
-          o.start(tn); o.stop(tn + .3);
-          this.nodes.push(o);
+          this.osc(ctx, 'sine', ch.n[(m + j) % ch.n.length] * 2, tn, .01, 1.6, .05, out);
         });
-        for (let k = 1; k < 8; k += 2) {
-          const tn = T + k * beat / 2;
-          if (tn < at || !SFX.noise) continue;
-          const src = ctx.createBufferSource(), hp = ctx.createBiquadFilter(), g = ctx.createGain();
-          src.buffer = SFX.noise();
-          hp.type = 'highpass'; hp.frequency.setValueAtTime(7200, tn);
-          this.env(g, tn, .003, .05, .05);
-          src.connect(hp).connect(g).connect(out);
-          src.start(tn); src.stop(tn + .09);
-          this.nodes.push(src);
-        }
+      }
+
+      /* pas de batterie : juste une pulsation grave sur le premier temps,
+         qui donne l'appui sans casser le calme */
+      if (tb >= p3 && T >= at) {
+        const o = ctx.createOscillator(), g = ctx.createGain();
+        o.type = 'sine';
+        o.frequency.setValueAtTime(84, T);
+        o.frequency.exponentialRampToValueAtTime(44, T + .16);
+        this.env(g, T, .02, .5, .13);
+        o.connect(g).connect(out);
+        o.start(T); o.stop(T + .7);
+        this.nodes.push(o);
       }
     }
   },
