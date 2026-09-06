@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<!-- ==========================================================================
+     MINIATURES YOUTUBE — 1280 × 720
+     Même identité que le moteur promo : fond violet pâle, Archivo très gras,
+     accent violet dense. Tout le contenu est dans THUMBS ci-dessous ; pour
+     une autre vidéo ou un autre client, on ne touche que ce tableau.
+
+     Export : ouvrir la page, chaque carte fait exactement 1280 × 720 px.
+     Capture d'écran de la carte, ou rendu automatique par Playwright
+     (voir le script de rendu, il photographie chaque [data-thumb]).
+
+     Lisibilité : une miniature est vue en 210 × 118 px dans les suggestions.
+     Trois mots maximum en gros, un seul point d'accroche, fort contraste.
+     ========================================================================== -->
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Miniatures YouTube — MJ Agency</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link id="fontLink" rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;800;900&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  --violet:#6d2bff; --violet-2:#b026ff; --violet-3:#3a12a8;
+  --accent:#5a1fd6; --ink:#150c2e;
+  --font-display:'Archivo',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --font-ui:'JetBrains Mono',ui-monospace,Menlo,monospace;
+}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:#1a1526;padding:40px;display:flex;flex-direction:column;gap:40px;align-items:center}
+
+.thumb{
+  position:relative;width:1280px;height:720px;overflow:hidden;flex:none;
+  display:flex;flex-direction:column;justify-content:space-between;
+  background:
+    radial-gradient(86% 58% at 62% 18%, rgba(109,43,255,.30) 0%, rgba(244,242,250,0) 62%),
+    radial-gradient(66% 60% at 4% 104%, rgba(176,38,255,.22) 0%, rgba(244,242,250,0) 58%),
+    radial-gradient(150% 130% at 50% 45%, #fbfaff 0%, #ece7f8 56%, #ddd6f0 100%);
+  color:var(--ink);font-family:var(--font-display);
+  padding:56px 72px;
+}
+/* grain : la même texture que la vidéo, sinon le fond paraît plastique */
+.thumb::after{
+  content:"";position:absolute;inset:0;opacity:.05;mix-blend-mode:multiply;pointer-events:none;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/><feColorMatrix type='saturate' values='0'/></filter><rect width='240' height='240' filter='url(%23n)' opacity='.6'/></svg>");
+}
+
+/* marque, en haut à gauche : reconnaissable même en tout petit */
+.brand{display:flex;align-items:center;gap:16px;z-index:3;flex:none}
+.brand__mark{
+  width:64px;height:64px;border-radius:19px;display:grid;place-items:center;
+  background:linear-gradient(150deg,#2a1160,#5a1fd6);color:#fff;
+  font-weight:900;font-size:26px;letter-spacing:-.05em;
+  box-shadow:0 20px 44px -16px rgba(90,31,214,.6);
+}
+.brand__name{font-weight:900;font-size:27px;letter-spacing:-.01em}
+
+/* pied : la ville, c'est ce qui déclenche le clic en local */
+.foot{
+  margin:0;z-index:3;flex:none;
+  font-family:var(--font-ui);font-size:21px;letter-spacing:.18em;text-transform:uppercase;
+  color:rgba(21,12,46,.52);
+}
+
+.col{position:relative;z-index:2;max-width:760px;flex:1;display:flex;flex-direction:column;justify-content:center;padding:14px 0}
+.eyebrow{
+  margin:0 0 22px;display:flex;align-items:center;gap:16px;
+  font-family:var(--font-ui);font-size:23px;letter-spacing:.24em;text-transform:uppercase;
+  color:var(--accent);font-weight:500;
+}
+.eyebrow b{width:44px;height:3px;background:var(--accent);display:block;border-radius:2px}
+.title{
+  margin:0;font-weight:900;font-size:118px;line-height:.93;letter-spacing:-.048em;
+  text-wrap:balance;
+}
+.title em{font-style:normal;color:var(--accent)}
+.sub{
+  margin:26px 0 0;font-weight:600;font-size:31px;line-height:1.26;letter-spacing:-.02em;
+  color:rgba(21,12,46,.66);max-width:24ch;
+}
+.thumb--plain .title{font-size:104px}
+.has-sub .title{font-size:86px}
+.has-sub.thumb--mock .title{font-size:76px}
+
+/* pastille chiffrée : le seul élément qui doit rester lisible en miniature */
+.big{
+  position:absolute;right:64px;top:50%;transform:translateY(-50%);z-index:2;
+  width:420px;height:420px;border-radius:50%;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;
+  background:linear-gradient(150deg,#2a1160,#5a1fd6);color:#fff;
+  box-shadow:0 60px 110px -40px rgba(42,17,96,.6),inset 0 2px 0 rgba(255,255,255,.22);
+}
+.big u{text-decoration:none;font-weight:900;font-size:168px;letter-spacing:-.06em;line-height:.9}
+.big span{
+  font-family:var(--font-ui);font-size:21px;letter-spacing:.2em;text-transform:uppercase;
+  opacity:.82;margin-top:10px;
+}
+.thumb--big .col{max-width:640px}
+.thumb--big .title{font-size:96px}
+.has-sub.thumb--big .title{font-size:74px}
+.has-sub.thumb--big .sub{max-width:19ch;font-size:29px}
+/* un symbole seul tient plus de place qu'un nombre : on le pousse */
+.big u.wide{font-size:248px}
+
+/* maquette de navigateur : pour la vidéo de présentation */
+.mock{
+  position:absolute;right:-40px;top:50%;transform:translateY(-50%) rotate(-4deg);z-index:1;
+  width:560px;border-radius:20px;overflow:hidden;background:#0c0c12;
+  box-shadow:0 70px 120px -40px rgba(30,16,70,.55),0 0 0 1px rgba(30,16,70,.10);
+}
+.mock__bar{height:44px;display:flex;align-items:center;gap:9px;padding:0 18px;background:linear-gradient(#1b1b25,#101017)}
+.mock__bar u{width:10px;height:10px;border-radius:50%;background:#2f2f3c;display:block}
+.mock__view{height:392px;background:#fbfaff;padding:34px 30px}
+.mock__view b{display:block;height:30px;border-radius:8px;background:#170c2e;margin-bottom:14px;width:78%}
+.mock__view b.s{background:linear-gradient(90deg,#6d2bff,#b026ff);width:54%}
+.mock__view u{display:block;height:11px;border-radius:6px;background:rgba(10,4,30,.14);margin-bottom:11px}
+.mock__img{margin-top:26px;height:150px;border-radius:14px;background:linear-gradient(150deg,#2a0f6b,#6d2bff 46%,#ff9ad5)}
+
+.label{color:#b9aee0;font-family:var(--font-ui);font-size:13px;letter-spacing:.2em;text-transform:uppercase}
+</style>
+</head>
+<body>
+<script>
+/* ==========================================================================
+   Le contenu des miniatures. type : 'big' (pastille chiffrée),
+   'plain' (texte seul), 'mock' (maquette de site à droite).
+   ========================================================================== */
+const BRAND = { monogram:'MJ', name:'MJ AGENCY' };
+
+const THUMBS = [
+  { id:'apporteur-chiffre', type:'big',
+    eyebrow:'Apporteur d\'affaires',
+    title:'Votre réseau<br>vaut de<br><em>l\'argent.</em>',
+    big:{ n:'10 %', s:'par projet' },
+    foot:'Sète · Montpellier' },
+
+  { id:'apporteur-sans-chiffre', type:'big',
+    eyebrow:'On recrute',
+    title:'Votre réseau<br>vaut de <em>l\'argent.</em>',
+    sub:'Devenez apporteur d\'affaires pour une agence web.',
+    big:{ n:'€', s:'sur chaque projet', wide:true },
+    foot:'Sète · Montpellier · Occitanie' },
+
+  { id:'agence-accroche', type:'mock',
+    eyebrow:'Création de sites',
+    title:'Votre site<br>ne raconte<br><em>rien.</em>',
+    foot:'Sète · Montpellier' },
+
+  { id:'agence-metier', type:'mock',
+    eyebrow:'Studio web & design',
+    title:'Des sites qui<br>font <em>vendre.</em>',
+    sub:'Design, code et marque, sous le même toit.',
+    foot:'mjagency.eu · Sète' }
+];
+
+const card = t => `
+  <div class="thumb thumb--${t.type}${t.sub ? ' has-sub' : ''}" data-thumb id="${t.id}">
+    <div class="brand">
+      <span class="brand__mark">${BRAND.monogram}</span>
+      <span class="brand__name">${BRAND.name}</span>
+    </div>
+    <div class="col">
+      <p class="eyebrow"><b></b>${t.eyebrow}</p>
+      <h1 class="title">${t.title}</h1>
+      ${t.sub ? `<p class="sub">${t.sub}</p>` : ''}
+    </div>
+    ${t.type === 'big' ? `
+      <div class="big"><u class="${t.big.wide ? 'wide' : ''}">${t.big.n}</u><span>${t.big.s}</span></div>` : ''}
+    ${t.type === 'mock' ? `
+      <div class="mock">
+        <div class="mock__bar"><u></u><u></u><u></u></div>
+        <div class="mock__view">
+          <b></b><b class="s"></b>
+          <u style="width:64%"></u><u style="width:48%"></u>
+          <div class="mock__img"></div>
+        </div>
+      </div>` : ''}
+    <p class="foot">${t.foot}</p>
+  </div>`;
+
+document.body.insertAdjacentHTML('beforeend',
+  THUMBS.map(t => `<p class="label">${t.id} — 1280 × 720</p>${card(t)}`).join(''));
+</script>
+</body>
+</html>
