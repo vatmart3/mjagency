@@ -1,16 +1,19 @@
 <!DOCTYPE html>
 <!-- ==========================================================================
      MINIATURES YOUTUBE — 1280 × 720
-     Même identité que le moteur promo : fond violet pâle, Archivo très gras,
-     accent violet dense. Tout le contenu est dans THUMBS ci-dessous ; pour
-     une autre vidéo ou un autre client, on ne touche que ce tableau.
+     Parti pris : fond sombre. L'interface de YouTube est blanche, une
+     miniature claire s'y fond ; une miniature sombre et lumineuse s'en
+     détache. Un seul objet dominant par image (pièces, écran, badge), un
+     texte de trois mots, un mot en violet pour accrocher le regard.
 
-     Export : ouvrir la page, chaque carte fait exactement 1280 × 720 px.
-     Capture d'écran de la carte, ou rendu automatique par Playwright
-     (voir le script de rendu, il photographie chaque [data-thumb]).
+     Tout le contenu est dans THUMBS, en bas du fichier : pour une autre
+     vidéo ou un autre client, on ne touche que ce tableau.
 
-     Lisibilité : une miniature est vue en 210 × 118 px dans les suggestions.
-     Trois mots maximum en gros, un seul point d'accroche, fort contraste.
+     Export : chaque carte fait exactement 1280 × 720 px. Capture d'écran,
+     ou rendu automatique (le script photographie chaque [data-thumb]).
+
+     Repère de lisibilité : une miniature est vue en 210 × 118 px dans les
+     suggestions — soit six fois plus petite que ce qu'on voit à l'écran.
      ========================================================================== -->
 <html lang="fr">
 <head>
@@ -23,160 +26,298 @@
 <style>
 :root{
   --violet:#6d2bff; --violet-2:#b026ff; --violet-3:#3a12a8;
-  --accent:#5a1fd6; --ink:#150c2e;
+  --accent:#c9a7ff; --lilac:#a97cf5;
   --font-display:'Archivo',system-ui,-apple-system,'Segoe UI',sans-serif;
   --font-ui:'JetBrains Mono',ui-monospace,Menlo,monospace;
 }
 *,*::before,*::after{box-sizing:border-box}
-body{margin:0;background:#1a1526;padding:40px;display:flex;flex-direction:column;gap:40px;align-items:center}
+body{margin:0;background:#0d0a14;padding:40px;display:flex;flex-direction:column;gap:44px;align-items:center}
 
+/* ---------- la carte ---------- */
 .thumb{
   position:relative;width:1280px;height:720px;overflow:hidden;flex:none;
   display:flex;flex-direction:column;justify-content:space-between;
+  padding:52px 68px;color:#fff;font-family:var(--font-display);
   background:
-    radial-gradient(86% 58% at 62% 18%, rgba(109,43,255,.30) 0%, rgba(244,242,250,0) 62%),
-    radial-gradient(66% 60% at 4% 104%, rgba(176,38,255,.22) 0%, rgba(244,242,250,0) 58%),
-    radial-gradient(150% 130% at 50% 45%, #fbfaff 0%, #ece7f8 56%, #ddd6f0 100%);
-  color:var(--ink);font-family:var(--font-display);
-  padding:56px 72px;
+    radial-gradient(78% 62% at 76% 22%, rgba(176,38,255,.42) 0%, rgba(10,5,24,0) 62%),
+    radial-gradient(70% 60% at 6% 96%, rgba(109,43,255,.38) 0%, rgba(10,5,24,0) 60%),
+    radial-gradient(150% 120% at 50% 40%, #17093a 0%, #0c0522 52%, #06020f 100%);
 }
-/* grain : la même texture que la vidéo, sinon le fond paraît plastique */
+/* halo diffus derrière l'objet principal : c'est lui qui donne la profondeur */
+.glow{
+  position:absolute;right:170px;top:50%;width:660px;height:660px;margin-top:-330px;
+  border-radius:50%;filter:blur(70px);z-index:0;
+  background:radial-gradient(circle,rgba(176,38,255,.58) 0%,rgba(109,43,255,.30) 42%,rgba(10,5,24,0) 70%);
+}
+/* trame fine : sans elle le fond sombre paraît plat */
+.thumb::before{
+  content:"";position:absolute;inset:0;z-index:0;opacity:.16;pointer-events:none;
+  background-image:linear-gradient(rgba(201,167,255,.18) 1px,transparent 1px),
+                   linear-gradient(90deg,rgba(201,167,255,.18) 1px,transparent 1px);
+  background-size:80px 80px;
+  mask-image:radial-gradient(70% 60% at 30% 50%,#000 0%,transparent 78%);
+  -webkit-mask-image:radial-gradient(70% 60% at 30% 50%,#000 0%,transparent 78%);
+}
 .thumb::after{
-  content:"";position:absolute;inset:0;opacity:.05;mix-blend-mode:multiply;pointer-events:none;
-  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/><feColorMatrix type='saturate' values='0'/></filter><rect width='240' height='240' filter='url(%23n)' opacity='.6'/></svg>");
+  content:"";position:absolute;inset:0;z-index:2;pointer-events:none;
+  background:radial-gradient(86% 78% at 46% 46%,rgba(0,0,0,0) 44%,rgba(0,0,0,.5) 100%);
 }
 
-/* marque, en haut à gauche : reconnaissable même en tout petit */
-.brand{display:flex;align-items:center;gap:16px;z-index:3;flex:none}
+/* ---------- marque ---------- */
+.brand{display:flex;align-items:center;gap:15px;z-index:5;flex:none}
 .brand__mark{
-  width:64px;height:64px;border-radius:19px;display:grid;place-items:center;
-  background:linear-gradient(150deg,#2a1160,#5a1fd6);color:#fff;
-  font-weight:900;font-size:26px;letter-spacing:-.05em;
-  box-shadow:0 20px 44px -16px rgba(90,31,214,.6);
+  width:60px;height:60px;border-radius:18px;display:grid;place-items:center;
+  background:linear-gradient(150deg,#fff,#d9c8ff);color:#12062e;
+  font-weight:900;font-size:25px;letter-spacing:-.05em;
+  box-shadow:0 18px 40px -12px rgba(176,38,255,.85);
 }
-.brand__name{font-weight:900;font-size:27px;letter-spacing:-.01em}
+.brand__name{font-weight:900;font-size:26px;letter-spacing:.01em}
 
-/* pied : la ville, c'est ce qui déclenche le clic en local */
+/* ---------- pied ---------- */
 .foot{
-  margin:0;z-index:3;flex:none;
-  font-family:var(--font-ui);font-size:21px;letter-spacing:.18em;text-transform:uppercase;
-  color:rgba(21,12,46,.52);
+  margin:0;z-index:5;flex:none;display:flex;align-items:center;gap:16px;
+  font-family:var(--font-ui);font-size:20px;letter-spacing:.2em;text-transform:uppercase;
+  color:rgba(255,255,255,.62);
 }
+.foot i{width:8px;height:8px;border-radius:50%;background:var(--accent);
+  box-shadow:0 0 16px 4px rgba(201,167,255,.7);display:block;flex:none}
 
-.col{position:relative;z-index:2;max-width:760px;flex:1;display:flex;flex-direction:column;justify-content:center;padding:14px 0}
+/* ---------- bloc de texte ---------- */
+.col{position:relative;z-index:5;max-width:690px;flex:1;
+  display:flex;flex-direction:column;justify-content:center;padding:10px 0}
 .eyebrow{
-  margin:0 0 22px;display:flex;align-items:center;gap:16px;
-  font-family:var(--font-ui);font-size:23px;letter-spacing:.24em;text-transform:uppercase;
-  color:var(--accent);font-weight:500;
+  margin:0 0 20px;display:inline-flex;align-items:center;gap:12px;align-self:flex-start;
+  padding:9px 20px 9px 14px;border-radius:999px;
+  border:1px solid rgba(201,167,255,.42);background:rgba(201,167,255,.12);
+  font-family:var(--font-ui);font-size:20px;letter-spacing:.18em;text-transform:uppercase;
+  color:#e4d6ff;
 }
-.eyebrow b{width:44px;height:3px;background:var(--accent);display:block;border-radius:2px}
+.eyebrow i{width:9px;height:9px;border-radius:50%;background:var(--accent);
+  box-shadow:0 0 14px 4px rgba(201,167,255,.8);display:block}
 .title{
-  margin:0;font-weight:900;font-size:118px;line-height:.93;letter-spacing:-.048em;
-  text-wrap:balance;
+  margin:0;font-weight:900;font-size:112px;line-height:.92;letter-spacing:-.05em;
+  text-shadow:0 8px 44px rgba(4,2,12,.75);
 }
-.title em{font-style:normal;color:var(--accent)}
+.title em{
+  font-style:normal;display:inline-block;color:#fff;-webkit-text-fill-color:#fff;
+  padding:.02em .13em .09em;margin:0 -.04em;border-radius:16px;
+  background:linear-gradient(134deg,#c22cff 0%,#7b34ff 62%,#5a1fd6 100%);
+  box-shadow:0 22px 50px -16px rgba(176,38,255,.95),inset 0 1px 0 rgba(255,255,255,.28);
+}
 .sub{
-  margin:26px 0 0;font-weight:600;font-size:31px;line-height:1.26;letter-spacing:-.02em;
-  color:rgba(21,12,46,.66);max-width:24ch;
+  margin:24px 0 0;font-weight:600;font-size:30px;line-height:1.26;letter-spacing:-.02em;
+  color:rgba(255,255,255,.74);max-width:22ch;
 }
-.thumb--plain .title{font-size:104px}
-.has-sub .title{font-size:86px}
-.has-sub.thumb--mock .title{font-size:76px}
+.has-sub .title{font-size:88px}
+.thumb--coins .col{max-width:640px}
+.thumb--coins .title{font-size:94px}
 
-/* pastille chiffrée : le seul élément qui doit rester lisible en miniature */
-.big{
-  position:absolute;right:64px;top:50%;transform:translateY(-50%);z-index:2;
-  width:420px;height:420px;border-radius:50%;
-  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;
-  background:linear-gradient(150deg,#2a1160,#5a1fd6);color:#fff;
-  box-shadow:0 60px 110px -40px rgba(42,17,96,.6),inset 0 2px 0 rgba(255,255,255,.22);
+/* badge d'appui, posé sous le titre : le chiffre qui décide du clic */
+.stamp{
+  margin-top:24px;align-self:flex-start;display:inline-flex;align-items:baseline;gap:13px;
+  padding:12px 26px;border-radius:15px;
+  background:linear-gradient(150deg,#ffffff,#ece1ff);color:#2a1160;
+  box-shadow:0 26px 60px -20px rgba(0,0,0,.75),0 0 40px -6px rgba(217,184,255,.5);
 }
-.big u{text-decoration:none;font-weight:900;font-size:168px;letter-spacing:-.06em;line-height:.9}
-.big span{
-  font-family:var(--font-ui);font-size:21px;letter-spacing:.2em;text-transform:uppercase;
-  opacity:.82;margin-top:10px;
-}
-.thumb--big .col{max-width:640px}
-.thumb--big .title{font-size:96px}
-.has-sub.thumb--big .title{font-size:74px}
-.has-sub.thumb--big .sub{max-width:19ch;font-size:29px}
-/* un symbole seul tient plus de place qu'un nombre : on le pousse */
-.big u.wide{font-size:248px}
+.stamp b{font-weight:900;font-size:46px;letter-spacing:-.04em;line-height:1}
+.stamp span{font-family:var(--font-ui);font-size:19px;letter-spacing:.16em;
+  text-transform:uppercase;color:rgba(42,17,96,.72)}
 
-/* maquette de navigateur : pour la vidéo de présentation */
-.mock{
-  position:absolute;right:-40px;top:50%;transform:translateY(-50%) rotate(-4deg);z-index:1;
-  width:560px;border-radius:20px;overflow:hidden;background:#0c0c12;
-  box-shadow:0 70px 120px -40px rgba(30,16,70,.55),0 0 0 1px rgba(30,16,70,.10);
+/* ---------- pièces en relief ---------- */
+.coins{position:absolute;right:0;top:0;bottom:0;width:620px;z-index:3}
+.coin{
+  position:absolute;border-radius:50%;display:grid;place-items:center;
+  background:
+    radial-gradient(120% 120% at 30% 22%, #ffffff 0%, #efe4ff 26%, #c9a7ff 56%, #7a3ce8 84%, #4a17c4 100%);
+  box-shadow:0 50px 90px -26px rgba(3,1,10,.9),
+             inset 0 -10px 22px rgba(42,17,96,.55),
+             inset 0 10px 18px rgba(255,255,255,.85);
+  font-weight:900;color:#3a0f8f;line-height:1;
+  text-shadow:0 2px 0 rgba(255,255,255,.55);
 }
-.mock__bar{height:44px;display:flex;align-items:center;gap:9px;padding:0 18px;background:linear-gradient(#1b1b25,#101017)}
-.mock__bar u{width:10px;height:10px;border-radius:50%;background:#2f2f3c;display:block}
-.mock__view{height:392px;background:#fbfaff;padding:34px 30px}
-.mock__view b{display:block;height:30px;border-radius:8px;background:#170c2e;margin-bottom:14px;width:78%}
-.mock__view b.s{background:linear-gradient(90deg,#6d2bff,#b026ff);width:54%}
-.mock__view u{display:block;height:11px;border-radius:6px;background:rgba(10,4,30,.14);margin-bottom:11px}
-.mock__img{margin-top:26px;height:150px;border-radius:14px;background:linear-gradient(150deg,#2a0f6b,#6d2bff 46%,#ff9ad5)}
+.coin::after{
+  content:"";position:absolute;inset:7%;border-radius:50%;
+  border:3px solid rgba(58,15,143,.22);
+}
+.coin--1{width:296px;height:296px;right:150px;top:186px;font-size:150px;transform:rotate(-7deg)}
+.coin--2{width:190px;height:190px;right:392px;top:112px;font-size:96px;transform:rotate(9deg);opacity:.96}
+.coin--3{width:150px;height:150px;right:96px;top:470px;font-size:76px;transform:rotate(14deg);opacity:.94}
+/* éclats : quelques points lumineux autour des pièces */
+.spark{position:absolute;border-radius:50%;background:#fff;z-index:3;
+  box-shadow:0 0 18px 6px rgba(217,184,255,.9)}
 
-.label{color:#b9aee0;font-family:var(--font-ui);font-size:13px;letter-spacing:.2em;text-transform:uppercase}
+/* ---------- écran de site, en perspective ---------- */
+.screen{
+  position:absolute;right:-46px;top:50%;z-index:3;width:600px;
+  transform:translateY(-50%) perspective(1400px) rotateY(-17deg) rotateX(4deg) rotate(-2deg);
+  border-radius:22px;overflow:hidden;background:#0c0c12;
+  box-shadow:0 70px 130px -34px rgba(2,1,8,.95),0 0 0 1px rgba(201,167,255,.28),
+             0 0 90px -10px rgba(176,38,255,.5);
+}
+.screen__bar{height:46px;display:flex;align-items:center;gap:9px;padding:0 18px;
+  background:linear-gradient(#20202c,#111119)}
+.screen__bar u{width:11px;height:11px;border-radius:50%;background:#33333f;display:block}
+.screen__view{height:410px;background:#fbfaff;padding:34px 32px}
+.screen__view b{display:block;height:30px;border-radius:8px;background:#170c2e;margin-bottom:13px;width:76%}
+.screen__view b.s{background:linear-gradient(90deg,#6d2bff,#b026ff);width:52%}
+.screen__view u{display:block;height:11px;border-radius:6px;background:rgba(10,4,30,.15);margin-bottom:10px}
+.screen__img{margin-top:24px;height:170px;border-radius:14px;
+  background:linear-gradient(150deg,#2a0f6b,#6d2bff 46%,#ff9ad5)}
+/* courbe de résultats posée sur l'écran */
+.curve{position:absolute;right:64px;bottom:74px;z-index:4;width:330px;height:190px}
+.curve svg{width:100%;height:100%;overflow:visible}
+
+/* ---------- avant / après ---------- */
+.ba{position:absolute;inset:0;z-index:2;display:flex}
+.ba__half{position:relative;flex:1;overflow:hidden}
+.ba__half--old{background:linear-gradient(160deg,#2a2a33,#15151c)}
+.ba__half--new{background:linear-gradient(160deg,#2a0f6b,#6d2bff 58%,#b026ff)}
+.ba__tag{
+  position:absolute;top:452px;transform:translateX(-50%);z-index:5;
+  padding:10px 26px;border-radius:999px;font-family:var(--font-ui);
+  font-size:20px;letter-spacing:.22em;text-transform:uppercase;white-space:nowrap;
+}
+.ba__tag--old{left:25%;background:rgba(255,255,255,.16);color:rgba(255,255,255,.82)}
+.ba__tag--new{left:75%;background:#fff;color:#2a1160;font-weight:500;
+  box-shadow:0 18px 44px -14px rgba(0,0,0,.7)}
+.ba__site{position:absolute;left:50%;top:118px;transform:translateX(-50%);
+  width:330px;border-radius:14px;overflow:hidden;background:#fff;
+  box-shadow:0 40px 80px -30px rgba(0,0,0,.8)}
+.ba__site--old{filter:grayscale(1) contrast(.78) brightness(.86)}
+.ba__site u{display:block;height:9px;border-radius:5px;background:rgba(10,4,30,.16);margin:9px 22px}
+.ba__site b{display:block;height:22px;border-radius:6px;background:#170c2e;margin:22px 22px 12px;width:64%}
+.ba__site .img{height:120px;margin:16px 22px 22px;border-radius:10px;
+  background:linear-gradient(150deg,#2a0f6b,#6d2bff 50%,#ff9ad5)}
+.ba__mid{
+  position:absolute;left:50%;top:288px;transform:translate(-50%,-50%);z-index:6;
+  width:118px;height:118px;border-radius:50%;display:grid;place-items:center;
+  background:linear-gradient(150deg,#fff,#e2d3ff);color:#2a1160;
+  font-size:56px;font-weight:900;
+  box-shadow:0 30px 70px -18px rgba(0,0,0,.8),0 0 60px -6px rgba(217,184,255,.8);
+}
+.ba__scrim{
+  position:absolute;left:0;right:0;bottom:0;height:400px;z-index:4;pointer-events:none;
+  background:linear-gradient(to top,rgba(4,2,10,.96) 0%,rgba(4,2,10,.86) 34%,rgba(4,2,10,0) 100%);
+}
+.thumb--ba{justify-content:space-between}
+.thumb--ba .col{max-width:none;flex:none;position:absolute;left:0;right:0;bottom:44px;
+  align-items:center;text-align:center;z-index:7;padding:0 60px}
+.thumb--ba .title{font-size:100px;text-shadow:0 10px 40px rgba(0,0,0,.9)}
+/* sur la moitié violette, un dégradé de texte s'éteint : couleur pleine */
+.thumb--ba .title em{box-shadow:0 22px 50px -16px rgba(0,0,0,.8),inset 0 1px 0 rgba(255,255,255,.3)}
+.thumb--ba .eyebrow{display:none}
+.thumb--ba .foot{display:none}
+
+.label{color:#8d7fb8;font-family:var(--font-ui);font-size:13px;letter-spacing:.2em;text-transform:uppercase}
 </style>
 </head>
 <body>
 <script>
 /* ==========================================================================
-   Le contenu des miniatures. type : 'big' (pastille chiffrée),
-   'plain' (texte seul), 'mock' (maquette de site à droite).
+   Le contenu. art : 'coins' (pièces en relief), 'screen' (site en
+   perspective + courbe), 'ba' (avant / après).
    ========================================================================== */
 const BRAND = { monogram:'MJ', name:'MJ AGENCY' };
 
 const THUMBS = [
-  { id:'apporteur-chiffre', type:'big',
+
+  /* ---- vidéo apporteurs d'affaires ---- */
+  { id:'apporteur-pieces', art:'coins',
     eyebrow:'Apporteur d\'affaires',
     title:'Votre réseau<br>vaut de<br><em>l\'argent.</em>',
-    big:{ n:'10 %', s:'par projet' },
-    foot:'Sète · Montpellier' },
-
-  { id:'apporteur-sans-chiffre', type:'big',
-    eyebrow:'On recrute',
-    title:'Votre réseau<br>vaut de <em>l\'argent.</em>',
-    sub:'Devenez apporteur d\'affaires pour une agence web.',
-    big:{ n:'€', s:'sur chaque projet', wide:true },
+    stamp:{ n:'10 %', s:'sur chaque projet' },
     foot:'Sète · Montpellier · Occitanie' },
 
-  { id:'agence-accroche', type:'mock',
+  { id:'apporteur-pieces-sans-chiffre', art:'coins',
+    eyebrow:'On recrute',
+    title:'Gagnez sur<br>votre <em>carnet<br>d\'adresses.</em>',
+    foot:'Sète · Montpellier · Occitanie' },
+
+  /* ---- vidéo de présentation de l'agence ---- */
+  { id:'agence-ecran', art:'screen',
     eyebrow:'Création de sites',
     title:'Votre site<br>ne raconte<br><em>rien.</em>',
     foot:'Sète · Montpellier' },
 
-  { id:'agence-metier', type:'mock',
-    eyebrow:'Studio web & design',
-    title:'Des sites qui<br>font <em>vendre.</em>',
-    sub:'Design, code et marque, sous le même toit.',
-    foot:'mjagency.eu · Sète' }
+  { id:'agence-avant-apres', art:'ba',
+    eyebrow:'Refonte de site',
+    title:'Votre site<br>mérite <em>mieux.</em>',
+    foot:'' }
 ];
 
+const coins = () => `
+  <div class="glow"></div>
+  <div class="coins">
+    <div class="coin coin--2">€</div>
+    <div class="coin coin--1">€</div>
+    <div class="coin coin--3">€</div>
+    <span class="spark" style="width:14px;height:14px;right:430px;top:330px"></span>
+    <span class="spark" style="width:9px;height:9px;right:120px;top:150px;opacity:.8"></span>
+    <span class="spark" style="width:11px;height:11px;right:330px;top:600px;opacity:.7"></span>
+  </div>`;
+
+const screenArt = () => `
+  <div class="glow"></div>
+  <div class="screen">
+    <div class="screen__bar"><u></u><u></u><u></u></div>
+    <div class="screen__view">
+      <b></b><b class="s"></b>
+      <u style="width:62%"></u><u style="width:46%"></u>
+      <div class="screen__img"></div>
+    </div>
+  </div>
+  <div class="curve">
+    <svg viewBox="0 0 330 190" fill="none">
+      <defs>
+        <linearGradient id="g" x1="0" y1="190" x2="330" y2="0">
+          <stop offset="0" stop-color="#c9a7ff"/><stop offset="1" stop-color="#ff9ad5"/>
+        </linearGradient>
+      </defs>
+      <path d="M6 178 L92 132 L168 146 L246 66 L318 18" stroke="url(#g)" stroke-width="9"
+            stroke-linecap="round" stroke-linejoin="round"
+            style="filter:drop-shadow(0 0 22px rgba(201,167,255,.9))"/>
+      <path d="M282 14 L322 14 L322 54" stroke="url(#g)" stroke-width="9"
+            stroke-linecap="round" stroke-linejoin="round"
+            style="filter:drop-shadow(0 0 22px rgba(201,167,255,.9))"/>
+    </svg>
+  </div>`;
+
+const beforeAfter = () => `
+  <div class="ba">
+    <div class="ba__half ba__half--old">
+      <div class="ba__site ba__site--old">
+        <b></b><u style="width:70%"></u><u style="width:54%"></u>
+        <div class="img"></div><u style="width:62%"></u>
+      </div>
+    </div>
+    <div class="ba__half ba__half--new">
+      <div class="ba__site">
+        <b></b><u style="width:70%"></u><u style="width:54%"></u>
+        <div class="img"></div><u style="width:62%"></u>
+      </div>
+    </div>
+  </div>
+  <div class="ba__mid">→</div>
+  <div class="ba__scrim"></div>
+  <span class="ba__tag ba__tag--old">Avant</span>
+  <span class="ba__tag ba__tag--new">Après</span>`;
+
+const ART = { coins, screen: screenArt, ba: beforeAfter };
+
 const card = t => `
-  <div class="thumb thumb--${t.type}${t.sub ? ' has-sub' : ''}" data-thumb id="${t.id}">
+  <div class="thumb thumb--${t.art}${t.sub ? ' has-sub' : ''}" data-thumb id="${t.id}">
+    ${(ART[t.art] || coins)()}
     <div class="brand">
       <span class="brand__mark">${BRAND.monogram}</span>
       <span class="brand__name">${BRAND.name}</span>
     </div>
     <div class="col">
-      <p class="eyebrow"><b></b>${t.eyebrow}</p>
+      <p class="eyebrow"><i></i>${t.eyebrow}</p>
       <h1 class="title">${t.title}</h1>
       ${t.sub ? `<p class="sub">${t.sub}</p>` : ''}
+      ${t.stamp ? `<span class="stamp"><b>${t.stamp.n}</b><span>${t.stamp.s}</span></span>` : ''}
     </div>
-    ${t.type === 'big' ? `
-      <div class="big"><u class="${t.big.wide ? 'wide' : ''}">${t.big.n}</u><span>${t.big.s}</span></div>` : ''}
-    ${t.type === 'mock' ? `
-      <div class="mock">
-        <div class="mock__bar"><u></u><u></u><u></u></div>
-        <div class="mock__view">
-          <b></b><b class="s"></b>
-          <u style="width:64%"></u><u style="width:48%"></u>
-          <div class="mock__img"></div>
-        </div>
-      </div>` : ''}
-    <p class="foot">${t.foot}</p>
+    <p class="foot">${t.foot ? `<i></i>${t.foot}` : ''}</p>
   </div>`;
 
 document.body.insertAdjacentHTML('beforeend',
