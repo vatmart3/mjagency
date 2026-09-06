@@ -257,6 +257,15 @@ body.is-recording{cursor:none}
 .node b{font-family:var(--font-display);font-weight:800;font-size:14px;letter-spacing:.18em;color:var(--accent)}
 .node h3{margin:0;font-family:var(--font-display);font-weight:800;font-size:31px;letter-spacing:-.032em}
 .node p{margin:0;font-size:16px;line-height:1.45;color:rgba(255,255,255,.6)}
+.tagrow{display:flex;flex-wrap:wrap;gap:8px;margin-top:2px}
+.tag{
+  display:inline-flex;align-items:center;gap:7px;padding:7px 13px 7px 10px;
+  border:1px solid rgba(255,255,255,.14);border-radius:999px;
+  background:rgba(255,255,255,.05);
+  font-family:var(--font-ui);font-size:14px;letter-spacing:.01em;
+  color:rgba(255,255,255,.78);white-space:nowrap;
+}
+.tag .ico{width:18px;height:18px;color:var(--accent);opacity:.92;flex:none}
 .node--pay{border-color:rgba(201,167,255,.42);background:linear-gradient(150deg,rgba(176,38,255,.18),rgba(109,43,255,.07))}
 .pay{
   position:absolute;top:26px;right:26px;padding:8px 16px;border-radius:999px;
@@ -599,6 +608,7 @@ body.is-recording .overlay,body.is-recording .toast{display:none}
 .stage[data-fmt="1:1"] .node{padding:18px 24px;gap:8px}
 .stage[data-fmt="1:1"] .node h3{font-size:26px}
 .stage[data-fmt="1:1"] .node p{font-size:14px}
+.stage[data-fmt="1:1"] .tag{font-size:12px;padding:5px 10px 5px 8px;gap:5px}
 .stage[data-fmt="1:1"] .node .ico-box{width:34px;height:34px}
 .stage[data-fmt="1:1"] .pay{font-size:16px;padding:6px 12px;top:18px;right:18px}
 
@@ -762,6 +772,7 @@ body.clair{background:#e9e6f4}
 .stage.clair .meta{color:rgba(21,12,46,.78)}
 .stage.clair .stat__lab{color:rgba(21,12,46,.60)}
 .stage.clair .node p{color:rgba(21,12,46,.60)}
+.stage.clair .tag{border-color:rgba(21,12,46,.14);background:rgba(21,12,46,.045);color:rgba(21,12,46,.72)}
 .stage.clair .hub__core{
   background:radial-gradient(120% 120% at 50% 20%,rgba(255,255,255,.92),rgba(255,255,255,.62));
   border-color:rgba(30,16,70,.12);
@@ -1049,7 +1060,7 @@ const CONFIG = {
           items:[
             { i:'doc',   k:'Devis',   v:'Sous 24 h',                   s:'Gratuit' },
             { i:'mail',  k:'Écrire',  v:'mjagency.officiel@gmail.com', s:'Réponse le jour même' },
-            { i:'phone', k:'Appeler', v:'06 11 71 83 68',              s:'9 h – 18 h, du lundi au vendredi' }
+            { i:'phone', k:'Appeler', v:'06 11 71 83 68',              s:'9 h – 18 h · lun. – ven.' }
           ],
           note:'Sète · Montpellier · Occitanie' }
       ]
@@ -1066,18 +1077,18 @@ const CONFIG = {
         { type:'flow', t:4.4, eyebrow:'Comment ça marche',
           items:[
             { i:'users', k:'Étape 1', t:'Vous présentez',
-              d:'Un commerçant, un artisan, une entreprise qui a besoin d\'un site.' },
-            { i:'pen',   k:'Étape 2', t:'On prend le relais',
-              d:'Devis, design, développement, mise en ligne : le projet est mené de bout en bout.' },
+              tags:[{i:'cart',t:'Commerçant'},{i:'pen',t:'Artisan'},{i:'window',t:'TPE'}] },
+            { i:'spark', k:'Étape 2', t:'On prend le relais',
+              tags:[{i:'doc',t:'Devis'},{i:'pen',t:'Design'},{i:'code',t:'Dév'},{i:'send',t:'En ligne'}] },
             { i:'euro',  k:'Étape 3', t:'Vous êtes commissionné',
-              d:'Votre commission est versée dès le règlement du client.', pay:'350 €' }
+              tags:[{i:'bank',t:'Sous 15 jours'}], pay:'350 €' }
           ] },
 
         { type:'stats', t:3.0, eyebrow:'Ce que ça rapporte',
           items:[
             { i:'percent', n:10, dec:0, suffix:' %', lab:'du montant du projet', hi:true },
-            { i:'wallet',  n:0,  dec:0, suffix:' €', lab:'à avancer, aucun engagement' },
-            { i:'clock',   n:24, dec:0, suffix:' h', lab:'pour que votre contact ait son devis' }
+            { i:'wallet',  n:0,  dec:0, suffix:' €', lab:'à avancer' },
+            { i:'clock',   n:24, dec:0, suffix:' h', lab:'pour le devis' }
           ] },
 
         { type:'steps', t:3.8, eyebrow:'Concrètement',
@@ -1091,8 +1102,7 @@ const CONFIG = {
     {
       tab: 'Accompagnement', icon: 'gift', beats: [
         { type:'punch', t:3.2, eyebrow:'Accompagnement',
-          lines:['Vous n\'avez', 'rien à préparer.'],
-          lede:'Supports, argumentaire et formation vous sont remis dès le premier jour.' },
+          lines:['Vous n\'avez', 'rien à préparer.'] },
 
         { type:'hub', t:4.6, eyebrow:'Ce qu\'on vous fournit',
           core:{ title:'MJ Agency', sub:'vous équipe' },
@@ -1136,7 +1146,7 @@ const CONFIG = {
         { type:'offer', t:4.4, mark:true, title:'Devenez apporteur.', url:'mjagency.eu',
           items:[
             { i:'mail',  k:'Écrire',  v:'mjagency.officiel@gmail.com', s:'Réponse le jour même' },
-            { i:'phone', k:'Appeler', v:'06 11 71 83 68',              s:'9 h – 18 h, du lundi au vendredi' }
+            { i:'phone', k:'Appeler', v:'06 11 71 83 68',              s:'9 h – 18 h · lun. – ven.' }
           ],
           note:'Sète · Montpellier · Occitanie' }
       ]
@@ -1474,7 +1484,9 @@ const RENDER = {
             ${iconBox(n.i)}
             <b>${n.k}</b>
             <h3>${n.t}</h3>
-            <p>${n.d}</p>
+            ${n.tags ? `<div class="tagrow">${n.tags.map(t =>
+              `<span class="tag" data-tag>${icon(t.i)}${t.t}</span>`).join('')}</div>`
+              : (n.d ? `<p>${n.d}</p>` : '')}
             ${n.pay ? `<span class="pay" data-pay>${n.pay}</span>` : ''}
           </div>`).join('')}
       </div>
@@ -1768,6 +1780,14 @@ function beatTimeline(b) {
     tl.fromTo(nodes, { y: 30, scale: .95, opacity: 0 },
       { y: 0, scale: 1, opacity: 1, duration: .55, stagger: pace, ease: 'back.out(1.5)' }, .22);
     nodes.forEach((_, k) => tl.call(fx, ['click', k + 1, .22], .24 + k * pace));
+
+    /* les puces à icônes se posent juste après leur étape */
+    nodes.forEach((node, k) => {
+      const tags = el('[data-tag]', node);
+      if (!tags.length) return;
+      tl.fromTo(tags, { y: 10, opacity: 0 },
+        { y: 0, opacity: 1, duration: .3, stagger: .07, ease: 'power2.out' }, .5 + k * pace);
+    });
 
     const tips = el('[data-tip]', root);
     bars.forEach((bar, k) => {
