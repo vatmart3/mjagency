@@ -333,6 +333,45 @@ body.is-recording{cursor:none}
 .incl .ico-box{width:62px;height:62px}
 .incl__i{padding:12px 18px 14px}
 
+/* ---------- plan « formules » ---------- */
+.tiers{width:1660px}
+.tier-row{display:flex;gap:22px;margin-top:42px;align-items:stretch}
+.tier{
+  position:relative;flex:1;padding:40px 34px 34px;border-radius:26px;text-align:left;
+  border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.05);
+  -webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px);
+  display:flex;flex-direction:column;gap:14px;will-change:transform,opacity;
+}
+.tier--hi{
+  background:linear-gradient(150deg,rgba(176,38,255,.30),rgba(109,43,255,.12));
+  border-color:rgba(255,255,255,.28);
+}
+.tier__flag{
+  position:absolute;top:-15px;left:34px;padding:7px 18px;border-radius:999px;
+  background:var(--accent);color:#0a0416;
+  font-family:var(--font-display);font-weight:800;font-size:15px;letter-spacing:.04em;
+  box-shadow:0 12px 30px -10px var(--glow);
+}
+.tier .ico-box{width:40px;height:40px}
+.tier b{font-family:var(--font-display);font-weight:800;font-size:15px;letter-spacing:.2em;
+  text-transform:uppercase;color:var(--accent)}
+.tier__price{
+  margin:0;font-family:var(--font-display);font-weight:900;font-size:74px;line-height:.94;
+  letter-spacing:-.05em;font-variant-numeric:tabular-nums;
+}
+.tier__price small{
+  display:block;font-size:15px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;
+  color:rgba(255,255,255,.55);margin-bottom:10px;
+}
+.tier__list{margin:6px 0 0;padding:0;list-style:none;display:flex;flex-direction:column;gap:12px}
+.tier__list li{display:flex;align-items:center;gap:12px;font-size:19px;color:rgba(255,255,255,.82)}
+.tier__list .ico{width:22px;height:22px;flex:none;color:var(--accent)}
+.tier__time{
+  margin-top:auto;padding-top:18px;display:flex;align-items:center;gap:10px;
+  font-family:var(--font-ui);font-size:16px;letter-spacing:.1em;color:rgba(255,255,255,.6);
+}
+.tier__time .ico{width:19px;height:19px;flex:none}
+
 /* ---------- plan « citation » ---------- */
 .quote{max-width:1500px;margin:0 auto}
 .quote__txt{
@@ -638,6 +677,20 @@ body.is-recording .overlay,body.is-recording .toast{display:none}
 .stage:not([data-fmt="16:9"]) .incl .ico-box{width:66px;height:66px}
 .stage:not([data-fmt="16:9"]) .incl__i span{font-size:27px}
 
+/* formules : les trois cartes s'empilent */
+.stage:not([data-fmt="16:9"]) .tiers{width:100%}
+.stage:not([data-fmt="16:9"]) .tier-row{flex-direction:column;gap:16px;margin-top:30px}
+.stage:not([data-fmt="16:9"]) .tier{padding:28px 30px 26px;gap:10px}
+.stage:not([data-fmt="16:9"]) .tier__price{font-size:62px}
+.stage:not([data-fmt="16:9"]) .tier__list{flex-direction:row;flex-wrap:wrap;gap:10px 22px}
+.stage:not([data-fmt="16:9"]) .tier__list li{font-size:18px}
+.stage:not([data-fmt="16:9"]) .tier__time{margin-top:6px;padding-top:0}
+.stage:not([data-fmt="16:9"]) .tier__flag{top:-13px}
+.stage[data-fmt="1:1"] .tier{padding:18px 24px;gap:6px}
+.stage[data-fmt="1:1"] .tier__price{font-size:44px}
+.stage[data-fmt="1:1"] .tier__list li{font-size:15px}
+.stage[data-fmt="1:1"] .tier .ico-box{width:30px;height:30px}
+
 /* citation : la ligne se resserre, l'attribution passe dessous */
 .stage:not([data-fmt="16:9"]) .quote__txt{font-size:50px;margin-top:26px}
 .stage:not([data-fmt="16:9"]) .quote__who{
@@ -811,6 +864,15 @@ body.clair{background:#e9e6f4}
 }
 .stage.clair .hub__mark{background:linear-gradient(150deg,#2a1160,#5a1fd6);color:#fff}
 .stage.clair .hub__sub{color:rgba(21,12,46,.60)}
+.stage.clair .tier{background:linear-gradient(158deg,rgba(255,255,255,.86),rgba(255,255,255,.62));
+  border-color:rgba(30,16,70,.10);
+  box-shadow:0 40px 90px -40px rgba(40,20,90,.30),inset 0 1px 0 rgba(255,255,255,.9)}
+.stage.clair .tier--hi{background:linear-gradient(150deg,rgba(109,43,255,.16),rgba(176,38,255,.07));
+  border-color:rgba(90,31,214,.24)}
+.stage.clair .tier__flag{background:#2a1160;color:#fff}
+.stage.clair .tier__price small{color:rgba(21,12,46,.55)}
+.stage.clair .tier__list li{color:rgba(21,12,46,.78)}
+.stage.clair .tier__time{color:rgba(21,12,46,.58)}
 .stage.clair .quote__who i{color:rgba(21,12,46,.58)}
 .stage.clair .quote__av{background:linear-gradient(150deg,#2a1160,#5a1fd6);color:#fff}
 .stage.clair .node--pay{
@@ -1007,7 +1069,7 @@ const CONFIG = {
      'court' 15 s — Reels, TikTok, Shorts : on ouvre sur l'accroche et le
      logo arrive à la fin, là où le spectateur décide de vous suivre.
      Touche C pour passer de l'un à l'autre, ou ?cut=court dans l'URL. --- */
-  cut  : 'cas',
+  cut  : 'prix',
   cuts : {
 
   long: { chapters: [
@@ -1093,6 +1155,75 @@ const CONFIG = {
           items:[
             { i:'doc',   k:'Devis',   v:'Sous 24 h',                   s:'Gratuit' },
             { i:'mail',  k:'Écrire',  v:'mjagency.officiel@gmail.com', s:'Réponse le jour même' },
+            { i:'phone', k:'Appeler', v:'06 11 71 83 68',              s:'9 h – 18 h · lun. – ven.' }
+          ],
+          note:'Sète · Montpellier · Occitanie' }
+      ]
+    }
+  ] },
+
+  /* --- « combien coûte un site ? » -------------------------------------
+     Les montants sont à 0 et les délais entre chevrons ⟨…⟩ : ce sont des
+     emplacements. La grille tarifaire réelle doit être renseignée avant
+     toute publication. ------------------------------------------------ */
+  prix: { chapters: [
+    {
+      tab: 'La question', icon: 'eye', beats: [
+        { type:'punch', t:2.6, eyebrow:'La question qu\'on nous pose',
+          lines:['Combien coûte', 'un site ?'] },
+
+        { type:'included', t:3.2, eyebrow:'Ce qui fait le prix',
+          items:[
+            { i:'window', t:'Nombre de pages' },
+            { i:'pen',    t:'Design sur-mesure' },
+            { i:'cart',   t:'Vente en ligne' },
+            { i:'doc',    t:'Rédaction' },
+            { i:'pin',    t:'Référencement' },
+            { i:'refresh',t:'Reprise de l\'existant' }
+          ] }
+      ]
+    },
+    {
+      tab: 'Nos formules', icon: 'euro', beats: [
+        { type:'tiers', t:6.0, eyebrow:'Nos trois formules',
+          items:[
+            { i:'window', k:'Vitrine', n:0, time:'⟨délai⟩',
+              points:['⟨1 à 5 pages⟩', '⟨Formulaire de contact⟩', '⟨Mobile et desktop⟩'] },
+            { i:'pin', k:'Vitrine + SEO', n:0, time:'⟨délai⟩', hi:true, flag:'Le plus demandé',
+              points:['⟨Tout le vitrine⟩', '⟨Fiche Google⟩', '⟨Rédaction optimisée⟩'] },
+            { i:'cart', k:'E-commerce', n:0, time:'⟨délai⟩',
+              points:['⟨Boutique complète⟩', '⟨Paiement en ligne⟩', '⟨Gestion des stocks⟩'] }
+          ] }
+      ]
+    },
+    {
+      tab: 'Toujours inclus', icon: 'gift', beats: [
+        { type:'included', t:3.4, eyebrow:'Compris dans chaque formule',
+          items:[
+            { i:'server', t:'Hébergement' },
+            { i:'shield', t:'Certificat SSL' },
+            { i:'mobile', t:'Version mobile' },
+            { i:'trend',  t:'Mesures' },
+            { i:'book',   t:'Formation' },
+            { i:'check',  t:'Suivi 3 mois' }
+          ] },
+
+        { type:'steps', t:3.6, eyebrow:'Comment on règle',
+          items:[
+            { i:'doc',   k:'À la commande', t:'⟨acompte⟩' },
+            { i:'send',  k:'À la livraison', t:'⟨solde⟩' },
+            { i:'euro',  k:'Ensuite',        t:'⟨abonnement⟩' }
+          ] }
+      ]
+    },
+    {
+      tab: 'Votre devis', icon: 'spark', beats: [
+        { type:'punch', t:2.4, eyebrow:'Votre projet',
+          lines:['Un prix ferme,', 'sous 24 h.'] },
+
+        { type:'offer', t:4.2, mark:true, title:'Demandez le vôtre.', url:'mjagency.eu',
+          items:[
+            { i:'doc',   k:'Devis',   v:'Sous 24 h',                   s:'Gratuit et sans engagement' },
             { i:'phone', k:'Appeler', v:'06 11 71 83 68',              s:'9 h – 18 h · lun. – ven.' }
           ],
           note:'Sète · Montpellier · Occitanie' }
@@ -1633,6 +1764,28 @@ const RENDER = {
       <div class="incl" style="margin:56px auto 0">
         ${b.items.map(i => `
           <div class="incl__i" data-stat>${iconBox(i.i)}<span>${i.t}</span></div>`).join('')}
+      </div>
+    </div>`,
+
+  /* formules : trois offres alignées, celle du milieu mise en avant */
+  tiers: b => `
+    <div class="plain tiers" data-card data-iris>
+      ${eyebrow(b.eyebrow, true)}
+      <div class="tier-row">
+        ${b.items.map(i => `
+          <div class="tier${i.hi ? ' tier--hi' : ''}" data-stat>
+            ${i.flag ? `<span class="tier__flag">${i.flag}</span>` : ''}
+            ${iconBox(i.i)}
+            <b>${i.k}</b>
+            <p class="tier__price">
+              <small>${i.from || 'à partir de'}</small>
+              <span data-count="${i.n}" data-dec="0">0</span>${i.cur || ' €'}
+            </p>
+            <ul class="tier__list">
+              ${(i.points || []).map(pt => `<li>${icon('check')}${pt}</li>`).join('')}
+            </ul>
+            <span class="tier__time">${icon('clock')}${i.time}</span>
+          </div>`).join('')}
       </div>
     </div>`,
 
