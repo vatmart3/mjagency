@@ -1069,7 +1069,7 @@ const CONFIG = {
      'court' 15 s — Reels, TikTok, Shorts : on ouvre sur l'accroche et le
      logo arrive à la fin, là où le spectateur décide de vous suivre.
      Touche C pour passer de l'un à l'autre, ou ?cut=court dans l'URL. --- */
-  cut  : 'prix',
+  cut  : 'process',
   cuts : {
 
   long: { chapters: [
@@ -1156,6 +1156,77 @@ const CONFIG = {
             { i:'doc',   k:'Devis',   v:'Sous 24 h',                   s:'Gratuit' },
             { i:'mail',  k:'Écrire',  v:'mjagency.officiel@gmail.com', s:'Réponse le jour même' },
             { i:'phone', k:'Appeler', v:'06 11 71 83 68',              s:'9 h – 18 h · lun. – ven.' }
+          ],
+          note:'Sète · Montpellier · Occitanie' }
+      ]
+    }
+  ] },
+
+  /* --- « comment ça se passe ? » ---------------------------------------
+     Le parcours client, de l'appel à la mise en ligne. Le déroulé décrit
+     ici reprend celui des autres montages (cinq semaines) : à ajuster si
+     le vôtre diffère. --------------------------------------------------- */
+  process: { chapters: [
+    {
+      tab: 'Le premier appel', icon: 'phone', beats: [
+        { type:'punch', t:2.6, eyebrow:'Comment ça se passe',
+          lines:['De l\'appel à', 'la mise en ligne.'] },
+
+        { type:'steps', t:3.8, eyebrow:'Les trois premiers jours',
+          items:[
+            { i:'phone', k:'Jour 1', t:'Un appel de 20 min' },
+            { i:'doc',   k:'Jour 2', t:'Votre devis' },
+            { i:'check', k:'Jour 3', t:'On démarre' }
+          ] }
+      ]
+    },
+    {
+      tab: 'La conception', icon: 'pen', beats: [
+        { type:'steps', t:3.8, eyebrow:'Semaines 1 à 3',
+          items:[
+            { i:'compass', k:'Semaine 1', t:'Cadrage' },
+            { i:'pen',     k:'Semaine 2', t:'Maquette' },
+            { i:'check',   k:'Semaine 3', t:'Validation' }
+          ] },
+
+        { type:'included', t:3.2, eyebrow:'Ce qu\'on vous demande',
+          items:[
+            { i:'clock',  t:'20 min d\'appel' },
+            { i:'window', t:'Vos photos' },
+            { i:'doc',    t:'Vos textes' },
+            { i:'check',  t:'Une validation' },
+            { i:'mail',   t:'Vos accès' },
+            { i:'spark',  t:'Rien de plus' }
+          ] }
+      ]
+    },
+    {
+      tab: 'La construction', icon: 'code', beats: [
+        { type:'steps', t:3.6, eyebrow:'Semaines 4 et 5',
+          items:[
+            { i:'code',   k:'Développement', t:'On code' },
+            { i:'gauge',  k:'Optimisation',  t:'On accélère' },
+            { i:'shield', k:'Tests',         t:'On vérifie' }
+          ] },
+
+        { type:'devices', t:3.4, eyebrow:'Avant la mise en ligne',
+          title:'Vous validez<br>sur chaque écran.',
+          url:'mjagency.eu' }
+      ]
+    },
+    {
+      tab: 'La mise en ligne', icon: 'send', beats: [
+        { type:'steps', t:3.4, eyebrow:'Le jour J',
+          items:[
+            { i:'send',  k:'Mise en ligne', t:'Votre site est là' },
+            { i:'book',  k:'Formation',     t:'Une heure ensemble' },
+            { i:'check', k:'Suivi',         t:'Trois mois inclus' }
+          ] },
+
+        { type:'offer', t:4.2, mark:true, title:'On commence quand ?', url:'mjagency.eu',
+          items:[
+            { i:'phone', k:'Appeler', v:'06 11 71 83 68',              s:'9 h – 18 h · lun. – ven.' },
+            { i:'mail',  k:'Écrire',  v:'mjagency.officiel@gmail.com', s:'Réponse le jour même' }
           ],
           note:'Sète · Montpellier · Occitanie' }
       ]
