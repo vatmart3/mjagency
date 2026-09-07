@@ -333,6 +333,38 @@ body.is-recording{cursor:none}
 .incl .ico-box{width:62px;height:62px}
 .incl__i{padding:12px 18px 14px}
 
+/* ---------- plan « grandes icônes » ---------- */
+.ico-row{display:flex;gap:40px;justify-content:center;margin-top:56px}
+.ico-cell{flex:1;display:flex;flex-direction:column;align-items:center;text-align:center;gap:14px;
+  will-change:transform,opacity}
+.ico-disc{
+  width:214px;height:214px;border-radius:50%;display:grid;place-items:center;
+  border:1px solid rgba(255,255,255,.18);
+  background:radial-gradient(120% 120% at 50% 18%,rgba(255,255,255,.16),rgba(255,255,255,.04));
+  -webkit-backdrop-filter:blur(22px);backdrop-filter:blur(22px);
+  box-shadow:0 44px 90px -40px rgba(0,0,0,.75),inset 0 1px 0 rgba(255,255,255,.2);
+  color:var(--accent);will-change:transform;
+}
+.ico-disc .ico{width:96px;height:96px}
+.ico-disc--sm{width:118px;height:118px}
+.ico-disc--sm .ico{width:54px;height:54px}
+.ico-cell b{font-family:var(--font-ui);font-size:16px;letter-spacing:.22em;text-transform:uppercase;
+  color:var(--accent);margin-top:8px}
+.ico-cell h3{margin:0;font-family:var(--font-display);font-weight:800;font-size:44px;letter-spacing:-.035em}
+
+/* ---------- plan « frise » ---------- */
+.tline{width:1700px}
+.tline__rail{position:relative;display:flex;justify-content:space-between;margin-top:64px;padding-top:8px}
+.tline__track,.tline__bar{position:absolute;left:6%;right:6%;top:65px;height:3px;border-radius:2px}
+.tline__track{background:rgba(255,255,255,.16)}
+.tline__bar{background:linear-gradient(90deg,var(--accent),rgba(201,167,255,.35));
+  transform-origin:0 50%;will-change:transform}
+.tline__pt{position:relative;z-index:2;flex:1;display:flex;flex-direction:column;align-items:center;
+  gap:10px;will-change:transform,opacity}
+.tline__pt b{font-family:var(--font-ui);font-size:15px;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--accent);margin-top:6px}
+.tline__pt h3{margin:0;font-family:var(--font-display);font-weight:800;font-size:32px;letter-spacing:-.03em}
+
 /* ---------- plan « formules » ---------- */
 .tiers{width:1660px}
 .tier-row{display:flex;gap:22px;margin-top:42px;align-items:stretch}
@@ -677,6 +709,33 @@ body.is-recording .overlay,body.is-recording .toast{display:none}
 .stage:not([data-fmt="16:9"]) .incl .ico-box{width:66px;height:66px}
 .stage:not([data-fmt="16:9"]) .incl__i span{font-size:27px}
 
+/* grandes icônes : en colonne, pastille et mot côte à côte */
+.stage:not([data-fmt="16:9"]) .ico-row{flex-direction:column;gap:26px;margin-top:42px}
+.stage:not([data-fmt="16:9"]) .ico-cell{flex-direction:row;gap:28px;text-align:left;justify-content:flex-start}
+.stage:not([data-fmt="16:9"]) .ico-disc{width:150px;height:150px;flex:none}
+.stage:not([data-fmt="16:9"]) .ico-disc .ico{width:70px;height:70px}
+.stage:not([data-fmt="16:9"]) .ico-cell b{margin:0}
+.stage:not([data-fmt="16:9"]) .ico-cell h3{font-size:40px}
+.stage[data-fmt="1:1"] .ico-disc{width:104px;height:104px}
+.stage[data-fmt="1:1"] .ico-disc .ico{width:50px;height:50px}
+.stage[data-fmt="1:1"] .ico-cell h3{font-size:30px}
+.stage[data-fmt="1:1"] .ico-row{gap:16px;margin-top:28px}
+
+/* frise : elle bascule à la verticale */
+.stage:not([data-fmt="16:9"]) .tline{width:100%}
+.stage:not([data-fmt="16:9"]) .tline__rail{flex-direction:column;gap:22px;margin-top:40px}
+.stage:not([data-fmt="16:9"]) .tline__track,
+.stage:not([data-fmt="16:9"]) .tline__bar{
+  left:74px;right:auto;top:6%;bottom:6%;height:auto;width:3px;transform-origin:50% 0;
+}
+.stage:not([data-fmt="16:9"]) .tline__bar{background:linear-gradient(180deg,var(--accent),rgba(201,167,255,.35))}
+.stage:not([data-fmt="16:9"]) .tline__pt{flex-direction:row;align-items:center;gap:24px;text-align:left}
+.stage:not([data-fmt="16:9"]) .tline__pt b{margin:0;flex:0 0 130px}
+.stage:not([data-fmt="16:9"]) .tline__pt h3{font-size:34px}
+.stage[data-fmt="1:1"] .tline__pt h3{font-size:24px}
+.stage[data-fmt="1:1"] .ico-disc--sm{width:74px;height:74px}
+.stage[data-fmt="1:1"] .ico-disc--sm .ico{width:34px;height:34px}
+
 /* formules : les trois cartes s'empilent */
 .stage:not([data-fmt="16:9"]) .tiers{width:100%}
 .stage:not([data-fmt="16:9"]) .tier-row{flex-direction:column;gap:16px;margin-top:30px}
@@ -864,6 +923,12 @@ body.clair{background:#e9e6f4}
 }
 .stage.clair .hub__mark{background:linear-gradient(150deg,#2a1160,#5a1fd6);color:#fff}
 .stage.clair .hub__sub{color:rgba(21,12,46,.60)}
+.stage.clair .ico-disc{
+  background:linear-gradient(158deg,rgba(255,255,255,.9),rgba(255,255,255,.64));
+  border-color:rgba(30,16,70,.10);
+  box-shadow:0 40px 90px -40px rgba(40,20,90,.32),inset 0 1px 0 rgba(255,255,255,.9);
+}
+.stage.clair .tline__track{background:rgba(30,16,70,.16)}
 .stage.clair .tier{background:linear-gradient(158deg,rgba(255,255,255,.86),rgba(255,255,255,.62));
   border-color:rgba(30,16,70,.10);
   box-shadow:0 40px 90px -40px rgba(40,20,90,.30),inset 0 1px 0 rgba(255,255,255,.9)}
@@ -1172,55 +1237,57 @@ const CONFIG = {
         { type:'punch', t:2.6, eyebrow:'Comment ça se passe',
           lines:['De l\'appel à', 'la mise en ligne.'] },
 
-        { type:'steps', t:3.8, eyebrow:'Les trois premiers jours',
+        { type:'icos', t:3.4, eyebrow:'Les trois premiers jours',
           items:[
-            { i:'phone', k:'Jour 1', t:'Un appel de 20 min' },
-            { i:'doc',   k:'Jour 2', t:'Votre devis' },
+            { i:'phone', k:'Jour 1', t:'Un appel' },
+            { i:'doc',   k:'Jour 2', t:'Un devis' },
             { i:'check', k:'Jour 3', t:'On démarre' }
           ] }
       ]
     },
     {
-      tab: 'La conception', icon: 'pen', beats: [
-        { type:'steps', t:3.8, eyebrow:'Semaines 1 à 3',
+      tab: 'Le déroulé', icon: 'compass', beats: [
+        { type:'tline', t:4.6, eyebrow:'Cinq semaines',
           items:[
-            { i:'compass', k:'Semaine 1', t:'Cadrage' },
-            { i:'pen',     k:'Semaine 2', t:'Maquette' },
-            { i:'check',   k:'Semaine 3', t:'Validation' }
+            { i:'compass', k:'S1', t:'Cadrage' },
+            { i:'pen',     k:'S2', t:'Design' },
+            { i:'check',   k:'S3', t:'Validation' },
+            { i:'code',    k:'S4', t:'Dév' },
+            { i:'send',    k:'S5', t:'En ligne' }
           ] },
 
-        { type:'included', t:3.2, eyebrow:'Ce qu\'on vous demande',
+        { type:'included', t:3.0, eyebrow:'Ce qu\'on vous demande',
           items:[
-            { i:'clock',  t:'20 min d\'appel' },
+            { i:'clock',  t:'20 minutes' },
             { i:'window', t:'Vos photos' },
             { i:'doc',    t:'Vos textes' },
-            { i:'check',  t:'Une validation' },
+            { i:'check',  t:'Un accord' },
             { i:'mail',   t:'Vos accès' },
-            { i:'spark',  t:'Rien de plus' }
+            { i:'spark',  t:'Rien d\'autre' }
           ] }
       ]
     },
     {
       tab: 'La construction', icon: 'code', beats: [
-        { type:'steps', t:3.6, eyebrow:'Semaines 4 et 5',
-          items:[
-            { i:'code',   k:'Développement', t:'On code' },
-            { i:'gauge',  k:'Optimisation',  t:'On accélère' },
-            { i:'shield', k:'Tests',         t:'On vérifie' }
-          ] },
-
-        { type:'devices', t:3.4, eyebrow:'Avant la mise en ligne',
+        { type:'devices', t:3.6, eyebrow:'Avant la mise en ligne',
           title:'Vous validez<br>sur chaque écran.',
-          url:'mjagency.eu' }
+          url:'mjagency.eu' },
+
+        { type:'icos', t:3.2, eyebrow:'Ce qu\'on vérifie',
+          items:[
+            { i:'gauge',  t:'Rapide' },
+            { i:'shield', t:'Sécurisé' },
+            { i:'mobile', t:'Mobile' }
+          ] }
       ]
     },
     {
       tab: 'La mise en ligne', icon: 'send', beats: [
-        { type:'steps', t:3.4, eyebrow:'Le jour J',
+        { type:'icos', t:3.2, eyebrow:'Le jour J',
           items:[
-            { i:'send',  k:'Mise en ligne', t:'Votre site est là' },
-            { i:'book',  k:'Formation',     t:'Une heure ensemble' },
-            { i:'check', k:'Suivi',         t:'Trois mois inclus' }
+            { i:'send',  t:'En ligne' },
+            { i:'book',  t:'Formation' },
+            { i:'check', t:'Suivi 3 mois' }
           ] },
 
         { type:'offer', t:4.2, mark:true, title:'On commence quand ?', url:'mjagency.eu',
@@ -1838,6 +1905,37 @@ const RENDER = {
       </div>
     </div>`,
 
+  /* grandes icônes : trois pastilles, un mot chacune. Quand il n'y a rien
+     à expliquer, il ne faut pas l'écrire. */
+  icos: b => `
+    <div class="plain icos" data-card data-iris>
+      ${eyebrow(b.eyebrow, true)}
+      <div class="ico-row">
+        ${b.items.map(i => `
+          <div class="ico-cell" data-stat>
+            <span class="ico-disc" data-disc>${icon(i.i)}</span>
+            ${i.k ? `<b>${i.k}</b>` : ''}
+            <h3>${i.t}</h3>
+          </div>`).join('')}
+      </div>
+    </div>`,
+
+  /* frise : le rail se trace, les jalons se posent l'un après l'autre */
+  tline: b => `
+    <div class="plain tline" data-card data-iris>
+      ${eyebrow(b.eyebrow, true)}
+      <div class="tline__rail">
+        <i class="tline__track"></i>
+        <i class="tline__bar" data-tbar></i>
+        ${b.items.map(i => `
+          <div class="tline__pt" data-tpt>
+            <span class="ico-disc ico-disc--sm">${icon(i.i)}</span>
+            <b>${i.k}</b>
+            <h3>${i.t}</h3>
+          </div>`).join('')}
+      </div>
+    </div>`,
+
   /* formules : trois offres alignées, celle du milieu mise en avant */
   tiers: b => `
     <div class="plain tiers" data-card data-iris>
@@ -2112,6 +2210,24 @@ function beatTimeline(b) {
     lines.forEach((ln, k) => {
       tl.fromTo(ln, { scaleX: 0 }, { scaleX: 1, duration: .45, ease: 'power2.out' }, .46 + k * .15);
     });
+  }
+
+  /* grandes icônes : la pastille se pose avec un rebond */
+  const discs = el('[data-disc]', root);
+  if (discs.length) {
+    tl.fromTo(discs, { scale: .72 }, { scale: 1, duration: .6, stagger: .12, ease: 'back.out(2)' }, .14);
+  }
+
+  /* frise : le rail se trace pendant que les jalons se posent */
+  const tbar = $('[data-tbar]', root), tpts = el('[data-tpt]', root);
+  if (tpts.length) {
+    const step = .26;
+    tl.fromTo(tpts, { y: 26, scale: .9, opacity: 0 },
+      { y: 0, scale: 1, opacity: 1, duration: .5, stagger: step, ease: 'back.out(1.6)' }, .2);
+    tpts.forEach((_, k) => tl.call(fx, ['click', k, .18], .22 + k * step));
+    if (tbar) tl.fromTo(tbar,
+      { scaleX: () => narrow() ? 1 : 0, scaleY: () => narrow() ? 0 : 1 },
+      { scaleX: 1, scaleY: 1, duration: step * tpts.length, ease: 'none' }, .24);
   }
 
   /* schéma : les étapes tombent une à une, le lien se trace, la pièce file
