@@ -333,6 +333,26 @@ body.is-recording{cursor:none}
 .incl .ico-box{width:62px;height:62px}
 .incl__i{padding:12px 18px 14px}
 
+/* ---------- plan « citation » ---------- */
+.quote{max-width:1500px;margin:0 auto}
+.quote__txt{
+  margin:34px 0 0;font-family:var(--font-display);font-weight:800;font-size:62px;
+  line-height:1.16;letter-spacing:-.035em;text-wrap:balance;
+}
+.quote__who{
+  margin:44px 0 0;display:flex;align-items:center;justify-content:center;gap:18px;
+  font-size:20px;letter-spacing:.06em;
+}
+.quote__who b{font-family:var(--font-display);font-weight:800;font-size:24px;letter-spacing:-.02em}
+.quote__who i{font-style:normal;color:rgba(255,255,255,.58);letter-spacing:.08em}
+.quote__who i::before{content:"·";margin-right:14px}
+.quote__av{
+  width:62px;height:62px;border-radius:50%;display:grid;place-items:center;flex:none;
+  background:linear-gradient(150deg,#fff,#d9c8ff);color:#0a0416;
+  font-family:var(--font-display);font-weight:900;font-size:22px;letter-spacing:-.03em;
+  box-shadow:0 16px 36px -14px var(--glow);
+}
+
 /* ---------- petites lignes d'icônes sous un titre ---------- */
 .points{display:flex;flex-wrap:wrap;gap:18px 26px;margin-top:34px}
 .point{
@@ -618,6 +638,17 @@ body.is-recording .overlay,body.is-recording .toast{display:none}
 .stage:not([data-fmt="16:9"]) .incl .ico-box{width:66px;height:66px}
 .stage:not([data-fmt="16:9"]) .incl__i span{font-size:27px}
 
+/* citation : la ligne se resserre, l'attribution passe dessous */
+.stage:not([data-fmt="16:9"]) .quote__txt{font-size:50px;margin-top:26px}
+.stage:not([data-fmt="16:9"]) .quote__who{
+  margin-top:36px;flex-wrap:wrap;row-gap:10px;font-size:18px;
+}
+.stage:not([data-fmt="16:9"]) .quote__who i{flex-basis:100%;text-align:center}
+.stage:not([data-fmt="16:9"]) .quote__who i::before{content:none}
+.stage[data-fmt="1:1"] .quote__txt{font-size:38px}
+.stage[data-fmt="1:1"] .quote__who{margin-top:26px;gap:14px}
+.stage[data-fmt="1:1"] .quote__av{width:48px;height:48px;font-size:18px}
+
 /* chiffres : empilés, icône à gauche */
 .stage:not([data-fmt="16:9"]) .stats{flex-direction:column;width:100%;gap:14px}
 .stage:not([data-fmt="16:9"]) .stat{
@@ -780,6 +811,8 @@ body.clair{background:#e9e6f4}
 }
 .stage.clair .hub__mark{background:linear-gradient(150deg,#2a1160,#5a1fd6);color:#fff}
 .stage.clair .hub__sub{color:rgba(21,12,46,.60)}
+.stage.clair .quote__who i{color:rgba(21,12,46,.58)}
+.stage.clair .quote__av{background:linear-gradient(150deg,#2a1160,#5a1fd6);color:#fff}
 .stage.clair .node--pay{
   background:linear-gradient(150deg,rgba(109,43,255,.16),rgba(176,38,255,.07));
   border-color:rgba(90,31,214,.26);
@@ -974,7 +1007,7 @@ const CONFIG = {
      'court' 15 s — Reels, TikTok, Shorts : on ouvre sur l'accroche et le
      logo arrive à la fin, là où le spectateur décide de vous suivre.
      Touche C pour passer de l'un à l'autre, ou ?cut=court dans l'URL. --- */
-  cut  : 'apporteur',
+  cut  : 'cas',
   cuts : {
 
   long: { chapters: [
@@ -1060,6 +1093,77 @@ const CONFIG = {
           items:[
             { i:'doc',   k:'Devis',   v:'Sous 24 h',                   s:'Gratuit' },
             { i:'mail',  k:'Écrire',  v:'mjagency.officiel@gmail.com', s:'Réponse le jour même' },
+            { i:'phone', k:'Appeler', v:'06 11 71 83 68',              s:'9 h – 18 h · lun. – ven.' }
+          ],
+          note:'Sète · Montpellier · Occitanie' }
+      ]
+    }
+  ] },
+
+  /* --- étude de cas -----------------------------------------------------
+     Les valeurs entre chevrons ⟨…⟩ sont des emplacements : elles doivent
+     être remplacées par les données réelles du client avant publication.
+     Rien ici ne doit être diffusé tel quel. --------------------------- */
+  cas: { chapters: [
+    {
+      tab: 'Le client', icon: 'users', beats: [
+        { type:'punch', t:2.8, eyebrow:'Étude de cas',
+          lines:['Un cas', 'concret.'] },
+
+        { type:'browser', t:4.2, eyebrow:'⟨Métier⟩ · ⟨Ville⟩',
+          title:'⟨Nom du<br>client⟩.',
+          url:'⟨adresse-du-site.fr⟩',
+          points:[
+            { i:'window', t:'⟨Type de projet⟩' },
+            { i:'clock',  t:'⟨Durée⟩' },
+            { i:'pin',    t:'⟨Ville⟩' }
+          ] }
+      ]
+    },
+    {
+      tab: 'Avant', icon: 'eye', beats: [
+        { type:'punch', t:2.6, eyebrow:'Le point de départ',
+          lines:['Le site ne', 'suivait plus.'] },
+
+        { type:'stats', t:3.4, eyebrow:'Avant la refonte',
+          items:[
+            { i:'phone', n:0, dec:0, suffix:'', lab:'⟨appels par mois⟩' },
+            { i:'clock', n:0, dec:1, suffix:' s', lab:'⟨temps de chargement⟩' },
+            { i:'gauge', n:0, dec:0, suffix:'/100', lab:'⟨score PageSpeed⟩' }
+          ] }
+      ]
+    },
+    {
+      tab: 'Ce qu\'on a fait', icon: 'code', beats: [
+        { type:'steps', t:3.8, eyebrow:'Le chantier',
+          items:[
+            { i:'compass', k:'Semaine 1',    t:'⟨Cadrage⟩' },
+            { i:'pen',     k:'Semaines 2-3', t:'⟨Design⟩' },
+            { i:'code',    k:'Semaines 4-5', t:'⟨Développement⟩' },
+            { i:'send',    k:'Jour J',       t:'⟨Mise en ligne⟩' }
+          ] },
+
+        { type:'devices', t:3.6, eyebrow:'Le nouveau site',
+          title:'⟨Ce qu\'on a<br>changé⟩.',
+          url:'⟨adresse-du-site.fr⟩' }
+      ]
+    },
+    {
+      tab: 'Le résultat', icon: 'trend', beats: [
+        { type:'stats', t:3.8, eyebrow:'⟨Trois mois plus tard⟩',
+          items:[
+            { i:'trend', n:0, dec:1, suffix:' ×', lab:'⟨demandes de devis⟩', hi:true },
+            { i:'gauge', n:0, dec:0, suffix:'/100', lab:'⟨score PageSpeed⟩' },
+            { i:'clock', n:0, dec:1, suffix:' s', lab:'⟨temps de chargement⟩' }
+          ] },
+
+        { type:'quote', t:3.6, eyebrow:'Le mot du client',
+          text:'⟨Une phrase du client, dite avec ses mots⟩',
+          who:'⟨Prénom Nom⟩', role:'⟨Fonction, entreprise⟩', initials:'⟨XX⟩' },
+
+        { type:'offer', t:4.2, mark:true, title:'On fait la même<br>pour vous ?', url:'mjagency.eu',
+          items:[
+            { i:'doc',   k:'Devis',   v:'Sous 24 h',                   s:'Gratuit' },
             { i:'phone', k:'Appeler', v:'06 11 71 83 68',              s:'9 h – 18 h · lun. – ven.' }
           ],
           note:'Sète · Montpellier · Occitanie' }
@@ -1530,6 +1634,17 @@ const RENDER = {
         ${b.items.map(i => `
           <div class="incl__i" data-stat>${iconBox(i.i)}<span>${i.t}</span></div>`).join('')}
       </div>
+    </div>`,
+
+  /* citation : la parole du client, seule à l'écran */
+  quote: b => `
+    <div class="plain quote" data-card data-iris>
+      ${eyebrow(b.eyebrow, true)}
+      <blockquote class="quote__txt" data-in>«&nbsp;${b.text}&nbsp;»</blockquote>
+      <p class="quote__who" data-in>
+        <span class="quote__av">${b.initials || ''}</span>
+        <b>${b.who}</b>${b.role ? `<i>${b.role}</i>` : ''}
+      </p>
     </div>`,
 
   punch: b => `
