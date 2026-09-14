@@ -1,0 +1,2431 @@
+<!doctype html>
+<!--
+  ============================================================================
+  DÉMO AVANT / APRÈS — PLOMBERIE PASSEBOSC
+  Fichier unique, ouvrable en double-clic, filmable en vertical.
+  MJAGENCY — bassin de Thau.
+  ----------------------------------------------------------------------------
+  RACCOURCIS
+    Espace   rejoue toute la séquence          R  réinitialise
+    ← / →    scrubbe la mutation image/image   V  cadrage 9:16 centré
+    S        lecture 0,5× (montage)            A  auto-scroll sur la phase APRÈS
+    + / -    vitesse de l'auto-scroll          H  masque l'interface
+    Le curseur sous l'écran pilote la mutation à la main (démo au doigt).
+
+  QUERY PARAMS — rejouer la démo au nom d'un vrai prospect
+    ?nom=Plomberie+Cabrol&ville=Mèze&tel=04+67+00+00+00&gerant=Luc+Cabrol
+    &note=4,9&avis=124&creation=2014&mail=contact@exemple.fr
+    Tout est également surchargeable dans l'objet CLIENT, en tête du script.
+
+  STRUCTURE
+    1. CSS — jetons, site 2011, site premium, interface de contrôle
+    2. CLIENT — le dossier complet de l'entreprise (source unique)
+    3. TIMING — les cinq temps de la mutation, en millisecondes
+    4. Rendu du site AVANT, puis du site APRÈS, depuis CLIENT
+    5. Mutation WebGL (capture html2canvas → 384 tuiles → noyau → onde)
+    6. Réseau de cuivre Three.js piloté par une seule progression de scroll
+    7. Contrôles clavier, cadrage, auto-scroll, replis
+
+  NUMÉROS : les plages 04 39 98 / 06 39 98 sont réservées par l'ARCEP à la
+  fiction. Aucun vrai abonné n'est joignable depuis cette démo.
+  ============================================================================
+-->
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<meta name="color-scheme" content="light">
+<title>Plomberie Passebosc — démo avant / après</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:ital,wght@0,400;0,500;0,600;0,700;1,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+
+<style>
+/* ==========================================================================
+   JETONS
+   Palette volontairement courte : l'eau, l'encre, le papier, le zinc et les
+   deux métaux. Le cuivre et le laiton ne servent JAMAIS de fond — uniquement
+   de matière (tuyau 3D) et de filet. C'est ce qui évite le virage crème.
+   ========================================================================== */
+:root{
+  --eau:#0071E3;          /* l'eau, l'accent, les liens                   */
+  --encre:#0C1116;        /* texte et sections sombres                    */
+  --blanc:#FFFFFF;        /* le papier                                    */
+  --zinc:#E7ECF1;         /* surfaces froides, filets, séparateurs        */
+  --cuivre:#A9663A;       /* matière du tuyau                             */
+  --laiton:#C9A66B;       /* vannes, robinet, filets d'accent             */
+
+  --fond-eau:#EAF3FE;
+  --gris:#5C6672;
+  --gris-clair:#9AA5B1;
+
+  /* Familjen Grotesk : grotesque à terminaisons mécaniques, pour la voix.
+     IBM Plex Mono : tout ce qui est mesuré — prix, délais, heures, réfs.
+     Un métier de précision écrit ses valeurs en chiffres alignés.        */
+  --display:'Familjen Grotesk','Helvetica Neue',Helvetica,Arial,sans-serif;
+  --mono:'IBM Plex Mono',ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+
+  --frameW:100%;          /* passe à 9/16 de la hauteur en mode V         */
+  --u:8px;
+}
+
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;overflow-x:clip}
+body{
+  margin:0;background:var(--blanc);color:var(--encre);
+  font-family:var(--display);
+  overflow-x:hidden;
+}
+body.verrou{overflow:hidden;height:100vh}
+body.v916{background:#000}
+img{max-width:100%;display:block}
+a{color:inherit}
+:focus-visible{outline:2px solid var(--eau);outline-offset:3px}
+body.v916 :focus-visible{outline-color:var(--laiton)}
+
+/* Les éléments fixes se calent sur le cadre, pas sur la fenêtre : c'est ce
+   qui permet au mode 9:16 de recadrer sans casser les positions.         */
+.cadre{
+  position:fixed;top:0;left:50%;transform:translateX(-50%);
+  width:var(--frameW);height:100%;
+}
+#bandeG,#bandeD{
+  position:fixed;top:0;height:100%;width:calc((100vw - var(--frameW)) / 2);
+  background:#000;z-index:90;display:none;pointer-events:none;
+}
+#bandeG{left:0} #bandeD{right:0}
+/* Le papier du cadre : le noir du mode 9:16 ne doit jamais passer dessous. */
+#fond{z-index:0;background:var(--blanc)}
+body.v916 #bandeG,body.v916 #bandeD{display:block}
+
+/* ==========================================================================
+   INTERFACE DE CONTRÔLE — discrète, en bas, masquable par H
+   ========================================================================== */
+#ui{
+  position:fixed;left:12px;bottom:12px;z-index:120;
+  font-family:var(--mono);font-size:11px;letter-spacing:.02em;
+  background:rgba(12,17,22,.86);color:#E9EEF3;
+  border:1px solid rgba(201,166,107,.35);
+  padding:9px 10px;max-width:min(420px,calc(100vw - 24px));
+  -webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);
+}
+#ui.off{opacity:0;pointer-events:none}
+#ui .rang{display:flex;flex-wrap:wrap;gap:4px}
+#ui button{
+  font:inherit;color:#E9EEF3;background:transparent;
+  border:1px solid rgba(233,238,243,.28);padding:4px 7px;cursor:pointer;
+}
+#ui button:hover{border-color:var(--laiton);color:#fff}
+#ui button[aria-pressed="true"]{background:var(--eau);border-color:var(--eau);color:#fff}
+#ui .barre{display:flex;align-items:center;gap:8px;margin-top:8px}
+#ui label{color:#8E9AA6;text-transform:uppercase;font-size:9.5px;letter-spacing:.09em}
+#scrub{
+  -webkit-appearance:none;appearance:none;flex:1;height:2px;
+  background:rgba(233,238,243,.3);cursor:pointer;
+}
+#scrub::-webkit-slider-thumb{
+  -webkit-appearance:none;width:11px;height:11px;border-radius:50%;
+  background:var(--eau);border:2px solid #fff;
+}
+#scrub::-moz-range-thumb{
+  width:11px;height:11px;border-radius:50%;background:var(--eau);border:2px solid #fff;
+}
+#etat{margin-top:6px;color:#7D8894;font-size:10px}
+#etat b{color:var(--laiton);font-weight:500}
+
+/* Faux curseur ------------------------------------------------------------ */
+#faux{
+  position:fixed;z-index:110;width:20px;height:26px;left:0;top:0;
+  pointer-events:none;opacity:0;
+  filter:drop-shadow(0 2px 3px rgba(0,0,0,.4));
+}
+#onde-clic{
+  position:fixed;z-index:109;width:14px;height:14px;border-radius:50%;
+  border:2px solid #0071E3;pointer-events:none;opacity:0;
+}
+
+/* ==========================================================================
+   PHASE 1 — LE SITE DE 2011
+   Largeur fixe 980 px, fond saturé, bandes vides sur les côtés. Aucun
+   responsive : sur téléphone ça déborde, et c'est exactement le propos.
+   ========================================================================== */
+#avant{
+  position:fixed;top:0;left:50%;transform:translateX(-50%);
+  width:var(--frameW);height:100%;z-index:40;
+  background:#2c6ba0;  /* le bleu « intranet » saturé de l'époque */
+  overflow:hidden;
+  font-family:Verdana,Geneva,sans-serif;font-size:11.5px;color:#111;
+}
+#avant .page{
+  width:980px;margin:0 auto;background:#fff;
+  border-left:1px solid #14405f;border-right:1px solid #14405f;
+  min-height:100%;
+}
+#avant .banniere{
+  height:108px;position:relative;
+  background:linear-gradient(#ffd34d 0%,#f39a0d 46%,#c96f00 100%);
+  border-bottom:3px double #7c4400;
+  overflow:hidden;
+}
+#avant .banniere h1{
+  margin:0;padding:19px 0 0 128px;
+  font-family:'Comic Sans MS','Comic Sans',cursive;
+  font-size:31px;color:#fff;letter-spacing:.5px;
+  text-shadow:2px 2px 0 #8a4b00, 3px 3px 2px rgba(0,0,0,.45);
+  -webkit-text-stroke:.4px #6d3b00;
+}
+#avant .banniere .slog{
+  margin:2px 0 0;padding-left:130px;
+  font-family:'Times New Roman',Times,serif;font-style:italic;
+  font-size:15px;color:#3a2000;text-shadow:1px 1px 0 #ffe9b0;
+}
+#avant .banniere .tel{
+  position:absolute;right:14px;top:22px;text-align:right;
+  font-family:'Times New Roman',Times,serif;font-size:13px;color:#2b1700;
+}
+#avant .banniere .tel strong{display:block;font-size:22px;letter-spacing:1px}
+#avant .clip{position:absolute;left:14px;top:12px;width:100px;height:84px}
+#avant .menu{
+  background:#e8e8e8;border-bottom:1px solid #999;padding:5px 6px;
+  white-space:nowrap;
+}
+#avant .menu a{
+  display:inline-block;padding:4px 11px;margin-right:3px;
+  border:2px outset #b9b9b9;background:#dcdcdc;
+  color:#00309c;text-decoration:none;font-size:11px;font-weight:bold;
+}
+#avant .menu a:hover{background:#ff2a00;color:#ff0;border-style:inset}
+#avant .corps{display:table;width:100%;table-layout:fixed}
+#avant .flanc{
+  display:table-cell;width:196px;vertical-align:top;
+  background:#dfe9f2;border-right:1px solid #9fb6c9;padding:8px;
+}
+#avant .flanc h3{
+  margin:0 0 5px;font-size:11px;background:#14405f;color:#fff;
+  padding:3px 5px;font-family:Verdana,sans-serif;
+}
+#avant .flanc ul{margin:0 0 12px;padding-left:17px}
+#avant .flanc li{margin-bottom:3px}
+#avant .flanc a{color:#00309c}
+#avant .encart{
+  border:1px solid #9fb6c9;background:#fff;padding:6px;margin-bottom:10px;
+  font-size:10.5px;line-height:1.45;
+}
+#avant .main{display:table-cell;vertical-align:top;padding:10px 14px 0}
+#avant .main h2{
+  margin:0 0 7px;font-family:'Times New Roman',Times,serif;font-size:19px;
+  color:#14405f;border-bottom:2px solid #f39a0d;padding-bottom:3px;
+}
+#avant .photo{
+  float:right;width:288px;height:136px;margin:0 0 8px 12px;
+  border:4px ridge #c0c0c0;image-rendering:pixelated;
+  background-size:100% 100%;background-repeat:no-repeat;background-color:#8a8f86;
+}
+#avant .main p{margin:0 0 7px;text-align:justify;line-height:1.5}
+#avant .rouge{color:#d00000;font-weight:bold;text-decoration:underline}
+#avant .tbl{
+  width:100%;border-collapse:collapse;margin:4px 0 10px;font-size:10.5px;
+}
+#avant .tbl caption{
+  text-align:left;font-weight:bold;font-size:11px;padding:2px 0 3px;color:#14405f;
+}
+#avant .tbl th,#avant .tbl td{border:1px solid #6d6d6d;padding:3px 5px}
+#avant .tbl th{background:#c9d9e6;text-align:left}
+#avant .tbl tr:nth-child(even) td{background:#f2f6fa}
+#avant .deux{display:table;width:100%;table-layout:fixed;border-spacing:10px 0;margin-left:-10px}
+#avant .deux>div{display:table-cell;vertical-align:top}
+#avant .pied{
+  clear:both;margin-top:6px;border-top:1px solid #9fb6c9;
+  background:#eef3f7;padding:7px 8px;font-size:10px;color:#3d4c58;
+  display:flex;justify-content:space-between;align-items:center;gap:10px;
+  flex-wrap:wrap;
+}
+#avant .compteur{
+  font-family:'Courier New',Courier,monospace;background:#000;color:#39ff5e;
+  border:2px inset #777;padding:2px 5px;letter-spacing:2px;font-size:12px;
+}
+#avant .ie{border:1px solid #888;background:#fff;padding:2px 5px;font-size:9.5px}
+#avant .maj{font-style:italic}
+
+/* ==========================================================================
+   PHASE 2 — MUTATION
+   ========================================================================== */
+#fx{z-index:60;display:none;pointer-events:none}
+#frag{z-index:59;display:none;pointer-events:none;perspective:900px;overflow:hidden}
+#frag .tuile{
+  position:absolute;top:0;left:0;width:100%;height:100%;
+  transform-origin:50% 50%;backface-visibility:hidden;will-change:transform,opacity;
+}
+#frag .tuile img{position:absolute;top:0;left:0;width:100%;height:100%}
+#voile{
+  z-index:61;display:none;pointer-events:none;
+  background:radial-gradient(circle at 50% 50%,rgba(255,255,255,.95) 0%,rgba(255,255,255,0) 62%);
+  opacity:0;
+}
+
+/* ==========================================================================
+   PHASE 3 — LE SITE PREMIUM
+   Une grille de 12 colonnes, mais jamais remplie de la même façon : chaque
+   section a son propre ancrage et sa propre mesure de texte.
+   ========================================================================== */
+#apres{
+  position:relative;z-index:20;display:none;
+  background:transparent;
+  width:var(--frameW);margin:0 auto;
+  container-type:inline-size;container-name:cadre;
+}
+#net{z-index:0;pointer-events:none}
+#rail{z-index:0;display:none;pointer-events:none}
+#rail{--voie:82%}
+body.etroit #rail{--voie:76%}
+#rail .tige{
+  position:absolute;left:var(--voie);top:0;width:14px;height:100%;
+  transform:translateX(-50%);
+  background:linear-gradient(90deg,#6E3A1C 0%,#C98A56 38%,#8E4F27 68%,#5B2F17 100%);
+}
+#rail .flux{
+  position:absolute;left:var(--voie);top:0;width:6px;height:100%;
+  transform:translateX(-50%) scaleY(0);transform-origin:50% 0;
+  background:linear-gradient(180deg,#3E9BFF,#0071E3 30%,#004C9E);
+}
+#rail .vanne{
+  position:absolute;left:var(--voie);width:34px;height:12px;margin-left:-17px;
+  background:linear-gradient(180deg,#E3CB95,#C9A66B 40%,#8E7238);
+}
+
+.sect{position:relative;z-index:1;padding:clamp(72px,11vh,132px) 0}
+.grille{
+  width:min(1340px,92%);margin:0 auto;
+  display:grid;grid-template-columns:repeat(12,1fr);column-gap:clamp(14px,2cqw,30px);
+}
+.etiq{
+  font-family:var(--mono);font-size:10.5px;font-weight:500;
+  letter-spacing:.14em;text-transform:uppercase;color:var(--eau);
+  display:block;margin-bottom:14px;
+}
+.etiq.laiton{color:#8A6E2F}
+.etiq.pale{color:rgba(255,255,255,.55)}
+h2.titre{
+  font-size:clamp(26px,4cqw,54px);line-height:1.02;letter-spacing:-.022em;
+  font-weight:600;margin:0 0 18px;text-wrap:balance;
+}
+h3.sous{font-size:clamp(17px,1.5cqw,21px);font-weight:600;letter-spacing:-.01em;margin:0 0 6px}
+.txt{font-size:clamp(15px,1.15cqw,17px);line-height:1.62;color:#39424E;margin:0 0 14px}
+.txt strong{color:var(--encre);font-weight:600}
+.val{font-family:var(--mono);font-variant-numeric:tabular-nums;font-weight:500}
+.filet{height:1px;background:var(--zinc);border:0;margin:0}
+.filet.cuivre{background:linear-gradient(90deg,var(--cuivre),rgba(169,102,58,0))}
+
+/* Révélations — pilotées par --o (0 → 1), calculé chaque frame depuis la
+   position de l'eau dans le tuyau. Transform et opacity uniquement.       */
+[data-rev]{opacity:var(--o,0);will-change:transform,opacity}
+[data-rev="up"]   {transform:translate3d(0,calc((1 - var(--o)) * 30px),0)}
+[data-rev="left"] {transform:translate3d(calc((1 - var(--o)) * -46px),0,0)}
+[data-rev="right"]{transform:translate3d(calc((1 - var(--o)) * 46px),0,0)}
+[data-rev="vanne"]{transform:scaleX(var(--o,0));transform-origin:0 50%}
+[data-rev="fil"]  {transform:scaleX(var(--o,0));transform-origin:0 50%;opacity:1}
+[data-rev="tour"] {transform:rotate(calc((1 - var(--o)) * -92deg))}
+
+/* --- bandeau téléphone permanent ---------------------------------------- */
+#barre-haut{
+  position:fixed;top:0;left:50%;transform:translateX(-50%) translateY(-101%);
+  width:var(--frameW);z-index:70;
+  background:rgba(255,255,255,.93);
+  -webkit-backdrop-filter:saturate(1.6) blur(14px);backdrop-filter:saturate(1.6) blur(14px);
+  border-bottom:1px solid var(--zinc);
+  display:flex;align-items:center;gap:clamp(10px,2vw,26px);
+  padding:9px 16px;
+}
+#barre-haut.on{transform:translateX(-50%) translateY(0)}
+#barre-haut .nom{font-weight:600;font-size:13.5px;letter-spacing:-.01em;white-space:nowrap}
+#barre-haut .pastille{margin-left:auto}
+#barre-haut .tel-lien{
+  font-family:var(--mono);font-weight:600;font-size:14px;
+  background:var(--eau);color:#fff;text-decoration:none;padding:7px 13px;
+  white-space:nowrap;
+}
+#barre-haut .tel-lien:hover{background:#005BC0}
+
+/* pastille d'ouverture, calculée en direct --------------------------------- */
+.pastille{
+  display:inline-flex;align-items:center;gap:7px;
+  font-family:var(--mono);font-size:11px;font-weight:500;letter-spacing:.04em;
+  border:1px solid var(--zinc);padding:5px 10px;color:#2A333D;white-space:nowrap;
+}
+.pastille .led{width:6px;height:6px;border-radius:50%;background:#12A150;flex:0 0 auto}
+.pastille.ferme .led{background:var(--laiton)}
+.pastille.sombre{border-color:rgba(255,255,255,.18);color:rgba(255,255,255,.82)}
+
+/* --- S1 urgence ---------------------------------------------------------- */
+.s-urgence{min-height:100vh;display:flex;align-items:center;padding-top:clamp(90px,14vh,150px)}
+.s-urgence .grille{align-items:end}
+.bloc-titre{grid-column:1 / span 6}
+.s-urgence h1{
+  font-size:clamp(34px,7.4cqw,94px);line-height:.94;letter-spacing:-.038em;
+  font-weight:700;margin:0 0 22px;text-wrap:balance;
+}
+.s-urgence h1 .mot{display:inline-block;white-space:nowrap}
+.s-urgence h1 .l{display:inline-block;will-change:transform,opacity}
+.s-urgence h1 em{font-style:normal;color:var(--eau)}
+.appel{display:flex;flex-wrap:wrap;align-items:center;gap:14px;margin:0 0 16px}
+.appel .num{
+  font-family:var(--mono);font-weight:600;
+  font-size:clamp(23px,3.4cqw,40px);letter-spacing:-.02em;
+  text-decoration:none;color:var(--blanc);background:var(--eau);
+  padding:10px 18px;display:inline-block;
+}
+.appel .num:hover{background:#005BC0}
+.appel .num small{display:block;font-size:10.5px;font-weight:500;letter-spacing:.12em;
+  text-transform:uppercase;opacity:.82;margin-bottom:2px}
+.sous-cta{font-size:13px;color:var(--gris);max-width:46ch;line-height:1.5;margin:0}
+.bloc-fiche{grid-column:7 / span 3;border-left:1px solid var(--zinc);padding-left:clamp(14px,1.8cqw,24px)}
+.fiche-t{
+  font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--gris-clair);margin:0 0 12px;
+}
+.fiche-l{display:flex;justify-content:space-between;gap:10px;padding:8px 0;border-bottom:1px solid var(--zinc);font-size:13px}
+.fiche-l b{font-family:var(--mono);font-weight:500;font-variant-numeric:tabular-nums}
+.creneaux{margin-top:14px;font-size:13px;line-height:1.5;color:#39424E}
+.creneaux u{text-decoration:none;border-bottom:2px solid var(--laiton);white-space:nowrap}
+.legal{
+  grid-column:1 / span 9;margin-top:clamp(28px,5vh,56px);padding-top:12px;
+  border-top:1px solid var(--zinc);
+  font-family:var(--mono);font-size:10.5px;color:var(--gris-clair);
+  display:flex;flex-wrap:wrap;gap:6px 26px;
+}
+
+/* --- S2 zone d'intervention --------------------------------------------- */
+.s-zone .grille{align-items:start}
+.s-zone .intro{grid-column:1 / span 4;position:sticky;top:96px}
+.s-zone .liste{grid-column:5 / span 5}
+.z-ligne{
+  display:grid;grid-template-columns:1fr auto auto;align-items:baseline;gap:14px;
+  padding:11px 0;border-bottom:1px solid var(--zinc);
+}
+.z-ligne .com{font-size:16px;font-weight:500;letter-spacing:-.01em}
+.z-ligne .zn{font-family:var(--mono);font-size:10px;letter-spacing:.1em;color:var(--gris-clair)}
+.z-ligne .dl{font-family:var(--mono);font-size:15px;font-weight:500;font-variant-numeric:tabular-nums;color:var(--eau);min-width:74px;text-align:right}
+.selecteur{margin-top:24px;border-top:2px solid var(--encre);padding-top:16px}
+.selecteur label{display:block;font-family:var(--mono);font-size:10px;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--gris-clair);margin-bottom:8px}
+select,input,textarea{
+  font-family:var(--display);font-size:15px;color:var(--encre);
+  background:var(--blanc);border:1px solid #C6CFD9;padding:11px 12px;width:100%;
+  border-radius:0;
+}
+select:focus,input:focus,textarea:focus{border-color:var(--eau)}
+.reponse-zone{margin-top:12px;font-size:15px;line-height:1.55}
+.reponse-zone b{font-family:var(--mono);font-weight:600;color:var(--eau)}
+
+/* --- S3 prestations : un collecteur, une prise par prestation ------------ */
+.s-presta .tete{grid-column:1 / span 6;margin-bottom:clamp(20px,4vh,44px)}
+.p-ligne{
+  grid-column:1 / span 9;
+  display:grid;grid-template-columns:34px minmax(0,1fr) minmax(150px,auto);
+  gap:clamp(10px,2.2cqw,26px);align-items:start;
+  padding:clamp(18px,2.4vh,26px) 0;border-top:1px solid var(--zinc);
+}
+.p-ligne:last-of-type{border-bottom:1px solid var(--zinc)}
+.p-prise{
+  width:30px;height:30px;margin-top:2px;flex:0 0 auto;
+  transform-origin:50% 50%;
+}
+.p-ligne .nom{font-size:clamp(18px,1.9cqw,25px);font-weight:600;letter-spacing:-.018em;margin:0}
+.p-ligne .det{font-size:14.5px;line-height:1.58;color:#39424E;margin:6px 0 0;max-width:52ch}
+.p-ligne .prix{
+  font-family:var(--mono);font-size:14px;font-weight:500;text-align:right;
+  padding-top:4px;color:var(--encre);line-height:1.45;
+}
+.p-ligne .prix span{display:block;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--gris-clair);font-weight:400;margin-bottom:3px}
+
+/* --- S4 tarifs : la seule section sombre, l'eau reste visible derrière --- */
+.s-tarif{background:rgba(12,17,22,.945);color:#EDF1F5;margin-top:clamp(40px,7vh,90px)}
+.s-tarif .txt{color:#A9B4C0}
+.s-tarif h2.titre{color:#fff}
+.s-tarif .expli{grid-column:1 / span 4}
+.s-tarif .feuille{grid-column:5 / span 5}
+.t-ligne{display:grid;grid-template-columns:1fr auto;gap:16px;align-items:baseline;
+  padding:13px 0;border-bottom:1px solid rgba(237,241,245,.14)}
+.t-ligne .quoi{font-size:15px;line-height:1.4}
+.t-ligne .quoi em{display:block;font-style:normal;font-size:12.5px;color:#8C97A3;margin-top:3px}
+.t-ligne .cb{font-family:var(--mono);font-size:19px;font-weight:500;font-variant-numeric:tabular-nums;color:#fff;white-space:nowrap}
+.t-ligne.fort .cb{color:#5AAEFF}
+.note-tarif{margin-top:18px;font-family:var(--mono);font-size:11.5px;line-height:1.6;color:#8C97A3}
+
+/* --- S5 preuves + chiffres qui se comptent ------------------------------- */
+.s-preuve .chiffres{grid-column:1 / span 9;display:grid;
+  grid-template-columns:1.15fr 1fr 1.35fr;gap:clamp(16px,3cqw,40px);
+  border-top:2px solid var(--encre);padding-top:20px;margin-bottom:clamp(34px,6vh,68px)}
+.ch .n{font-family:var(--mono);font-weight:600;font-variant-numeric:tabular-nums;
+  font-size:clamp(32px,5.4cqw,68px);letter-spacing:-.04em;line-height:1;color:var(--eau)}
+.ch .n i{font-style:normal;font-size:.44em;letter-spacing:0;color:var(--encre)}
+.ch .q{font-size:13.5px;line-height:1.45;color:#39424E;margin-top:8px;max-width:26ch}
+.s-preuve .tete{grid-column:1 / span 4}
+.s-preuve .certs{grid-column:5 / span 5}
+.c-ligne{display:grid;grid-template-columns:auto 1fr;gap:14px;align-items:start;
+  padding:12px 0;border-bottom:1px solid var(--zinc)}
+.c-ligne .poincon{
+  width:26px;height:26px;border:1px solid var(--laiton);
+  display:grid;place-items:center;flex:0 0 auto;
+}
+.c-ligne .poincon svg{width:14px;height:14px}
+.c-ligne b{display:block;font-size:14.5px;font-weight:600}
+.c-ligne span{display:block;font-family:var(--mono);font-size:11.5px;line-height:1.5;color:var(--gris);margin-top:3px}
+
+/* --- S6 avis : colonne éditoriale, mesures inégales, aucune carte -------- */
+.s-avis .tete{grid-column:1 / span 6;margin-bottom:clamp(24px,4vh,50px)}
+.s-avis .flux{grid-column:1 / span 9;display:flex;flex-direction:column;gap:clamp(22px,3.4vh,40px)}
+.avis{max-width:58ch}
+.avis:nth-child(2n){margin-left:auto;text-align:left;max-width:45ch}
+.avis:nth-child(3n){max-width:62ch;margin-left:clamp(0px,5cqw,90px)}
+.avis:nth-child(5n){max-width:39ch;margin-left:auto;margin-right:clamp(0px,7cqw,120px)}
+.avis q{
+  display:block;quotes:none;font-size:clamp(15px,1.25cqw,18px);line-height:1.58;
+  color:#20272F;
+}
+.avis q:before,.avis q:after{content:''}
+.avis .qui{
+  margin-top:9px;font-family:var(--mono);font-size:11px;letter-spacing:.04em;color:var(--gris);
+  display:flex;flex-wrap:wrap;gap:4px 14px;
+}
+.avis .qui b{color:var(--encre);font-weight:600}
+.avis .qui i{font-style:normal;color:#8A6E2F}
+.s-avis .note{
+  grid-column:1 / span 9;margin-top:clamp(26px,4vh,52px);padding-top:16px;
+  border-top:1px solid var(--zinc);display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;
+}
+.s-avis .note .g{font-family:var(--mono);font-size:clamp(26px,3.3cqw,40px);font-weight:600;color:var(--encre)}
+.s-avis .note .g s{text-decoration:none;font-size:.42em;color:var(--gris-clair)}
+.s-avis .note p{margin:0;font-size:13.5px;color:var(--gris)}
+
+/* --- S7 devis ------------------------------------------------------------ */
+.s-devis{padding-bottom:clamp(160px,24vh,280px)}
+.s-devis .tete{grid-column:1 / span 6;margin-bottom:clamp(22px,3.5vh,42px)}
+.s-devis form{grid-column:1 / span 5;display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.s-devis form .plein{grid-column:1 / span 2}
+.s-devis .champ label{display:block;font-family:var(--mono);font-size:10px;letter-spacing:.12em;
+  text-transform:uppercase;color:var(--gris-clair);margin-bottom:6px}
+.btn{
+  font-family:var(--display);font-size:16px;font-weight:600;letter-spacing:-.01em;
+  background:var(--eau);color:#fff;border:0;padding:15px 22px;cursor:pointer;width:100%;
+}
+.btn:hover{background:#005BC0}
+.btn.creux{background:transparent;color:var(--encre);border:1px solid var(--encre)}
+.btn.creux:hover{background:var(--encre);color:#fff}
+.apres-clic{
+  grid-column:1 / span 2;font-size:13px;line-height:1.55;color:var(--gris);margin:2px 0 0;
+}
+.s-devis .aside{grid-column:6 / span 4;border-left:1px solid var(--zinc);padding-left:clamp(16px,2cqw,28px)}
+.s-devis .aside .gros{
+  font-family:var(--mono);font-weight:600;font-size:clamp(22px,2.6cqw,32px);
+  letter-spacing:-.02em;text-decoration:none;display:block;margin:6px 0 4px;color:var(--eau);
+}
+.s-devis .aside .ou{font-family:var(--mono);font-size:10px;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--gris-clair);margin:22px 0 0}
+.liens-sec{display:flex;flex-direction:column;gap:9px;margin-top:10px}
+.liens-sec a{font-size:14.5px;color:var(--encre);text-decoration:none;border-bottom:1px solid var(--zinc);padding-bottom:7px}
+.liens-sec a:hover{border-color:var(--eau);color:var(--eau)}
+.merci{grid-column:1 / span 6;font-size:15px;line-height:1.6;display:none}
+.merci b{color:var(--eau)}
+
+/* --- barre collante mobile ----------------------------------------------- */
+#barre-mob{
+  position:fixed;bottom:0;left:50%;transform:translateX(-50%) translateY(101%);
+  width:var(--frameW);z-index:100;display:none;
+  grid-template-columns:1fr 1fr;gap:1px;background:var(--zinc);
+  padding-bottom:env(safe-area-inset-bottom);
+}
+#barre-mob.on{transform:translateX(-50%) translateY(0)}
+#barre-mob a{
+  text-align:center;padding:15px 8px;text-decoration:none;font-size:15px;font-weight:600;
+  background:var(--blanc);color:var(--encre);
+}
+#barre-mob a.eau{background:var(--eau);color:#fff;font-family:var(--mono)}
+
+/* --- indicateur de scroll ------------------------------------------------ */
+#indic{
+  position:fixed;left:50%;bottom:26px;transform:translateX(-50%);z-index:75;
+  font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--gris);display:flex;flex-direction:column;align-items:center;gap:8px;
+  opacity:0;pointer-events:none;
+}
+#indic .trait{width:1px;height:34px;background:linear-gradient(var(--eau),rgba(0,113,227,0))}
+
+/* ==========================================================================
+   RESPONSIVE RÉEL — jusqu'à 360 px
+   ========================================================================== */
+/* Sous 1120 px de cadre, le réseau se resserre : le contenu reprend
+   les colonnes de droite. */
+@container cadre (max-width:1120px){
+  .bloc-titre{grid-column:1 / span 7}
+  .bloc-fiche{grid-column:8 / span 5}
+  .s-zone .liste{grid-column:5 / span 8}
+  .s-presta .tete,.p-ligne,.legal,
+  .s-preuve .chiffres,.s-avis .flux,.s-avis .note{grid-column:1 / span 12}
+  .s-tarif .feuille{grid-column:5 / span 8}
+  .s-preuve .certs{grid-column:5 / span 8}
+  .s-devis form{grid-column:1 / span 6}
+  .s-devis .aside{grid-column:7 / span 6}
+}
+@container cadre (max-width:820px){
+  [data-rev="left"] {transform:translate3d(calc((1 - var(--o)) * -16px),0,0)}
+  [data-rev="right"]{transform:translate3d(calc((1 - var(--o)) *  16px),0,0)}
+  .bloc-titre,.bloc-fiche,.s-zone .intro,.s-zone .liste,
+  .s-tarif .expli,.s-tarif .feuille,.s-preuve .tete,.s-preuve .certs,
+  .s-presta .tete,.s-avis .tete,.s-devis .tete,.s-devis form,.s-devis .aside{
+    grid-column:1 / span 12;
+  }
+  .bloc-fiche{border-left:0;padding-left:0;border-top:1px solid var(--zinc);padding-top:20px;margin-top:30px}
+  .s-zone .intro{position:static;margin-bottom:26px}
+  .s-tarif .feuille{margin-top:28px}
+  .s-preuve .certs{margin-top:24px}
+  .s-preuve .chiffres{grid-template-columns:1fr;gap:20px}
+  .s-devis .aside{border-left:0;padding-left:0;border-top:1px solid var(--zinc);padding-top:22px;margin-top:30px}
+  .p-ligne{grid-template-columns:28px 1fr;row-gap:8px}
+  .p-ligne .prix{grid-column:2;text-align:left;padding-top:2px}
+  .p-ligne .prix span{display:inline;margin-right:8px}
+  .avis,.avis:nth-child(2n),.avis:nth-child(3n),.avis:nth-child(5n){
+    max-width:none;margin-left:0;margin-right:0;
+  }
+}
+@container cadre (max-width:420px){
+  .sect{padding:clamp(52px,8vh,80px) 0}
+  .s-urgence{padding-top:104px}
+  .appel .num{font-size:26px;padding:10px 14px;width:100%;text-align:center}
+  .z-ligne{grid-template-columns:1fr auto;row-gap:2px}
+  .z-ligne .zn{grid-column:1;font-size:9.5px}
+  .s-devis form{grid-template-columns:1fr}
+  .s-devis form .plein{grid-column:1}
+  .apres-clic{grid-column:1}
+}
+/* Ces trois-là vivent hors du site : c'est le script qui pose « etroit »,
+   d'après la largeur du cadre — la fenêtre peut être bien plus large. */
+body.etroit #barre-mob{display:grid}
+body.etroit #barre-haut .nom{display:none}
+body.etroit #indic{display:none}
+body.minus #ui{left:6px;right:6px;bottom:6px;max-width:none;font-size:10px}
+
+/* ==========================================================================
+   PREFERS-REDUCED-MOTION — l'eau se positionne d'un coup, sans interpolation
+   ========================================================================== */
+@media (prefers-reduced-motion:reduce){
+  [data-rev]{opacity:1 !important;transform:none !important}
+  [data-rev="fil"],[data-rev="vanne"]{transform:scaleX(1) !important}
+  #indic{transition:none}
+}
+</style>
+</head>
+<body>
+
+<div id="bandeG"></div><div id="bandeD"></div>
+
+<!-- PHASE 1 — le site de 2011, injecté depuis CLIENT -->
+<section id="avant" class="cadre" aria-label="Le site actuel de l'entreprise, mis en ligne en 2011"></section>
+
+<!-- PHASE 2 — mutation. Les deux canvas WebGL (#fx et #net) sont créés par
+     le script APRÈS la capture : html2canvas prend un contexte 2D sur tout
+     canvas qu'il croise en clonant le document, et un canvas qui a déjà un
+     contexte 2D refuse définitivement le WebGL. -->
+<div id="frag" class="cadre" aria-hidden="true"></div>
+<div id="voile" class="cadre" aria-hidden="true"></div>
+
+<div id="fond" class="cadre" aria-hidden="true"></div>
+
+<!-- PHASE 3 — le réseau de cuivre, fixé en fond -->
+<div id="rail" class="cadre" aria-hidden="true">
+  <div class="tige"></div><div class="flux"></div>
+</div>
+
+<main id="apres"></main>
+
+<div id="barre-haut"></div>
+<div id="barre-mob"></div>
+<div id="indic"><span>faites couler</span><span class="trait"></span></div>
+
+<svg id="faux" viewBox="0 0 20 26" aria-hidden="true">
+  <path d="M1 1 L1 20 L6 15.4 L9.4 24 L12.6 22.6 L9.2 14.2 L16 14.2 Z"
+        fill="#fff" stroke="#111" stroke-width="1.3" stroke-linejoin="round"/>
+</svg>
+<div id="onde-clic" aria-hidden="true"></div>
+
+<div id="ui">
+  <div class="rang">
+    <button id="bRejouer" title="Espace">Rejouer</button>
+    <button id="bReset" title="R">Reset</button>
+    <button id="bV" title="V" aria-pressed="false">9:16</button>
+    <button id="bS" title="S" aria-pressed="false">0,5&times;</button>
+    <button id="bA" title="A" aria-pressed="false">Auto-scroll</button>
+    <button id="bH" title="H">Masquer</button>
+  </div>
+  <div class="barre">
+    <label for="scrub">Mutation</label>
+    <input id="scrub" type="range" min="0" max="1000" value="0" step="1"
+           aria-label="Position de la mutation">
+  </div>
+  <div id="etat"></div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/0.160.0/three.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+<script>
+/* ==========================================================================
+   1. LE DOSSIER CLIENT — source unique, servie à l'AVANT comme à l'APRÈS.
+      Entreprise fictive. Le nom « Passebosc » a été vérifié : aucun plombier
+      ni artisan de ce nom sur le bassin de Thau, et aucune proximité avec les
+      enseignes réellement installées à Sète, Frontignan, Balaruc ou Mèze.
+      Téléphones : plages 04 39 98 / 06 39 98, réservées par l'ARCEP à la
+      fiction — la démo ne fait sonner personne.
+   ========================================================================== */
+const CLIENT = {
+  nom:        'Plomberie Passebosc',
+  court:      'Passebosc',
+  gerant:     'Damien Passebosc',
+  creation:   2009,
+  statut:     'Artisan plombier inscrit au répertoire des métiers de l’Hérault',
+  siret:      '512 884 037 00019',
+  equipe:     'Damien, deux compagnons et un apprenti',
+  adresse:    '9 impasse des Salins, 34200 Sète',
+  ville:      'Sète',
+  tel:        '04 39 98 00 42',
+  telAstreinte:'06 39 98 12 40',
+  mail:       'contact@plomberie-passebosc.fr',
+  domaine:    'www.plomberie-passebosc.fr',
+  note:       '4,8',
+  avisNb:     87,
+  interventions: 1240,
+  delaiMoyen: 34,
+
+  /* Horaires d'atelier, par jour de la semaine (0 = dimanche).
+     L'astreinte, elle, tourne 7 j/7 — c'est deux promesses différentes et le
+     site doit les distinguer, sinon la première fuite du dimanche brûle la
+     confiance.                                                              */
+  horaires: [
+    null,            /* dimanche : astreinte seule */
+    [7.5, 18.5],     /* lundi    */
+    [7.5, 18.5],
+    [7.5, 18.5],
+    [7.5, 18.5],
+    [7.5, 18.5],     /* vendredi */
+    [8, 12.5]        /* samedi matin */
+  ],
+
+  zones: [
+    { com:'Sète',              dl:20, z:1 },
+    { com:'Frontignan',        dl:25, z:1 },
+    { com:'La Peyrade',        dl:25, z:1 },
+    { com:'Balaruc-les-Bains', dl:25, z:1 },
+    { com:'Balaruc-le-Vieux',  dl:30, z:1 },
+    { com:'Poussan',           dl:30, z:1 },
+    { com:'Bouzigues',         dl:30, z:1 },
+    { com:'Vic-la-Gardiole',   dl:35, z:2 },
+    { com:'Mèze',              dl:35, z:2 },
+    { com:'Loupian',           dl:35, z:2 },
+    { com:'Gigean',            dl:40, z:2 },
+    { com:'Marseillan',        dl:40, z:2 },
+    { com:'Villeveyrac',       dl:45, z:2 }
+  ],
+
+  prestations: [
+    { nom:'Fuite en urgence',
+      det:'Coupure, mise en sécurité, réparation dans la même visite quand la pièce est dans le camion. Elle y est neuf fois sur dix.',
+      prix:'39 € de déplacement,\npuis 58 €/h', etiq:'Astreinte' },
+    { nom:'Débouchage de canalisation',
+      det:'Furet électrique d’abord. Hydrocureur si le bouchon est loin. On repasse la caméra derrière pour vous montrer que c’est propre.',
+      prix:'140 € au furet\n260 € à l’hydrocureur', etiq:'Sur place' },
+    { nom:'Remplacement de chauffe-eau',
+      det:'Dépose de l’ancien, groupe de sécurité neuf, mise en eau et réglage de la sonde. Évacuation de la vieille cuve comprise.',
+      prix:'890 € posé,\ncumulus 200 L inclus', etiq:'Demi-journée' },
+    { nom:'Recherche de fuite non destructive',
+      det:'Caméra thermique, gaz traceur, corrélateur acoustique. On ouvre le mur au bon endroit, une seule fois, et on referme.',
+      prix:'Forfait 180 €,\ndéduit des travaux', etiq:'Diagnostic' },
+    { nom:'Rénovation de salle de bain',
+      det:'Plan, dépose, plomberie, carrelage, pose. Un seul interlocuteur, un seul planning, deux à trois semaines de chantier.',
+      prix:'À partir de 4 900 €\nTVA 10 %', etiq:'Chantier' },
+    { nom:'Entretien de chaudière gaz',
+      det:'Visite annuelle obligatoire, contrôle de combustion, ramonage du conduit. Attestation remise sur place, pas trois semaines après.',
+      prix:'119 € la visite\n189 € le contrat 2 visites', etiq:'Contrat' }
+  ],
+
+  tarifs: [
+    { quoi:'Déplacement et diagnostic sur place, zone 1',
+      sous:'Sète, Frontignan, La Peyrade, Balaruc, Poussan, Bouzigues', cb:'39 €',
+      court:'Déplacement zone 1' },
+    { quoi:'Déplacement et diagnostic sur place, zone 2',
+      sous:'Vic-la-Gardiole, Mèze, Loupian, Gigean, Marseillan, Villeveyrac', cb:'49 €',
+      court:'Déplacement zone 2' },
+    { quoi:'Main-d’œuvre, du lundi au samedi midi',
+      sous:'Décomptée au quart d’heure après la première heure', cb:'58 €/h',
+      court:'Main-d’œuvre en journée' },
+    { quoi:'Main-d’œuvre de nuit, dimanche et jours fériés',
+      sous:'De 20 h à 7 h 30 — le tarif est dit au téléphone avant de partir', cb:'87 €/h',
+      court:'Main-d’œuvre de nuit et dimanche', fort:true },
+    { quoi:'Devis écrit, chiffré, gratuit',
+      sous:'Systématique au-delà de 350 € de travaux, valable deux mois', cb:'0 €',
+      court:'Devis écrit', fort:true }
+  ],
+
+  certifs: [
+    { t:'PG — Professionnel du Gaz',        d:'Qualification ATG B.540.9, renouvelée en mars 2026' },
+    { t:'RGE Qualibat 5911',                d:'Chauffage et eau chaude sanitaire — ouvre droit aux aides' },
+    { t:'Qualibat 4311',                    d:'Plomberie et installations sanitaires' },
+    { t:'Habilitation électrique BR',       d:'Raccordement et dépannage des chauffe-eau' },
+    { t:'Garantie décennale',               d:'Contrat n° 4 187 226 K — attestation jointe à chaque devis' },
+    { t:'Responsabilité civile pro',        d:'2 000 000 € par sinistre, dégâts des eaux inclus' }
+  ],
+
+  avis: [
+    { qui:'Corinne B.', ou:'Balaruc-les-Bains', quoi:'Fuite sous évier, un dimanche',
+      txt:'J’ai appelé un dimanche matin, il y avait de l’eau qui remontait sous l’évier et je commençais à paniquer un peu. Damien m’a rappelée en moins de dix minutes et m’a expliqué au téléphone comment couper l’arrivée en attendant. Il est arrivé vers onze heures, le joint du siphon était mort et le flexible aussi. Réparé en trois quarts d’heure, il m’a montré la pièce usée et m’a laissé la facture détaillée. Le prix était celui annoncé au téléphone, ce qui n’est pas si courant.' },
+    { qui:'Mehdi', ou:'Frontignan', quoi:'Chauffe-eau remplacé',
+      txt:'Chauffe-eau changé en une matinée, ancien emporté, rien à redire.' },
+    { qui:'Jean-Louis Estève', ou:'Poussan', quoi:'Recherche de fuite',
+      txt:'Une tache d’humidité au plafond depuis des mois et deux artisans avant eux qui me disaient qu’il fallait tout ouvrir. Ils sont venus avec la caméra, ils ont trouvé le coude percé en une heure, derrière le placard. Un seul trou de trente centimètres et refermé proprement. Je recomande.' },
+    { qui:'Sandrine', ou:'Sète, Île de Thau', quoi:'WC bouchés un dimanche soir',
+      txt:'WC bouchés un dimanche soir de mars, avec la belle-famille à table — autant dire que le moment était mal choisi. J’ai eu quelqu’un au téléphone tout de suite, on m’a dit quarante-cinq minutes et c’était quarante. Le furet n’a pas suffit, il est revenu le lendemain matin avec l’hydrocureur comme prévu, et il a passé la caméra pour me montrer les racines dans la canalisation. On a fait couper l’arbre depuis. La majoration du dimanche m’a été expliquée avant, pas sur la facture.' },
+    { qui:'Patrick M.', ou:'Mèze', quoi:'Salle de bain refaite',
+      txt:'Salle de bain entière reprise : dépose de la baignoire, douche à l’italienne, faïence du sol au plafond. Trois semaines annoncées, ils ont fini en dix-sept jours. Chantier balayé chaque soir, ce qui compte quand on vit sur place pendant les travaux.' },
+    { qui:'Noëlle', ou:'Bouzigues', quoi:'Entretien annuel',
+      txt:'Entretien de la chaudière, ponctuel, attestation remise sur place.' },
+    { qui:'Karim et Élodie', ou:'Marseillan', quoi:'Reprise complète en cuivre',
+      txt:'On a acheté une maison de 1974 avec toute la plomberie en plomb et un ballon qui datait de la même époque. Le devis était en deux colonnes, ce qui était obligatoire et ce qui pouvait attendre — on a apprécié qu’on ne nous pousse pas à tout faire d’un coup. Reprise en cuivre au rez-de-chaussée, ballon thermodynamique, et ils ont monté le dossier d’aide avec nous. Un an après, zéro souci.' },
+    { qui:'Thierry', ou:'Villeveyrac', quoi:'Fuite sur compteur, un 14 juillet',
+      txt:'Fuite au compteur un 14 juillet. L’astreinte répond vraiment, ce n’est pas un standard qui prend le message et vous rappelle mardi. 87 €/h le jour férié, c’est le tarif, mais au moins il est dit avant de raccrocher.' }
+  ]
+};
+
+/* ==========================================================================
+   2. TIMING — les cinq temps de la mutation, en millisecondes.
+      Tout se recalcule seul : les seuils envoyés au shader sont dérivés de
+      ces valeurs, donc allonger un temps ne casse rien.
+   ========================================================================== */
+const TIMING = {
+  attente:        2000,   /* immobilité avant l'entrée du faux curseur      */
+  curseur:        1150,   /* traversée d'écran du faux curseur              */
+  saisie:          500,   /* 1. glitch RGB, désaturation, capture du DOM    */
+  fracture:       1300,   /* 2. 16 × 24 tuiles détachées par vagues         */
+  effondrement:   1400,   /* 3. aspiration au centre, noyau bleu           */
+  onde:            600,   /* 4. implosion, onde blanche vers les bords      */
+  reconstruction: 2200    /* 5. titre, blocs, réseau de cuivre qui se visse */
+};
+const MUT_MS = TIMING.saisie + TIMING.fracture + TIMING.effondrement
+             + TIMING.onde + TIMING.reconstruction;   /* 6000 ms */
+
+/* Seuils normalisés 0 → 1, partagés par le shader et la timeline. */
+const SEUIL = (() => {
+  let a = TIMING.saisie, b = a + TIMING.fracture,
+      c = b + TIMING.effondrement, d = c + TIMING.onde;
+  return { saisie:a/MUT_MS, fracture:b/MUT_MS, effondrement:c/MUT_MS, onde:d/MUT_MS };
+})();
+</script>
+
+<script>
+/* ==========================================================================
+   3. SURCHARGE PAR QUERY PARAMS + PETITS OUTILS
+   ========================================================================== */
+(() => {
+  const p = new URLSearchParams(location.search);
+  const map = { nom:'nom', ville:'ville', tel:'tel', gerant:'gerant', mail:'mail',
+                note:'note', avis:'avisNb', creation:'creation', domaine:'domaine',
+                astreinte:'telAstreinte', adresse:'adresse' };
+  for (const [k, cle] of Object.entries(map)) {
+    const v = p.get(k);
+    if (v) CLIENT[cle] = (cle === 'creation' || cle === 'avisNb') ? +v : v;
+  }
+  if (p.get('nom')) CLIENT.court = CLIENT.nom.replace(/^(plomberie|sarl|ets)\s+/i, '');
+  if (p.get('ville')) {
+    /* La commune du prospect passe en tête de la zone d'intervention, avec le
+       délai le plus court : c'est le premier chiffre qu'il cherche.        */
+    const i = CLIENT.zones.findIndex(z => z.com.toLowerCase() === CLIENT.ville.toLowerCase());
+    if (i > 0) CLIENT.zones.unshift(CLIENT.zones.splice(i, 1)[0]);
+    else if (i < 0) CLIENT.zones.unshift({ com: CLIENT.ville, dl: 20, z: 1 });
+  }
+})();
+
+const $  = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const clamp = (v, a = 0, b = 1) => v < a ? a : v > b ? b : v;
+const doux  = t => t * t * (3 - 2 * t);
+const echap = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+const REDUIT = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+const JOURS = ['dimanche','lundi','mardi','mercredi','jeudi','vendredi','samedi'];
+const MOIS  = ['janvier','février','mars','avril','mai','juin','juillet',
+               'août','septembre','octobre','novembre','décembre'];
+const telHref = t => 'tel:+33' + t.replace(/\D/g,'').slice(1);
+const fmtH = x => {
+  const h = Math.floor(x), m = Math.round((x - h) * 60);
+  return m ? `${h} h ${String(m).padStart(2,'0')}` : `${h} h`;
+};
+
+/* Horaires calculés en direct — atelier d'un côté, astreinte de l'autre.
+   Ce sont deux promesses distinctes, le site ne les confond pas.          */
+function ouverture(now = new Date()) {
+  const j = now.getDay(), h = now.getHours() + now.getMinutes() / 60;
+  const aujourdhui = CLIENT.horaires[j];
+  if (aujourdhui && h >= aujourdhui[0] && h < aujourdhui[1])
+    return { ouvert:true, txt:`Ouvert maintenant, jusqu’à ${fmtH(aujourdhui[1])}` };
+  if (aujourdhui && h < aujourdhui[0])
+    return { ouvert:false, txt:`Ouvre à ${fmtH(aujourdhui[0])}, astreinte en attendant` };
+  for (let d = 1; d <= 7; d++) {
+    const k = (j + d) % 7, s = CLIENT.horaires[k];
+    if (s) return { ouvert:false,
+      txt:`Réouvre ${d === 1 ? 'demain' : JOURS[k]} à ${fmtH(s[0])}, astreinte en attendant` };
+  }
+  return { ouvert:false, txt:'Astreinte 7 j/7' };
+}
+
+/* Rareté honnête : les créneaux restants sont de vraies dates, calculées
+   depuis maintenant, et ne comptent que les heures encore atteignables.   */
+function creneaux(now = new Date()) {
+  const poses = [8, 10.5, 14, 16.5], out = [];
+  const maintenant = now.getHours() + now.getMinutes() / 60;
+  for (let d = 0; d <= 6; d++) {
+    const dt = new Date(now.getFullYear(), now.getMonth(), now.getDate() + d);
+    const wd = dt.getDay(), plage = CLIENT.horaires[wd];
+    if (d > 0 && wd === 1) break;            /* on ne promet pas la semaine suivante */
+    if (!plage) continue;
+    for (const s of poses) {
+      if (s < plage[0] || s > plage[1] - 1) continue;
+      if (d === 0 && s < maintenant + 1.5) continue;
+      out.push({ dt, h:s });
+    }
+  }
+  const graine = now.getFullYear() * 372 + now.getMonth() * 31 + now.getDate();
+  const garde  = Math.min(out.length, 2 + (graine % 3));
+  const pas    = out.length / garde;
+  return Array.from({ length:garde }, (_, i) => out[Math.floor(i * pas)]).filter(Boolean);
+}
+const fmtCreneau = c =>
+  `${JOURS[c.dt.getDay()]} ${c.dt.getDate()} ${MOIS[c.dt.getMonth()]} à ${fmtH(c.h)}`;
+
+/* La photo de chantier de 2011 : peinte en 48 × 30 px puis étirée en 288 × 136.
+   Le rapport ne correspond pas, et c'est exactement ce qu'on voyait.      */
+function photoBasseDef() {
+  const c = document.createElement('canvas'); c.width = 48; c.height = 30;
+  const x = c.getContext('2d');
+  x.fillStyle = '#9fa79b'; x.fillRect(0, 0, 48, 30);
+  x.fillStyle = '#cfd3c8'; x.fillRect(0, 0, 48, 19);
+  x.strokeStyle = '#b3b8ab'; x.lineWidth = 1;
+  for (let i = 4; i < 48; i += 7) { x.beginPath(); x.moveTo(i, 0); x.lineTo(i, 19); x.stroke(); }
+  for (let j = 5; j < 19; j += 6) { x.beginPath(); x.moveTo(0, j); x.lineTo(48, j); x.stroke(); }
+  x.fillStyle = '#6d6f68'; x.fillRect(0, 19, 48, 11);
+  x.fillStyle = '#8d5f38'; x.fillRect(29, 4, 3, 16); x.fillRect(29, 4, 12, 3);
+  x.fillStyle = '#c9c9c9'; x.fillRect(11, 14, 9, 6); x.fillRect(13, 11, 5, 3);
+  x.fillStyle = '#2f5d86'; x.fillRect(4, 22, 7, 6);
+  x.fillStyle = '#d8c58a'; x.fillRect(20, 24, 12, 2);
+  return c.toDataURL('image/png');
+}
+
+/* Le clipart de robinet : contour épais, aplats, un reflet blanc. */
+const CLIPART = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(
+`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 84">
+<g stroke="#1d1d1d" stroke-width="3" stroke-linejoin="round">
+<path d="M22 78h44v-9H22z" fill="#b9bdc2"/>
+<path d="M34 69V44c0-13 11-22 24-22h14v13H60c-7 0-11 5-11 11v23z" fill="#d7dbdf"/>
+<path d="M68 16h20v13H68z" fill="#a8adb3"/>
+<path d="M27 44h30v8H27z" fill="#8f949a"/>
+<circle cx="42" cy="30" r="9" fill="#c9ced3"/>
+<path d="M42 17v26M29 30h26" stroke-width="4"/>
+<path d="M41 57c4 5 6 8 6 11a6 6 0 0 1-12 0c0-3 2-6 6-11z" fill="#3f8ede"/>
+</g>
+<path d="M37 47c0-9 1-16 4-19" stroke="#fff" stroke-width="3" fill="none" opacity=".8"/>
+</svg>`);
+
+/* ==========================================================================
+   4. RENDU DU SITE AVANT — 980 px fixes, aucune concession au téléphone
+   ========================================================================== */
+function rendreAvant() {
+  const z = CLIENT.zones, t = CLIENT.tarifs;
+  const horLignes = [
+    ['Lundi au vendredi', '7 h 30 – 12 h 00 / 13 h 30 – 18 h 30'],
+    ['Samedi',            '8 h 00 – 12 h 30'],
+    ['Dimanche et fériés','Fermé (astreinte téléphonique)']
+  ];
+  $('#avant').innerHTML = `
+  <div class="page">
+    <div class="banniere">
+      <img class="clip" src="${CLIPART}" alt="robinet" width="100" height="84">
+      <h1>${echap(CLIENT.nom)}</h1>
+      <p class="slog">Plomberie - Chauffage - Sanitaire depuis ${CLIENT.creation}</p>
+      <div class="tel">Téléphone :<strong>${echap(CLIENT.tel)}</strong></div>
+    </div>
+
+    <div class="menu">
+      <a href="#">Accueil</a><a href="#">Nos prestations</a
+      ><a href="#" id="lienMort">Urgences 24h/24</a><a href="#">Tarifs</a
+      ><a href="#">Nos réalisations</a><a href="#">Livre d'or</a><a href="#">Nous contacter</a>
+    </div>
+
+    <div class="corps">
+      <div class="flanc">
+        <h3>Navigation</h3>
+        <ul>
+          <li><a href="#">Dépannage fuite</a></li>
+          <li><a href="#">Débouchage</a></li>
+          <li><a href="#">Chauffe-eau</a></li>
+          <li><a href="#">Salle de bain</a></li>
+          <li><a href="#">Chaudière</a></li>
+          <li><a href="#">Plan du site</a></li>
+        </ul>
+        <div class="encart">
+          <b>Nous contacter</b><br>
+          ${echap(CLIENT.nom)}<br>
+          ${echap(CLIENT.adresse)}<br>
+          Tel. ${echap(CLIENT.tel)}<br>
+          Fax. ${echap(CLIENT.tel.replace(/\d\d$/, '09'))}<br>
+          ${echap(CLIENT.mail)}
+        </div>
+        <h3>Zone d'intervention</h3>
+        <div class="encart">
+          ${z.slice(0, 9).map(o => echap(o.com)).join(', ')} et communes limitrophes.
+        </div>
+        <div class="encart" style="text-align:center">
+          <b>DEVIS GRATUIT</b><br>Sur simple appel<br>téléphonique
+        </div>
+      </div>
+
+      <div class="main">
+        <h2>Bienvenue sur notre site internet</h2>
+        <div class="photo" id="photo2011"></div>
+        <p>Bienvenue sur le site de l'entreprise ${echap(CLIENT.nom)} !
+        Nous sommes une entreprise artisanale de plomberie installée à ${echap(CLIENT.ville)}
+        depuis ${CLIENT.creation} et nous intervenons sur l'ensemble du bassin de Thau pour
+        tous vos travaux de plomberie, de sanitaire et de chauffage. Nous mettons à votre
+        disposition notre savoir-faire ainsi que notre sérieux afin de vous garantir un
+        travail soigné et durable, réalisé dans les règles de l'art et avec
+        <span class="rouge">des matériaux de première qualité</span>.</p>
+        <p>Que vous soyez un particulier ou un professionnel, nous étudions avec vous
+        votre projet et nous vous proposons la solution la mieux adaptée à vos besoins
+        ainsi qu'à votre budget. N'hésitez pas à nous contacter par téléphone aux heures
+        d'ouverture afin d'obtenir un <span class="rouge">devis gratuit et sans
+        engagement</span>. Nous nous déplaçons également en urgence
+        <span class="rouge">24h/24 et 7j/7</span> pour toutes vos fuites d'eau, vos
+        canalisations bouchées et vos pannes de chauffe-eau, sur ${echap(CLIENT.ville)}
+        et ses alentours.</p>
+
+        <div class="deux">
+          <div>
+            <table class="tbl">
+              <caption>Nos tarifs (TTC)</caption>
+              <tr><th>Prestation</th><th>Prix</th></tr>
+              ${t.map(o => `<tr><td>${echap(o.court)}</td>
+                <td>${echap(o.cb)}</td></tr>`).join('')}
+            </table>
+          </div>
+          <div>
+            <table class="tbl">
+              <caption>Horaires d'ouverture</caption>
+              <tr><th>Jour</th><th>Ouverture</th></tr>
+              ${horLignes.map(l => `<tr><td>${l[0]}</td><td>${l[1]}</td></tr>`).join('')}
+            </table>
+            <table class="tbl">
+              <caption>Nos garanties</caption>
+              <tr><td>Garantie décennale</td></tr>
+              <tr><td>Artisan qualifié PG gaz</td></tr>
+              <tr><td>Devis gratuit</td></tr>
+            </table>
+          </div>
+        </div>
+
+        <div class="pied">
+          <span class="maj">Dernière mise à jour : 14/03/2011</span>
+          <span>Visiteurs : <span class="compteur">00041872</span></span>
+          <span class="ie">Site optimisé pour Internet Explorer 8 — 1024x768</span>
+          <span>&copy; ${CLIENT.creation}-2011 ${echap(CLIENT.nom)}</span>
+        </div>
+      </div>
+    </div>
+  </div>`;
+  $('#photo2011').style.backgroundImage = `url(${photoBasseDef()})`;
+}
+rendreAvant();
+</script>
+
+<script>
+/* ==========================================================================
+   5. RENDU DU SITE APRÈS
+      Sept sections, sept vannes sur le réseau. Chaque section a son propre
+      ancrage dans la grille : rien ne se répète d'un bloc à l'autre.
+   ========================================================================== */
+const VANNES = [0.02, 0.19, 0.33, 0.47, 0.62, 0.78, 0.95];
+const ANS = new Date().getFullYear() - CLIENT.creation;
+const OUV = ouverture();
+const CRN = creneaux();
+
+const svgCheck = '<svg viewBox="0 0 16 16" fill="none" stroke="#8A6E2F" stroke-width="2">'
+              + '<path d="M2.5 8.6l3.4 3.4L13.5 4.4"/></svg>';
+/* Le piquage : un té de dérivation qui pivote en place quand l'eau arrive. */
+const svgPrise = '<svg class="p-prise" viewBox="0 0 30 30" data-rev="tour" aria-hidden="true">'
+  + '<path d="M2 15h26" stroke="#A9663A" stroke-width="4" stroke-linecap="round"/>'
+  + '<path d="M15 15v12" stroke="#C9A66B" stroke-width="4" stroke-linecap="round"/>'
+  + '<circle cx="15" cy="15" r="5.2" fill="none" stroke="#0071E3" stroke-width="2.4"/></svg>';
+
+function rendreApres() {
+  const n = CLIENT.nom, tel = CLIENT.tel, hr = telHref(tel);
+  const proches = CLIENT.zones.slice(0, 3);
+  const maintenant = new Date();
+
+  /* --- bandeau permanent + barre collante mobile ------------------------- */
+  $('#barre-haut').innerHTML = `
+    <span class="nom">${echap(n)}</span>
+    <span class="pastille ${OUV.ouvert ? '' : 'ferme'}"><span class="led"></span>${echap(OUV.txt)}</span>
+    <a class="tel-lien" href="${hr}">${echap(tel)}</a>`;
+  $('#barre-mob').innerHTML = `
+    <a class="eau" href="${hr}">Appeler ${echap(tel)}</a>
+    <a href="#devis">Demander un devis</a>`;
+
+  /* --- le site ----------------------------------------------------------- */
+  $('#apres').innerHTML = `
+
+  <section class="sect s-urgence" aria-label="Urgence">
+    <div class="grille">
+      <div class="bloc-titre">
+        <span class="etiq" data-hero>Astreinte 7 j/7 — bassin de Thau</span>
+        <h1 id="titreHero">Une fuite ne prend pas <em>rendez-vous</em>.</h1>
+        <div class="appel" data-hero>
+          <a class="num" href="${hr}"><small>Urgence fuite, jour et nuit</small>${echap(tel)}</a>
+          <span class="pastille ${OUV.ouvert ? '' : 'ferme'}"><span class="led"></span>${echap(OUV.txt)}</span>
+        </div>
+        <p class="sous-cta" data-hero>${echap(CLIENT.gerant.split(' ')[0])} ou l’un de ses compagnons
+        décroche lui-même. On vous dit quoi couper avant de raccrocher, et à quelle heure
+        le camion est devant chez vous.</p>
+      </div>
+
+      <aside class="bloc-fiche" data-hero>
+        <p class="fiche-t">Planning du ${echap(JOURS[maintenant.getDay()])}
+          ${maintenant.getDate()} ${echap(MOIS[maintenant.getMonth()])}</p>
+        <div class="fiche-l"><span>Délai moyen</span><b>${CLIENT.delaiMoyen} min</b></div>
+        ${proches.map(o => `<div class="fiche-l"><span>${echap(o.com)}</span><b>${o.dl} min</b></div>`).join('')}
+        <div class="fiche-l"><span>Nuit et dimanche</span><b>${echap(CLIENT.telAstreinte)}</b></div>
+        <p class="creneaux">Il reste <u>${CRN.length} créneau${CRN.length > 1 ? 'x' : ''} de pose</u>
+        cette semaine : ${CRN.map(c => echap(fmtCreneau(c))).join(', ')}. Une urgence passe
+        avant, toujours, et se case dans la journée.</p>
+      </aside>
+
+      <div class="legal" data-hero>
+        <span>${echap(CLIENT.statut)}</span>
+        <span>SIRET ${echap(CLIENT.siret)}</span>
+        <span>Garantie décennale</span>
+        <span>${echap(CLIENT.adresse)}</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="sect s-zone" data-sec="1" aria-label="Zone d'intervention">
+    <div class="grille">
+      <div class="intro">
+        <span class="etiq" data-rev="up">Là où on arrive vite</span>
+        <h2 class="titre" data-rev="up">Le temps qu’on met à être devant chez vous.</h2>
+        <p class="txt" data-rev="up">Relevé sur les <strong>${CLIENT.interventions.toLocaleString('fr-FR')}
+        interventions</strong> de l’an dernier, camion chargé, aux heures d’atelier.
+        La nuit et le dimanche, comptez dix minutes de plus : le camion part de
+        ${echap(CLIENT.ville)}, pas d’un standard.</p>
+        <div class="selecteur" data-rev="up">
+          <label for="maCommune">Votre commune</label>
+          <select id="maCommune">
+            ${CLIENT.zones.map((o, i) => `<option value="${i}">${echap(o.com)}</option>`).join('')}
+            <option value="-1">Une autre commune</option>
+          </select>
+          <p class="reponse-zone" id="repZone"></p>
+        </div>
+      </div>
+      <div class="liste">
+        ${CLIENT.zones.map(o => `
+        <div class="z-ligne" data-rev="left">
+          <span class="com">${echap(o.com)}</span>
+          <span class="zn">zone ${o.z}</span>
+          <span class="dl">${o.dl} min</span>
+        </div>`).join('')}
+      </div>
+    </div>
+  </section>
+
+  <section class="sect s-presta" data-sec="2" aria-label="Prestations">
+    <div class="grille">
+      <div class="tete">
+        <span class="etiq" data-rev="up">Ce qu’on vient faire chez vous</span>
+        <h2 class="titre" data-rev="up">Six interventions, et ce qu’elles coûtent une fois finies.</h2>
+      </div>
+      ${CLIENT.prestations.map(p => `
+      <div class="p-ligne">
+        ${svgPrise}
+        <div>
+          <h3 class="nom" data-rev="up">${echap(p.nom)}</h3>
+          <p class="det" data-rev="up">${echap(p.det)}</p>
+        </div>
+        <p class="prix" data-rev="right"><span>${echap(p.etiq)}</span>${echap(p.prix).replace(/\n/g,'<br>')}</p>
+      </div>`).join('')}
+    </div>
+  </section>
+
+  <section class="sect s-tarif" data-sec="3" aria-label="Tarifs">
+    <div class="grille">
+      <div class="expli">
+        <span class="etiq pale" data-rev="up">Ce que vous savez avant qu’on parte</span>
+        <h2 class="titre" data-rev="up">Le montant est dit au téléphone. La facture le répète.</h2>
+        <p class="txt" data-rev="up">Un dépannage se chiffre en deux temps : le déplacement,
+        qui couvre le diagnostic sur place, puis la main-d’œuvre au temps passé. Les pièces
+        sont facturées au prix du fournisseur, facture jointe. Il n’y a pas de troisième ligne.</p>
+        <p class="txt" data-rev="up">Si le chantier dépasse
+        <strong>350 €</strong>, vous repartez avec un devis écrit avant qu’on touche à quoi
+        que ce soit — et il est valable deux mois.</p>
+      </div>
+      <div class="feuille">
+        ${CLIENT.tarifs.map(o => `
+        <div class="t-ligne ${o.fort ? 'fort' : ''}" data-rev="right">
+          <span class="quoi">${echap(o.quoi)}<em>${echap(o.sous)}</em></span>
+          <span class="cb">${echap(o.cb)}</span>
+        </div>`).join('')}
+        <p class="note-tarif" data-rev="up">Majoration de nuit appliquée de 20 h à 7 h 30,
+        le dimanche et les jours fériés. Aucune autre majoration, aucun frais de dossier.
+        Paiement à la fin de l’intervention, carte acceptée dans le camion.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="sect s-preuve" data-sec="4" aria-label="Garanties et certifications">
+    <div class="grille">
+      <div class="chiffres">
+        <div class="ch" data-rev="up">
+          <div class="n" data-cible="${CLIENT.interventions}">0</div>
+          <p class="q">interventions l’an dernier, sur le bassin</p>
+        </div>
+        <div class="ch" data-rev="up">
+          <div class="n" data-cible="${CLIENT.delaiMoyen}">0<i> min</i></div>
+          <p class="q">de délai moyen constaté, urgences comprises</p>
+        </div>
+        <div class="ch" data-rev="up">
+          <div class="n" data-cible="${ANS}">0<i> ans</i></div>
+          <p class="q">d’atelier à ${echap(CLIENT.ville)}, ${echap(CLIENT.equipe)}</p>
+        </div>
+      </div>
+      <div class="tete">
+        <span class="etiq laiton" data-rev="up">Papiers à jour</span>
+        <h2 class="titre" data-rev="up">Les qualifications, et ce qu’elles couvrent réellement.</h2>
+        <p class="txt" data-rev="up">Chaque attestation part avec le devis, sans qu’on ait besoin
+        de la demander. Le numéro de contrat décennale est sur la facture.</p>
+      </div>
+      <div class="certs">
+        ${CLIENT.certifs.map(c => `
+        <div class="c-ligne" data-rev="right">
+          <span class="poincon">${svgCheck}</span>
+          <span><b>${echap(c.t)}</b><span>${echap(c.d)}</span></span>
+        </div>`).join('')}
+      </div>
+    </div>
+  </section>
+
+  <section class="sect s-avis" data-sec="5" aria-label="Avis clients">
+    <div class="grille">
+      <div class="tete">
+        <span class="etiq" data-rev="up">Des gens d’ici</span>
+        <h2 class="titre" data-rev="up">Ce qu’ils racontent quand on leur demande.</h2>
+      </div>
+      <div class="flux">
+        ${CLIENT.avis.map(a => `
+        <blockquote class="avis" data-rev="up">
+          <q>${echap(a.txt)}</q>
+          <p class="qui"><b>${echap(a.qui)}</b><span>${echap(a.ou)}</span><i>${echap(a.quoi)}</i></p>
+        </blockquote>`).join('')}
+      </div>
+      <div class="note" data-rev="up">
+        <span class="g">${echap(CLIENT.note)}<s>/5</s></span>
+        <p>Moyenne Google sur ${CLIENT.avisNb} avis vérifiés. Les deux avis à trois étoiles
+        sont en ligne aussi, avec la réponse de ${echap(CLIENT.gerant.split(' ')[0])} dessous.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="sect s-devis" data-sec="6" id="devis" aria-label="Demande de devis">
+    <div class="grille">
+      <div class="tete">
+        <span class="etiq" data-rev="up">Le robinet au bout du réseau</span>
+        <h2 class="titre" data-rev="up">Dites ce qui coule. On vous répond avec un chiffre.</h2>
+      </div>
+
+      <form id="formDevis" novalidate>
+        <div class="champ" data-rev="up">
+          <label for="fNom">Votre nom</label>
+          <input id="fNom" name="nom" type="text" autocomplete="name" required>
+        </div>
+        <div class="champ" data-rev="up">
+          <label for="fTel">Téléphone</label>
+          <input id="fTel" name="tel" type="tel" autocomplete="tel" inputmode="tel" required>
+        </div>
+        <div class="champ" data-rev="up">
+          <label for="fCom">Commune</label>
+          <select id="fCom" name="commune">
+            ${CLIENT.zones.map(o => `<option>${echap(o.com)}</option>`).join('')}
+            <option>Une autre commune</option>
+          </select>
+        </div>
+        <div class="champ" data-rev="up">
+          <label for="fBesoin">Ce qui se passe</label>
+          <select id="fBesoin" name="besoin">
+            ${CLIENT.prestations.map(p => `<option>${echap(p.nom)}</option>`).join('')}
+            <option>Autre chose</option>
+          </select>
+        </div>
+        <div class="champ plein" data-rev="up">
+          <label for="fMot">Deux lignes pour décrire</label>
+          <textarea id="fMot" name="mot" rows="3"></textarea>
+        </div>
+        <div class="plein" data-rev="up">
+          <button class="btn" type="submit">Demander un devis</button>
+        </div>
+        <p class="apres-clic" data-rev="up">Vous recevez un SMS de confirmation dans la minute,
+        avec le prénom du plombier qui passe et son heure d’arrivée. Pas de rappel commercial,
+        pas de liste de diffusion, et votre numéro ne sort pas de l’atelier.</p>
+      </form>
+      <div class="merci" id="merciDevis"></div>
+
+      <aside class="aside">
+        <span class="etiq" data-rev="up">Ça coule maintenant ?</span>
+        <a class="gros" href="${hr}" data-rev="up">${echap(tel)}</a>
+        <p class="txt" data-rev="up" style="font-size:13.5px">${echap(OUV.txt)}. Astreinte nuit
+        et dimanche au ${echap(CLIENT.telAstreinte)}.</p>
+        <p class="ou" data-rev="up">Autrement</p>
+        <div class="liens-sec">
+          <a href="https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(CLIENT.adresse)}"
+             target="_blank" rel="noopener" data-rev="up">Itinéraire vers l’atelier, ${echap(CLIENT.adresse)}</a>
+          <a href="#fTel" data-rev="up">Être rappelé sous 5 minutes aux heures d’atelier</a>
+          <a href="mailto:${echap(CLIENT.mail)}" data-rev="up">${echap(CLIENT.mail)}</a>
+        </div>
+      </aside>
+    </div>
+  </section>`;
+}
+rendreApres();
+
+/* --- le titre du héros, lettre par lettre ------------------------------- */
+function decouperTitre() {
+  const h = $('#titreHero'); if (!h) return [];
+  const frag = document.createDocumentFragment();
+  [...h.childNodes].forEach(nd => {
+    const em = nd.nodeType === 1 && nd.tagName === 'EM';
+    const txt = nd.textContent;
+    txt.split(/(\s+)/).forEach(mot => {
+      if (!mot) return;
+      if (/^\s+$/.test(mot)) { frag.appendChild(document.createTextNode(' ')); return; }
+      const precedent = frag.lastElementChild;
+      if (/^[.,;:!?…»)]+$/.test(mot) && precedent) {   /* la ponctuation ne part pas seule */
+        [...mot].forEach(c => {
+          const s = document.createElement('span'); s.className = 'l'; s.textContent = c;
+          if (!em) s.style.color = 'var(--encre)';
+          precedent.appendChild(s);
+        });
+        return;
+      }
+      const w = document.createElement('span'); w.className = 'mot';
+      if (em) w.style.color = 'var(--eau)';
+      [...mot].forEach(c => {
+        const s = document.createElement('span'); s.className = 'l'; s.textContent = c;
+        w.appendChild(s);
+      });
+      frag.appendChild(w);
+    });
+  });
+  h.textContent = ''; h.appendChild(frag);
+  return $$('.l', h);
+}
+const LETTRES = decouperTitre();
+</script>
+
+<script>
+/* ==========================================================================
+   6. MUTATION — capture du DOM, 384 tuiles, noyau, onde
+      Tout est fonction pure de la progression : le shader ne garde aucun état.
+      C'est ce qui rend le scrub ← / → et le curseur de l'interface exacts,
+      image par image, dans les deux sens.
+   ========================================================================== */
+const ETAT = { mut:0, build:0, flux:0, cible:0 };
+const FX = { ok:false, uni:null, rendre:null, dispose:null, mode:'attente' };
+
+/* Sonde sur un canvas jetable — jamais sur #fx ni #net, qu'un contexte 2D
+   parasite condamnerait. */
+let _gl = null;
+function webglDispo() {
+  if (_gl !== null) return _gl;
+  try {
+    const c = document.createElement('canvas');
+    _gl = !!(c.getContext('webgl2') || c.getContext('webgl') || c.getContext('experimental-webgl'));
+  } catch (e) { _gl = false; }
+  return _gl;
+}
+
+const dimsCadre = () => {
+  const r = $('#avant').getBoundingClientRect();
+  return { W:Math.max(1, Math.round(r.width)), H:Math.max(1, Math.round(r.height)) };
+};
+
+/* Point de départ de la fracture : le lien mort sur lequel on vient de cliquer. */
+function pointClic() {
+  const a = $('#lienMort'), cadre = $('#avant').getBoundingClientRect();
+  if (!a) return { x:0, y:0, px:cadre.width / 2, py:cadre.height / 2 };
+  const r = a.getBoundingClientRect();
+  const cx = r.left + r.width / 2, cy = r.top + r.height / 2;
+  return { x:cx - cadre.left - cadre.width / 2,        /* scène : origine au centre */
+           y:cadre.height / 2 - (cy - cadre.top),      /*         y vers le haut     */
+           px:cx, py:cy };                             /* écran : pour le faux curseur */
+}
+
+/* Un canvas neuf, vierge de tout contexte, inséré au bon rang du DOM. */
+function neufCanvas(id, avantId) {
+  const vieux = document.getElementById(id);
+  if (vieux) vieux.remove();
+  const c = document.createElement('canvas');
+  c.id = id; c.className = 'cadre'; c.setAttribute('aria-hidden', 'true');
+  c.style.display = 'none';
+  const ref = document.getElementById(avantId);
+  ref.parentNode.insertBefore(c, ref);
+  return c;
+}
+
+const HORS_CAPTURE = new Set(['apres','ui','net','fx','frag','rail','voile','fond',
+                              'barre-haut','barre-mob','indic','faux','onde-clic']);
+
+async function capturerPage() {
+  if (!window.html2canvas) return null;
+  const el = $('#avant');
+  const l0 = el.style.left, t0 = el.style.transform;
+  el.style.left = '0'; el.style.transform = 'none';   /* html2canvas et les transforms */
+  try {
+    return await html2canvas(el, {
+      backgroundColor:null, scale:Math.min(2, devicePixelRatio || 1),
+      logging:false, useCORS:true, removeContainer:true,
+      ignoreElements:el => HORS_CAPTURE.has(el.id),
+      windowWidth:innerWidth, windowHeight:innerHeight, scrollX:0, scrollY:0
+    });
+  } catch (e) { console.warn('capture impossible', e); return null; }
+  finally { el.style.left = l0; el.style.transform = t0; }
+}
+
+const VERT_TUILE = `
+precision highp float;
+attribute vec2 aUv0;
+attribute vec3 aHome;
+attribute vec4 aRnd;
+uniform float uP, uMaxD;
+uniform vec4  uSeuil;
+uniform vec2  uClick, uRes, uCell;
+varying vec2  vUv;
+varying float vDark, vAl;
+vec3 rot(vec3 p, vec3 ax, float a){
+  float c = cos(a), s = sin(a);
+  return p * c + cross(ax, p) * s + ax * dot(ax, p) * (1.0 - c);
+}
+void main(){
+  vUv = aUv0 + uv * uCell;
+  float d = length(aHome.xy - uClick) / uMaxD;
+
+  /* 2. FRACTURE — détachement par vagues depuis le point du clic */
+  float larg = 0.42;
+  float tf = (uP - uSeuil.x) / max(uSeuil.y - uSeuil.x, 1e-4);
+  float pf = clamp((tf - d * larg) / (1.0 - larg), 0.0, 1.0);
+  pf = pf * pf * (3.0 - 2.0 * pf);
+
+  /* 3. EFFONDREMENT — aspiration au centre, compression */
+  float pc = clamp((uP - uSeuil.y) / max(uSeuil.z - uSeuil.y, 1e-4), 0.0, 1.0);
+  pc = pc * pc;
+
+  /* 4. ONDE — les tuiles ont disparu dans le noyau */
+  float po = clamp((uP - uSeuil.z) / max(uSeuil.w - uSeuil.z, 1e-4), 0.0, 1.0);
+
+  vec3 ax  = normalize(aRnd.xyz * 2.0 - 1.0 + vec3(0.003, 0.001, 0.002));
+  vec3 loc = rot(vec3(position.xy, 0.0), ax, pf * (aRnd.w * 5.4 - 2.7));
+
+  vec3 derive = vec3((aRnd.x - 0.5) * uRes.x * 0.30,
+                     (aRnd.y - 0.5) * uRes.y * 0.30,
+                     -(120.0 + aRnd.z * 820.0));
+  vec3 c = aHome + derive * pf;
+  c = mix(c, vec3(0.0, 0.0, -170.0), pc);
+  loc *= mix(1.0, 0.05, pc);
+
+  vDark = pc;
+  vAl   = 1.0 - po;
+  gl_Position = projectionMatrix * modelViewMatrix * vec4(c + loc, 1.0);
+}`;
+
+const FRAG_TUILE = `
+precision highp float;
+uniform sampler2D uMap;
+uniform float uP;
+uniform vec4  uSeuil;
+varying vec2  vUv;
+varying float vDark, vAl;
+void main(){
+  if (vAl <= 0.002) discard;
+  /* 1. SAISIE — léger glitch RGB en bandes, puis désaturation */
+  float g = clamp(uP / max(uSeuil.x, 1e-4), 0.0, 1.0);
+  float bande = step(0.62, fract(vUv.y * 74.0 + uP * 31.0));
+  float o = 0.0032 * g * (0.35 + bande);
+  vec3 c;
+  c.r = texture2D(uMap, vUv + vec2(o, 0.0)).r;
+  c.g = texture2D(uMap, vUv).g;
+  c.b = texture2D(uMap, vUv - vec2(o, 0.0)).b;
+  float lum = dot(c, vec3(0.2126, 0.7152, 0.0722));
+  c = mix(c, vec3(lum), 0.62 * g);
+  /* 3. le bleu du noyau gagne les tuiles pendant qu'elles se compressent */
+  c = mix(c, vec3(0.0, 0.443, 0.890), vDark * 0.82) * (1.0 - vDark * 0.42);
+  gl_FragColor = vec4(c, vAl);
+}`;
+
+function initFX(capture) {
+  if (!window.THREE || !capture || !webglDispo()) return false;
+  const { W, H } = dimsCadre();
+  const cv = neufCanvas('fx', 'frag');
+  let r;
+  try {
+    r = new THREE.WebGLRenderer({ canvas:cv, antialias:false, alpha:true,
+                                  powerPreference:'high-performance' });
+  } catch (e) { cv.remove(); return false; }
+  if (!r.getContext || !r.getContext()) { cv.remove(); return false; }
+  r.setPixelRatio(Math.min(2, devicePixelRatio || 1));
+  r.setSize(W, H, false);
+  /* Aucune conversion d'espace couleur : ce qui entre ressort au même pixel. */
+  r.outputColorSpace = THREE.LinearSRGBColorSpace;
+
+  const scene = new THREE.Scene();
+  const cam = new THREE.PerspectiveCamera(45, W / H, 1, 9000);
+  cam.position.z = (H / 2) / Math.tan(45 / 2 * Math.PI / 180);
+
+  const tex = new THREE.CanvasTexture(capture);
+  tex.colorSpace = THREE.LinearSRGBColorSpace;
+  tex.minFilter = THREE.LinearFilter; tex.generateMipmaps = false;
+
+  /* --- 384 tuiles indépendantes, 16 colonnes sur 24 rangées --- */
+  const COLS = 16, ROWS = 24, N = COLS * ROWS;
+  const tw = W / COLS, th = H / ROWS;
+  const base = new THREE.PlaneGeometry(tw, th);
+  const g = new THREE.InstancedBufferGeometry();
+  g.index = base.index;
+  g.setAttribute('position', base.attributes.position);
+  g.setAttribute('uv', base.attributes.uv);
+  g.instanceCount = N;
+
+  const uv0 = new Float32Array(N * 2), home = new Float32Array(N * 3), rnd = new Float32Array(N * 4);
+  let i = 0;
+  for (let ry = 0; ry < ROWS; ry++) for (let cx = 0; cx < COLS; cx++, i++) {
+    uv0[i*2]   = cx / COLS;
+    uv0[i*2+1] = 1 - (ry + 1) / ROWS;
+    home[i*3]   = (cx + 0.5) * tw - W / 2;
+    home[i*3+1] = H / 2 - (ry + 0.5) * th;
+    home[i*3+2] = 0;
+    for (let k = 0; k < 4; k++) rnd[i*4+k] = Math.random();
+  }
+  g.setAttribute('aUv0',  new THREE.InstancedBufferAttribute(uv0, 2));
+  g.setAttribute('aHome', new THREE.InstancedBufferAttribute(home, 3));
+  g.setAttribute('aRnd',  new THREE.InstancedBufferAttribute(rnd, 4));
+
+  const clic = pointClic();
+  const coins = [[-W/2,-H/2],[W/2,-H/2],[-W/2,H/2],[W/2,H/2]];
+  const maxD = Math.max(...coins.map(c => Math.hypot(c[0] - clic.x, c[1] - clic.y)));
+
+  const uni = {
+    uMap:{ value:tex }, uP:{ value:0 },
+    uSeuil:{ value:new THREE.Vector4(SEUIL.saisie, SEUIL.fracture, SEUIL.effondrement, SEUIL.onde) },
+    uClick:{ value:new THREE.Vector2(clic.x, clic.y) },
+    uRes:{ value:new THREE.Vector2(W, H) },
+    uCell:{ value:new THREE.Vector2(1 / COLS, 1 / ROWS) },
+    uMaxD:{ value:maxD }
+  };
+  const tuiles = new THREE.Mesh(g, new THREE.ShaderMaterial({
+    vertexShader:VERT_TUILE, fragmentShader:FRAG_TUILE, uniforms:uni,
+    transparent:true, side:THREE.DoubleSide
+  }));
+  tuiles.frustumCulled = false;
+  scene.add(tuiles);
+
+  /* --- le noyau anguleux --- */
+  const R = Math.min(W, H) * 0.155;
+  const noyau = new THREE.Mesh(
+    new THREE.IcosahedronGeometry(R, 0),
+    new THREE.MeshStandardMaterial({ color:0x0071E3, emissive:0x08356b, flatShading:true,
+                                     metalness:0.3, roughness:0.32 })
+  );
+  noyau.position.z = -170; noyau.visible = false;
+  scene.add(noyau);
+  scene.add(new THREE.AmbientLight(0xffffff, 0.75));
+  const dir = new THREE.DirectionalLight(0xffffff, 2.1);
+  dir.position.set(0.5, 0.9, 1); scene.add(dir);
+
+  /* --- l'onde blanche --- */
+  const maxR = Math.hypot(W, H) * 0.56;
+  const uOnde = { uO:{ value:0 }, uMaxR:{ value:maxR } };
+  const onde = new THREE.Mesh(
+    new THREE.PlaneGeometry(W * 1.2, H * 1.2),
+    new THREE.ShaderMaterial({
+      uniforms:uOnde, transparent:true, depthWrite:false, blending:THREE.AdditiveBlending,
+      vertexShader:`varying vec2 vP; void main(){ vP = position.xy;
+        gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0); }`,
+      fragmentShader:`precision highp float; uniform float uO, uMaxR; varying vec2 vP;
+        void main(){
+          if (uO <= 0.001 || uO >= 0.999) discard;
+          float r = length(vP), R = uO * uMaxR;
+          float a = smoothstep(96.0, 0.0, abs(r - R)) * (1.0 - uO * 0.2);
+          a += smoothstep(R, R - 300.0, r) * uO * 0.30;
+          gl_FragColor = vec4(1.0, 1.0, 1.0, clamp(a, 0.0, 1.0));
+        }`
+    })
+  );
+  onde.position.z = 40; onde.renderOrder = 5;
+  scene.add(onde);
+
+  FX.uni = uni;
+  FX.rendre = (p, t) => {
+    uni.uP.value = p;
+    const pc = clamp((p - SEUIL.fracture) / Math.max(SEUIL.effondrement - SEUIL.fracture, 1e-4));
+    const po = clamp((p - SEUIL.effondrement) / Math.max(SEUIL.onde - SEUIL.effondrement, 1e-4));
+    noyau.visible = pc > 0.02 && po < 0.999;
+    const pousse = Math.pow(pc, 1.6) * (1 - Math.pow(po, 0.5));
+    noyau.scale.setScalar(Math.max(0.0001, pousse));
+    noyau.rotation.set(t * 0.0021 + pc * 6, t * 0.0034 + pc * 9, t * 0.0013);
+    noyau.material.emissiveIntensity = 1 + po * 7;
+    uOnde.uO.value = po;
+    r.render(scene, cam);
+  };
+  FX.dispose = () => {
+    g.dispose(); base.dispose(); tex.dispose();
+    try { r.forceContextLoss(); } catch (e) {}
+    r.dispose(); cv.remove();
+  };
+  FX.ok = true;
+  return true;
+}
+
+/* --------------------------------------------------------------------------
+   REPLI — pas de WebGL, ou pas de html2canvas : fragments CSS 3D en clip-path.
+   Jamais un simple fondu : la page se casse quand même.
+   -------------------------------------------------------------------------- */
+const FRG = { tuiles:[], actif:false };
+function initRepli(capture) {
+  const F = $('#frag'), C = capture ? 6 : 4, R = capture ? 8 : 6;
+  const url = capture ? capture.toDataURL('image/jpeg', 0.85) : null;
+  const src = url ? null : $('#avant').innerHTML.replace(/\sid="[^"]*"/g, '');
+  F.innerHTML = '';
+  const clic = pointClic(), { W, H } = dimsCadre();
+  for (let ry = 0; ry < R; ry++) for (let cx = 0; cx < C; cx++) {
+    const d = document.createElement('div'); d.className = 'tuile';
+    const x0 = cx / C * 100, x1 = (cx + 1) / C * 100, y0 = ry / R * 100, y1 = (ry + 1) / R * 100;
+    d.style.clipPath = `polygon(${x0}% ${y0}%, ${x1}% ${y0}%, ${x1}% ${y1}%, ${x0}% ${y1}%)`;
+    if (url) d.innerHTML = `<img src="${url}" alt="">`;
+    else { d.innerHTML = src; d.style.background = '#2c6ba0'; }
+    const hx = (x0 + x1) / 200 * W - W / 2, hy = H / 2 - (y0 + y1) / 200 * H;
+    d.dataset.d = (Math.hypot(hx - clic.x, hy - clic.y) / Math.hypot(W, H)).toFixed(3);
+    F.appendChild(d);
+  }
+  FRG.tuiles = $$('.tuile', F);
+  FRG.actif = true;
+  return FRG.tuiles.length > 0;
+}
+</script>
+
+<script>
+/* ==========================================================================
+   7. LE RÉSEAU DE CUIVRE
+      Un seul tube traverse toute la page, fixé en fond. Le scroll fait
+      progresser l'eau dedans ; chaque section est une vanne sur ce réseau.
+      On voit toujours où on en est du parcours en regardant le tuyau.
+   ========================================================================== */
+const NET = { ok:false, rendre:null, resize:null, courbe:null };
+
+const VERT_METAL = `
+varying vec3 vN, vV; varying vec2 vT;
+void main(){
+  vT = uv;
+  vec4 mv = modelViewMatrix * vec4(position, 1.0);
+  vN = normalize(normalMatrix * normal);
+  vV = normalize(-mv.xyz);
+  gl_Position = projectionMatrix * mv;
+}`;
+const FRAG_METAL = `
+precision highp float;
+uniform vec3  uSombre, uClair;
+uniform float uA0, uAF, uOpa, uStrie, uFenetre;
+varying vec3  vN, vV; varying vec2 vT;
+void main(){
+  vec3 N = normalize(vN), V = normalize(vV);
+  float g = 1.0 - abs(dot(N, V));            /* 0 au centre, 1 sur la silhouette */
+  float f = g * g;
+  vec3 c = mix(uSombre, uClair, smoothstep(0.04, 0.68, g));
+  c = mix(c, uSombre * 0.42, smoothstep(0.88, 1.0, g));
+  /* Deux sources d'atelier, serrées, et teintées par le métal lui-même :
+     un reflet large et blanc délavait le cuivre jusqu'au rose pâle. */
+  float l1 = max(dot(N, normalize(vec3( 0.34, 0.88, 0.34))), 0.0);
+  float l2 = max(dot(N, normalize(vec3(-0.62,-0.26, 0.74))), 0.0);
+  c += uClair * (pow(l1, 34.0) * 0.55 + pow(l2, 16.0) * 0.16);
+  c *= 1.0 - uStrie + uStrie * (0.5 + 0.5 * sin(vT.x * 280.0));
+  /* Le hublot : la bande qui nous fait face s'ouvre, le reste reste plein. */
+  float hublot = smoothstep(0.78, 0.96, dot(N, V)) * uFenetre;
+  float a = (uA0 * (1.0 - hublot * 0.80) + uAF * f) * uOpa;
+  if (a <= 0.004) discard;
+  gl_FragColor = vec4(c, a);
+}`;
+const FRAG_EAU = `
+precision highp float;
+uniform float uProg, uTime, uOpa;
+uniform vec3  uEau, uFond;
+varying vec3  vN, vV; varying vec2 vT;
+void main(){
+  if (vT.x > uProg) discard;                      /* l'eau n'est pas encore là */
+  float flux = sin(vT.x * 330.0 - uTime * 3.2) * 0.5 + 0.5;
+  float f = pow(1.0 - abs(dot(normalize(vN), normalize(vV))), 1.5);
+  vec3 c = mix(uFond, uEau, 0.30 + 0.48 * flux + 0.30 * f);
+  c += smoothstep(0.018, 0.0, uProg - vT.x) * 0.85;   /* la crête du front d'eau */
+  gl_FragColor = vec4(c, uOpa);
+}`;
+
+function matMetal(sombre, clair, a0, aF, strie, fenetre) {
+  return new THREE.ShaderMaterial({
+    vertexShader:VERT_METAL, fragmentShader:FRAG_METAL, transparent:true,
+    uniforms:{
+      uSombre:{ value:new THREE.Color(sombre) }, uClair:{ value:new THREE.Color(clair) },
+      uA0:{ value:a0 }, uAF:{ value:aF }, uOpa:{ value:0 }, uStrie:{ value:strie },
+      uFenetre:{ value:fenetre || 0 }
+    }
+  });
+}
+
+function initNET() {
+  if (!window.THREE || !webglDispo()) return false;
+  const cv = neufCanvas('net', 'rail');
+  const { W, H } = dimsCadre();
+  let r;
+  try { r = new THREE.WebGLRenderer({ canvas:cv, antialias:true, alpha:true,
+                                      powerPreference:'high-performance' }); }
+  catch (e) { cv.remove(); return false; }
+  if (!r.getContext || !r.getContext()) { cv.remove(); return false; }
+  r.setPixelRatio(Math.min(2, devicePixelRatio || 1));
+  r.setSize(W, H, false);
+  r.setClearAlpha(0);
+
+  const scene = new THREE.Scene();
+  const cam = new THREE.PerspectiveCamera(38, W / H, 0.1, 260);
+
+  /* Le tracé : une descente en serpentin, jamais deux coudes identiques, avec
+     de la profondeur pour que le tuyau passe devant puis derrière le texte. */
+  const courbe = new THREE.CatmullRomCurve3([
+    [ 0.2, 33.0,  0.4], [-1.6, 27.4, -0.9], [ 1.3, 21.6,  0.7], [-1.0, 15.8, -0.5],
+    [ 1.7,  9.9,  0.8], [-1.5,  4.0, -0.7], [ 1.0, -1.9,  0.5], [-1.2, -7.8, -0.6],
+    [ 1.6,-13.7,  0.7], [-0.9,-19.6, -0.4], [ 0.8,-25.4,  0.3], [-0.5,-30.8, -0.2],
+    [ 0.2,-34.6,  0.1]
+  ].map(p => new THREE.Vector3(...p)), false, 'catmullrom', 0.42);
+  NET.courbe = courbe;
+
+  const grp = new THREE.Group();
+  /* position.x posée par calerZ : voie de droite en large, axe en étroit. */
+  scene.add(grp);
+
+  /* La caméra ne parcourt qu'une tranche de la courbe : il reste du tuyau
+     au-dessus au chargement et en dessous en bas de page, donc jamais
+     l'extrémité ouverte du tube dans le cadre. */
+  const U0 = 0.055, U1 = 0.955;
+  const surCourbe = p => U0 + (U1 - U0) * clamp(p);
+  const frontEau = p => surCourbe(p) - 0.070 * (1 - doux(clamp(p / 0.14)));
+
+  const matEau = new THREE.ShaderMaterial({
+    vertexShader:VERT_METAL, fragmentShader:FRAG_EAU, transparent:true,
+    uniforms:{ uProg:{ value:0 }, uTime:{ value:0 }, uOpa:{ value:0 },
+               uEau:{ value:new THREE.Color(0x3E9BFF) }, uFond:{ value:new THREE.Color(0x004C9E) } }
+  });
+  const matCuivre = matMetal(0x7A3F1C, 0xE6AC72, 0.94, 0.06, 0.14, 1);
+  const matLaiton = matMetal(0x7A5F1C, 0xF0D68F, 1.00, 0.00, 0.05, 0);
+  const matDedans = matMetal(0x17222D, 0x33465A, 1.00, 0.00, 0.00, 0);
+
+  /* L'eau est dessinée d'abord, le cuivre par-dessus en semi-transparence :
+     le métal est opaque sur sa silhouette et se laisse traverser au centre.
+     C'est ce qui donne le flux bleu visible à l'intérieur du tube.          */
+  const dedans = new THREE.Mesh(new THREE.TubeGeometry(courbe, 620, 0.200, 14, false), matDedans);
+  dedans.renderOrder = 0;
+  const eau = new THREE.Mesh(new THREE.TubeGeometry(courbe, 900, 0.210, 18, false), matEau);
+  eau.renderOrder = 1;
+  const cuivre = new THREE.Mesh(new THREE.TubeGeometry(courbe, 900, 0.33, 22, false), matCuivre);
+  cuivre.renderOrder = 3; cuivre.material.depthWrite = false;
+  grp.add(dedans, eau, cuivre);
+
+  /* --- une vanne par section --- */
+  const vannes = [];
+  const geoCorps  = new THREE.CylinderGeometry(0.44, 0.44, 0.70, 24, 1);
+  const geoBride  = new THREE.CylinderGeometry(0.53, 0.53, 0.08, 24, 1);
+  const geoTige   = new THREE.CylinderGeometry(0.075, 0.075, 0.46, 12, 1);
+  const geoManche = new THREE.BoxGeometry(0.66, 0.09, 0.13);
+  const geoBoule  = new THREE.SphereGeometry(0.11, 12, 10);
+  const AXE = new THREE.Vector3(0, 1, 0);
+  VANNES.forEach(v => {
+    const u = surCourbe(v);
+    const g = new THREE.Group();
+    g.position.copy(courbe.getPointAt(u));
+    g.quaternion.setFromUnitVectors(AXE, courbe.getTangentAt(u).normalize());
+    const corps = new THREE.Mesh(geoCorps, matLaiton);
+    const b1 = new THREE.Mesh(geoBride, matLaiton); b1.position.y =  0.40;
+    const b2 = new THREE.Mesh(geoBride, matLaiton); b2.position.y = -0.40;
+    const tige = new THREE.Mesh(geoTige, matLaiton);
+    tige.rotation.x = Math.PI / 2; tige.position.z = 0.27;
+    const volant = new THREE.Group(); volant.position.z = 0.52;
+    const manche = new THREE.Mesh(geoManche, matLaiton);
+    const boule  = new THREE.Mesh(geoBoule, matLaiton); boule.position.x = 0.33;
+    volant.add(manche, boule);
+    g.add(corps, b1, b2, tige, volant);
+    g.renderOrder = 2;
+    grp.add(g);
+    vannes.push({ u:v, g, volant });
+  });
+
+  /* --- le robinet, au bout du réseau : l'eau y arrive en fin de page --- */
+  const becGrp = new THREE.Group();
+  becGrp.position.copy(courbe.getPointAt(surCourbe(1)));
+  const bec = new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3([
+    new THREE.Vector3(0, 0, 0), new THREE.Vector3(0.55, -0.55, 0.45),
+    new THREE.Vector3(1.25, -0.95, 0.75), new THREE.Vector3(1.35, -1.60, 0.80)
+  ]), 90, 0.135, 16, false), matLaiton);
+  const col = new THREE.Mesh(new THREE.CylinderGeometry(0.21, 0.21, 0.11, 18), matLaiton);
+  col.position.set(1.35, -1.66, 0.80);
+  const geoJet = new THREE.CylinderGeometry(0.055, 0.085, 2.0, 12, 1, true);
+  geoJet.translate(0, -1.0, 0);
+  const matJet = matEau.clone();         /* uv du cylindre : pas de front d'eau */
+  matJet.uniforms.uProg.value = 1;
+  const jet = new THREE.Mesh(geoJet, matJet);
+  jet.position.set(1.35, -1.72, 0.80);
+  becGrp.add(bec, col, jet);
+  becGrp.renderOrder = 2;
+  grp.add(becGrp);
+
+  /* Le recul de la caméra suit le cadre : en 9:16, l'amplitude du serpentin
+     sortirait du champ, on recule juste ce qu'il faut. */
+  let zCam = 16.2;
+  const calerZ = () => {
+    const tg = Math.tan(cam.fov / 2 * Math.PI / 180);
+    const etroit = dimsCadre().W < 820;
+    grp.position.x = etroit ? 3.4 : 6.9;
+    const marge = etroit ? 5.5 : 9.0;
+    zCam = Math.max(etroit ? 24.0 : 16.3, marge / Math.max(0.02, cam.aspect * tg));
+  };
+  calerZ();
+  const placerCam = p => {
+    const pt = courbe.getPointAt(surCourbe(p));
+    cam.position.set(0, pt.y, zCam);      /* pas de suivi en x : vue de côté */
+    cam.lookAt(0, pt.y - 0.3, 0);
+  };
+  placerCam(0);
+
+  NET.rendre = t => {
+    const p = ETAT.flux, b = ETAT.build;
+    matEau.uniforms.uProg.value = frontEau(p);
+    matEau.uniforms.uTime.value = t * 0.001;
+    matEau.uniforms.uOpa.value = b;
+    matJet.uniforms.uTime.value = t * 0.001;
+    matJet.uniforms.uOpa.value = b;
+    matCuivre.uniforms.uOpa.value = b;
+    matLaiton.uniforms.uOpa.value = b;
+    matDedans.uniforms.uOpa.value = b;
+    /* « se visse en place » : le réseau arrive en tournant sur son axe et en
+       reprenant son amplitude. Les y ne bougent pas, la caméra reste juste.  */
+    grp.rotation.y = (1 - b) * Math.PI * 1.6;
+    const s = 0.22 + 0.78 * b;
+    grp.scale.set(s, 1, s);
+    vannes.forEach(v => {
+      const o = doux(clamp((p - v.u + 0.048) / 0.052));   /* v.u en progression de page */
+      v.volant.rotation.z = o * Math.PI / 2 + (1 - b) * Math.PI * 2;
+    });
+    const coule = clamp((p - 0.955) / 0.035);
+    jet.visible = coule > 0.02 && b > 0.4;
+    jet.scale.y = Math.max(0.001, coule);
+    placerCam(p);
+    r.render(scene, cam);
+  };
+  /* Repositionne chaque vanne sur la courbe d'après la progression de page
+     à laquelle sa section croise le centre de l'image. */
+  NET.majVannes = liste => {
+    vannes.forEach((v, i) => {
+      if (liste[i] === undefined) return;
+      v.u = liste[i];
+      const u = surCourbe(v.u);
+      v.g.position.copy(courbe.getPointAt(u));
+      v.g.quaternion.setFromUnitVectors(AXE, courbe.getTangentAt(u).normalize());
+    });
+  };
+
+  NET.cam = cam; NET.grp = grp;   /* exposés pour régler le cadrage */
+  NET.resize = () => {
+    const d = dimsCadre();
+    r.setSize(d.W, d.H, false);
+    cam.aspect = d.W / d.H; cam.updateProjectionMatrix(); calerZ();
+  };
+  NET.ok = true;
+  return true;
+}
+
+/* --- repli sans WebGL : une tige de cuivre en dégradé, remplie au scroll --- */
+function initRail() {
+  const R = $('#rail');
+  R.style.display = 'block';
+  VANNES.forEach(u => {
+    const v = document.createElement('div');
+    v.className = 'vanne';
+    v.style.top = (u * 100).toFixed(2) + '%';
+    R.appendChild(v);
+  });
+  return true;
+}
+</script>
+
+<script>
+/* ==========================================================================
+   7bis. REPLI SANS CDN
+   La démo se montre en rendez-vous, et un rendez-vous n'a pas toujours de
+   réseau. Si GSAP ne répond pas, ce mini-moteur prend sa place : timeline
+   scrubbable, tweens sur transform et opacity, ScrollTrigger réduit à ce
+   qu'on lui demande ici. Three.js manquant, c'est le repli CSS 3D déjà prévu
+   qui prend le relais. Le fichier ne tombe jamais en panne sèche.
+   ========================================================================== */
+if (!window.gsap) (() => {
+  const EASES = {
+    'none':         t => t,
+    'power2.in':    t => t * t,
+    'power2.out':   t => 1 - (1 - t) * (1 - t),
+    'power2.inOut': t => t < .5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2,
+    'power3.out':   t => 1 - Math.pow(1 - t, 3)
+  };
+  const ez  = e => EASES[e] || EASES['power2.out'];
+  const TR  = ['x','y','z','rotateX','rotateY','rotateZ','scale'];
+  const NEU = { x:0, y:0, z:0, rotateX:0, rotateY:0, rotateZ:0, scale:1 };
+
+  const cibles = c => {
+    if (!c) return [];
+    if (typeof c === 'string') return [...document.querySelectorAll(c)];
+    if (Array.isArray(c)) return c;
+    if (c.nodeType) return [c];
+    if (typeof c.length === 'number' && !c.style) return [...c];
+    return [c];                                    /* objet simple, ex. ETAT */
+  };
+  const memo = o => o.__tw || (o.__tw = Object.assign({}, NEU));
+  const poser = (o, cles) => {
+    if (!o.style) return;                          /* objet simple : déjà écrit */
+    const m = memo(o);
+    if (cles.has('opacity')) o.style.opacity = m.opacity;
+    if (cles.has('filter'))  o.style.filter  = m.filter;
+    if (cles.has('left'))    o.style.left    = m.left + 'px';
+    if (cles.has('top'))     o.style.top     = m.top + 'px';
+    if (TR.some(k => cles.has(k)))
+      o.style.transform =
+        `translate3d(${m.x}px,${m.y}px,${m.z}px) rotateX(${m.rotateX}deg)`
+      + ` rotateY(${m.rotateY}deg) rotateZ(${m.rotateZ}deg) scale(${m.scale})`;
+  };
+  const val = (v, i, o) => typeof v === 'function' ? v(i, o) : v;
+
+  /* Un tween = une cible, un état de départ, un état d'arrivée, une durée.
+     Rendu comme fonction pure de sa progression locale : d'où le scrub exact. */
+  function faireTweens(c, de, vers, temps, dureeDef) {
+    const l = cibles(c), out = [];
+    const opts = vers || {};
+    const duree = ('duration' in opts ? +opts.duration : dureeDef) || 0;
+    const easeF = ez(opts.ease), pas = +opts.stagger || 0;
+    const sauf = new Set(['duration','ease','stagger','delay','immediateRender',
+                          'onComplete','onUpdate','force3D','transformOrigin']);
+    l.forEach((o, i) => {
+      const cles = new Set(), a = {}, b = {};
+      const lire = src => { for (const k in src) if (!sauf.has(k)) cles.add(k); };
+      lire(opts); if (de) lire(de);
+      const m = o.style ? memo(o) : o;
+      for (const k of cles) {
+        const dep = de && k in de ? val(de[k], i, o)
+                  : (k in m && m[k] !== undefined ? m[k] : (k in NEU ? NEU[k] : 0));
+        a[k] = dep;
+        b[k] = k in opts ? val(opts[k], i, o) : dep;
+      }
+      if (opts.transformOrigin && o.style) o.style.transformOrigin = opts.transformOrigin;
+      out.push({
+        t0:temps + i * pas, dur:duree,
+        rendre(p) {
+          const e = easeF(p), cle = o.style ? memo(o) : o;
+          for (const k of cles) {
+            const x = a[k], y = b[k];
+            cle[k] = (typeof x === 'number' && typeof y === 'number')
+                   ? x + (y - x) * e : (p > 0 ? y : x);
+          }
+          poser(o, cles);
+        }
+      });
+    });
+    return out;
+  }
+
+  class Timeline {
+    constructor(cfg = {}) {
+      this.cfg = cfg; this.items = []; this.fin = 0; this._p = 0; this._t = 0;
+      this.ts = 1; this.joue = !cfg.paused; this.dernier = 0;
+      TLS.push(this);
+    }
+    _place(temps, dur) {
+      if (typeof temps === 'number') return temps;
+      if (typeof temps === 'string' && temps.startsWith('+=')) return this.fin + parseFloat(temps.slice(2));
+      return this.fin;
+    }
+    _pousser(tw) {
+      this.items.push(...tw);
+      tw.forEach(t => { this.fin = Math.max(this.fin, t.t0 + t.dur); });
+      return this;
+    }
+    to(c, vars, temps)        { const t = this._place(temps); return this._pousser(faireTweens(c, null, vars, t, 0.5)); }
+    fromTo(c, de, vers, temps){ const t = this._place(temps);
+                                const tw = faireTweens(c, de, vers, t, 0.5);
+                                tw.forEach(x => x.rendre(0));       /* immediateRender */
+                                return this._pousser(tw); }
+    add(fn, temps)            { const t = this._place(temps);
+                                this.items.push({ t0:t, dur:0, cb:fn, fait:false });
+                                this.fin = Math.max(this.fin, t); return this; }
+    clear()      { this.items = []; this.fin = 0; this._p = this._t = 0; return this; }
+    duration()   { return this.fin; }
+    timeScale(v) { if (v === undefined) return this.ts; this.ts = v; return this; }
+    pause()      { this.joue = false; return this; }
+    play(t)      { if (typeof t === 'number') this.progress(this.fin ? t / this.fin : 0);
+                   this.joue = true; return this; }
+    progress(p) {
+      if (p === undefined) return this._p;
+      this._p = Math.max(0, Math.min(1, p)); this._t = this._p * this.fin;
+      for (const it of this.items) {
+        if (it.cb) {
+          const passe = this._t >= it.t0;
+          if (passe && !it.fait) { it.fait = true; it.cb(); }
+          if (!passe) it.fait = false;
+          continue;
+        }
+        it.rendre(it.dur > 0 ? Math.max(0, Math.min(1, (this._t - it.t0) / it.dur))
+                             : (this._t >= it.t0 ? 1 : 0));
+      }
+      this.cfg.onUpdate && this.cfg.onUpdate();
+      return this;
+    }
+    eventCallback(nom, fn) { this.cfg[nom] = fn; return this; }
+  }
+
+  const TLS = [];
+  let tp = 0;
+  (function tic(t) {
+    requestAnimationFrame(tic);
+    const dt = Math.min(0.05, (t - tp) / 1000 || 0); tp = t;
+    for (const tl of TLS) {
+      if (!tl.joue || !tl.fin) continue;
+      const suivant = tl._t + dt * tl.ts;
+      if (suivant >= tl.fin) { tl.progress(1); tl.joue = false; }
+      else tl.progress(suivant / tl.fin);
+    }
+  })(0);
+
+  window.gsap = {
+    timeline:cfg => new Timeline(cfg),
+    set(c, vars)  { faireTweens(c, null, Object.assign({ duration:0 }, vars), 0, 0)
+                      .forEach(t => t.rendre(1)); },
+    to(c, vars)   { const tl = new Timeline(); tl.to(c, vars, 0); return tl; },
+    registerPlugin() {}, config() {},
+    utils:{ random(a, b, pas) {
+      const v = a + Math.random() * (b - a);
+      return pas ? Math.round(v / pas) * pas : v;
+    } }
+  };
+
+  /* ScrollTrigger, réduit à l'usage d'ici : « top top » → « bottom bottom »,
+     c'est-à-dire la progression du scroll sur toute la hauteur du document. */
+  const DECL = [];
+  const prog = () => {
+    const max = Math.max(1, document.documentElement.scrollHeight - innerHeight);
+    return Math.max(0, Math.min(1, window.scrollY / max));
+  };
+  window.ScrollTrigger = {
+    create(cfg) {
+      const o = { cfg, progress:prog(),
+        refresh() { o.progress = prog(); cfg.onRefresh && cfg.onRefresh(o); } };
+      DECL.push(o); o.refresh(); return o;
+    },
+    refresh() { DECL.forEach(o => o.refresh()); }
+  };
+  addEventListener('scroll', () => {
+    const p = prog();
+    DECL.forEach(o => { o.progress = p; o.cfg.onUpdate && o.cfg.onUpdate(o); });
+  }, { passive:true });
+
+  console.info('CDN injoignable : moteur d’animation interne activé.');
+})();
+</script>
+
+<script>
+/* ==========================================================================
+   8. ORCHESTRATION
+      Une seule progression de scroll (ScrollTrigger) alimente ETAT.flux.
+      Tout le reste — vannes, révélations, compteurs, robinet — en dérive,
+      donc le retour en arrière refait le trajet à l'envers, sans exception.
+   ========================================================================== */
+gsap.registerPlugin(ScrollTrigger);
+gsap.config({ force3D:true });
+
+/* Les lettres du titre partent de positions 3D dispersées : il faut une
+   perspective sur le titre et sur chaque mot. */
+(() => {
+  const h = $('#titreHero'); if (!h) return;
+  h.style.perspective = '900px';
+  $$('.mot', h).forEach(m => { m.style.transformStyle = 'preserve-3d'; m.style.perspective = '900px'; });
+  $('#indic').style.transition = 'opacity .45s ease';
+  $('#barre-haut').style.transition = 'transform .5s cubic-bezier(.3,.8,.2,1)';
+  $('#barre-mob').style.transition = 'transform .5s cubic-bezier(.3,.8,.2,1)';
+  $('#voile').style.willChange = 'opacity';
+})();
+
+/* --- cibles de révélation, section par section -------------------------- */
+const TOUTES = $$('#apres .sect');
+const SECTIONS = $$('#apres .sect[data-sec]').map(el => ({
+  el, cibles:$$('[data-rev]', el),
+  chiffres:$$('.ch .n', el).map(nd => {
+    const sfx = nd.querySelector('i');
+    return { nd, sfx, pluriel:sfx && sfx.textContent,
+             singulier:sfx && sfx.textContent.replace(/s$/, ''),
+             cible:+nd.dataset.cible, dernier:-1 };
+  })
+}));
+
+/* offsetTop ignore les transforms : mesurer avec getBoundingClientRect
+   donnerait la position déjà décalée par la révélation en cours. */
+const hautDoc = el => { let y = 0, n = el; while (n) { y += n.offsetTop; n = n.offsetParent; } return y; };
+
+function mesurer() {
+  for (const s of SECTIONS) {
+    s.cibles.forEach(c => { c._top = hautDoc(c); });
+    s.chiffres.forEach(ch => { ch.top = hautDoc(ch.nd); });
+  }
+  /* Une vanne par section, posée là où la section croise le centre de
+     l'image : c'est exactement le moment où l'eau y arrive. */
+  const max = Math.max(1, document.documentElement.scrollHeight - innerHeight);
+  TOUTES.forEach((el, i) => {
+    const centre = hautDoc(el) + el.offsetHeight / 2;
+    VANNES[i] = clamp((centre - innerHeight / 2) / max);
+  });
+  if (NET.majVannes) NET.majVannes(VANNES);
+  $$('#rail .vanne').forEach((v, i) => { v.style.top = (VANNES[i] * 100).toFixed(2) + '%'; });
+}
+
+function majRevelations() {
+  const y = window.scrollY, h = innerHeight;
+  const reste = document.documentElement.scrollHeight - h - y;
+  const bout = reste < h ? 1 - Math.max(0, reste) / h : 0;
+  const front = y + h * (0.86 + 0.52 * bout), fen = h * 0.34;
+  for (const s of SECTIONS) {
+    const c = s.cibles;
+    for (let k = 0; k < c.length; k++) {
+      const o = doux(clamp((front - c[k]._top) / fen));
+      if (c[k]._o === undefined || Math.abs(c[k]._o - o) > 0.004 || o === 0 || o === 1) {
+        c[k]._o = o; c[k].style.setProperty('--o', o.toFixed(3));
+      }
+    }
+    /* Les chiffres se comptent pendant que l'eau les traverse, et se
+       décomptent si on remonte : même progression, dans les deux sens. */
+    for (const ch of s.chiffres) {
+      const v = Math.round(ch.cible * doux(clamp((front - ch.top) / fen)));
+      if (v !== ch.dernier) {
+        ch.dernier = v;
+        ch.nd.firstChild.nodeValue = v.toLocaleString('fr-FR');
+        if (ch.sfx) ch.sfx.textContent = v < 2 ? ch.singulier : ch.pluriel;
+      }
+    }
+  }
+}
+
+/* --- la timeline de mutation, entièrement scrubbable -------------------- */
+const MUT = gsap.timeline({ paused:true, onUpdate:surMutation });
+const T_REC = (TIMING.saisie + TIMING.fracture + TIMING.effondrement + TIMING.onde) / 1000;
+
+function construireMUT() {
+  MUT.clear();
+  MUT.to(ETAT, { mut:1, duration:MUT_MS / 1000, ease:'none' }, 0);
+
+  /* 4. l'onde blanche recouvre la bascule canvas → DOM */
+  MUT.fromTo('#voile', { opacity:0 },
+    { opacity:0.96, duration:TIMING.onde / 1000 * 0.55, ease:'power2.in' },
+    (TIMING.saisie + TIMING.fracture + TIMING.effondrement) / 1000);
+  MUT.to('#voile', { opacity:0, duration:0.75, ease:'power2.out' }, T_REC);
+  MUT.to('#fx', { opacity:0, duration:0.45, ease:'none' }, T_REC);
+
+  /* 5. reconstruction : le titre lettre par lettre, puis les blocs à 60 ms */
+  if (LETTRES.length) MUT.fromTo(LETTRES,
+    { opacity:0, x:() => gsap.utils.random(-260, 260, 1), y:() => gsap.utils.random(-180, 180, 1),
+      z:() => gsap.utils.random(-480, 320, 1),
+      rotateX:() => gsap.utils.random(-95, 95, 1), rotateY:() => gsap.utils.random(-95, 95, 1) },
+    { opacity:1, x:0, y:0, z:0, rotateX:0, rotateY:0,
+      duration:0.92, ease:'power3.out', stagger:0.016 }, T_REC + 0.05);
+
+  MUT.fromTo('[data-hero]', { opacity:0, y:36 },
+    { opacity:1, y:0, duration:0.7, ease:'power2.out', stagger:0.06 }, T_REC + 0.30);
+
+  /* le réseau de cuivre qui se visse en place */
+  MUT.to(ETAT, { build:1, duration:1.65, ease:'power2.out' }, T_REC);
+
+  /* repli CSS 3D : la page se fracture quand même, en clip-path */
+  if (!FX.ok && FRG.actif) {
+    MUT.to('#frag', { filter:'saturate(.34) contrast(1.12)', duration:TIMING.saisie / 1000 }, 0);
+    FRG.tuiles.forEach(t => {
+      const d = +t.dataset.d;
+      MUT.to(t, { x:gsap.utils.random(-300, 300, 1), y:gsap.utils.random(-230, 230, 1),
+                  z:-gsap.utils.random(140, 760, 1),
+                  rotateX:gsap.utils.random(-150, 150, 1), rotateY:gsap.utils.random(-150, 150, 1),
+                  rotateZ:gsap.utils.random(-95, 95, 1), ease:'power2.in',
+                  duration:TIMING.fracture / 1000 * 0.8 },
+        TIMING.saisie / 1000 + d * TIMING.fracture / 1000 * 0.4);
+      MUT.to(t, { x:0, y:0, z:-1100, scale:0.04, opacity:0, ease:'power2.in',
+                  duration:TIMING.effondrement / 1000 },
+        (TIMING.saisie + TIMING.fracture) / 1000);
+    });
+  }
+}
+
+/* --- machine à états DOM : une seule écriture par changement de phase --- */
+let phase = -1, stInit = false;
+function surMutation() {
+  const p = MUT.progress();
+  ETAT.mut = p;
+  const ph = p <= 0.0005 ? 0 : (p < SEUIL.effondrement ? 1 : (p < 0.999 ? 2 : 3));
+  if (ph === phase) return;
+  const avant = phase; phase = ph;
+
+  $('#avant').style.visibility = ph === 0 ? 'visible' : 'hidden';
+  const casseur = (FX.ok && $('#fx')) || $('#frag');
+  casseur.style.display = (ph >= 1 && ph <= 2) ? 'block' : 'none';
+  $('#voile').style.display = (ph === 1 || ph === 2) ? 'block' : 'none';
+
+  const montre = ph >= 2;
+  $('#apres').style.display = montre ? 'block' : 'none';
+  const fond = (NET.ok && $('#net')) || $('#rail');
+  fond.style.display = montre ? 'block' : 'none';
+
+  const fini = ph === 3;
+  document.body.classList.toggle('verrou', !fini);
+  if (!fini) $('#barre-haut').classList.remove('on');
+  $('#barre-mob').classList.toggle('on', fini);
+  if (!fini) { $('#indic').style.opacity = 0; window.scrollTo(0, 0); }
+  if (fini && avant !== 3) $('#indic').style.opacity = 1;
+
+  /* ScrollTrigger ne mesure la page qu'une fois le verrou levé : bloquée à
+     100 vh, elle n'a pas encore sa vraie hauteur. */
+  if (montre && !stInit) {
+    stInit = true;
+    ScrollTrigger.create({
+      trigger:'#apres', start:'top top', end:'bottom bottom',
+      onUpdate:s => { ETAT.cible = s.progress; },
+      onRefresh:s => { ETAT.cible = s.progress; }
+    });
+  }
+  if (montre) { ScrollTrigger.refresh(); mesurer(); majRevelations(); }
+  if (ph === 0) { ETAT.flux = ETAT.cible = 0; ETAT.build = 0; majRevelations(); }
+}
+
+/* --- le faux curseur, puis le clic sur le lien mort --------------------- */
+function jouerCurseur() {
+  if (MUT.progress() > 0) return;
+  const c = pointClic(), f = $('#faux'), a = $('#lienMort');
+  gsap.set(f, { x:innerWidth * 0.84, y:innerHeight * 0.9, opacity:0, scale:1 });
+  gsap.timeline()
+    .to(f, { opacity:1, duration:0.16 })
+    .to(f, { x:c.px - 3, y:c.py - 3, duration:TIMING.curseur / 1000, ease:'power2.inOut' })
+    .add(() => { if (a) { a.style.background = '#ff2a00'; a.style.color = '#ff0'; a.style.borderStyle = 'inset'; } })
+    .to(f, { scale:0.84, duration:0.07 })
+    .add(() => {
+      gsap.set('#onde-clic', { left:c.px - 7, top:c.py - 7, opacity:1, scale:0.4 });
+      gsap.to('#onde-clic', { scale:3.4, opacity:0, duration:0.5, ease:'power2.out' });
+    })
+    .to(f, { scale:1, duration:0.09 })
+    .add(() => lancerMutation())
+    .to(f, { opacity:0, duration:0.35 }, '+=0.2');
+}
+function lancerMutation() {
+  MUT.timeScale(LENT ? 0.5 : 1);
+  MUT.play(0);
+}
+
+/* --- auto-scroll à vitesse constante, pour filmer sans à-coups ---------- */
+const AUTO = { on:false, v:70, pos:0, t0:null, y0:0 };
+const relancerAuto = () => { AUTO.t0 = null; };
+let LENT = false;
+
+/* --- boucle de rendu ---------------------------------------------------- */
+let tPrec = 0;
+function boucle(t) {
+  requestAnimationFrame(boucle);
+  const dt = Math.min(0.05, (t - tPrec) / 1000 || 0); tPrec = t;
+
+  if (FX.ok && phase >= 1 && phase <= 2) FX.rendre(ETAT.mut, t);
+
+  if (phase >= 2) {
+    if (AUTO.on) {
+      if (AUTO.t0 === null) { AUTO.t0 = t; AUTO.y0 = window.scrollY; }
+      AUTO.pos = AUTO.y0 + (t - AUTO.t0) / 1000 * AUTO.v * (LENT ? 0.5 : 1);
+      const max = document.documentElement.scrollHeight - innerHeight;
+      if (AUTO.pos >= max) { AUTO.pos = max; AUTO.on = false; majUI(); }
+      window.scrollTo(0, AUTO.pos);
+    }
+    ETAT.flux += (ETAT.cible - ETAT.flux) * (REDUIT ? 1 : Math.min(1, dt * 7.5));
+    if (Math.abs(ETAT.cible - ETAT.flux) < 0.0002) ETAT.flux = ETAT.cible;
+    majRevelations();
+    if (NET.ok) NET.rendre(t);
+    else $('#rail .flux').style.transform = `translateX(-50%) scaleY(${ETAT.flux.toFixed(4)})`;
+    if (phase === 3) {
+      if (ETAT.flux > 0.03 && $('#indic').style.opacity !== '0') $('#indic').style.opacity = 0;
+      const b = $('#barre-haut'), veut = ETAT.flux > 0.045;
+      if (b.classList.contains('on') !== veut) b.classList.toggle('on', veut);
+    }
+  }
+}
+
+/* --- interface ---------------------------------------------------------- */
+const NOMS_PHASE = ['site de 2011', 'saisie', 'fracture', 'effondrement', 'onde', 'reconstruction', 'site premium'];
+function nomPhase(p) {
+  if (p <= 0) return NOMS_PHASE[0];
+  if (p < SEUIL.saisie) return NOMS_PHASE[1];
+  if (p < SEUIL.fracture) return NOMS_PHASE[2];
+  if (p < SEUIL.effondrement) return NOMS_PHASE[3];
+  if (p < SEUIL.onde) return NOMS_PHASE[4];
+  if (p < 1) return NOMS_PHASE[5];
+  return NOMS_PHASE[6];
+}
+function majUI() {
+  const p = MUT.progress();
+  $('#scrub').value = Math.round(p * 1000);
+  $('#bS').setAttribute('aria-pressed', LENT);
+  $('#bA').setAttribute('aria-pressed', AUTO.on);
+  $('#bV').setAttribute('aria-pressed', document.body.classList.contains('v916'));
+  $('#etat').innerHTML =
+    `<b>${nomPhase(p)}</b> — ${Math.round(p * MUT_MS)} / ${MUT_MS} ms`
+    + ` — eau ${Math.round(ETAT.flux * 100)} %`
+    + ` — auto ${Math.round(AUTO.v * (LENT ? 0.5 : 1))} px/s`
+    + (FX.ok ? '' : ' — repli CSS 3D');
+}
+MUT.eventCallback('onUpdate', () => { surMutation(); majUI(); });
+setInterval(majUI, 250);
+
+function scrub(delta) {
+  MUT.pause();
+  MUT.progress(clamp(MUT.progress() + delta));
+  majUI();
+}
+function reinitialiser() {
+  MUT.pause(); MUT.progress(0);
+  AUTO.on = false; AUTO.pos = 0; relancerAuto();
+  window.scrollTo(0, 0);
+  const a = $('#lienMort');
+  if (a) { a.style.background = ''; a.style.color = ''; a.style.borderStyle = ''; }
+  gsap.set('#faux', { opacity:0 });
+  if (FX.ok) $('#fx').style.opacity = 1;
+  majUI();
+}
+function rejouer() { reinitialiser(); setTimeout(jouerCurseur, 240); }
+
+function majEtroit() {
+  const w = dimsCadre().W;
+  document.body.classList.toggle('etroit', w < 820);
+  document.body.classList.toggle('minus',  w < 420);
+}
+
+function recadrer() {
+  const v = document.body.classList.contains('v916');
+  document.documentElement.style.setProperty('--frameW',
+    v ? 'min(100%, calc(100vh * 9 / 16))' : '100%');
+  majEtroit();
+  requestAnimationFrame(() => {
+    if (NET.ok) NET.resize();
+    if (MUT.progress() === 0) refaireFX();
+    ScrollTrigger.refresh();
+    if (phase >= 2) { mesurer(); majRevelations(); }
+    majUI();
+  });
+}
+async function refaireFX() {
+  if (FX.dispose) { try { FX.dispose(); } catch (e) {} }
+  FX.ok = false; FX.dispose = null;
+  CAP = await capturerPage();
+  if (!initFX(CAP)) initRepli(CAP);
+  construireMUT();
+}
+
+$('#bRejouer').onclick = rejouer;
+$('#bReset').onclick   = reinitialiser;
+$('#bH').onclick       = () => $('#ui').classList.toggle('off');
+$('#bS').onclick       = () => { LENT = !LENT; MUT.timeScale(LENT ? 0.5 : 1); relancerAuto(); majUI(); };
+$('#bA').onclick       = () => { AUTO.on = !AUTO.on; relancerAuto(); majUI(); };
+$('#bV').onclick       = () => { document.body.classList.toggle('v916'); recadrer(); };
+$('#scrub').oninput    = e => { MUT.pause(); MUT.progress(+e.target.value / 1000); majUI(); };
+
+addEventListener('keydown', e => {
+  if (/^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName)) return;
+  const k = e.key.toLowerCase();
+  if (k === ' ' || e.code === 'Space') { e.preventDefault(); rejouer(); }
+  else if (k === 'r') reinitialiser();
+  else if (k === 'v') { document.body.classList.toggle('v916'); recadrer(); }
+  else if (k === 's') { LENT = !LENT; MUT.timeScale(LENT ? 0.5 : 1); relancerAuto(); majUI(); }
+  else if (k === 'a') { AUTO.on = !AUTO.on; relancerAuto(); majUI(); }
+  else if (k === 'h') $('#ui').classList.toggle('off');
+  else if (e.key === 'ArrowLeft')  { e.preventDefault(); scrub(-1 / (60 * MUT_MS / 1000)); }
+  else if (e.key === 'ArrowRight') { e.preventDefault(); scrub( 1 / (60 * MUT_MS / 1000)); }
+  else if (k === '+' || k === '=') { AUTO.v = Math.min(400, AUTO.v + 10); relancerAuto(); majUI(); }
+  else if (k === '-') { AUTO.v = Math.max(10, AUTO.v - 10); relancerAuto(); majUI(); }
+});
+/* Le scroll reste bloqué tant que la mutation n'est pas finie. */
+['wheel', 'touchmove'].forEach(ev => addEventListener(ev, e => {
+  if (!document.body.classList.contains('verrou')) return;
+  if (e.target.closest && e.target.closest('#ui')) return;  /* le slider suit le doigt */
+  e.preventDefault();
+}, { passive:false }));
+
+let tRz;
+addEventListener('resize', () => { clearTimeout(tRz); tRz = setTimeout(recadrer, 180); });
+
+/* --- leviers de conversion : sélecteur de commune, formulaire ----------- */
+(() => {
+  const sel = $('#maCommune'), rep = $('#repZone');
+  const dire = () => {
+    const i = +sel.value;
+    if (i < 0) { rep.innerHTML = 'Appelez, on vous dit tout de suite si on peut y aller — '
+      + 'au-delà de Villeveyrac et Marseillan, on ne promet pas de délai qu’on ne tiendrait pas.'; return; }
+    const z = CLIENT.zones[i];
+    rep.innerHTML = `À ${echap(z.com)}, on est chez vous en <b>${z.dl} min</b> en moyenne, `
+      + `et le déplacement est facturé <b>${z.z === 1 ? '39 €' : '49 €'}</b>, diagnostic compris.`;
+  };
+  sel.addEventListener('change', dire); dire();
+
+  $('#formDevis').addEventListener('submit', e => {
+    e.preventDefault();
+    const d = new FormData(e.target);
+    const nom = (d.get('nom') || '').toString().trim().split(' ')[0] || 'Bonjour';
+    const c = CRN[0];
+    $('#formDevis').style.display = 'none';
+    const m = $('#merciDevis');
+    m.style.display = 'block';
+    m.innerHTML = `<p class="txt">${echap(nom)}, c’est noté pour <b>${echap(d.get('besoin'))}</b>
+      à ${echap(d.get('commune'))}. ${echap(CLIENT.gerant.split(' ')[0])} vous rappelle
+      ${c ? 'avant ' + echap(fmtCreneau(c)) : 'dans la demi-journée'}, et vous recevez le SMS
+      de confirmation dans la minute.</p>
+      <p class="txt">Si ça coule maintenant, ne l’attendez pas :
+      <a href="${telHref(CLIENT.tel)}"><b>${echap(CLIENT.tel)}</b></a>.</p>`;
+  });
+})();
+
+/* --- démarrage --------------------------------------------------------- */
+let CAP = null;
+(async function demarrer() {
+  document.body.classList.add('verrou');
+  majEtroit();
+  majRevelations();
+  try { if (document.fonts) await document.fonts.ready; } catch (e) {}
+  CAP = await capturerPage();
+  if (!initFX(CAP)) initRepli(CAP);
+  if (!initNET()) initRail();
+  construireMUT();
+  MUT.progress(0); surMutation(); majUI();
+  requestAnimationFrame(boucle);
+  if (REDUIT) { MUT.progress(1); majUI(); }
+  else setTimeout(jouerCurseur, TIMING.attente);
+})();
+</script>
+</body>
+</html>

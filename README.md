@@ -14,6 +14,28 @@ serverless, pour l'envoi du formulaire.
 | `contact.html` | Calendrier de réservation + formulaire |
 | `creation-site-internet-sete.html` *et 3 autres* | Pages locales, générées |
 | `au-bon-pain/` | Site client, servi depuis `/au-bon-pain` |
+| `promo/avant-apres/` | Démo commerciale avant / après, plomberie |
+
+## Démo avant / après — `promo/avant-apres/index.html`
+
+Fichier unique, ouvrable en double-clic, filmable en vertical : un site de
+plombier de 2011 se fracture en 3D et se reconstruit en site premium piloté au
+scroll, où l'eau progresse dans un réseau de cuivre et ouvre une vanne par
+section.
+
+- **Raccourcis** — `Espace` rejoue la séquence, `R` réinitialise, `←`/`→`
+  scrubbent la mutation image par image, `V` cadre en 9:16, `S` passe en 0,5×,
+  `A` lance l'auto-scroll de la phase APRÈS, `+`/`-` en règlent la vitesse,
+  `H` masque l'interface. Le curseur sous l'écran pilote la mutation à la main.
+- **Query params** — `?nom=&ville=&tel=&gerant=&mail=&note=&avis=&creation=&adresse=&astreinte=&domaine=`,
+  par exemple `?nom=Plomberie+Cabrol&ville=M%C3%A8ze&tel=04+67+11+22+33&gerant=Luc+Cabrol`.
+  La commune passée remonte en tête de la zone d'intervention.
+- Le dossier de l'entreprise vit dans l'objet `CLIENT`, les cinq temps de la
+  mutation dans `TIMING`, tous deux en tête du script.
+- GSAP, ScrollTrigger, Three.js et html2canvas viennent du CDN ; sans réseau,
+  un moteur d'animation interne prend le relais, et sans WebGL la page se
+  fracture quand même, en `clip-path`. L'entreprise est fictive et les numéros
+  sont pris dans les plages que l'ARCEP réserve à la fiction.
 
 ## Direction artistique
 
