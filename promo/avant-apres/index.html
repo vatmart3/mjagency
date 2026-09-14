@@ -1561,16 +1561,18 @@ function initFX(capture) {
   const onde = new THREE.Mesh(
     new THREE.PlaneGeometry(W * 1.2, H * 1.2),
     new THREE.ShaderMaterial({
-      uniforms:uOnde, transparent:true, depthWrite:false, blending:THREE.AdditiveBlending,
+      uniforms:uOnde, transparent:true, depthWrite:false, depthTest:false,
       vertexShader:`varying vec2 vP; void main(){ vP = position.xy;
         gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0); }`,
       fragmentShader:`precision highp float; uniform float uO, uMaxR; varying vec2 vP;
         void main(){
           if (uO <= 0.001 || uO >= 0.999) discard;
           float r = length(vP), R = uO * uMaxR;
-          float a = smoothstep(96.0, 0.0, abs(r - R)) * (1.0 - uO * 0.2);
-          a += smoothstep(R, R - 300.0, r) * uO * 0.30;
-          gl_FragColor = vec4(1.0, 1.0, 1.0, clamp(a, 0.0, 1.0));
+          float d = abs(r - R);
+          float a = smoothstep(170.0, 0.0, d) * (1.0 - uO * 0.25);
+          a += smoothstep(R, R - 340.0, r) * uO * 0.22;      /* le sillage */
+          vec3 c = mix(vec3(0.0, 0.443, 0.890), vec3(1.0), smoothstep(105.0, 8.0, d));
+          gl_FragColor = vec4(c, clamp(a, 0.0, 1.0));
         }`
     })
   );
@@ -2144,7 +2146,7 @@ function construireMUT() {
 
   /* 4. l'onde blanche recouvre la bascule canvas → DOM */
   MUT.fromTo('#voile', { opacity:0 },
-    { opacity:0.96, duration:TIMING.onde / 1000 * 0.55, ease:'power2.in' },
+    { opacity:0.55, duration:TIMING.onde / 1000 * 0.45, ease:'power2.in' },
     (TIMING.saisie + TIMING.fracture + TIMING.effondrement) / 1000);
   MUT.to('#voile', { opacity:0, duration:0.75, ease:'power2.out' }, T_REC);
   MUT.to('#fx', { opacity:0, duration:0.45, ease:'none' }, T_REC);
