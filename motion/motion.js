@@ -15,7 +15,8 @@
   const deck   = $('#deck');
   const replay = $('#replay');
 
-  const SOFT = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const SOFT   = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const COARSE = matchMedia('(pointer: coarse)').matches;
 
   /* ---------------------------------------------------------
      Mise à l'échelle de la scène
@@ -31,10 +32,11 @@
   function fit() {
     const vw = innerWidth, vh = innerHeight;
 
-    /* Sur un téléphone tenu debout, la scène pivote d'un quart de tour :
-       une composition couchée sur un écran debout ne remplirait qu'un
-       bandeau au milieu. Tournée, elle prend tout l'écran. */
-    const turn = vh > vw * 1.15 && vw < 1200;
+    /* Sur un écran tactile tenu debout, la scène pivote d'un quart de
+       tour : couchée sur un écran debout, elle ne remplirait qu'un
+       bandeau au milieu. La condition exclut les écrans à souris, pour
+       qu'une fenêtre de navigateur étroite ne bascule jamais. */
+    const turn = COARSE && vh > vw * 1.15;
     const fw = turn ? vh : vw;      /* la largeur utile, scène tournée */
     const fh = turn ? vw : vh;
 
@@ -56,7 +58,7 @@
      --------------------------------------------------------- */
   (function dust() {
     const box = $('#dust');
-    const n = SOFT ? 0 : 64;
+    const n = SOFT ? 0 : 20;
     let html = '';
     for (let i = 0; i < n; i++) {
       const d = (6 + Math.random() * 10).toFixed(1);
@@ -80,10 +82,15 @@
     minimumFractionDigits: 2, maximumFractionDigits: 2
   });
 
+  /* Numéro de la lecture en cours. Tout ce qui survit d'une lecture à
+     l'autre — compteurs, atterrissages — s'y réfère avant d'agir. */
+  let gen = 0;
+
   /* Un compteur qui monte, en sortie douce */
   function countUp(el, to, dur, fmt) {
-    const t0 = performance.now();
+    const mine = gen, t0 = performance.now();
     (function step(now) {
+      if (mine !== gen) return;            /* une autre lecture a commencé */
       const p = Math.min(1, (now - t0) / dur);
       const e = 1 - Math.pow(1 - p, 3);
       el.textContent = fmt(to * e);
@@ -137,6 +144,7 @@
       return el;
     };
 
+    const mine  = gen;
     const trail = make('flychip flytrail');   /* la traîne, en retard et floutée */
     const chip  = make('flychip');
 
@@ -150,12 +158,13 @@
     });
 
     setTimeout(() => {
+      if (mine !== gen) { chip.remove(); trail.remove(); return; }
       fld.classList.add('hit');
       on($('.v', fld));
       chip.style.opacity = '0';
       trail.style.opacity = '0';
       setTimeout(() => { chip.remove(); trail.remove(); }, 340);
-      setTimeout(() => fld.classList.remove('hit'), 720);
+      setTimeout(() => { if (mine === gen) fld.classList.remove('hit'); }, 720);
     }, 850);
   }
 
@@ -266,12 +275,47 @@
 
   /* ---------------------------------------------------------
      Horloge
+
+     Une seule horloge, relue à chaque image, plutôt qu'une trentaine
+     de minuteurs posés au lancement. Trois choses en découlent :
+
+     — si une image saute, les repères suivants restent à l'heure au
+       lieu de dériver les uns par rapport aux autres ;
+     — dans un onglet en arrière-plan, le navigateur cesse d'appeler
+       l'horloge : on la met en pause et on la reprend au retour, au
+       lieu de voir toute la séquence se jouer d'un bloc ;
+     — un rejeu remet le compteur à zéro, sans minuteur en retard qui
+       viendrait rallumer un élément déjà éteint.
      --------------------------------------------------------- */
-  let timers = [];
+  const SPEED = SOFT ? 2.8 : 1;   /* animations réduites : on abrège */
+
+  let raf = 0, cue = 0, start = 0, held = 0;
+
+  function frame(now) {
+    const t = (now - start) / 1000 * SPEED;
+    while (cue < score.length && score[cue][0] <= t) score[cue++][1]();
+    raf = cue < score.length ? requestAnimationFrame(frame) : 0;
+  }
+
+  function stop() {
+    if (raf) { cancelAnimationFrame(raf); raf = 0; }
+  }
+
+  /* Onglet masqué : on gèle le temps écoulé, on repart d'ici au retour. */
+  addEventListener('visibilitychange', () => {
+    if (document.hidden) {
+      if (raf) { held = performance.now() - start; stop(); }
+    } else if (held) {
+      start = performance.now() - held;
+      held = 0;
+      if (cue < score.length) raf = requestAnimationFrame(frame);
+    }
+  });
 
   function reset() {
-    timers.forEach(clearTimeout);
-    timers = [];
+    gen++;                 /* tout ce qui traîne de la lecture d'avant expire */
+    stop();
+    cue = 0; held = 0;
     FLY.innerHTML = '';
     off(replay);
 
@@ -297,15 +341,18 @@
 
   function play() {
     reset();
-    /* Une image de battement, pour que la remise à zéro soit peinte */
+    /* Une image de battement, pour que la remise à zéro soit peinte
+       avant que la première transition ne parte. */
     requestAnimationFrame(() => {
-      score.forEach(([t, fn]) =>
-        timers.push(setTimeout(fn, (SOFT ? t * 0.35 : t) * 1000)));
+      start = performance.now();
+      raf = requestAnimationFrame(frame);
     });
   }
 
   replay.addEventListener('click', play);
-  addEventListener('keydown', e => { if (e.key === ' ' || e.key === 'Enter') play(); });
+  addEventListener('keydown', e => {
+    if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); play(); }
+  });
 
   play();
 })();
