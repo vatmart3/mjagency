@@ -252,6 +252,10 @@ body{ color: var(--ink); font-family: var(--font) }
 }
 .app.in  { opacity:1; transform: translateX(160px) }
 .app.mid { opacity:1; transform: none }
+/* Quand le téléphone devient le sujet, la caisse recule dans l'ombre :
+   c'est ce qui fait la profondeur, et cela évite de lire un texte que
+   le bord du cadre coupe en deux. */
+.app.recule{ opacity:.20 }
 .app.gone{ opacity:0; transform: translateY(-46px) scale(.95) }
 
 .titlebar{
@@ -440,7 +444,7 @@ body{ color: var(--ink); font-family: var(--font) }
 .pq li span{ color: var(--ink-2) }
 .pq li i{
   display:block; height:11px; border-radius:99px; width:0;
-  background: linear-gradient(90deg,#E24444,#BF2A2A);
+  background: linear-gradient(90deg,#D9A23C,#9E6F18);
   transition: width .9s var(--ease);
 }
 .pq.grow li i{ width: var(--p) }

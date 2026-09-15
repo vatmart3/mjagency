@@ -70,6 +70,35 @@ enseigne : c'est « Votre commerce », comme le premier film montre
 | 20,4 | Tableau de bord — et « Pourquoi ils viennent », la mesure qui dit si les SMS rapportent |
 | 26,2 | Signature |
 
+## Le découpage
+
+Le film ne tient plus en un seul plan large : **huit cadres, deux coupes
+franches**, et à l'intérieur de chaque plan un mouvement lent — un cadre
+parfaitement fixe fait tableau, pas film.
+
+| s | Cadre |
+|---|---|
+| 0,0 | Serré sur la carte, qui se resserre encore pendant deux secondes et demie |
+| 2,9 | On s'élargit : la caisse entre par la droite |
+| 4,6 | On entre dans la caisse : la fiche de la cliente |
+| 6,6 | Plan sur le pavé, appui lent pendant la frappe |
+| 10,5 | Léger recul sur le bouton |
+| **11,95** | **Coupe** — sur le téléphone, pendant que les points volent |
+| 13,5 | Le cadre s'ouvre : les récompenses se découvrent |
+| 16,1 | La caisse revient, puis on respire lentement |
+| **20,4** | **Coupe** — plein cadre sur les quatre compteurs |
+| 22,2 | Recul jusqu'au plan large |
+| 26,2 | Signature |
+
+Deux principes, appliqués chaque fois qu'un cadre serré coupait quelque
+chose : le sujet du plan reste entier — c'est le décor qui sort du cadre,
+jamais le texte qu'on doit lire ; et quand le téléphone devient le sujet,
+**la caisse recule dans l'ombre** (opacité 0,20) plutôt que d'être
+tranchée par le bord.
+
+`cadre(x, y, s)` amène le point (x, y) de la scène au centre, à
+l'échelle s. `cam(cadre, durée)` l'exécute — une durée nulle coupe net.
+
 Les chiffres se répondent d'un plan à l'autre : 42,50 € encaissés donnent
 +43 points, la carte passe de 1 529 à 1 572, les passages de 29 à 30, et
 la cliente reparaît au tableau de bord avec 1 672 points cumulés pour

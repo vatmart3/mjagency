@@ -240,7 +240,7 @@ def film2(p):
     p.pose(11.35, mouvement(.16), .16, .1)
     p.pose(12.20, toc(), .44, -.35)
     p.pose(12.20, egrene(.90, 10, 1100), .26, -.35)
-    p.pose(12.60, notif(), .34, .45)
+    p.pose(11.55, notif(), .34, .45)
     # 6 · ce que ça débloque
     p.pose(13.40, toc(), .28, -.35)
     for i in range(3): p.pose(13.80 + i * .22, tap(i), .22, -.35)
@@ -254,9 +254,9 @@ def film2(p):
     for i in range(4):
         p.pose(20.90 + i * .16, tap(i), .22, -.3 + i * .2)
         p.pose(20.90 + i * .16, egrene(.85, 8, 1250), .14, -.3 + i * .2)
-    p.pose(21.90, tap(3), .16)
-    p.pose(22.30, gonflement(.9), .22)
-    p.pose(22.90, tap(1), .14)
+    p.pose(21.50, tap(3), .16)
+    p.pose(21.85, gonflement(.9), .22)
+    p.pose(22.60, tap(1), .14)
     # 9 · la signature
     p.pose(25.30, gonflement(1.5), .40)
     p.pose(26.20, mouvement(.30, False), .25)

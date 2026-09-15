@@ -128,10 +128,24 @@ const Motion = (function () {
   const on  = (el, c = 'on') => el && el.classList.add(c);
   const off = (el, c = 'on') => el && el.classList.remove(c);
 
-  /* La caméra ne fait que translater : changer son échelle obligerait
-     le navigateur à redessiner toute la scène pendant toute la
-     transition, alors qu'une translation déplace une texture prête. */
-  const cam = (t) => { camera.style.transform = t; };
+  /* La caméra : un cadre, une durée, éventuellement une courbe.
+     Une durée nulle coupe net — c'est un changement de plan.
+
+     Un changement d'échelle oblige le navigateur à redessiner la scène
+     pendant la transition, là où une translation déplace une texture
+     déjà prête. C'est le prix du découpage ; `eq-2` fige la caméra sur
+     les machines qui ne suivent pas. */
+  const cam = (t, duree = 1.7, courbe) => {
+    camera.style.transitionDuration = duree + 's';
+    camera.style.transitionTimingFunction =
+      courbe || (duree === 0 ? 'linear' : 'var(--ease)');
+    camera.style.transform = t;
+  };
+
+  /* Amener un point de la scène au centre du cadre, à l'échelle voulue.
+     Le repère est celui de la scène : (0,0) au centre, x vers la droite. */
+  const cadre = (x, y, s) =>
+    `translate(${(-x * s).toFixed(1)}px, ${(-y * s).toFixed(1)}px) scale(${s})`;
 
   const euros = new Intl.NumberFormat('fr-FR', {
     minimumFractionDigits: 2, maximumFractionDigits: 2
@@ -277,6 +291,8 @@ const Motion = (function () {
     cue = 0; held = 0;
     FLY.innerHTML = '';
     off(replay);
+    camera.style.transitionDuration = '';
+    camera.style.transitionTimingFunction = '';
     remiseAZero();
     /* Une image de battement, pour que la remise à zéro soit peinte
        avant que la première transition ne parte. */
@@ -292,7 +308,7 @@ const Motion = (function () {
   });
 
   return {
-    $, $$, on, off, cam, fly, countUp, euros, entier, replay, SOFT,
+    $, $$, on, off, cam, cadre, fly, countUp, euros, entier, replay, SOFT,
     jouer(film) {
       partition   = film.partition;
       remiseAZero = film.remiseAZero || (() => {});

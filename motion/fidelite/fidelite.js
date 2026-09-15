@@ -10,7 +10,7 @@
 
 (function () {
 
-  const { $, $$, on, off, cam, fly, countUp, euros, entier, replay } = Motion;
+  const { $, $$, on, off, cam, cadre, fly, countUp, euros, entier, replay } = Motion;
 
   const phone  = $('#phone'), app = $('#app'), toast = $('#toast'), outro = $('#outro');
   const carte  = $('#carte'), qr = $('#qr'), valider = $('#valider');
@@ -46,6 +46,27 @@
     $('#qrArt').innerHTML = `<path d="${d + yeux}" fill="#151517"/>`;
   })();
 
+  /* ---------------------------------------------------------
+     Le découpage
+
+     `cadre(x, y, s)` amène le point (x, y) de la scène au centre du
+     cadre, à l'échelle s — repère centré, x vers la droite. Huit
+     cadres, deux coupes franches, et à l'intérieur de chaque plan un
+     mouvement lent : un cadre parfaitement fixe fait tableau, pas film.
+     --------------------------------------------------------- */
+  const CARTE       = cadre(   0, -154, 1.30);   // la carte, plein cadre
+  const CARTE_PLUS  = cadre(   0, -150, 1.38);   // le même plan, qui se resserre
+  const LARGE       = cadre(   0,    0, 1.00);
+  const FICHE       = cadre( 170,  -90, 1.20);   // le client s'ouvre en caisse
+  const PAVE        = cadre( 284,  -20, 1.18);   // le pavé numérique
+  const PAVE_PLUS   = cadre( 275,    0, 1.20);
+  const VALIDER     = cadre( 150,   60, 1.06);   // le bouton
+  const CARTE_SERRE = cadre(-400, -136, 1.35);   // retour sur le téléphone
+  const CARTE_OUVRE = cadre(-400,  -40, 1.12);   // on découvre les récompenses
+  const ANNIV       = cadre(   0,  -30, 1.04);
+  const TUILES      = cadre(   0, -108, 1.38);   // la rangée de compteurs, plein cadre
+  const FIN         = cadre(   0,    0, 1.05);
+
   function onglet(nom) {
     $$('.tab').forEach(t => t.classList.toggle('on', t.dataset.nav === nom));
     $$('.view').forEach(v => v.classList.toggle('on', v.dataset.view === nom));
@@ -73,27 +94,34 @@
   const partition = [
 
     /* 1 — La carte, dans la poche du client */
-    [0.10, () => { cam('translateY(10px)'); on(phone, 'in'); }],
+    /* 1 — Plan serré sur la carte */
+    [0.10, () => on(phone, 'in')],
+    [0.60, () => cam(CARTE_PLUS, 2.6)],          // il se resserre doucement
     [1.30, () => on($('#jauge'))],
     [1.55, () => $('#barre').style.width = '78%'],
 
     /* 2 — La caisse s'ouvre, le code part au scan */
-    [3.00, () => { on(phone, 'aside'); on(app, 'in'); onglet('caisse');
-                   cam('translate(0,0)'); }],
+    /* 2 — On s'élargit : la caisse entre */
+    [2.85, () => cam(LARGE, 1.5)],
+    [3.00, () => { on(phone, 'aside'); on(app, 'in'); onglet('caisse'); }],
     [4.40, () => on($('#btnScan'), 'tap')],
     [4.70, () => { off($('#btnScan'), 'tap'); on($('#champ'), 'hot');
                    fly(qr, $('#champ'), { etiquette: 'Carte', valeur: 'n° 1042',
                      arrivee() { on($('#fiche')); off($('#champ'), 'hot'); } }); }],
     [5.10, () => on(qr, 'out')],
 
-    /* 3 — La fiche du client s'ouvre */
+    /* 3 — On entre dans la caisse */
+    [4.60, () => cam(FICHE, 1.3)],
     [6.10, () => on($('#dispo'))],
     [6.50, () => { on($('#montant')); on($('#pave')); }],
 
-    /* 4 — Le montant se compose, touche par touche */
+    /* 4 — Plan sur le pavé, le montant se compose */
+    [6.60, () => cam(PAVE, 1.2)],
     ...SAISIE.map((_, i) => [7.40 + i * 0.42, () => frapper(i)]),
+    [8.80, () => cam(PAVE_PLUS, 1.8)],           // appui lent pendant la frappe
     [9.40, () => on($('.raisons [data-r="habitue"]'), 'pick')],
     [9.90, () => on(valider)],
+    [10.50, () => cam(VALIDER, 1.0)],
 
     /* 5 — On encaisse : les points s'envolent vers la carte */
     [11.00, () => on(valider, 'tap')],
@@ -109,23 +137,29 @@
         setTimeout(() => off(carte, 'credit'), 950);
       }
     })],
-    [12.60, () => on(toast)],
+    [11.55, () => on(toast)],
+    /* COUPE — on passe sur le téléphone pendant que les points volent.
+       La caisse recule dans l'ombre : elle n'est plus le sujet. */
+    [11.95, () => { cam(CARTE_SERRE, 0); on(app, 'recule'); }],
 
-    /* 6 — Ce que ça débloque, côté client */
+    /* 6 — On ouvre le cadre : ce que ça débloque */
+    [13.10, () => off(toast)],
     [13.40, () => on($('#reward'))],
+    [13.45, () => cam(CARTE_OUVRE, 1.6)],
     ...[0, 1, 2].map(i => [13.80 + i * 0.22, () => on(recs[i], 'show')]),
-    [15.20, () => off(toast)],
 
     /* 7 — L'anniversaire du mois */
-    [16.20, () => { onglet('anniv'); on(phone, 'gone'); on(app, 'mid');
-                    cam('translateY(-6px)'); }],
+    [15.95, () => off(app, 'recule')],
+    [16.05, () => cam(ANNIV, 1.2)],
+    [16.20, () => { onglet('anniv'); on(phone, 'gone'); on(app, 'mid'); }],
+    [17.80, () => cam(LARGE, 2.6)],              // on respire
     ...annivs.map((l, i) => [16.80 + i * 0.2, () => on(l, 'show')]),
     [18.40, () => on($('.offrir', annivs[0]), 'tap')],
     [18.66, () => { off($('.offrir', annivs[0]), 'tap'); on(annivs[0], 'donne');
                     $('.offrir', annivs[0]).textContent = '50 points offerts'; }],
 
-    /* 8 — Pourquoi ils viennent */
-    [20.40, () => { onglet('dash'); cam('translateY(-10px)'); }],
+    /* 8 — COUPE sur les compteurs, puis on recule */
+    [20.40, () => { onglet('dash'); cam(TUILES, 0); }],
     ...tuiles.map((t, i) => [20.90 + i * 0.16, () => {
       on(t, 'show');
       const v = $('.t-v', t), to = +v.dataset.to;
@@ -134,13 +168,13 @@
       : v.dataset.cent ? euros.format(x) + ' €'
       :                  entier.format(Math.round(x)));
     }]),
-    [21.90, () => on($('.pourquoi'))],
-    [22.30, () => on($('#pq'), 'grow')],
-    [22.90, () => on($('#meilleurs'))],
-    [24.20, () => cam('translateY(-4px)')],
+    [21.50, () => on($('.pourquoi'))],
+    [21.85, () => on($('#pq'), 'grow')],
+    [22.20, () => cam(LARGE, 2.6)],
+    [22.60, () => on($('#meilleurs'))],
 
     /* 9 — La signature */
-    [26.20, () => { on(app, 'gone'); cam('translateY(0px)'); }],
+    [26.20, () => { on(app, 'gone'); cam(FIN, 2.2); }],
     [27.00, () => on(outro)],
     [30.20, () => on(replay)]
   ];
@@ -175,7 +209,7 @@
     tuiles.forEach(t => { off(t, 'show'); $('.t-v', t).textContent = '0'; });
     $$('.tab').forEach(t => off(t));
     $$('.view').forEach(v => off(v));
-    cam('translateY(18px)');
+    cam(CARTE, 0);            /* on ouvre déjà serré sur la carte */
   }
 
   Motion.jouer({ partition, remiseAZero });
