@@ -4,15 +4,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 
-<title>Du mail au planning, sans rien ressaisir — motion design</title>
-<meta name="description" content="Démonstration animée : un mail de demande de devis devient fiche client, devis, signature, planning et facture, sans aucune ressaisie.">
+<title>Du mail au planning, sans rien ressaisir — MJ Agency</title>
+<meta name="description" content="Démonstration animée signée MJ Agency : un mail de demande de devis devient fiche client, devis, signature, planning et facture, sans aucune ressaisie.">
 <meta name="robots" content="noindex, nofollow">
-<meta name="theme-color" content="#04060d">
+<meta name="theme-color" content="#02040A">
 
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='24' fill='%2304060d'/%3E%3Ctext x='50' y='70' font-family='Arial' font-weight='700' font-size='58' fill='%23eaf1ff' text-anchor='middle'%3EB%3C/text%3E%3C/svg%3E">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='24' fill='%230071E3'/%3E%3Ctext x='50' y='68' font-family='Helvetica,Arial' font-weight='600' font-size='46' fill='%23FFFFFF' text-anchor='middle'%3EMJ%3C/text%3E%3C/svg%3E">
 <link rel="stylesheet" href="motion.css">
 </head>
 
@@ -21,8 +18,9 @@
 
   <div class="stage" id="stage" data-scene="boot">
 
-    <!-- Lueur de fond + poussière -->
-    <div class="halo"></div>
+    <!-- Lueur de fond, balayage, poussière -->
+    <div class="halo" aria-hidden="true"></div>
+    <div class="sweep" aria-hidden="true"></div>
     <div class="dust" id="dust" aria-hidden="true"></div>
 
     <div class="camera" id="camera">
@@ -241,10 +239,15 @@
       </div>
     </div>
 
-    <!-- ============ 11 · FIN ============ -->
+    <!-- Grain et vignette : au-dessus de tout, sous la signature -->
+    <div class="grain" aria-hidden="true"></div>
+    <div class="vignette" aria-hidden="true"></div>
+
+    <!-- ============ 11 · SIGNATURE ============ -->
     <div class="outro" id="outro">
-      <p class="logo"><span class="mark">B</span>Biancola Studio</p>
+      <p class="logo"><span class="mark">MJ</span>MJ Agency</p>
       <p class="claim">Du mail au planning, sans rien ressaisir.</p>
+      <p class="site">mjagency.eu</p>
     </div>
 
   </div>

@@ -19,12 +19,36 @@
 
   /* ---------------------------------------------------------
      Mise à l'échelle de la scène
+
+     La scène prend toute la fenêtre : on lui donne exactement la
+     proportion de l'écran, puis on l'agrandit. L'échelle est choisie
+     pour qu'il reste toujours au moins 1240 × 720 d'espace de dessin,
+     de sorte que rien ne sorte du cadre — le décor, lui, s'étale
+     jusqu'aux bords. Aucune bande noire, aucune déformation.
      --------------------------------------------------------- */
+  const DESIGN_W = 1240, DESIGN_H = 720;
+
   function fit() {
-    const k = Math.min(innerWidth / 1280, innerHeight / 720);
-    stage.style.transform = `translate(-50%,-50%) scale(${k})`;
+    const vw = innerWidth, vh = innerHeight;
+
+    /* Sur un téléphone tenu debout, la scène pivote d'un quart de tour :
+       une composition couchée sur un écran debout ne remplirait qu'un
+       bandeau au milieu. Tournée, elle prend tout l'écran. */
+    const turn = vh > vw * 1.15 && vw < 1200;
+    const fw = turn ? vh : vw;      /* la largeur utile, scène tournée */
+    const fh = turn ? vw : vh;
+
+    const k = Math.min(fw / DESIGN_W, fh / DESIGN_H);
+    const w = fw / k, h = fh / k;
+
+    stage.style.width      = w + 'px';
+    stage.style.height     = h + 'px';
+    stage.style.marginLeft = (-w / 2) + 'px';
+    stage.style.marginTop  = (-h / 2) + 'px';
+    stage.style.transform  = (turn ? 'rotate(90deg) ' : '') + `scale(${k})`;
   }
   addEventListener('resize', fit);
+  addEventListener('orientationchange', fit);
   fit();
 
   /* ---------------------------------------------------------
@@ -32,7 +56,7 @@
      --------------------------------------------------------- */
   (function dust() {
     const box = $('#dust');
-    const n = SOFT ? 0 : 46;
+    const n = SOFT ? 0 : 64;
     let html = '';
     for (let i = 0; i < n; i++) {
       const d = (6 + Math.random() * 10).toFixed(1);
@@ -102,28 +126,36 @@
     const a  = centre(src, dR, k);
     const b  = centre(fld, dR, k);
 
-    const chip = document.createElement('span');
-    chip.className = 'flychip';
-    chip.innerHTML = `<b>${LABELS[key]}</b>${VALUES[key]}`;
-    chip.style.left = a.x + 'px';
-    chip.style.top  = a.y + 'px';
-    chip.style.transform = 'translate(-50%,-50%)';
-    FLY.appendChild(chip);
+    const make = (cls) => {
+      const el = document.createElement('span');
+      el.className = cls;
+      el.innerHTML = `<b>${LABELS[key]}</b>${VALUES[key]}`;
+      el.style.left = a.x + 'px';
+      el.style.top  = a.y + 'px';
+      el.style.transform = 'translate(-50%,-50%)';
+      FLY.appendChild(el);
+      return el;
+    };
+
+    const trail = make('flychip flytrail');   /* la traîne, en retard et floutée */
+    const chip  = make('flychip');
 
     src.classList.add('spent');
 
     /* Une image pour que la position de départ soit prise en compte */
+    const land = `translate(-50%,-50%) translate(${(b.x - a.x).toFixed(1)}px,${(b.y - a.y).toFixed(1)}px)`;
     requestAnimationFrame(() => {
-      chip.style.transform =
-        `translate(-50%,-50%) translate(${(b.x - a.x).toFixed(1)}px,${(b.y - a.y).toFixed(1)}px)`;
+      chip.style.transform = land;
+      trail.style.transform = land;
     });
 
     setTimeout(() => {
       fld.classList.add('hit');
       on($('.v', fld));
       chip.style.opacity = '0';
-      setTimeout(() => chip.remove(), 320);
-      setTimeout(() => fld.classList.remove('hit'), 700);
+      trail.style.opacity = '0';
+      setTimeout(() => { chip.remove(); trail.remove(); }, 340);
+      setTimeout(() => fld.classList.remove('hit'), 720);
     }, 850);
   }
 

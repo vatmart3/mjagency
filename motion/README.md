@@ -1,11 +1,12 @@
-# « Du mail au planning » — motion design
+# MJ Agency — « Du mail au planning »
 
-Reproduction, en HTML/CSS/JS, de la séquence animée filmée sur la vidéo
-de référence : un mail de demande de devis qui se transforme en fiche
-client, devis, signature, planning et facturation, sans ressaisie.
+Séquence animée en HTML/CSS/JS : un mail de demande de devis qui devient
+fiche client, devis, signature, planning, automatisations et tableau de
+bord — sans une seule ressaisie.
 
-Ouvrir `motion/index.html`, ou `https://…/motion` une fois en ligne.
-`Espace` ou `Entrée` rejoue la séquence, comme le bouton en bas à droite.
+Ouvrir `motion/index.html`, ou `https://www.mjagency.eu/motion` une fois
+en ligne. `Espace` ou `Entrée` rejoue la séquence, comme le bouton en bas
+à droite.
 
 ## La séquence — 32 s
 
@@ -18,11 +19,31 @@ Ouvrir `motion/index.html`, ou `https://…/motion` une fois en ligne.
 | 7,6 | Les six données s'envolent et se posent dans les champs de la fiche |
 | 9,6 | « Créé automatiquement », étiquette prospect, journal horodaté |
 | 11,4 | Devis N° 2026-0142 : trois lignes, puis le total qui grimpe à 9 561,20 € |
-| 15,3 | Envoi. Le téléphone du client arrive, le devis est accepté |
-| 17,8 | Notification verte, passage au planning, la pose se pose au mardi 13 |
+| 15,3 | Envoi. Le devis s'efface à gauche, le téléphone du client entre |
+| 16,9 | Devis accepté, notification verte |
+| 18,6 | Planning de la semaine, la pose tombe au mardi 13 |
 | 20,7 | Les cinq automatisations s'enchaînent, reliées entre elles |
-| 23,8 | Tableau de bord : compteurs, dont « Ressaisies : 0 » |
-| 28,0 | Signature — « Du mail au planning, sans rien ressaisir. » |
+| 23,8 | Tableau de bord : 18 devis envoyés, 11 acceptés, 7 chantiers, 0 ressaisie |
+| 28,0 | Signature MJ Agency |
+
+## Plein écran, vraiment
+
+`motion.js` donne à la scène l'exacte proportion de la fenêtre, puis
+l'agrandit. L'échelle est choisie pour qu'il reste toujours au moins
+1 240 × 720 d'espace de dessin : le décor s'étale jusqu'aux bords, rien
+n'est rogné, aucune bande noire, aucune déformation.
+
+Sur un écran tenu debout — téléphone, tablette — la scène pivote d'un
+quart de tour : couchée sur un écran debout, elle ne remplirait qu'un
+bandeau au milieu. Le seuil tient en une ligne de `fit()`
+(`vh > vw * 1.15 && vw < 1200`) ; le mettre à `false` supprime la rotation.
+
+## Direction artistique
+
+La charte MJ Agency, en version nuit : `#0071E3` en accent, pile
+typographique système (SF Pro), unité de 8 px, coins arrondis, ombres
+douces. La profondeur vient de quatre couches — lueur bleue, balayage
+lent, poussière, grain — et d'une vignette discrète.
 
 ## Comment c'est fait
 
@@ -30,19 +51,14 @@ Trois fichiers, aucune dépendance ni étape de build.
 
 - `index.html` — le décor complet, tous plans confondus. Rien n'est créé
   en cours de route sauf les étiquettes volantes.
-- `motion.css` — la scène mesure 1280 × 720 ; tous les états sont des
-  classes (`.in`, `.show`, `.on`, `.gone`) et toutes les apparitions des
-  transitions. La caméra n'applique que des translations et une échelle
-  uniforme : c'est ce qui rend le calcul des vols exact.
+- `motion.css` — tous les états sont des classes (`.in`, `.show`, `.on`,
+  `.gone`), toutes les apparitions des transitions. La caméra n'applique
+  que des translations et une échelle uniforme : c'est cette contrainte
+  qui rend le calcul des vols exact.
 - `motion.js` — une partition : une liste `[seconde, action]` posée en
   `setTimeout` au lancement. `flyOne()` mesure la position de départ dans
   le mail et celle d'arrivée dans le champ, en coordonnées de scène, et
-  anime une étiquette de l'une à l'autre.
+  anime une étiquette — doublée d'une traîne floutée — de l'une à l'autre.
 
-La scène est mise à l'échelle par `transform: scale()` sur `#stage`, donc
-elle occupe toujours la fenêtre sans jamais se déformer. `prefers-reduced-
-motion` coupe la poussière et la respiration du fond, et accélère la
-séquence.
-
-La police est Poppins, chargée depuis Google Fonts ; sans elle, la pile
-système prend le relais sans casser la mise en page.
+`prefers-reduced-motion` coupe la poussière, le balayage, le grain et la
+respiration du fond, et accélère la séquence.
