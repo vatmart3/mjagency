@@ -16,6 +16,7 @@ motion/
   stage.css     décor commun   — scène, caméra, étiquettes volantes, « Rejouer »
   index.html    film 1         + mjagency.css · mjagency.js
   fidelite/     film 2         + fidelite.css · fidelite.js
+  outils/       exportation    — bruitage.py (le son) · rendu.js (la vidéo)
 ```
 
 Un film ne fournit que deux choses au moteur : une **partition**, liste de
@@ -157,32 +158,53 @@ premières images et retire ce qu'il ne peut pas tenir :
 `?eco` ou `?eco=2` dans l'adresse force le niveau, pour comparer sans
 attendre la mesure.
 
+## Le son
+
+Chaque film a son bruitage, synthétisé et calé à la seconde sur la même
+partition que l'image : `outils/bruitage.py`. Pas de banque de sons, pas
+de fichier extérieur — des clics, des souffles, des carillons et un lit
+très bas, construits à partir de bruit filtré et de sinusoïdes.
+
+La hiérarchie compte plus que les sons eux-mêmes. Mesurée sur le mixage
+final, fenêtre de 8 ms :
+
+| | niveau |
+|---|---|
+| le lit sonore | −22 dB |
+| un clic, une touche de pavé | −14 dB |
+| une donnée qui se pose, un carillon | −8 dB |
+| le choc de la signature | −5 dB |
+
+Soit dix-sept décibels entre le fond et le point culminant. Deux pièges
+rencontrés : un lit trop haut masque les clics — il a fallu le descendre
+de huit décibels ; et un souffle d'entrée doit **enfler** jusqu'à
+l'arrivée, alors qu'une enveloppe décroissante le fait mourir avant
+d'arriver, six décibels sous le lit, c'est-à-dire inaudible.
+
 ## Exporter le film en vidéo
 
-Le piège : l'enregistreur du navigateur ne capte que **25 images par
-seconde**. Une animation à 60 i/s captée ainsi, puis ré-encodée en 30,
-donne un fichier qui saccade — alors que la page, elle, est fluide.
+Le détail est dans `outils/README.md`. En résumé, trois pièges :
+l'enregistreur du navigateur ne capte que **25 images par seconde**, la
+fenêtre réelle ne fait pas la taille demandée (d'où une bande grise en
+bas de l'image), et l'enregistrement commence avant le film.
 
-La parade est dans le moteur : `?vitesse=0.25` joue le film au quart de
-sa vitesse, transitions CSS comprises (`playbackRate` sur toutes les
-animations, pas seulement l'horloge). On capte, puis on accélère au
-montage :
+La parade : jouer le film au quart de sa vitesse — transitions CSS
+comprises — imposer les dimensions, retenir le départ, puis accélérer au
+montage. Mesuré sur un passage en mouvement continu, images distinctes
+par seconde :
 
-```
-setpts=PTS/4, fps=60
-```
+| | film 1 | film 2 |
+|---|---|---|
+| captation directe, 25 i/s étirée à 30 | 20,4 | 20,4 |
+| ralenti ×4, rendu à 60 i/s | **47,2** | **41,6** |
 
-Chaque seconde de film est alors échantillonnée cent fois au lieu de
-vingt-cinq. Mesuré sur un passage en mouvement continu — le bouton qui
-s'enfonce, les points qui volent, le compteur qui monte :
+Ralentir davantage (×8) n'apporte rien : le plafond vient alors du rendu
+de la machine qui filme, plus de la méthode.
 
-| | images distinctes par seconde |
-|---|---|
-| captation directe, 25 i/s étirée à 30 | 20,4 |
-| ralenti ×4, rendu à 60 i/s | **39,6** |
-
-Ralentir davantage (×8) n'apporte rien : le plafond vient alors du
-rendu logiciel de la machine qui filme, plus de la méthode.
+La synchronisation se vérifie, elle ne se suppose pas : on cherche dans
+la vidéo l'instant d'un repère connu — le compteur de points qui se met
+à monter, les sous-totaux qui apparaissent — et on recoupe l'amorce
+jusqu'à tomber juste. Les deux films sont calés à une image près.
 
 Les règles qui en découlent, si la séquence doit évoluer :
 
