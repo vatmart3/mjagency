@@ -48,7 +48,6 @@ body{
   font-family: var(--font);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  text-rendering: optimizeLegibility;
 }
 
 .viewport{ position:fixed; inset:0; background:#02040A }
@@ -100,7 +99,7 @@ body{
 .camera{
   position:absolute; inset:0;
   transition: transform 1.7s var(--ease);
-  will-change: transform;
+  will-change: transform;   /* translations seules : jamais de redessin */
 }
 .deck{ position:absolute; inset:0 }
 
@@ -162,8 +161,8 @@ body{
 }
 .mail.in{ opacity:1; transform:none }
 .mail.open{ height:418px }
-.mail.away{ opacity:.26; transform: translateX(-560px) scale(.86) }
-.mail.gone{ opacity:0; transform: translateX(-700px) scale(.8) }
+.mail.away{ opacity:.20; transform: translateX(-336px) scale(.60) }
+.mail.gone{ opacity:0; transform: translateX(-336px) scale(.48) }
 
 .mail-top{ display:flex; align-items:center; gap:14px; margin-bottom:20px; position:relative }
 .mail-title{ font-size:19px; font-weight:600; letter-spacing:-.015em; white-space:nowrap }
@@ -280,9 +279,11 @@ body{
 }
 .app.in   { opacity:1; transform: translateX(58px) }
 .app.mid  { opacity:1; transform: none }
-/* Le devis s'efface vers la gauche pour laisser entrer le téléphone,
-   en gardant la colonne des montants dans le cadre. */
-.app.aside{ opacity:1; transform: translateX(-620px) }
+/* Le devis s'écarte pour laisser entrer le téléphone. Il recule et
+   rapetisse plutôt que de sortir par la gauche : aux proportions les
+   plus étroites, la scène ne fait que 1240 de large, et un simple
+   décalage tranchait la barre latérale en deux. */
+.app.aside{ opacity:1; transform: translateX(-182px) scale(.84) }
 .app.gone { opacity:0; transform: translateY(-46px) scale(.95) }
 
 .titlebar{
@@ -330,9 +331,11 @@ body{
   position:absolute; inset:0;
   padding:26px 30px;
   opacity:0; transform: translateY(20px); pointer-events:none;
-  transition: opacity .6s var(--ease), transform .65s var(--ease);
+  visibility:hidden;                       /* sorti du dessin, pas seulement transparent */
+  transition: opacity .6s var(--ease), transform .65s var(--ease),
+              visibility 0s linear .6s;
 }
-.view.on{ opacity:1; transform:none }
+.view.on{ opacity:1; transform:none; visibility:visible; transition-delay:0s,0s,0s }
 
 .v-title{ font-size:21px; font-weight:600; letter-spacing:-.025em }
 .v-sub{ font-size:13px; color:var(--dim); margin-top:3px }
@@ -506,6 +509,7 @@ body{
   background: rgba(18,32,58,.32);
   box-shadow: inset 0 0 0 1px rgba(150,190,255,.09);
   display:flex; align-items:flex-end; gap:12px;
+  contain: layout;   /* l'animation de hauteur ne sort pas d'ici */
 }
 .chart span{
   position:relative;
@@ -533,7 +537,7 @@ body{
   will-change: transform, opacity;
   transition: opacity .75s var(--ease), transform 1s var(--ease);
 }
-.phone.in  { opacity:1; transform: translateX(-372px) rotate(-2.5deg) }
+.phone.in  { opacity:1; transform: translateX(0) rotate(-2.5deg) }
 .phone.gone{ opacity:0; transform: translateX(420px) rotate(6deg) }
 .screen{
   position:relative; height:100%; border-radius:38px; overflow:hidden;
@@ -585,8 +589,8 @@ body{
    ========================================================= */
 .flow{
   position:absolute;
-  left:50%; top:50%; margin-left:-600px; margin-top:152px;
-  width:1200px;
+  left:50%; top:50%; margin-left:-580px; margin-top:152px;
+  width:1160px;
   display:grid; grid-template-columns: repeat(5,1fr); gap:24px;
   transition: opacity .6s var(--ease);
 }
@@ -656,10 +660,10 @@ body{
 .outro{
   position:absolute; inset:0; z-index:8;
   display:grid; place-content:center; justify-items:center; gap:22px;
-  opacity:0; pointer-events:none;
-  transition: opacity 1.1s var(--ease);
+  opacity:0; pointer-events:none; visibility:hidden;
+  transition: opacity 1.1s var(--ease), visibility 0s linear 1.1s;
 }
-.outro.on{ opacity:1 }
+.outro.on{ opacity:1; visibility:visible; transition-delay:0s,0s }
 .logo{
   display:flex; align-items:center; gap:22px;
   font-size:54px; font-weight:600; letter-spacing:-.04em;

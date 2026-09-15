@@ -58,7 +58,7 @@
      --------------------------------------------------------- */
   (function dust() {
     const box = $('#dust');
-    const n = SOFT ? 0 : 20;
+    const n = SOFT ? 0 : 14;
     let html = '';
     for (let i = 0; i < n; i++) {
       const d = (6 + Math.random() * 10).toFixed(1);
@@ -76,6 +76,9 @@
      --------------------------------------------------------- */
   const on   = (el, c = 'on')    => el && el.classList.add(c);
   const off  = (el, c = 'on')    => el && el.classList.remove(c);
+  /* La caméra ne translate jamais qu'en translation : changer son échelle
+     obligerait le navigateur à redessiner toute la scène pendant toute la
+     transition, alors qu'une translation déplace une texture déjà prête. */
   const cam  = (t)               => { camera.style.transform = t; };
 
   const nf = new Intl.NumberFormat('fr-FR', {
@@ -89,11 +92,15 @@
   /* Un compteur qui monte, en sortie douce */
   function countUp(el, to, dur, fmt) {
     const mine = gen, t0 = performance.now();
+    let vu = null;
     (function step(now) {
       if (mine !== gen) return;            /* une autre lecture a commencé */
       const p = Math.min(1, (now - t0) / dur);
       const e = 1 - Math.pow(1 - p, 3);
-      el.textContent = fmt(to * e);
+      const txt = fmt(to * e);
+      /* Sur un écran à 120 Hz, réécrire le texte à chaque image referait
+         la mise en page pour rien : on n'écrit qu'au changement. */
+      if (txt !== vu) { el.textContent = vu = txt; }
       if (p < 1) requestAnimationFrame(step);
     })(t0);
   }
@@ -200,12 +207,12 @@
   const score = [
 
     /* 1 — La boîte de réception */
-    [0.10, () => { cam('scale(1.05) translateY(6px)'); on(mail, 'in'); }],
+    [0.10, () => { cam('translateY(8px)'); on(mail, 'in'); }],
     ...rows.map((r, i) => [0.55 + i * 0.13, () => on(r, 'show')]),
 
     /* 2 — Le mail s'ouvre */
     [2.60, () => { on($('#mailList'), 'out'); on(mail, 'open'); on($('#mailOpen'), 'in');
-                   cam('scale(1.09) translateY(2px)'); }],
+                   cam('translateY(0px)'); }],
     ...lns.map((l, i) => [2.95 + i * 0.15, () => on(l, 'show')]),
 
     /* 3 — L'IA lit le mail */
@@ -214,7 +221,7 @@
 
     /* 4 — Les données s'envolent vers la fiche */
     [6.30, () => { on(mail, 'away'); on(app, 'in'); goto('clients');
-                   cam('scale(1) translate(0,0)'); }],
+                   cam('translate(0,0)'); }],
     ...ENTS.map((e, i) => [7.60 + i * 0.14, () => flyOne(e)]),
 
     /* 5 — La fiche client est créée */
@@ -225,7 +232,7 @@
 
     /* 6 — Le devis */
     [11.40, () => { goto('devis'); on(app, 'mid'); off(mail, 'away'); on(mail, 'gone');
-                    cam('scale(1.03) translateY(-4px)'); }],
+                    cam('translateY(-6px)'); }],
     ...lines.map((l, i) => [11.85 + i * 0.16, () => on(l, 'show')]),
     [12.65, () => on(sums[0], 'show')],
     [12.80, () => on(sums[1], 'show')],
@@ -236,20 +243,20 @@
     /* 7 — Envoi, puis acceptation sur le téléphone */
     [15.30, () => on(cta, 'tap')],
     [15.55, () => off(cta, 'tap')],
-    [15.60, () => { on(app, 'aside'); on(phone, 'in'); cam('scale(1) translateY(4px)'); }],
+    [15.60, () => { on(app, 'aside'); on(phone, 'in'); cam('translateY(4px)'); }],
     [16.90, () => on(accept, 'tap')],
     [17.15, () => { off(accept, 'tap'); on(accept, 'done'); }],
     [17.80, () => on(toast)],
 
     /* 8 — Le planning */
     [18.60, () => { goto('planning'); off(app, 'aside'); on(phone, 'gone');
-                    cam('scale(1) translate(0,-8px)'); }],
+                    cam('translate(0,-10px)'); }],
     [19.20, () => on($('#evPose'), 'show')],
     [19.60, () => on($('#evLivr'), 'show')],
     [20.20, () => off(toast)],
 
     /* 9 — Les automatisations */
-    [20.60, () => cam('scale(.98) translate(0,-26px)')],
+    [20.60, () => cam('translate(0,-30px)')],
     ...cards.flatMap((c, i) => [
       [20.75 + i * 0.34, () => on(c, 'show')],
       [21.05 + i * 0.34, () => on(c, 'link')]
@@ -257,7 +264,7 @@
 
     /* 10 — Le tableau de bord */
     [23.80, () => { cards.forEach(c => { off(c, 'show'); off(c, 'link'); });
-                    cam('scale(1) translate(0,0)'); }],
+                    cam('translate(0,0)'); }],
     [24.20, () => goto('dash')],
     ...stats.map((s, i) => [24.45 + i * 0.16, () => {
       on(s, 'show');
@@ -265,10 +272,10 @@
       countUp(v, +v.dataset.to, 900, x => String(Math.round(x)));
     }]),
     [25.40, () => on($('#chart'), 'grow')],
-    [26.20, () => cam('scale(1.04) translateY(-6px)')],
+    [26.20, () => cam('translateY(-8px)')],
 
     /* 11 — La signature */
-    [28.00, () => { on(app, 'gone'); on(mail, 'gone'); cam('scale(1.1)'); }],
+    [28.00, () => { on(app, 'gone'); on(mail, 'gone'); cam('translateY(0px)'); }],
     [28.80, () => on(outro)],
     [31.80, () => on(replay)]
   ];
@@ -336,7 +343,7 @@
     $$('.s-v').forEach(v => v.textContent = '0');
     $$('.nav').forEach(n => off(n));
     $$('.view').forEach(v => off(v));
-    cam('scale(1.06) translateY(12px)');
+    cam('translateY(16px)');
   }
 
   function play() {

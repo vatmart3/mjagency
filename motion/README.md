@@ -19,7 +19,7 @@ en ligne. `Espace` ou `Entrée` rejoue la séquence, comme le bouton en bas
 | 7,6 | Les six données s'envolent et se posent dans les champs de la fiche |
 | 9,6 | « Créé automatiquement », étiquette prospect, journal horodaté |
 | 11,4 | Devis N° 2026-0142 : trois lignes, puis le total qui grimpe à 9 561,20 € |
-| 15,3 | Envoi. Le devis s'efface à gauche, le téléphone du client entre |
+| 15,3 | Envoi. Le devis s'écarte et rapetisse, le téléphone du client entre |
 | 16,9 | Devis accepté, notification verte |
 | 18,6 | Planning de la semaine, la pose tombe au mardi 13 |
 | 20,7 | Les cinq automatisations s'enchaînent, reliées entre elles |
@@ -61,14 +61,55 @@ chaque panneau. Résultat mesuré en 1920 × 1080, rendu logiciel :
 | sans `backdrop-filter` ni grain animé | 21,6 |
 | décor plié dans le fond (état actuel) | **46,9** |
 
+Puis la caméra a cessé de changer d'échelle : un facteur d'échelle qui
+varie oblige à redessiner toute la scène pendant toute la transition,
+là où une translation déplace une texture déjà prête. Les plans
+inactifs passent en `visibility: hidden` plutôt que d'être seulement
+transparents, `optimizeLegibility` disparaît, et l'animation de hauteur
+du graphique est confinée par `contain: layout`.
+
+Ce qu'il reste à faire par image, mesuré au protocole DevTools :
+
+| | par image |
+|---|---|
+| script | 0,04 ms |
+| calcul des styles | 0,20 ms |
+| mise en page | 0,03 ms |
+| **total fil principal** | **0,27 ms** |
+
+Un écran à 120 Hz laisse 8,3 ms par image : il reste trente fois la
+marge nécessaire. Le reste du travail est de la composition, faite par
+la carte graphique. À noter : le navigateur ne peut pas dépasser le
+rafraîchissement de l'écran — 120 images par seconde supposent un écran
+à 120 Hz. Le but n'est donc pas d'« atteindre 120 », mais de tenir
+largement sous les 8,3 ms, ce qui est le cas.
+
 Les règles qui en découlent, si la séquence doit évoluer :
 
 - pas de `backdrop-filter` — les panneaux sont opaques à 90 %, ce qui
   donne le même rendu sur un fond en dégradé ;
 - pas de `filter: blur()` sur un élément qui se déplace ;
+- la caméra ne translate, jamais elle ne change d'échelle ;
 - un calque plein écran de plus se paie à chaque image : le mettre dans
   le fond de `.stage` s'il est fixe ;
-- `will-change: transform, opacity` sur ce qui bouge, et rien d'autre.
+- `will-change: transform, opacity` sur ce qui bouge, et rien d'autre ;
+- un élément invisible mais toujours dessiné se paie aussi :
+  `visibility: hidden`, pas seulement `opacity: 0`.
+
+## Rien ne doit être tranché par le bord
+
+Deux plans faisaient sortir du texte de l'écran : le mail qui recule et
+le devis qui s'écarte pour laisser entrer le téléphone. Les deux
+restent désormais entiers dans le cadre — le mail recule en
+rapetissant, le devis aussi.
+
+La règle : aux proportions les plus étroites, la scène ne fait que
+**1 240 de large**, soit 620 de part et d'autre du centre. Tout élément
+visible doit tenir dans cette demi-largeur, échelle de la caméra
+comprise. Un détecteur vérifie la séquence entière, à quatre
+proportions d'écran, et signale ce qui reste tranché plus d'une
+demi-seconde — le passage fugace d'un élément qui entre ou sort ne
+compte pas. Il ne signale plus rien.
 
 ## Comment c'est fait
 
