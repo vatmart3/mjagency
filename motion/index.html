@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+
+<title>Du mail au planning, sans rien ressaisir — motion design</title>
+<meta name="description" content="Démonstration animée : un mail de demande de devis devient fiche client, devis, signature, planning et facture, sans aucune ressaisie.">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#04060d">
+
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='24' fill='%2304060d'/%3E%3Ctext x='50' y='70' font-family='Arial' font-weight='700' font-size='58' fill='%23eaf1ff' text-anchor='middle'%3EB%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap">
+<link rel="stylesheet" href="motion.css">
+</head>
+
+<body>
+<div class="viewport">
+
+  <div class="stage" id="stage" data-scene="boot">
+
+    <!-- Lueur de fond + poussière -->
+    <div class="halo"></div>
+    <div class="dust" id="dust" aria-hidden="true"></div>
+
+    <div class="camera" id="camera">
+      <div class="deck" id="deck">
+
+        <!-- ============ 1-3 · LE MAIL ============ -->
+        <section class="mail" id="mail" aria-label="Boîte de réception">
+          <header class="mail-top">
+            <h2 class="mail-title">Boîte de réception</h2>
+            <span class="searchbar"></span>
+            <span class="count">4</span>
+            <span class="ai-badge" id="aiBadge"><i></i>IA · lecture du mail…</span>
+          </header>
+
+          <!-- Liste -->
+          <ul class="mail-list" id="mailList">
+            <li class="row on">
+              <span class="ava">ML</span>
+              <div class="rw">
+                <p class="rw-h"><b>Martin Leroy</b><em class="pill">Nouveau</em></p>
+                <p class="rw-s">Demande de devis — rénovation cuisine</p>
+                <p class="rw-p">Bonjour, nous souhaiterions un devis pour…</p>
+              </div>
+              <span class="rw-t">08:02</span>
+            </li>
+            <li class="row">
+              <span class="ava b2">BC</span>
+              <div class="rw">
+                <p class="rw-h"><b>Bois &amp; Co</b></p>
+                <p class="rw-s">Confirmation de livraison</p>
+                <p class="rw-p">Votre commande sera livrée jeudi matin.</p>
+              </div>
+              <span class="rw-t">Hier</span>
+            </li>
+            <li class="row">
+              <span class="ava b2">CP</span>
+              <div class="rw">
+                <p class="rw-h"><b>Comptabilité</b></p>
+                <p class="rw-s">Pièces justificatives de septembre</p>
+                <p class="rw-p">Pourriez-vous m'envoyer les factures ?</p>
+              </div>
+              <span class="rw-t">Hier</span>
+            </li>
+            <li class="row">
+              <span class="ava b2">EQ</span>
+              <div class="rw">
+                <p class="rw-h"><b>Équipe chantier</b></p>
+                <p class="rw-s">Planning de la semaine</p>
+                <p class="rw-p">Qui s'occupe du chantier de mardi ?</p>
+              </div>
+              <span class="rw-t">Ven.</span>
+            </li>
+          </ul>
+
+          <!-- Mail ouvert -->
+          <article class="mail-open" id="mailOpen">
+            <div class="mo-from">
+              <span class="ava">ML</span>
+              <div>
+                <p class="mo-name">Martin Leroy</p>
+                <p class="mo-meta">à moi · 08:02</p>
+              </div>
+            </div>
+            <h3 class="mo-subject">Demande de devis — rénovation cuisine</h3>
+            <div class="mo-body">
+              <p class="ln">Bonjour,</p>
+              <p class="ln">Nous souhaiterions un devis pour la <mark class="ent" data-ent="projet">rénovation de notre cuisine</mark> (environ <mark class="ent" data-ent="surface">12 m²</mark>), <mark class="ent" data-ent="pose">pose comprise</mark>.</p>
+              <p class="ln">Idéalement avant le <mark class="ent" data-ent="echeance">15 octobre</mark>.</p>
+              <p class="ln">Le chantier se situe à <mark class="ent" data-ent="lieu">Liège</mark>.</p>
+              <p class="ln">Merci d'avance,</p>
+              <p class="ln"><mark class="ent" data-ent="client">Martin Leroy</mark></p>
+            </div>
+          </article>
+        </section>
+
+        <!-- ============ 4-10 · L'OUTIL ============ -->
+        <section class="app" id="app" aria-label="Votre outil">
+          <header class="titlebar">
+            <span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
+            <span class="tb-name">Votre outil</span>
+          </header>
+
+          <div class="app-body">
+            <nav class="side" id="side">
+              <a class="nav" data-nav="dash"><i></i>Tableau de bord</a>
+              <a class="nav" data-nav="clients"><i></i>Clients</a>
+              <a class="nav" data-nav="devis"><i></i>Devis</a>
+              <a class="nav" data-nav="planning"><i></i>Planning</a>
+              <a class="nav" data-nav="factures"><i></i>Factures</a>
+              <a class="nav" data-nav="auto"><i></i>Automatisations</a>
+            </nav>
+
+            <div class="views">
+
+              <!-- 4-5 · Fiche client -->
+              <div class="view" data-view="clients">
+                <h3 class="v-title">Nouveau client</h3>
+                <span class="chip-auto" id="chipAuto"><i></i>Créé automatiquement</span>
+
+                <div class="who">
+                  <span class="ava xl">ML</span>
+                  <div>
+                    <p class="who-n">Martin Leroy</p>
+                    <p class="who-m">Particulier · Liège</p>
+                  </div>
+                </div>
+
+                <div class="grid2">
+                  <div class="field" data-field="client"><span class="k">Client</span><span class="v">Martin Leroy</span></div>
+                  <div class="field" data-field="projet"><span class="k">Projet</span><span class="v">Rénovation cuisine</span></div>
+                  <div class="field" data-field="surface"><span class="k">Surface</span><span class="v">12 m²</span></div>
+                  <div class="field" data-field="pose"><span class="k">Pose</span><span class="v">Incluse</span></div>
+                  <div class="field" data-field="echeance"><span class="k">Échéance</span><span class="v">15 octobre</span></div>
+                  <div class="field" data-field="lieu"><span class="k">Lieu</span><span class="v">Liège</span></div>
+                </div>
+
+                <span class="tag" id="tagProspect"><i></i>Nouveau prospect</span>
+                <ul class="log" id="log">
+                  <li><i></i>08:02 — Mail reçu de Martin Leroy</li>
+                  <li><i></i>08:02 — Fiche créée automatiquement</li>
+                </ul>
+              </div>
+
+              <!-- 6 · Devis -->
+              <div class="view" data-view="devis">
+                <h3 class="v-title">Devis N° 2026-0142</h3>
+                <p class="v-sub">Martin Leroy · Rénovation cuisine</p>
+
+                <div class="thead"><span>Description</span><span>Qté</span><span>Montant</span></div>
+                <div class="lines" id="lines">
+                  <div class="line"><span>Meubles &amp; plan de travail</span><span>12 m²</span><span>6 480,00 €</span></div>
+                  <div class="line"><span>Pose &amp; raccordements</span><span>1</span><span>2 150,00 €</span></div>
+                  <div class="line"><span>Évacuation &amp; déplacement</span><span>1</span><span>390,00 €</span></div>
+                </div>
+
+                <div class="sums" id="sums">
+                  <p><span>Sous-total</span><span>9 020,00 €</span></p>
+                  <p><span>TVA 6 %</span><span>541,20 €</span></p>
+                  <p class="tot"><span>Total</span><b id="total">0,00 €</b></p>
+                </div>
+
+                <button class="cta" id="cta" type="button">Envoyer le devis</button>
+              </div>
+
+              <!-- 8 · Planning -->
+              <div class="view" data-view="planning">
+                <h3 class="v-title">Planning · semaine du 12 octobre</h3>
+                <div class="week">
+                  <div class="day"><p class="d-h">Lun. 12</p>
+                    <span class="ev">Chantier en cours</span>
+                    <span class="ev blue late" id="evLivr">Livraison mobilier</span>
+                  </div>
+                  <div class="day"><p class="d-h">Mar. 13</p>
+                    <span class="ev blue big drop" id="evPose">Pose cuisine<br>M. Leroy</span>
+                  </div>
+                  <div class="day"><p class="d-h">Mer. 14</p>
+                    <span class="ev">Visite technique</span>
+                  </div>
+                  <div class="day"><p class="d-h">Jeu. 15</p>
+                    <span class="ev tall">Chantier en cours</span>
+                  </div>
+                  <div class="day"><p class="d-h">Ven. 16</p>
+                    <span class="ev push">Réunion équipe</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 10 · Tableau de bord -->
+              <div class="view" data-view="dash">
+                <div class="stats">
+                  <div class="stat"><p class="s-k">Devis envoyés</p><p class="s-v" data-to="18">0</p></div>
+                  <div class="stat"><p class="s-k">Devis acceptés</p><p class="s-v" data-to="11">0</p></div>
+                  <div class="stat"><p class="s-k">Chantiers planifiés</p><p class="s-v" data-to="7">0</p></div>
+                  <div class="stat ok"><p class="s-k">Ressaisies</p><p class="s-v" data-to="0">0</p><p class="s-n">tout est automatique</p></div>
+                </div>
+                <div class="chart" id="chart">
+                  <span style="--h:38%"></span><span style="--h:46%"></span><span style="--h:43%"></span>
+                  <span style="--h:57%"></span><span style="--h:55%"></span><span style="--h:66%"></span>
+                  <span style="--h:72%"></span><span style="--h:78%"></span><span style="--h:88%"></span>
+                  <span style="--h:100%"></span>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </section>
+
+        <!-- ============ 7 · LE TÉLÉPHONE ============ -->
+        <aside class="phone" id="phone" aria-label="Devis reçu par le client">
+          <div class="screen">
+            <span class="notch"></span>
+            <p class="st"><span>09:41</span><span class="st-r"></span></p>
+            <div class="ph-from"><span class="ph-ava"></span>Votre entreprise</div>
+            <h4 class="ph-h">Votre devis N° 2026-0142</h4>
+            <p class="ph-p">Bonjour Monsieur Leroy, voici votre devis pour la rénovation de votre cuisine.</p>
+            <div class="pdf"><span class="pdf-i"></span>Devis_2026-0142.pdf</div>
+            <p class="ph-t"><span>Total</span><b>9 561,20 €</b></p>
+            <button class="accept" id="accept" type="button"><span class="lbl-a">Accepter le devis</span><span class="lbl-b">Devis accepté</span></button>
+          </div>
+        </aside>
+
+        <!-- ============ 9 · LES AUTOMATISATIONS ============ -->
+        <div class="flow" id="flow" aria-label="Automatisations déclenchées">
+          <div class="fc"><span class="tick"></span><p class="fc-h">Projet créé</p><p class="fc-s">Rénovation cuisine</p></div>
+          <div class="fc"><span class="tick"></span><p class="fc-h">Pose planifiée</p><p class="fc-s">mar. 13 oct.</p></div>
+          <div class="fc"><span class="tick"></span><p class="fc-h">Commande envoyée</p><p class="fc-s">Bois &amp; Co</p></div>
+          <div class="fc"><span class="tick"></span><p class="fc-h">Facture d'acompte</p><p class="fc-s">30 % · envoyée</p></div>
+          <div class="fc"><span class="tick"></span><p class="fc-h">Relance programmée</p><p class="fc-s">J+7 si impayée</p></div>
+        </div>
+
+        <!-- Toast -->
+        <div class="toast" id="toast"><span class="tick"></span><div><p class="to-h">Devis accepté</p><p class="to-s">Martin Leroy · à l'instant</p></div></div>
+
+        <!-- Couche des étiquettes volantes -->
+        <div class="fly" id="fly" aria-hidden="true"></div>
+      </div>
+    </div>
+
+    <!-- ============ 11 · FIN ============ -->
+    <div class="outro" id="outro">
+      <p class="logo"><span class="mark">B</span>Biancola Studio</p>
+      <p class="claim">Du mail au planning, sans rien ressaisir.</p>
+    </div>
+
+  </div>
+
+  <button class="replay" id="replay" type="button">Rejouer</button>
+</div>
+
+<script src="motion.js"></script>
+</body>
+</html>
