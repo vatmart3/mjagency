@@ -165,21 +165,27 @@ partition que l'image : `outils/bruitage.py`. Pas de banque de sons, pas
 de fichier extérieur — des clics, des souffles, des carillons et un lit
 très bas, construits à partir de bruit filtré et de sinusoïdes.
 
-La hiérarchie compte plus que les sons eux-mêmes. Mesurée sur le mixage
-final, fenêtre de 8 ms :
+La hiérarchie compte plus que les sons eux-mêmes. Mesurée sur les
+mixages finaux, fenêtre de 8 ms :
 
-| | niveau |
-|---|---|
-| le lit sonore | −22 dB |
-| un clic, une touche de pavé | −14 dB |
-| une donnée qui se pose, un carillon | −8 dB |
-| le choc de la signature | −5 dB |
+| | film 1 | film 2 |
+|---|---|---|
+| le fond, entre deux gestes | −22 dB | *silence* |
+| un clic, une touche de pavé | −14 dB | −20 dB |
+| une donnée qui se pose, un carillon | −8 dB | −20 dB |
+| le choc de la signature | −5 dB | −17 dB |
+| sonie intégrée | −16,7 LUFS | −26,9 LUFS |
 
-Soit dix-sept décibels entre le fond et le point culminant. Deux pièges
-rencontrés : un lit trop haut masque les clics — il a fallu le descendre
-de huit décibels ; et un souffle d'entrée doit **enfler** jusqu'à
-l'arrivée, alors qu'une enveloppe décroissante le fait mourir avant
-d'arriver, six décibels sous le lit, c'est-à-dire inaudible.
+Les deux films ne sont pas au même niveau, et c'est voulu : le second
+n'a **pas de lit sonore** — le bourdon s'y entendait pour lui-même au
+lieu de porter les bruitages — et il est mixé moitié plus bas. Seuls les
+gestes sonnent, le reste est silencieux.
+
+Deux pièges rencontrés en chemin : un lit trop haut masque les clics —
+il a fallu le descendre de huit décibels sur le premier film ; et un
+souffle d'entrée doit **enfler** jusqu'à l'arrivée, alors qu'une
+enveloppe décroissante le fait mourir avant d'arriver, six décibels sous
+le lit, c'est-à-dire inaudible.
 
 ## Exporter le film en vidéo
 

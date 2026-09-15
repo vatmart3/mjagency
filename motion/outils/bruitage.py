@@ -265,8 +265,11 @@ def film1(p):
 
 
 def film2(p):
-    """« La carte de fidélité » — voir ../fidelite/fidelite.js"""
-    p.pose(0, nappe(32.5), .9)
+    """« La carte de fidélité » — voir ../fidelite/fidelite.js
+
+    Pas de lit sonore ici : sur ce film le bourdon s'entendait pour
+    lui-même au lieu de porter les bruitages. Seuls les gestes sonnent,
+    le reste est silencieux."""
 
     # 1 · la carte
     p.pose(0.10, souffle(.8, True, .9), .75)
