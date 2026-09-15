@@ -35,20 +35,13 @@ ffmpeg -ss <amorce> -i brut.mp4 -t <durée> -vf "fps=60" \
 Vérifier ensuite qu'un repère connu tombe à la bonne seconde : la
 synchronisation du son en dépend.
 
-## `bruitage.py` — le son
+## Le son
 
-```
-python3 outils/bruitage.py film1 son1.wav
-python3 outils/bruitage.py film2 son2.wav
-```
+Il n'y en a pas. Une bande a été synthétisée puis retirée : elle ne
+convenait pas, et je n'ai aucun moyen de juger un son à l'oreille — je
+ne peux qu'en mesurer les niveaux, ce qui évite qu'il écrête mais ne dit
+rien de sa qualité.
 
-Tout est synthétisé : pas de banque de sons, pas de fichier extérieur.
-Chaque son est posé à la seconde sur la même partition que le film.
-
-Masterisation en deux passes, avec de la marge — l'encodage AAC dépasse
-d'environ un décibel, et sans cette marge le son écrête :
-
-```
-ffmpeg -i son.wav -af "loudnorm=I=-16:TP=-2.5:LRA=9:measured_...,alimiter=limit=0.72" mix.wav
-ffmpeg -i film.mp4 -i mix.wav -map 0:v -map 1:a -c:v copy -c:a aac -b:a 192k -shortest final.mp4
-```
+Les repères sont dans le README principal, plan par plan et à la
+seconde : de quoi caler des sons existants sur l'image sans avoir à
+retrouver la partition.
