@@ -160,12 +160,41 @@ attendre la mesure.
 
 ## Le son
 
-Les films sont muets. Une bande synthétisée a été essayée puis retirée.
+Synthétisé, calé à la seconde sur la même partition que l'image :
+`outils/bruitage.py`. Pas de banque de sons, pas de fichier extérieur.
 
-Les tableaux de séquence ci-dessus donnent chaque repère à la seconde :
-c'est ce qu'il faut pour caler des sons sur l'image. Les temps sont ceux
-des partitions (`mjagency.js`, `fidelite/fidelite.js`), et les vidéos
-exportées sont calées sur eux à une image près.
+Deux règles, tirées d'une première version qui ne convenait pas :
+
+**Aucune hauteur musicale.** Pas de carillon, pas de mélodie de
+validation — ça sonnait synthétiseur bon marché. À la place, des objets
+frappés : un grain de bruit excite quatre résonances **inharmoniques**
+(rapports 1 · 1,41 · 2,13 · 2,91) qui s'éteignent en quelques dizaines
+de millisecondes. C'est ce qui fait entendre une matière plutôt qu'un
+bip. Un tap dure 18 ms, une touche 41, un toc 161.
+
+**Aucun sifflement.** Les mouvements de panneaux sifflaient : c'était du
+bruit large, ouvert jusqu'à 3,4 kHz. Ils durent désormais 100 ms et sont
+coupés par un passe-bas d'ordre 5 — un seul pôle ne coupe qu'à 6 dB par
+octave et laissait passer la moitié de l'énergie. Leur centre de gravité
+est à **127 Hz**, et sur l'ensemble d'un film il ne reste que **0,6 %**
+d'énergie au-dessus de 2,5 kHz.
+
+Hiérarchie, mesurée sur le mixage final, fenêtre de 8 ms :
+
+| | niveau |
+|---|---|
+| entre deux gestes | *silence* (−180 dB) |
+| un petit tap | −26 dB |
+| une touche, une donnée qui se pose | −20 dB |
+| un mouvement, un bouton | −18 dB |
+| ce qui est acquis | −16 dB |
+| le choc de la signature | −10 dB |
+
+Sonie intégrée : −26 LUFS, crête −5,5 dB. Les deux films sont au même
+niveau, et aucun n'a de lit sonore — le fond est vraiment silencieux.
+
+Synchronisation vérifiée sur le fichier final, en cherchant l'attaque de
+chaque son près de son repère : **3 millisecondes d'écart**.
 
 ## Exporter le film en vidéo
 

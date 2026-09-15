@@ -35,13 +35,28 @@ ffmpeg -ss <amorce> -i brut.mp4 -t <durée> -vf "fps=60" \
 Vérifier ensuite qu'un repère connu tombe à la bonne seconde : la
 synchronisation du son en dépend.
 
-## Le son
+## `bruitage.py` — le son
 
-Il n'y en a pas. Une bande a été synthétisée puis retirée : elle ne
-convenait pas, et je n'ai aucun moyen de juger un son à l'oreille — je
-ne peux qu'en mesurer les niveaux, ce qui évite qu'il écrête mais ne dit
-rien de sa qualité.
+```
+python3 outils/bruitage.py film1 son1.wav
+python3 outils/bruitage.py film2 son2.wav
+```
 
-Les repères sont dans le README principal, plan par plan et à la
-seconde : de quoi caler des sons existants sur l'image sans avoir à
-retrouver la partition.
+Tout est synthétisé, et posé à la seconde sur la même partition que le
+film. Les deux règles de la palette sont expliquées dans le README
+principal : **aucune hauteur musicale** (des objets frappés, pas des
+carillons) et **aucun sifflement** (des mouvements courts et sourds).
+
+Un seul chiffre par famille de sons suffit à les doser : le gain passé à
+`p.pose(...)`. Le niveau d'ensemble est le paramètre `niveau` de
+`rendre()` — c'est la crête visée.
+
+Mixage dans la vidéo :
+
+```
+ffmpeg -i film.mp4 -i son.wav -map 0:v -map 1:a \
+       -c:v copy -c:a aac -b:a 192k -shortest -movflags +faststart final.mp4
+```
+
+L'encodage AAC dépasse d'environ un décibel : garder de la marge sous
+0 dBFS, sinon le son écrête.
