@@ -1,14 +1,13 @@
 /* =========================================================
    MJ AGENCY — « Du mail au planning »
-   Scène plein écran, pilotée par motion.js.
+   L'habillage de ce film. La scène, la poussière, la caméra et les
+   étiquettes volantes sont dans stage.css ; la mécanique dans engine.js.
    Charte MJ Agency en version sombre : #0071E3 en accent,
    pile typographique système, unité de 8 px, coins arrondis.
    Aucune dépendance : tout est CSS et transformations.
    ========================================================= */
 
 :root{
-  color-scheme: dark;
-
   /* Palette — le bleu est celui de la charte, posé sur une nuit profonde */
   --blue:      #0071E3;
   --blue-dark: #0058B0;
@@ -26,43 +25,22 @@
   --stroke:    rgba(150,190,255,.16);
   --stroke-2:  rgba(150,190,255,.30);
 
-  --r:  22px;
-  --r2: 14px;
-  --r3: 10px;
-
   /* Typographie — la pile système de la charte, SF Pro en tête */
   --font: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text",
           "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 
-  /* Courbes — sortie exponentielle pour les entrées, ressort pour les éclats */
-  --ease:   cubic-bezier(.16,1,.30,1);
-  --spring: cubic-bezier(.34,1.34,.36,1);
+  /* L'étiquette qui vole, la poussière, le bouton : au bleu du film */
+  --chip:      linear-gradient(160deg, #2A93FF, #0058B0);
+  --chip-glow: rgba(0,113,227,.9);
+  --dust:      rgba(200,222,255,.85);
+  --dust-glow: rgba(140,190,255,.9);
+  --replay-ink:  #D6E7FF;
+  --replay-bg:   rgba(0,113,227,.18);
+  --replay-line: rgba(111,178,255,.4);
 }
 
-*{ margin:0; padding:0; box-sizing:border-box }
-
-html,body{ height:100%; overflow:hidden; background:#02040A }
-
-body{
-  color: var(--ink);
-  font-family: var(--font);
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-.viewport{ position:fixed; inset:0; background:#02040A }
-
-/* ---------- La scène ----------
-   Ses dimensions sont fixées par motion.js à l'exacte proportion
-   de la fenêtre, puis mises à l'échelle : la scène remplit toujours
-   l'écran, sans bande noire ni déformation. */
+/* ---------- Le fond de la scène ---------- */
 .stage{
-  position:absolute;
-  left:50%; top:50%;
-  width:1280px; height:720px;
-  margin:-360px 0 0 -640px;   /* recalculé par motion.js */
-  transform-origin:50% 50%;
-  overflow:hidden;
   /* Tout le décor tient dans le fond de la scène : grain, vignette,
      lueur bleue, nuit de base. Peint une fois, il ne coûte plus un
      passage plein écran par image — c'est ce qui faisait saccader
@@ -78,30 +56,6 @@ body{
   background-size: 180px 180px, 100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100%;
   background-repeat: repeat, no-repeat, no-repeat, no-repeat, no-repeat, no-repeat, no-repeat;
 }
-
-/* Poussière */
-.dust{ position:absolute; inset:0; pointer-events:none }
-.dust i{
-  position:absolute; width:2px; height:2px; border-radius:50%;
-  will-change: transform;
-  background: rgba(200,222,255,.85);
-  box-shadow: 0 0 7px rgba(140,190,255,.9);
-  animation: float linear infinite;
-}
-@keyframes float{
-  from{ transform: translateY(0); opacity:0 }
-  14%{ opacity:.95 } 86%{ opacity:.95 }
-  to  { transform: translateY(-190px); opacity:0 }
-}
-
-/* Caméra : translations et échelle uniforme seulement.
-   C'est cette contrainte qui rend le calcul des vols exact. */
-.camera{
-  position:absolute; inset:0;
-  transition: transform 1.7s var(--ease);
-  will-change: transform;   /* translations seules : jamais de redessin */
-}
-.deck{ position:absolute; inset:0 }
 
 /* =========================================================
    Briques communes
@@ -635,26 +589,6 @@ body{
 .to-s{ font-size:11px; color:var(--dim); margin-top:1px }
 
 /* =========================================================
-   Étiquettes volantes (mail ➜ fiche)
-   ========================================================= */
-.fly{ position:absolute; inset:0; pointer-events:none; z-index:6 }
-.flychip{
-  position:absolute; left:0; top:0;
-  display:inline-flex; align-items:center; gap:8px;
-  padding:6px 12px; border-radius:9px; white-space:nowrap;
-  font-size:13px; font-weight:600; color:#fff;
-  background: linear-gradient(160deg, #2A93FF, #0058B0);
-  box-shadow: 0 0 38px rgba(0,113,227,.9), inset 0 1px 0 rgba(255,255,255,.35);
-  transition: transform .85s var(--ease), opacity .3s linear;
-}
-.flychip b{ font-size:8.5px; letter-spacing:.14em; text-transform:uppercase; opacity:.7; font-weight:700 }
-/* La traîne : elle suit la même course, en retard et floutée */
-.flytrail{
-  opacity:.30; filter: blur(5px);
-  transition: transform .95s var(--ease), opacity .3s linear;
-}
-
-/* =========================================================
    11 · Signature MJ Agency
    ========================================================= */
 .outro{
@@ -690,21 +624,3 @@ body{
   transition: opacity .85s var(--ease) .6s, transform .85s var(--ease) .6s;
 }
 .outro.on .claim, .outro.on .site{ opacity:1; transform:none }
-
-/* Rejouer — il reste à l'endroit, même quand la scène est tournée */
-.replay{
-  position:fixed; right:22px; bottom:22px; z-index:20;
-  padding:10px 20px; border:0; border-radius:999px; cursor:pointer;
-  font-family:inherit; font-size:13px; font-weight:500; color:#D6E7FF;
-  background: rgba(0,113,227,.18);
-  box-shadow: inset 0 0 0 1px rgba(111,178,255,.4);
-  opacity:0; transform: translateY(10px); pointer-events:none;
-  transition: opacity .45s var(--ease), transform .45s var(--ease), background .3s;
-}
-.replay.on{ opacity:1; transform:none; pointer-events:auto }
-.replay:hover{ background: rgba(0,113,227,.32) }
-
-@media (prefers-reduced-motion: reduce){
-  .dust i{ animation:none }
-  .camera{ transition:none }
-}

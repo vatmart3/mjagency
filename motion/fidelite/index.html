@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+
+<title>La carte du boucher — Boucherie Vatuone | MJ Agency</title>
+<meta name="description" content="Démonstration animée : la carte de fidélité de la Boucherie Vatuone, du code scanné en caisse aux points crédités sur le téléphone du client.">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#0A0505">
+
+<link rel="icon" href="vatuone.png">
+<link rel="stylesheet" href="../stage.css">
+<link rel="stylesheet" href="fidelite.css">
+</head>
+
+<body>
+<div class="viewport">
+
+  <div class="stage" id="stage">
+
+    <div class="dust" id="dust" aria-hidden="true"></div>
+
+    <div class="camera" id="camera">
+      <div class="deck" id="deck">
+
+        <!-- ============ LE TÉLÉPHONE DU CLIENT ============ -->
+        <aside class="phone" id="phone" aria-label="La carte de Mehdi Nasri">
+          <div class="screen">
+            <span class="notch"></span>
+            <p class="st"><span>09:41</span><span class="st-r"></span></p>
+
+            <header class="ph-top">
+              <img class="mark" src="vatuone.png" alt="">
+              <span>Boucherie Vatuone</span>
+            </header>
+
+            <!-- La carte -->
+            <div class="carte" id="carte">
+              <img class="carte-bete" src="vatuone.png" alt="" aria-hidden="true">
+              <div class="carte-tete">
+                <p class="carte-nom">Boucherie<br>Vatuone</p>
+                <span class="rang">Ambassadeur</span>
+              </div>
+              <p class="carte-ville">Sète · Carte de fidélité</p>
+              <p class="pts"><b id="ptsCarte">1 529</b><span>points</span></p>
+              <p class="carte-client">Mehdi Nasri</p>
+              <p class="carte-num">n° 1011 · client depuis mars 2026</p>
+            </div>
+
+            <!-- Bandeau récompense (apparaît après l'achat) -->
+            <div class="reward" id="reward"><span class="etoile">★</span>
+              <p><b>5 récompenses disponibles.</b> À demander en caisse.</p>
+            </div>
+
+            <!-- Le code à scanner -->
+            <div class="qr" id="qr">
+              <svg viewBox="0 0 29 29" shape-rendering="crispEdges" aria-hidden="true" id="qrArt"></svg>
+              <p class="qr-t">Faites scanner ce code en caisse</p>
+              <p class="qr-s">ou donnez votre numéro : <b>1011</b></p>
+            </div>
+
+            <!-- La jauge et les récompenses -->
+            <div class="jauge" id="jauge">
+              <p class="jauge-t" id="jaugeT">Prochaine récompense à 800 points</p>
+              <span class="barre"><i id="barre"></i></span>
+            </div>
+            <ul class="recs" id="recs">
+              <li><span class="coche">✓</span><b>500 g de merguez maison offerts</b><em>Disponible</em></li>
+              <li><span class="coche">✓</span><b>10 € de remise sur votre achat</b><em>Disponible</em></li>
+              <li><span class="coche">✓</span><b>Un poulet fermier offert</b><em>Disponible</em></li>
+            </ul>
+          </div>
+        </aside>
+
+        <!-- ============ L'ESPACE BOUCHER ============ -->
+        <section class="app" id="app" aria-label="Espace boucher">
+          <header class="titlebar">
+            <img class="mark" src="vatuone.png" alt="">
+            <div class="tb-nom"><b>Boucherie Vatuone</b><span>Carte de fidélité</span></div>
+            <span class="tb-actions">Verrouiller &nbsp; Quitter</span>
+          </header>
+
+          <nav class="tabs" id="tabs">
+            <a class="tab" data-nav="dash">Tableau de bord</a>
+            <a class="tab" data-nav="caisse">Encaisser</a>
+            <a class="tab" data-nav="clients">Clients</a>
+            <a class="tab" data-nav="anniv">Anniversaires</a>
+            <a class="tab" data-nav="parrain">Parrainage</a>
+            <a class="tab" data-nav="reglages">Réglages</a>
+          </nav>
+
+          <div class="views">
+
+            <!-- Encaisser -->
+            <div class="view caisse" data-view="caisse">
+              <div class="col-g">
+                <div class="chercher" id="chercher">
+                  <span class="champ" id="champ">N° de carte, téléphone ou nom</span>
+                  <span class="btn-scan" id="btnScan">Scanner</span>
+                </div>
+
+                <div class="fiche" id="fiche">
+                  <span class="ava">MN</span>
+                  <div>
+                    <p class="fiche-n">Mehdi Nasri</p>
+                    <p class="fiche-m" id="ficheM">n° 1011 · 1 529 pts · 29 passages</p>
+                  </div>
+                  <span class="rang">Ambassadeur</span>
+                </div>
+
+                <div class="dispo" id="dispo">
+                  <span class="etoile">★</span>
+                  <p><b>Récompense disponible :</b> 30 € de remise + le colis du boucher</p>
+                  <span class="btn-ambre">Utiliser</span>
+                </div>
+
+                <p class="raison-t">Pourquoi est-il venu ? <em>(facultatif)</em></p>
+                <div class="raisons" id="raisons">
+                  <span data-r="habitue">Habitué</span>
+                  <span>A reçu le SMS</span>
+                  <span>Nouveau client</span>
+                  <span>Bouche à oreille</span>
+                  <span>Passait devant</span>
+                  <span>Pour une récompense</span>
+                </div>
+
+                <button class="valider" id="valider" type="button">Encaisser <b id="valMontant">42,50 €</b></button>
+              </div>
+
+              <div class="col-d">
+                <div class="montant" id="montant">
+                  <p class="m-val" id="mVal">0,00 €</p>
+                  <p class="m-pts" id="mPts">1 point par euro</p>
+                </div>
+
+                <div class="pave" id="pave">
+                  <span>1</span><span>2</span><span>3</span>
+                  <span>4</span><span>5</span><span>6</span>
+                  <span>7</span><span>8</span><span>9</span>
+                  <span class="gris">C</span><span>0</span><span class="gris">⌫</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Anniversaires -->
+            <div class="view" data-view="anniv">
+              <h3 class="v-titre">Anniversaires · octobre</h3>
+              <p class="v-sous">50 points offerts, une fois par an et par client.</p>
+              <ul class="annivs" id="annivs">
+                <li><span class="ava a1">TA</span>
+                  <div><p class="an-n">Thérèse Aubry</p><p class="an-m">12 octobre · n° 1004 · 295 pts</p></div>
+                  <span class="jour">aujourd'hui</span>
+                  <span class="btn-ambre offrir">Offrir 50 points</span></li>
+                <li><span class="ava a2">JC</span>
+                  <div><p class="an-n">Julie Caron</p><p class="an-m">18 octobre · n° 1016 · 1 380 pts</p></div>
+                  <span class="btn-ambre offrir">Offrir 50 points</span></li>
+                <li><span class="ava a3">LB</span>
+                  <div><p class="an-n">Lucas Berthier</p><p class="an-m">27 octobre · n° 1013 · 911 pts</p></div>
+                  <span class="btn-ambre offrir">Offrir 50 points</span></li>
+              </ul>
+            </div>
+
+            <!-- Tableau de bord -->
+            <div class="view" data-view="dash">
+              <div class="tuiles">
+                <div class="tuile"><p class="t-k">Clients</p><p class="t-v" data-to="16">0</p></div>
+                <div class="tuile"><p class="t-k">Passages</p><p class="t-v" data-to="293">0</p></div>
+                <div class="tuile"><p class="t-k">Encaissé</p><p class="t-v" data-to="15723" data-euro="1">0</p></div>
+                <div class="tuile"><p class="t-k">Panier moyen</p><p class="t-v" data-to="53.66" data-cent="1">0</p></div>
+              </div>
+
+              <div class="pourquoi">
+                <p class="pq-t">Pourquoi ils viennent <em>· sur 3 mois</em></p>
+                <ul class="pq" id="pq">
+                  <li style="--p:100%"><span>Habitué</span><i></i><b>118</b></li>
+                  <li style="--p:62%"><span>A reçu le SMS</span><i></i><b>73</b></li>
+                  <li style="--p:38%"><span>Bouche à oreille</span><i></i><b>45</b></li>
+                  <li style="--p:26%"><span>Pour une récompense</span><i></i><b>31</b></li>
+                  <li style="--p:18%"><span>Passait devant</span><i></i><b>21</b></li>
+                </ul>
+              </div>
+
+              <div class="meilleurs" id="meilleurs">
+                <p class="pq-t">Meilleurs clients <em>· points cumulés</em></p>
+                <ul class="best">
+                  <li><span class="ava a4">AD</span><b>Antoine Duclos</b><em>2 153 pts · 2 136 €</em></li>
+                  <li><span class="ava a5">ML</span><b>Marie Lefevre</b><em>1 849 pts · 1 778 €</em></li>
+                  <li><span class="ava a6">FD</span><b>Fatou Diallo</b><em>1 799 pts · 1 756 €</em></li>
+                  <li class="lui"><span class="ava">MN</span><b>Mehdi Nasri</b><em>1 672 pts · 1 629 €</em></li>
+                </ul>
+              </div>
+            </div>
+
+          </div>
+        </section>
+
+        <!-- Notification -->
+        <div class="toast" id="toast">
+          <span class="tick"></span>
+          <div><p class="to-h">Achat encaissé</p><p class="to-s">Mehdi Nasri · +43 points</p></div>
+        </div>
+
+        <!-- Couche des étiquettes volantes -->
+        <div class="fly" id="fly" aria-hidden="true"></div>
+      </div>
+    </div>
+
+    <!-- ============ SIGNATURE ============ -->
+    <div class="outro" id="outro">
+      <p class="o-projet"><img src="vatuone.png" alt="">La carte du boucher</p>
+      <p class="claim">Chaque euro rapporte un point. Le reste se fait tout seul.</p>
+      <p class="logo"><span class="mark-mj">MJ</span>MJ Agency</p>
+    </div>
+
+  </div>
+
+  <button class="replay" id="replay" type="button">Rejouer</button>
+</div>
+
+<script src="../engine.js"></script>
+<script src="fidelite.js"></script>
+</body>
+</html>

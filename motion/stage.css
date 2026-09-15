@@ -1,0 +1,106 @@
+/* =========================================================
+   MJ AGENCY — décor commun aux séquences animées
+   Ce qui ne dépend d'aucun film : la scène plein écran, la
+   poussière, la caméra, les étiquettes volantes, le bouton
+   « Rejouer ». Chaque film pose sa palette et son fond.
+   ========================================================= */
+
+:root{
+  color-scheme: dark;
+
+  /* Courbes — sortie exponentielle pour les entrées, ressort pour les éclats */
+  --ease:   cubic-bezier(.16,1,.30,1);
+  --spring: cubic-bezier(.34,1.34,.36,1);
+
+  /* Chaque film redéfinit ces deux-là */
+  --chip:      #0071E3;
+  --chip-glow: rgba(0,113,227,.9);
+
+  --r:  22px;
+  --r2: 14px;
+  --r3: 10px;
+}
+
+*{ margin:0; padding:0; box-sizing:border-box }
+
+html,body{ height:100%; overflow:hidden; background:#02040A }
+
+body{
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.viewport{ position:fixed; inset:0; background:#02040A }
+
+/* ---------- La scène ----------
+   Ses dimensions sont fixées par engine.js à l'exacte proportion
+   de la fenêtre, puis mises à l'échelle : la scène remplit toujours
+   l'écran, sans bande noire ni déformation. Le fond est au film. */
+.stage{
+  position:absolute;
+  left:50%; top:50%;
+  width:1280px; height:720px;
+  margin:-360px 0 0 -640px;   /* recalculé par engine.js */
+  transform-origin:50% 50%;
+  overflow:hidden;
+}
+
+/* Poussière */
+.dust{ position:absolute; inset:0; pointer-events:none }
+.dust i{
+  position:absolute; width:2px; height:2px; border-radius:50%;
+  background: var(--dust, rgba(200,222,255,.85));
+  box-shadow: 0 0 7px var(--dust-glow, rgba(140,190,255,.9));
+  will-change: transform;
+  animation: float linear infinite;
+}
+@keyframes float{
+  from{ transform: translateY(0); opacity:0 }
+  14%{ opacity:.95 } 86%{ opacity:.95 }
+  to  { transform: translateY(-190px); opacity:0 }
+}
+
+/* Caméra : translations seules, jamais de changement d'échelle */
+.camera{
+  position:absolute; inset:0;
+  transition: transform 1.7s var(--ease);
+  will-change: transform;
+}
+.deck{ position:absolute; inset:0 }
+
+/* ---------- Étiquettes volantes ---------- */
+.fly{ position:absolute; inset:0; pointer-events:none; z-index:6 }
+.flychip{
+  position:absolute; left:0; top:0;
+  display:inline-flex; align-items:center; gap:8px;
+  padding:6px 12px; border-radius:9px; white-space:nowrap;
+  font-family:inherit; font-size:13px; font-weight:600; color:#fff;
+  background: var(--chip);
+  box-shadow: 0 0 38px var(--chip-glow), inset 0 1px 0 rgba(255,255,255,.35);
+  transition: transform .85s var(--ease), opacity .3s linear;
+}
+.flychip b{ font-size:8.5px; letter-spacing:.14em; text-transform:uppercase; opacity:.7; font-weight:700 }
+/* La traîne : elle suit la même course, en retard et floutée */
+.flytrail{
+  opacity:.30; filter: blur(5px);
+  transition: transform .95s var(--ease), opacity .3s linear;
+}
+
+/* ---------- Rejouer ---------- */
+.replay{
+  position:fixed; right:22px; bottom:22px; z-index:20;
+  padding:10px 20px; border:0; border-radius:999px; cursor:pointer;
+  font-family:inherit; font-size:13px; font-weight:500;
+  color: var(--replay-ink, #D6E7FF);
+  background: var(--replay-bg, rgba(0,113,227,.18));
+  box-shadow: inset 0 0 0 1px var(--replay-line, rgba(111,178,255,.4));
+  opacity:0; transform: translateY(10px); pointer-events:none;
+  transition: opacity .45s var(--ease), transform .45s var(--ease), background .3s;
+}
+.replay.on{ opacity:1; transform:none; pointer-events:auto }
+.replay:hover{ filter: brightness(1.5) }
+
+@media (prefers-reduced-motion: reduce){
+  .dust i{ animation:none }
+  .camera{ transition:none }
+}
