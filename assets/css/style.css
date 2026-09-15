@@ -247,23 +247,11 @@ a.work-item:hover .work-item__title{color:var(--blue)}
 
 /* Carte pleine largeur : le 16/10 deviendrait un mur, on aplatit le visuel */
 .card--large .thumb{aspect-ratio:24/9}
-/* Le cadran du four du site, cité tel quel : arc complet, jamais rogné */
-.thumb__viz{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:min(30%,380px);height:auto}
-@media (max-width:860px){
-  .card--large .thumb{aspect-ratio:16/10}
-  .thumb__viz{width:min(48%,260px)}   /* le cadran doit rester lisible sur un téléphone */
-}
+@media (max-width:860px){ .card--large .thumb{aspect-ratio:16/10} }
 
 /* Visuels : dégradés doux, jamais saturés */
 .ph{background-size:cover;background-position:center}
-.ph-1{background:linear-gradient(160deg,#EDF1F7 0%,#DCE3EC 55%,#C9D3E0 100%)}
-.ph-2{background:linear-gradient(160deg,#F5F5F7 0%,#E6E6E9 55%,#D3D3D8 100%)}
-.ph-3{background:linear-gradient(160deg,#EDF4F3 0%,#DBE8E6 55%,#C7DAD7 100%)}
-.ph-4{background:linear-gradient(160deg,#F7F2ED 0%,#ECE1D6 55%,#DDCDBC 100%)}
 .ph-5{background:linear-gradient(160deg,#F1EEF7 0%,#E1DCEC 55%,#CFC8E0 100%)}
-.ph-6{background:linear-gradient(160deg,#EDF3F7 0%,#DAE5EC 55%,#C6D6E0 100%)}
-/* Au Bon Pain : violet et rose, comme le site */
-.ph-pain{background:linear-gradient(150deg,#5E36AE 0%,#4A2A8C 55%,#F2559B 100%)}
 .ph-fidelite{background:linear-gradient(160deg,#2A1416 0%,#190D0F 56%,#28151A 100%)}
 
 /* ---------- Carte de fidélité ----------
