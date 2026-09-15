@@ -100,6 +100,23 @@ body{
 .replay.on{ opacity:1; transform:none; pointer-events:auto }
 .replay:hover{ filter: brightness(1.5) }
 
+/* =========================================================
+   Allègement automatique
+
+   engine.js pose ces classes sur <html> quand la machine ne
+   tient pas la cadence. Chaque palier retire ce qui coûte le
+   plus cher pour ce qu'il apporte le moins.
+   ========================================================= */
+
+/* Palier 1 — la poussière et les traînées : autant de calques
+   composés à chaque image pour un détail qu'on ne regarde pas. */
+.eco .dust    { display:none }
+.eco .flytrail{ display:none }
+
+/* Palier 2 — la caméra enveloppe toute la scène : la déplacer
+   recompose un calque plein écran. On la fige. */
+.eco-2 .camera{ transform:none !important; transition:none }
+
 @media (prefers-reduced-motion: reduce){
   .dust i{ animation:none }
   .camera{ transition:none }

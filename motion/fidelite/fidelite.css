@@ -1,22 +1,22 @@
 /* =========================================================
-   « La carte du boucher » — habillage de ce film.
+   « La carte de fidélité » — habillage de ce film.
    Mise en scène nocturne comme le premier film ; l'interface,
-   elle, est montrée telle qu'elle est : claire, rouge et ambre,
-   aux valeurs exactes de la Boucherie Vatuone.
+   elle, reste claire, avec l'or pour accent — les points et les
+   récompenses s'y lisent d'eux-mêmes, et rien n'évoque une
+   enseigne en particulier.
    La scène, la poussière, la caméra et les étiquettes volantes
    sont dans ../stage.css ; la mécanique dans ../engine.js.
    ========================================================= */
 
 :root{
-  /* Palette de la boutique */
-  --rouge:      #BE2B2B;
-  --rouge-fill: #D33636;
-  --carte-haut: #E24444;
-  --carte-bas:  #BF2A2A;
-  --ambre:      #8E6210;
-  --ambre-fill: #E5A231;
-  --ambre-soft: #FCF3E4;
-  --good:       #1C7248;
+  /* Palette — l'or pour les points, le vert pour ce qui est acquis */
+  --or:       #8A6414;
+  --or-fill:  #C9922E;
+  --or-clair: #E5A231;
+  --or-doux:  #FBF3E3;
+  --carte-haut: #33281C;
+  --carte-bas:  #14100A;
+  --good:     #1C7248;
 
   --ink:    #151517;
   --ink-2:  #404046;
@@ -27,19 +27,18 @@
   --sur-2:  #FAFAFA;
   --sur-3:  #F0F0F1;
 
-  /* Une seule famille, large et ouverte : la plupart des clients de la
-     boutique ont passé soixante-dix ans. La pile système suffit. */
+  /* Une seule famille, large et ouverte. La pile système suffit. */
   --font: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text",
           "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 
   /* Ce que stage.css attend de chaque film */
-  --chip:        linear-gradient(160deg, #E24444, #B02525);
-  --chip-glow:   rgba(211,54,54,.85);
-  --dust:        rgba(255,214,206,.85);
-  --dust-glow:   rgba(226,120,100,.9);
-  --replay-ink:  #FFD9D2;
-  --replay-bg:   rgba(211,54,54,.20);
-  --replay-line: rgba(226,120,100,.45);
+  --chip:        linear-gradient(160deg, #D9A23C, #9E6F18);
+  --chip-glow:   rgba(201,146,46,.85);
+  --dust:        rgba(255,236,200,.85);
+  --dust-glow:   rgba(226,178,90,.9);
+  --replay-ink:  #FFE9C4;
+  --replay-bg:   rgba(201,146,46,.20);
+  --replay-line: rgba(226,178,90,.45);
 }
 
 body{ color: var(--ink); font-family: var(--font) }
@@ -51,11 +50,11 @@ body{ color: var(--ink); font-family: var(--font) }
   background-image:
     url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/></filter><rect width='180' height='180' filter='url(%23n)' opacity='.055'/></svg>"),
     radial-gradient(125% 105% at 50% 50%, transparent 40%, rgba(0,0,0,.55) 100%),
-    radial-gradient(20% 22% at 50% 52%, rgba(255,190,170,.16), transparent 72%),
-    radial-gradient(46% 48% at 50% 52%, rgba(200,52,45,.42), transparent 70%),
-    radial-gradient(34% 34% at 12% 84%, rgba(150,30,30,.30), transparent 72%),
-    radial-gradient(36% 36% at 90% 20%, rgba(220,120,40,.20), transparent 74%),
-    radial-gradient(62% 66% at 50% 52%, #2A1210 0%, #150A0A 56%, #0A0505 100%);
+    radial-gradient(20% 22% at 50% 52%, rgba(255,226,180,.16), transparent 72%),
+    radial-gradient(46% 48% at 50% 52%, rgba(186,132,38,.40), transparent 70%),
+    radial-gradient(34% 34% at 12% 84%, rgba(130,84,20,.30), transparent 72%),
+    radial-gradient(36% 36% at 90% 20%, rgba(200,140,50,.20), transparent 74%),
+    radial-gradient(62% 66% at 50% 52%, #241C11 0%, #120E08 56%, #070503 100%);
   background-size: 180px 180px, 100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100%;
   background-repeat: repeat, no-repeat, no-repeat, no-repeat, no-repeat, no-repeat, no-repeat;
 }
@@ -63,24 +62,28 @@ body{ color: var(--ink); font-family: var(--font) }
 /* =========================================================
    Briques communes
    ========================================================= */
-.mark{ width:30px; height:30px; object-fit:contain; flex:none }
+.mark{
+  width:30px; height:30px; border-radius:9px; flex:none;
+  display:grid; place-items:center; font-size:15px;
+  color:#150F06; background: linear-gradient(160deg,#E0AE45,#B07F1C);
+}
 
 .ava{
   width:38px; height:38px; border-radius:50%; flex:none;
   display:grid; place-items:center;
   font-size:11px; font-weight:700; letter-spacing:.03em; color:#fff;
-  background: var(--rouge-fill);
+  background: var(--or-fill);
 }
-.ava.a1{ background:#8E6210 } .ava.a2{ background:#1C7248 } .ava.a3{ background:#4A4A55 }
-.ava.a4{ background:#6B3FA0 } .ava.a5{ background:#1C5E72 } .ava.a6{ background:#8E4210 }
+.ava.a1{ background:#8A6414 } .ava.a2{ background:#1C7248 } .ava.a3{ background:#4A4A55 }
+.ava.a4{ background:#6B3FA0 } .ava.a5{ background:#1C5E72 } .ava.a6{ background:#8A4A14 }
 
 .rang{
   font-size:10px; font-weight:700; letter-spacing:.05em; text-transform:uppercase;
   padding:4px 11px; border-radius:999px; white-space:nowrap;
-  color: var(--ambre); background: var(--ambre-soft);
+  color: var(--or); background: var(--or-doux);
 }
 
-.etoile{ color: var(--ambre-fill); font-size:15px; flex:none }
+.etoile{ color: var(--or-clair); font-size:15px; flex:none }
 
 .tick{
   display:block; width:22px; height:22px; border-radius:50%; flex:none; position:relative;
@@ -99,7 +102,7 @@ body{ color: var(--ink); font-family: var(--font) }
 }
 .btn-ambre{
   padding:8px 15px; border-radius:10px; white-space:nowrap;
-  font-size:12px; font-weight:700; color:#231705; background: var(--ambre-fill);
+  font-size:12px; font-weight:700; color:#231705; background: var(--or-clair);
 }
 
 /* =========================================================
@@ -113,7 +116,7 @@ body{ color: var(--ink); font-family: var(--font) }
   background: linear-gradient(150deg,#E9EFF8 0%,#AFC0D6 42%,#7E90AB 68%,#D3DEEC 100%);
   box-shadow:
     0 44px 90px rgba(0,0,0,.72),
-    0 0 80px rgba(211,54,54,.34),
+    0 0 80px rgba(201,146,46,.34),
     inset 0 1px 1px rgba(255,255,255,.7);
   opacity:0; transform: translateY(40px) scale(.96);
   will-change: transform, opacity;
@@ -143,17 +146,18 @@ body{ color: var(--ink); font-family: var(--font) }
   position:relative; overflow:hidden;
   border-radius:16px; padding:14px 15px 13px;
   background: linear-gradient(160deg, var(--carte-haut), var(--carte-bas));
-  box-shadow: 0 10px 26px -10px rgba(190,43,43,.7);
-  color:#fff;
+  box-shadow: 0 10px 26px -10px rgba(0,0,0,.7), inset 0 0 0 1px rgba(224,174,69,.34);
+  color:#F6E3B8;
 }
-.carte-bete{
-  position:absolute; right:-14px; top:6px; width:104px; opacity:.17;
-  filter: brightness(0) invert(1);
+.carte .pts b, .carte-client{ color:#FFF6E2 }
+.carte-sceau{
+  position:absolute; right:-10px; top:-6px;
+  font-size:118px; line-height:1; opacity:.10; color:#F6E3B8;
   pointer-events:none;
 }
 .carte-tete{ display:flex; align-items:flex-start; justify-content:space-between; gap:10px }
 .carte-nom{ font-size:13px; font-weight:800; line-height:1.15; letter-spacing:.02em; text-transform:uppercase }
-.carte .rang{ background: rgba(255,255,255,.22); color:#fff; font-size:8.5px; padding:3px 8px }
+.carte .rang{ background: rgba(224,174,69,.20); color:#EFCB86; font-size:8.5px; padding:3px 8px }
 .carte-ville{ font-size:9px; font-weight:600; letter-spacing:.08em; text-transform:uppercase; opacity:.8; margin-top:3px }
 .pts{ display:flex; align-items:baseline; gap:6px; margin:10px 0 8px }
 .pts b{ font-size:38px; font-weight:800; letter-spacing:-.04em; font-variant-numeric: tabular-nums }
@@ -163,21 +167,21 @@ body{ color: var(--ink); font-family: var(--font) }
 /* L'éclat quand les points tombent */
 .carte.credit{ animation: credit .9s var(--ease) }
 @keyframes credit{
-  35%{ box-shadow: 0 10px 26px -10px rgba(190,43,43,.7), 0 0 0 4px rgba(229,162,49,.55), 0 0 60px rgba(229,162,49,.7) }
+  35%{ box-shadow: 0 10px 26px -10px rgba(138,100,20,.7), 0 0 0 4px rgba(229,162,49,.55), 0 0 60px rgba(229,162,49,.7) }
 }
 
 /* --- Bandeau récompense --- */
 .reward{
   display:flex; align-items:center; gap:9px;
   margin-top:9px; padding:9px 11px; border-radius:12px;
-  background: var(--ambre-soft); color: var(--ambre);
+  background: var(--or-doux); color: var(--or);
   font-size:10.5px; line-height:1.35;
   opacity:0; transform: translateY(8px); height:0; margin-top:0; padding-top:0; padding-bottom:0; overflow:hidden;
   transition: opacity .5s var(--ease), transform .55s var(--spring),
               height .5s var(--ease), margin .5s var(--ease), padding .5s var(--ease);
 }
 .reward.on{ opacity:1; transform:none; height:38px; margin-top:9px; padding-top:9px; padding-bottom:9px }
-.reward b{ color: var(--ambre) }
+.reward b{ color: var(--or) }
 
 /* --- Le code ---
    Une fois scanné il se replie : sans cela, les récompenses qui
@@ -221,15 +225,15 @@ body{ color: var(--ink); font-family: var(--font) }
 }
 .recs li.show{ opacity:1; transform:none }
 .recs b{ font-weight:700; line-height:1.3 }
-.recs em{ grid-column:2; font-style:normal; font-size:9.5px; font-weight:700; color: var(--ambre) }
+.recs em{ grid-column:2; font-style:normal; font-size:9.5px; font-weight:700; color: var(--or) }
 .coche{
   grid-row:1 / span 2; width:22px; height:22px; border-radius:50%;
   display:grid; place-items:center; font-size:11px; font-weight:800;
-  color:#231705; background: var(--ambre-fill);
+  color:#231705; background: var(--or-clair);
 }
 
 /* =========================================================
-   L'espace boucher
+   L'espace commerçant
    ========================================================= */
 .app{
   position:absolute;
@@ -240,7 +244,7 @@ body{ color: var(--ink); font-family: var(--font) }
   background: var(--sur-3);
   box-shadow:
     0 48px 100px rgba(0,0,0,.72),
-    0 0 100px rgba(211,54,54,.34),
+    0 0 100px rgba(201,146,46,.34),
     inset 0 0 0 1px rgba(255,255,255,.5);
   opacity:0; transform: translateX(560px) scale(.94);
   will-change: transform, opacity;
@@ -299,15 +303,15 @@ body{ color: var(--ink); font-family: var(--font) }
   font-size:12.5px; color:#9A9AA2;
   transition: box-shadow .4s var(--ease), border-color .4s;
 }
-.champ.hot{ border-color: var(--rouge-fill); box-shadow: 0 0 0 3px rgba(211,54,54,.16) }
+.champ.hot{ border-color: var(--or-fill); box-shadow: 0 0 0 3px rgba(201,146,46,.16) }
 .btn-scan{
   padding:10px 16px; border-radius:11px; white-space:nowrap;
   border:1px solid var(--hair-2); background: var(--sur-1);
   font-size:12.5px; font-weight:600;
   transition: transform .25s var(--spring), box-shadow .3s, background .3s;
 }
-.btn-scan.tap{ transform: scale(.93); background: var(--rouge-fill); color:#fff;
-  box-shadow: 0 0 34px rgba(211,54,54,.65) }
+.btn-scan.tap{ transform: scale(.93); background: var(--or-fill); color:#fff;
+  box-shadow: 0 0 34px rgba(201,146,46,.65) }
 
 .fiche{
   display:flex; align-items:center; gap:12px; margin-top:12px;
@@ -323,8 +327,8 @@ body{ color: var(--ink); font-family: var(--font) }
 
 .dispo{
   display:flex; align-items:center; gap:10px; margin-top:9px;
-  padding:10px 14px; border-radius:13px; background: var(--ambre-soft);
-  font-size:12px; color: var(--ambre);
+  padding:10px 14px; border-radius:13px; background: var(--or-doux);
+  font-size:12px; color: var(--or);
   opacity:0; transform: translateY(10px);
   transition: opacity .5s var(--ease), transform .55s var(--spring);
 }
@@ -341,7 +345,7 @@ body{ color: var(--ink); font-family: var(--font) }
 .montant.on{ opacity:1; transform:none }
 .m-val{ font-size:34px; font-weight:800; letter-spacing:-.04em; font-variant-numeric: tabular-nums }
 .m-pts{ font-size:11.5px; font-weight:700; color: var(--muted); margin-top:1px }
-.m-pts.credit{ color: var(--ambre) }
+.m-pts.credit{ color: var(--or) }
 
 .pave{
   flex:1; display:grid; grid-template-columns: repeat(3,1fr); grid-auto-rows:1fr; gap:6px;
@@ -357,8 +361,8 @@ body{ color: var(--ink); font-family: var(--font) }
 }
 .pave span.gris{ color: var(--muted); font-size:13px }
 .pave span.tap{
-  transform: scale(.9); color:#fff; background: var(--rouge-fill); border-color: var(--rouge-fill);
-  box-shadow: 0 0 26px rgba(211,54,54,.6);
+  transform: scale(.9); color:#fff; background: var(--or-fill); border-color: var(--or-fill);
+  box-shadow: 0 0 26px rgba(201,146,46,.6);
 }
 
 .raison-t{ font-size:11px; color: var(--muted); margin:12px 0 6px }
@@ -371,21 +375,21 @@ body{ color: var(--ink); font-family: var(--font) }
   transition: background .35s var(--ease), color .35s, border-color .35s, box-shadow .35s;
 }
 .raisons span.pick{
-  color:#fff; background: var(--rouge-fill); border-color: var(--rouge-fill); font-weight:600;
-  box-shadow: 0 0 26px rgba(211,54,54,.45);
+  color:#fff; background: var(--or-fill); border-color: var(--or-fill); font-weight:600;
+  box-shadow: 0 0 26px rgba(201,146,46,.45);
 }
 
 .valider{
   margin-top:auto; width:100%;
   padding:13px; border:0; border-radius:12px; cursor:pointer;
   font-family:inherit; font-size:14px; font-weight:700; color:#fff;
-  background: var(--rouge-fill);
-  box-shadow: 0 12px 30px -12px rgba(190,43,43,.9);
+  background: var(--or-fill);
+  box-shadow: 0 12px 30px -12px rgba(138,100,20,.9);
   opacity:0; transform: translateY(14px);
   transition: opacity .5s var(--ease), transform .25s var(--spring), box-shadow .3s;
 }
 .valider.on{ opacity:1; transform:none }
-.valider.tap{ transform: scale(.96); box-shadow: 0 4px 16px rgba(190,43,43,.8), 0 0 52px rgba(226,68,68,.8) }
+.valider.tap{ transform: scale(.96); box-shadow: 0 4px 16px rgba(138,100,20,.8), 0 0 52px rgba(224,174,69,.8) }
 .valider b{ font-weight:800 }
 
 /* --- Anniversaires --- */
@@ -398,13 +402,13 @@ body{ color: var(--ink); font-family: var(--font) }
   transition: opacity .5s var(--ease), transform .55s var(--spring), background .5s, border-color .5s;
 }
 .annivs li.show{ opacity:1; transform:none }
-.annivs li.donne{ background: var(--ambre-soft); border-color: rgba(229,162,49,.5) }
+.annivs li.donne{ background: var(--or-doux); border-color: rgba(229,162,49,.5) }
 .annivs li > div{ flex:1 }
 .an-n{ font-size:13.5px; font-weight:700 }
 .an-m{ font-size:11px; color: var(--muted); margin-top:1px }
 .jour{
   font-size:9.5px; font-weight:800; letter-spacing:.05em; text-transform:uppercase;
-  padding:4px 10px; border-radius:999px; color:#fff; background: var(--rouge-fill);
+  padding:4px 10px; border-radius:999px; color:#fff; background: var(--or-fill);
 }
 .offrir{ transition: transform .22s var(--spring), background .3s, color .3s }
 .offrir.tap{ transform: scale(.92) }
@@ -456,7 +460,7 @@ body{ color: var(--ink); font-family: var(--font) }
   padding:11px 8px; border-radius:11px; background: var(--sur-1);
   border:1px solid var(--hair);
 }
-.best li.lui{ border-color: rgba(211,54,54,.45); background:#FEF6F6 }
+.best li.lui{ border-color: rgba(201,146,46,.45); background:#FDF8EE }
 .best .ava{ width:30px; height:30px; font-size:9.5px }
 .best b{ font-size:11.5px; font-weight:700 }
 .best em{ font-style:normal; font-size:10px; color: var(--muted); font-variant-numeric: tabular-nums }
@@ -491,22 +495,22 @@ body{ color: var(--ink); font-family: var(--font) }
 .outro.on{ opacity:1; visibility:visible; transition-delay:0s,0s }
 .o-projet{
   display:flex; align-items:center; gap:18px;
-  font-size:46px; font-weight:800; letter-spacing:-.035em; color:#FFF3F0;
-  text-shadow: 0 0 52px rgba(255,140,120,.6);
+  font-size:46px; font-weight:800; letter-spacing:-.035em; color:#FFF6E8;
+  text-shadow: 0 0 52px rgba(230,180,90,.55);
   transform: translateY(20px) scale(.95);
   transition: transform 1.2s var(--ease);
 }
-.o-projet img{ width:64px; height:64px; object-fit:contain;
-  filter: drop-shadow(0 0 30px rgba(226,68,68,.85)) }
+.o-sceau{ font-size:54px; line-height:1; color:#E0AE45;
+  text-shadow: 0 0 34px rgba(224,174,69,.85) }
 .outro.on .o-projet{ transform:none }
 .claim{
-  font-size:16px; font-weight:400; color:#E4C9C4; letter-spacing:-.01em;
+  font-size:16px; font-weight:400; color:#DCCBAA; letter-spacing:-.01em;
   opacity:0; transform: translateY(12px);
   transition: opacity .85s var(--ease) .35s, transform .85s var(--ease) .35s;
 }
 .logo{
   display:flex; align-items:center; gap:12px; margin-top:14px;
-  font-size:19px; font-weight:600; letter-spacing:-.02em; color:#C8B6B2;
+  font-size:19px; font-weight:600; letter-spacing:-.02em; color:#BFB098;
   opacity:0; transform: translateY(12px);
   transition: opacity .85s var(--ease) .7s, transform .85s var(--ease) .7s;
 }
@@ -518,3 +522,28 @@ body{ color: var(--ink); font-family: var(--font) }
   box-shadow: 0 0 26px rgba(0,113,227,.55);
 }
 .outro.on .claim, .outro.on .logo{ opacity:1; transform:none }
+
+
+/* =========================================================
+   Allègement automatique (voir ../stage.css)
+   ========================================================= */
+
+/* Palier 1 — les lueurs très larges d'abord. */
+.eco .phone{
+  box-shadow: 0 30px 64px rgba(0,0,0,.72), inset 0 1px 1px rgba(255,255,255,.7);
+}
+.eco .app{
+  box-shadow: 0 34px 76px rgba(0,0,0,.72), inset 0 0 0 1px rgba(255,255,255,.5);
+}
+.eco .toast, .eco .flychip, .eco .pave span.tap,
+.eco .raisons span.pick, .eco .valider, .eco .btn-scan.tap{ box-shadow:none }
+.eco .o-projet{ text-shadow:none }
+.eco .o-sceau{ text-shadow:none }
+
+/* Palier 2 — le grain et la vignette quittent le fond. */
+.eco-2 .stage{
+  background-image:
+    radial-gradient(46% 48% at 50% 52%, rgba(200,52,45,.36), transparent 70%),
+    radial-gradient(62% 66% at 50% 52%, #2A1210 0%, #150A0A 56%, #0A0505 100%);
+  background-size: 100% 100%, 100% 100%;
+}

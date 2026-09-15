@@ -624,3 +624,33 @@
   transition: opacity .85s var(--ease) .6s, transform .85s var(--ease) .6s;
 }
 .outro.on .claim, .outro.on .site{ opacity:1; transform:none }
+
+
+/* =========================================================
+   Allègement automatique (voir stage.css)
+   ========================================================= */
+
+/* Palier 1 — les lueurs très larges sont ce qui coûte le plus :
+   un flou de 90 px se calcule sur toute la surface du panneau,
+   et à double densité d'écran il s'étale sur 180 pixels réels. */
+.eco .mail{
+  box-shadow: 0 30px 70px rgba(0,0,0,.66), inset 0 1px 0 rgba(255,255,255,.12);
+}
+.eco .app{
+  box-shadow: 0 34px 76px rgba(0,0,0,.70), inset 0 1px 0 rgba(255,255,255,.11);
+}
+.eco .phone{
+  box-shadow: 0 30px 64px rgba(0,0,0,.70), inset 0 1px 1px rgba(255,255,255,.7);
+}
+.eco .fc{ box-shadow: 0 16px 34px rgba(0,0,0,.55) }
+.eco .ev.blue, .eco .stat.ok, .eco .chart span,
+.eco .nav.on, .eco .line, .eco .flychip{ box-shadow:none }
+.eco .sums .tot b, .eco .s-v{ text-shadow:none }
+
+/* Palier 2 — le grain et la vignette quittent le fond. */
+.eco-2 .stage{
+  background-image:
+    radial-gradient(45% 47% at 50% 52%, rgba(0,113,227,.42), transparent 70%),
+    radial-gradient(62% 66% at 50% 52%, #12233F 0%, #08101F 56%, #02040A 100%);
+  background-size: 100% 100%, 100% 100%;
+}

@@ -4,12 +4,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 
-<title>La carte du boucher — Boucherie Vatuone | MJ Agency</title>
-<meta name="description" content="Démonstration animée : la carte de fidélité de la Boucherie Vatuone, du code scanné en caisse aux points crédités sur le téléphone du client.">
+<title>La carte de fidélité — MJ Agency</title>
+<meta name="description" content="Démonstration animée : une carte de fidélité, du code scanné en caisse aux points crédités sur le téléphone du client.">
 <meta name="robots" content="noindex, nofollow">
 <meta name="theme-color" content="#0A0505">
 
-<link rel="icon" href="vatuone.png">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='24' fill='%23C9922E'/%3E%3Ctext x='50' y='72' font-family='Helvetica,Arial' font-size='62' fill='%23150F06' text-anchor='middle'%3E%E2%98%85%3C/text%3E%3C/svg%3E">
 <link rel="stylesheet" href="../stage.css">
 <link rel="stylesheet" href="fidelite.css">
 </head>
@@ -25,27 +25,27 @@
       <div class="deck" id="deck">
 
         <!-- ============ LE TÉLÉPHONE DU CLIENT ============ -->
-        <aside class="phone" id="phone" aria-label="La carte de Mehdi Nasri">
+        <aside class="phone" id="phone" aria-label="La carte de la cliente">
           <div class="screen">
             <span class="notch"></span>
             <p class="st"><span>09:41</span><span class="st-r"></span></p>
 
             <header class="ph-top">
-              <img class="mark" src="vatuone.png" alt="">
-              <span>Boucherie Vatuone</span>
+              <span class="mark" aria-hidden="true">★</span>
+              <span>Votre commerce</span>
             </header>
 
             <!-- La carte -->
             <div class="carte" id="carte">
-              <img class="carte-bete" src="vatuone.png" alt="" aria-hidden="true">
+              <span class="carte-sceau" aria-hidden="true">★</span>
               <div class="carte-tete">
-                <p class="carte-nom">Boucherie<br>Vatuone</p>
+                <p class="carte-nom">Votre<br>commerce</p>
                 <span class="rang">Ambassadeur</span>
               </div>
-              <p class="carte-ville">Sète · Carte de fidélité</p>
+              <p class="carte-ville">Carte de fidélité</p>
               <p class="pts"><b id="ptsCarte">1 529</b><span>points</span></p>
-              <p class="carte-client">Mehdi Nasri</p>
-              <p class="carte-num">n° 1011 · client depuis mars 2026</p>
+              <p class="carte-client">Camille Fabre</p>
+              <p class="carte-num">n° 1042 · cliente depuis mars 2026</p>
             </div>
 
             <!-- Bandeau récompense (apparaît après l'achat) -->
@@ -57,7 +57,7 @@
             <div class="qr" id="qr">
               <svg viewBox="0 0 29 29" shape-rendering="crispEdges" aria-hidden="true" id="qrArt"></svg>
               <p class="qr-t">Faites scanner ce code en caisse</p>
-              <p class="qr-s">ou donnez votre numéro : <b>1011</b></p>
+              <p class="qr-s">ou donnez votre numéro : <b>1042</b></p>
             </div>
 
             <!-- La jauge et les récompenses -->
@@ -66,18 +66,18 @@
               <span class="barre"><i id="barre"></i></span>
             </div>
             <ul class="recs" id="recs">
-              <li><span class="coche">✓</span><b>500 g de merguez maison offerts</b><em>Disponible</em></li>
-              <li><span class="coche">✓</span><b>10 € de remise sur votre achat</b><em>Disponible</em></li>
-              <li><span class="coche">✓</span><b>Un poulet fermier offert</b><em>Disponible</em></li>
+              <li><span class="coche">✓</span><b>5 € de remise</b><em>Disponible</em></li>
+              <li><span class="coche">✓</span><b>10 € de remise</b><em>Disponible</em></li>
+              <li><span class="coche">✓</span><b>Un produit offert</b><em>Disponible</em></li>
             </ul>
           </div>
         </aside>
 
-        <!-- ============ L'ESPACE BOUCHER ============ -->
-        <section class="app" id="app" aria-label="Espace boucher">
+        <!-- ============ L'ESPACE COMMERÇANT ============ -->
+        <section class="app" id="app" aria-label="Espace commerçant">
           <header class="titlebar">
-            <img class="mark" src="vatuone.png" alt="">
-            <div class="tb-nom"><b>Boucherie Vatuone</b><span>Carte de fidélité</span></div>
+            <span class="mark" aria-hidden="true">★</span>
+            <div class="tb-nom"><b>Votre commerce</b><span>Carte de fidélité</span></div>
             <span class="tb-actions">Verrouiller &nbsp; Quitter</span>
           </header>
 
@@ -101,21 +101,21 @@
                 </div>
 
                 <div class="fiche" id="fiche">
-                  <span class="ava">MN</span>
+                  <span class="ava">CF</span>
                   <div>
-                    <p class="fiche-n">Mehdi Nasri</p>
-                    <p class="fiche-m" id="ficheM">n° 1011 · 1 529 pts · 29 passages</p>
+                    <p class="fiche-n">Camille Fabre</p>
+                    <p class="fiche-m" id="ficheM">n° 1042 · 1 529 pts · 29 passages</p>
                   </div>
                   <span class="rang">Ambassadeur</span>
                 </div>
 
                 <div class="dispo" id="dispo">
                   <span class="etoile">★</span>
-                  <p><b>Récompense disponible :</b> 30 € de remise + le colis du boucher</p>
+                  <p><b>Récompense disponible :</b> 30 € de remise sur votre achat</p>
                   <span class="btn-ambre">Utiliser</span>
                 </div>
 
-                <p class="raison-t">Pourquoi est-il venu ? <em>(facultatif)</em></p>
+                <p class="raison-t">Pourquoi cette visite ? <em>(facultatif)</em></p>
                 <div class="raisons" id="raisons">
                   <span data-r="habitue">Habitué</span>
                   <span>A reçu le SMS</span>
@@ -148,15 +148,15 @@
               <h3 class="v-titre">Anniversaires · octobre</h3>
               <p class="v-sous">50 points offerts, une fois par an et par client.</p>
               <ul class="annivs" id="annivs">
-                <li><span class="ava a1">TA</span>
-                  <div><p class="an-n">Thérèse Aubry</p><p class="an-m">12 octobre · n° 1004 · 295 pts</p></div>
+                <li><span class="ava a1">HM</span>
+                  <div><p class="an-n">Hélène Morel</p><p class="an-m">12 octobre · n° 1004 · 295 pts</p></div>
                   <span class="jour">aujourd'hui</span>
                   <span class="btn-ambre offrir">Offrir 50 points</span></li>
-                <li><span class="ava a2">JC</span>
-                  <div><p class="an-n">Julie Caron</p><p class="an-m">18 octobre · n° 1016 · 1 380 pts</p></div>
+                <li><span class="ava a2">PB</span>
+                  <div><p class="an-n">Paul Brunet</p><p class="an-m">18 octobre · n° 1016 · 1 380 pts</p></div>
                   <span class="btn-ambre offrir">Offrir 50 points</span></li>
-                <li><span class="ava a3">LB</span>
-                  <div><p class="an-n">Lucas Berthier</p><p class="an-m">27 octobre · n° 1013 · 911 pts</p></div>
+                <li><span class="ava a3">SN</span>
+                  <div><p class="an-n">Sarah Neveu</p><p class="an-m">27 octobre · n° 1013 · 911 pts</p></div>
                   <span class="btn-ambre offrir">Offrir 50 points</span></li>
               </ul>
             </div>
@@ -164,10 +164,10 @@
             <!-- Tableau de bord -->
             <div class="view" data-view="dash">
               <div class="tuiles">
-                <div class="tuile"><p class="t-k">Clients</p><p class="t-v" data-to="16">0</p></div>
-                <div class="tuile"><p class="t-k">Passages</p><p class="t-v" data-to="293">0</p></div>
-                <div class="tuile"><p class="t-k">Encaissé</p><p class="t-v" data-to="15723" data-euro="1">0</p></div>
-                <div class="tuile"><p class="t-k">Panier moyen</p><p class="t-v" data-to="53.66" data-cent="1">0</p></div>
+                <div class="tuile"><p class="t-k">Clients</p><p class="t-v" data-to="248">0</p></div>
+                <div class="tuile"><p class="t-k">Passages</p><p class="t-v" data-to="1936">0</p></div>
+                <div class="tuile"><p class="t-k">Encaissé</p><p class="t-v" data-to="96413" data-euro="1">0</p></div>
+                <div class="tuile"><p class="t-k">Panier moyen</p><p class="t-v" data-to="49.80" data-cent="1">0</p></div>
               </div>
 
               <div class="pourquoi">
@@ -184,10 +184,10 @@
               <div class="meilleurs" id="meilleurs">
                 <p class="pq-t">Meilleurs clients <em>· points cumulés</em></p>
                 <ul class="best">
-                  <li><span class="ava a4">AD</span><b>Antoine Duclos</b><em>2 153 pts · 2 136 €</em></li>
-                  <li><span class="ava a5">ML</span><b>Marie Lefevre</b><em>1 849 pts · 1 778 €</em></li>
-                  <li><span class="ava a6">FD</span><b>Fatou Diallo</b><em>1 799 pts · 1 756 €</em></li>
-                  <li class="lui"><span class="ava">MN</span><b>Mehdi Nasri</b><em>1 672 pts · 1 629 €</em></li>
+                  <li><span class="ava a4">AD</span><b>Alice Deschamps</b><em>2 153 pts · 2 136 €</em></li>
+                  <li><span class="ava a5">MR</span><b>Marc Reynaud</b><em>1 849 pts · 1 778 €</em></li>
+                  <li><span class="ava a6">FD</span><b>Fatou Diagne</b><em>1 799 pts · 1 756 €</em></li>
+                  <li class="lui"><span class="ava">CF</span><b>Camille Fabre</b><em>1 672 pts · 1 629 €</em></li>
                 </ul>
               </div>
             </div>
@@ -198,7 +198,7 @@
         <!-- Notification -->
         <div class="toast" id="toast">
           <span class="tick"></span>
-          <div><p class="to-h">Achat encaissé</p><p class="to-s">Mehdi Nasri · +43 points</p></div>
+          <div><p class="to-h">Achat encaissé</p><p class="to-s">Camille Fabre · +43 points</p></div>
         </div>
 
         <!-- Couche des étiquettes volantes -->
@@ -208,7 +208,7 @@
 
     <!-- ============ SIGNATURE ============ -->
     <div class="outro" id="outro">
-      <p class="o-projet"><img src="vatuone.png" alt="">La carte du boucher</p>
+      <p class="o-projet"><span class="o-sceau" aria-hidden="true">★</span>La carte de fidélité</p>
       <p class="claim">Chaque euro rapporte un point. Le reste se fait tout seul.</p>
       <p class="logo"><span class="mark-mj">MJ</span>MJ Agency</p>
     </div>

@@ -1,10 +1,10 @@
 /* =========================================================
-   « La carte du boucher » — la partition de ce film.
+   « La carte de fidélité » — la partition de ce film.
 
-   L'achat mis en scène est celui qui amène réellement Mehdi
-   Nasri à l'état qu'affiche l'application : 42,50 €, +43 points,
-   1 529 → 1 572 points, 29 → 30 passages. Les chiffres du
-   tableau de bord sont ceux du jeu de démonstration du projet.
+   Un seul achat, suivi de bout en bout : 42,50 € encaissés,
+   +43 points, 1 529 → 1 572 points, 29 → 30 passages. Les
+   chiffres se répondent d'un plan à l'autre, jusqu'au tableau
+   de bord où la cliente reparaît avec ses totaux.
    ========================================================= */
 'use strict';
 
@@ -63,7 +63,7 @@
     const v = (+tape) / 100;
     $('#mVal').textContent = euros.format(v) + ' €';
     const pts = Math.round(v);
-    $('#mPts').textContent = pts ? `+${pts} points pour Mehdi` : '1 point par euro';
+    $('#mPts').textContent = pts ? `+${pts} points pour Camille` : '1 point par euro';
     $('#mPts').classList.toggle('credit', !!pts);
   }
 
@@ -82,7 +82,7 @@
                    cam('translate(0,0)'); }],
     [4.40, () => on($('#btnScan'), 'tap')],
     [4.70, () => { off($('#btnScan'), 'tap'); on($('#champ'), 'hot');
-                   fly(qr, $('#champ'), { etiquette: 'Carte', valeur: 'n° 1011',
+                   fly(qr, $('#champ'), { etiquette: 'Carte', valeur: 'n° 1042',
                      arrivee() { on($('#fiche')); off($('#champ'), 'hot'); } }); }],
     [5.10, () => on(qr, 'out')],
 
@@ -103,7 +103,7 @@
       arrivee() {
         on(carte, 'credit');
         countUp($('#ptsCarte'), APRES, 900, v => entier.format(Math.round(v)), AVANT);
-        $('#ficheM').textContent = `n° 1011 · ${entier.format(APRES)} pts · 30 passages`;
+        $('#ficheM').textContent = `n° 1042 · ${entier.format(APRES)} pts · 30 passages`;
         $('#barre').style.width = '100%';
         $('#jaugeT').textContent = 'Toutes les récompenses sont débloquées';
         setTimeout(() => off(carte, 'credit'), 950);
@@ -162,7 +162,7 @@
     $('#mPts').textContent = '1 point par euro';
     off($('#mPts'), 'credit');
     $('#ptsCarte').textContent = entier.format(AVANT);
-    $('#ficheM').textContent = `n° 1011 · ${entier.format(AVANT)} pts · 29 passages`;
+    $('#ficheM').textContent = `n° 1042 · ${entier.format(AVANT)} pts · 29 passages`;
     $('#valMontant').textContent = euros.format(MONTANT) + ' €';
     $('#barre').style.width = '0';
     $('#jaugeT').textContent = 'Prochaine récompense à 800 points';

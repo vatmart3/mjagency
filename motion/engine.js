@@ -27,6 +27,48 @@ const Motion = (function () {
   const COARSE = matchMedia('(pointer: coarse)').matches;
 
   /* ---------------------------------------------------------
+     Qualité adaptative
+
+     Impossible de savoir d'avance ce que tiendra la machine qui
+     lit le film : un portable poussif, un écran 4K, un navigateur
+     sans accélération. Plutôt qu'un réglage écrit à l'aveugle, la
+     page se mesure et retire ce qu'elle ne peut pas tenir —
+     d'abord la poussière et les traînées, puis les lueurs larges
+     et les mouvements de caméra.
+
+     `?eco` ou `?eco=2` dans l'adresse force le niveau, pour
+     comparer sans attendre la mesure.
+     --------------------------------------------------------- */
+  const html = document.documentElement;
+
+  (function qualite() {
+    const force = new URLSearchParams(location.search).get('eco');
+    if (force !== null) {
+      html.classList.add('eco');
+      if (force === '2') html.classList.add('eco-2');
+      return;
+    }
+    if (SOFT) { html.classList.add('eco', 'eco-2'); return; }
+
+    const ech = [];
+    let last = performance.now(), vues = 0, t0 = last;
+
+    (function mesure(now) {
+      const dt = now - last; last = now;
+      if (++vues > 10) ech.push(dt);          /* on laisse passer le démarrage */
+
+      /* Deux verdicts : un rapide, un confirmé. */
+      if (ech.length === 60 || ech.length === 220) {
+        const tri = [...ech].sort((a, b) => a - b);
+        const med = tri[tri.length >> 1];
+        if (med > 21) html.classList.add('eco');      /* sous ~48 images par seconde */
+        if (med > 30) html.classList.add('eco-2');    /* sous ~33 */
+      }
+      if (now - t0 < 7000) requestAnimationFrame(mesure);
+    })(last);
+  })();
+
+  /* ---------------------------------------------------------
      Mise à l'échelle de la scène
 
      La scène prend toute la fenêtre : on lui donne exactement la
@@ -191,7 +233,21 @@ const Motion = (function () {
      — un rejeu remet le compteur à zéro, sans minuteur en retard
        qui viendrait rallumer un élément déjà éteint.
      --------------------------------------------------------- */
-  const SPEED = SOFT ? 2.8 : 1;   /* animations réduites : on abrège */
+  /* Vitesse de lecture. `?vitesse=0.25` la divise par quatre — c'est
+     ainsi qu'on exporte le film en vidéo : ralenti à la prise, rendu à
+     sa vitesse au montage, chaque seconde de film est échantillonnée
+     quatre fois plus, et le fichier produit est fluide même si la
+     machine qui filme ne l'est pas. Les transitions CSS sont ralenties
+     avec, sans quoi seuls les enchaînements s'étireraient. */
+  const VITESSE = +(new URLSearchParams(location.search).get('vitesse')) || 0;
+  const SPEED = VITESSE || (SOFT ? 2.8 : 1);
+
+  if (VITESSE) (function cadence() {
+    document.getAnimations().forEach(a => {
+      if (a.playbackRate !== VITESSE) a.playbackRate = VITESSE;
+    });
+    requestAnimationFrame(cadence);
+  })();
 
   let partition = [], remiseAZero = () => {};
   let raf = 0, cue = 0, start = 0, held = 0;
@@ -240,6 +296,14 @@ const Motion = (function () {
     jouer(film) {
       partition   = film.partition;
       remiseAZero = film.remiseAZero || (() => {});
+      /* `?capture` retient le départ : l'exportation en vidéo pilote
+         elle-même l'horloge, image par image, pour que le fichier
+         produit soit exact et non une captation d'écran à la volée. */
+      if (new URLSearchParams(location.search).has('capture')) {
+        remiseAZero();
+        window.__demarrer = play;
+        return;
+      }
       play();
     }
   };

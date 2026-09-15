@@ -7,7 +7,7 @@ droite.
 | | |
 |---|---|
 | `index.html` | **Du mail au planning** — un mail de demande de devis devient fiche client, devis, signature, planning, automatisations et tableau de bord, sans une seule ressaisie. |
-| `fidelite/` | **La carte du boucher** — le programme de fidélité de la Boucherie Vatuone : le code scanné en caisse, le montant tapé, les points qui tombent sur le téléphone du client. |
+| `fidelite/` | **La carte de fidélité** — le code scanné en caisse, le montant tapé au pavé, les points qui tombent sur le téléphone du client. |
 
 ```
 motion/
@@ -15,7 +15,7 @@ motion/
                                  compteurs, vol d'une donnée d'un point à l'autre
   stage.css     décor commun   — scène, caméra, étiquettes volantes, « Rejouer »
   index.html    film 1         + mjagency.css · mjagency.js
-  fidelite/     film 2         + fidelite.css · fidelite.js · vatuone.png
+  fidelite/     film 2         + fidelite.css · fidelite.js
 ```
 
 Un film ne fournit que deux choses au moteur : une **partition**, liste de
@@ -46,46 +46,38 @@ la mise à l'échelle, l'horloge, les vols — est écrit une fois.
 
 ---
 
-# Film 2 — « La carte du boucher »
+# Film 2 — « La carte de fidélité »
 
-Le programme de fidélité de la **Boucherie Vatuone** (Sète), réalisé par
-MJ Agency. Le film suit un seul achat, du code scanné aux points crédités.
+Un programme de fidélité vu des deux côtés du comptoir. Le film suit un
+seul achat, du code scanné aux points crédités. Rien n'y désigne une
+enseigne : c'est « Votre commerce », comme le premier film montre
+« Votre outil ».
 
 ## La séquence — 31 s
 
 | s | Plan |
 |---|---|
-| 0,1 | La carte dans le téléphone du client : 1 529 points, statut Ambassadeur, code à scanner |
+| 0,1 | La carte dans le téléphone de la cliente : 1 529 points, statut Ambassadeur, code à scanner |
 | 3,0 | La caisse entre par la droite, le téléphone s'écarte |
-| 4,4 | « Scanner » : le code s'envole vers le champ, la fiche de Mehdi Nasri s'ouvre |
-| 6,1 | Récompense disponible : 30 € de remise + le colis du boucher |
+| 4,4 | « Scanner » : le code s'envole vers le champ, la fiche de Camille Fabre s'ouvre |
+| 6,1 | Récompense disponible : 30 € de remise |
 | 7,4 | Le montant se compose touche par touche — 4, 2, 5, 0 — en centimes, par la droite |
-| 9,4 | Raison de la venue : « Habitué » |
+| 9,4 | Raison de la visite : « Habitué » |
 | 11,0 | On encaisse. Les points s'envolent vers la carte : 1 529 → 1 572 |
-| 13,4 | Côté client : cinq récompenses débloquées, la jauge est pleine |
+| 13,4 | Côté cliente : cinq récompenses débloquées, la jauge est pleine |
 | 16,2 | Les anniversaires du mois : 50 points offerts en un geste |
 | 20,4 | Tableau de bord — et « Pourquoi ils viennent », la mesure qui dit si les SMS rapportent |
 | 26,2 | Signature |
 
-## Ce qui est vrai, et ce qui est mis en scène
+Les chiffres se répondent d'un plan à l'autre : 42,50 € encaissés donnent
++43 points, la carte passe de 1 529 à 1 572, les passages de 29 à 30, et
+la cliente reparaît au tableau de bord avec 1 672 points cumulés pour
+1 629 € d'achats. Le code à scanner est dessiné : un vrai QR encoderait
+une adresse qui n'existe pas.
 
-L'achat filmé est **celui qui amène réellement** Mehdi Nasri à l'état
-qu'affiche l'application : 42,50 €, +43 points, 1 529 → 1 572 points,
-29 → 30 passages, et on le retrouve en fin de film dans les meilleurs
-clients avec 1 672 points cumulés et 1 629 € d'achats. Les chiffres du
-tableau de bord (16 clients, 293 passages, 15 723 € encaissés, 53,66 €
-de panier moyen), les récompenses, les statuts et les libellés viennent
-du projet lui-même.
-
-Deux choses sont illustratives, parce que le jeu de démonstration ne les
-porte pas : les **dates d'anniversaire** (la fonction existe, les dates
-non) et le **compte des raisons de venue** — leur total, 288, reste
-cohérent avec les 293 passages. Le **code à scanner** est dessiné : un
-vrai QR encoderait une adresse qui n'existe pas.
-
-L'interface est montrée telle qu'elle est — claire, rouge et ambre, aux
-valeurs exactes de la boutique — posée dans la même nuit que le premier
-film.
+L'interface reste claire, avec l'or pour accent — les points et les
+récompenses s'y lisent d'eux-mêmes — posée dans la même nuit que le
+premier film.
 
 ---
 
@@ -150,6 +142,47 @@ la carte graphique. À noter : le navigateur ne peut pas dépasser le
 rafraîchissement de l'écran — 120 images par seconde supposent un écran
 à 120 Hz. Le but n'est donc pas d'« atteindre 120 », mais de tenir
 largement sous les 8,3 ms, ce qui est le cas.
+
+## Quand la machine ne suit pas
+
+Impossible de savoir d'avance ce que tiendra l'ordinateur qui lit le
+film. Plutôt qu'un réglage écrit à l'aveugle, `engine.js` mesure les
+premières images et retire ce qu'il ne peut pas tenir :
+
+| classe sur `<html>` | ce qui part |
+|---|---|
+| `eco` (sous ~48 i/s) | la poussière, les traînées derrière les données qui volent, les lueurs les plus larges |
+| `eco-2` (sous ~33 i/s) | les mouvements de caméra, le grain et la vignette du fond |
+
+`?eco` ou `?eco=2` dans l'adresse force le niveau, pour comparer sans
+attendre la mesure.
+
+## Exporter le film en vidéo
+
+Le piège : l'enregistreur du navigateur ne capte que **25 images par
+seconde**. Une animation à 60 i/s captée ainsi, puis ré-encodée en 30,
+donne un fichier qui saccade — alors que la page, elle, est fluide.
+
+La parade est dans le moteur : `?vitesse=0.25` joue le film au quart de
+sa vitesse, transitions CSS comprises (`playbackRate` sur toutes les
+animations, pas seulement l'horloge). On capte, puis on accélère au
+montage :
+
+```
+setpts=PTS/4, fps=60
+```
+
+Chaque seconde de film est alors échantillonnée cent fois au lieu de
+vingt-cinq. Mesuré sur un passage en mouvement continu — le bouton qui
+s'enfonce, les points qui volent, le compteur qui monte :
+
+| | images distinctes par seconde |
+|---|---|
+| captation directe, 25 i/s étirée à 30 | 20,4 |
+| ralenti ×4, rendu à 60 i/s | **39,6** |
+
+Ralentir davantage (×8) n'apporte rien : le plafond vient alors du
+rendu logiciel de la machine qui filme, plus de la méthode.
 
 Les règles qui en découlent, si la séquence doit évoluer :
 
