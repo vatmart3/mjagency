@@ -1,0 +1,4 @@
+# Le dossier « brief » est une application Next.js déployée comme projet
+# Vercel distinct (Root Directory = brief). Le site statique de la racine
+# n'a pas à en publier les sources.
+brief/

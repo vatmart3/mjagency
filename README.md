@@ -156,6 +156,7 @@ node build-locales.js   # → 4 pages locales + sitemap.xml
 ```
 index.html · work.html · studio.html · contact.html
 api/contact.js         → réception du formulaire (Resend)
+brief/                 → « Brief projet » : application Next.js à part
 assets/
   css/style.css        → design system
   css/fonts.css        → pile typographique système
@@ -166,10 +167,20 @@ build-locales.js       → pages locales + sitemap
 vercel.json            → URL sans extension, en-têtes de sécurité
 ```
 
+## Le brief projet
+
+`brief/` est une application Next.js autonome : un parcours guidé en dix
+écrans où un prospect décrit le site qu'il veut, pendant qu'une maquette 3D
+se construit à partir de ses réponses. Elle se déploie comme **projet Vercel
+distinct** (Root Directory `brief`) et ne touche en rien au site statique
+de la racine — `.vercelignore` l'exclut d'ailleurs de son déploiement.
+Tout est expliqué dans [`brief/README.md`](brief/README.md).
+
 ## Reste à faire
 
 - Pages légales (mentions, confidentialité) — en attente du statut juridique,
-  du SIRET et de l'adresse du siège.
+  du SIRET et de l'adresse du siège. La case RGPD du brief pointe dessus :
+  y brancher `NEXT_PUBLIC_LEGAL_URL` une fois la page en ligne.
 - Remplacer les visuels de projets par de vraies photos.
 - Le calendrier est front-only : les créneaux sont simulés, à connecter à un
   agenda réel pour éviter les doubles réservations.
