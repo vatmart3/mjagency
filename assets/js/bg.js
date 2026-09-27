@@ -45,6 +45,7 @@
   uniform vec2  u_decal;       // position de l'objet à l'écran
   uniform float u_taille;      // échelle de l'objet
   uniform float u_petit;       // 1 sur téléphone
+  uniform float u_elan;        // vitesse de défilement, lissée — la souris du doigt
 
   mat2 rot(float a){ float c = cos(a), s = sin(a); return mat2(c, -s, s, c); }
 
@@ -149,8 +150,12 @@
     ombre *= mix(1.0, 1.0 - smoothstep(0.22, 0.80, u_scroll), u_petit);
     col = mix(col, vec3(0.878, 0.890, 0.914), ombre * 0.55);
 
-    g_ay = t * 0.16 + u_scroll * 1.05 + m.x * 0.40;
-    g_ax = 0.34 + sin(t * 0.11) * 0.16 - m.y * 0.22;
+    /* Sur un téléphone il n'y a pas de curseur à suivre : c'est l'élan du
+       défilement qui prend sa place. Un balayage rapide fait tourner la forme
+       plus vite, et la rotation retombe quand le doigt s'arrête — le même
+       « ça me répond » que le survol donne à la souris. */
+    g_ay = t * 0.16 + u_scroll * 1.05 + m.x * 0.40 + u_elan * 0.85;
+    g_ax = 0.34 + sin(t * 0.11) * 0.16 - m.y * 0.22 + u_elan * 0.22;
 
     vec3 ro = vec3(0.0, 0.0, 3.9);
     vec3 rd = normalize(vec3(p2, -1.65));
@@ -204,10 +209,11 @@
       // que frôler la surface, ce qui évite l'escalier sans multi-échantillon.
       float couv = 1.0 - smoothstep(0.0012, 0.005, h);
 
-      // Sur téléphone, l'objet est un moment d'ouverture, pas un décor
-      // permanent : passé le premier écran il s'efface, au lieu de passer
-      // derrière chaque titre sur sept mille pixels de défilement.
-      couv *= mix(1.0, 1.0 - smoothstep(0.22, 0.80, u_scroll), u_petit);
+      /* Sur téléphone, l'objet est franc dans le premier écran puis passe
+         derrière un voile : il reste en mouvement tout le long de la page
+         sans jamais rendre un titre difficile à lire. Il s'estompe, il ne
+         disparaît pas — c'est ce qui manquait après le premier écran. */
+      couv *= mix(1.0, mix(0.46, 1.0, 1.0 - smoothstep(0.20, 0.92, u_scroll)), u_petit);
       col = mix(col, min(o, vec3(1.0)), couv * 0.94);
     }
 
@@ -259,12 +265,14 @@
   const uDecal  = gl.getUniformLocation(prog, 'u_decal');
   const uTaille = gl.getUniformLocation(prog, 'u_taille');
   const uPetit  = gl.getUniformLocation(prog, 'u_petit');
+  const uElan   = gl.getUniformLocation(prog, 'u_elan');
 
   gl.uniform1f(uTaille, petit ? 0.22 : 0.40);
   gl.uniform1f(uPetit, petit ? 1 : 0);
 
   let souris = [0.5, 0.5], cible = [0.5, 0.5];
   let defile = 0, defileCible = 0;
+  let elan = 0, dernierY = scrollY;
   const lireScroll = () => { defileCible = scrollY / Math.max(innerHeight, 1); };
   addEventListener('scroll', lireScroll, { passive: true });
   lireScroll();
@@ -304,14 +312,23 @@
     souris[1] += (cible[1] - souris[1]) * 0.03;
     defile += (defileCible - defile) * 0.08;      // le retard donne de l'inertie
 
+    /* L'élan se mesure ici plutôt que dans l'écouteur de défilement : sur iOS
+       les événements arrivent par paquets pendant le défilement inertiel, ce
+       qui donnerait des saccades. Mesuré à chaque image, il monte avec le
+       geste et retombe de lui-même à l'arrêt. */
+    const dy = (scrollY - dernierY) / Math.max(innerHeight, 1);
+    dernierY = scrollY;
+    elan += (dy * 5.5 - elan) * 0.09;
+
     // L'objet ne se contente pas de descendre : il dérive en boucle, donc
     // il reste présent d'un bout à l'autre de la page au lieu de sortir
     // du cadre après le premier écran.
-    const x = (petit ? 0.00 : 0.45) + Math.sin(defile * 0.42) * (petit ? 0.03 : 0.10);
-    const y = (petit ? -0.40 : 0.04) - Math.sin(defile * 0.58) * (petit ? 0.10 : 0.26);
+    const x = (petit ? 0.09 : 0.45) + Math.sin(defile * 0.42) * (petit ? 0.17 : 0.10);
+    const y = (petit ? -0.36 : 0.04) - Math.sin(defile * 0.58) * (petit ? 0.22 : 0.26);
 
     gl.uniform1f(uTime, (now - t0) / 1000);
     gl.uniform2f(uMouse, souris[0], souris[1]);
+    gl.uniform1f(uElan, elan);
     gl.uniform1f(uScroll, defile);
     gl.uniform2f(uDecal, x, y);
     gl.drawArrays(gl.TRIANGLES, 0, 3);

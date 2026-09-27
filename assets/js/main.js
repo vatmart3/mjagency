@@ -351,6 +351,56 @@
     const scope = isRouter ? document.querySelector('.page.active') : document;
     revealHero(scope);
   }
+
+  /* =========================================================
+     PARALLAXE DES VISUELS
+
+     Les maquettes des cartes glissent légèrement pendant que la carte
+     traverse l'écran. C'est la seule chose qui donne de la profondeur au
+     téléphone, où il n'y a ni curseur à suivre ni survol : la page répond
+     au geste au lieu de se contenter d'apparaître une fois.
+
+     Volontairement discret — une dizaine de pixels. Sur un site, tout
+     faire bouger revient à ne rien mettre en avant.
+
+     La boucle ne tourne que lorsqu'un visuel est effectivement à l'écran,
+     et jamais si le visiteur a demandé moins d'animations.
+     ========================================================= */
+  (function parallaxe() {
+    if (reduced) return;
+    const cibles = [...document.querySelectorAll(
+      '.feature__viz--nav .nave, .feature__viz--board .board, .feature__viz--3d .gyro, .card--large .fid'
+    )];
+    if (!cibles.length) return;
+
+    const vus = new Set();
+    const io = new IntersectionObserver(entrees => {
+      entrees.forEach(e => e.isIntersecting ? vus.add(e.target) : vus.delete(e.target));
+      relancer();
+    }, { rootMargin: '10% 0px' });
+    cibles.forEach(c => io.observe(c));
+
+    let enCours = false;
+    function relancer() {
+      if (enCours || !vus.size) return;
+      enCours = true;
+      requestAnimationFrame(image);
+    }
+    function image() {
+      if (!vus.size) { enCours = false; return; }
+      const h = innerHeight;
+      vus.forEach(el => {
+        const r = el.getBoundingClientRect();
+        // -1 quand l'élément entre par le bas, +1 quand il sort par le haut
+        // Borné : hors écran le rapport dépasse 1 et le décalage filait à
+        // vingt pixels au lieu des onze prévus.
+        const p = Math.max(-1, Math.min(1, ((r.top + r.height / 2) / h - 0.5) * -2));
+        el.style.transform = `translate3d(0, ${(p * 11).toFixed(2)}px, 0)`;
+      });
+      requestAnimationFrame(image);
+    }
+  })();
+
   if (document.readyState === 'complete') boot();
   else addEventListener('load', boot);
 })();
