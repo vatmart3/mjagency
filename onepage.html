@@ -470,6 +470,103 @@ a.work-item:hover .work-item__title{color:var(--blue)}
 .figure{border-radius:var(--radius);overflow:hidden;aspect-ratio:4/3;box-shadow:var(--shadow-s)}
 .figure .ph{width:100%;height:100%}
 
+/* ---------- Cohérence de marque ----------
+   Visuel du manifeste : le même repère posé sur quatre supports. C'est la
+   démonstration de ce que dit le texte à côté — une marque tient à sa
+   cohérence, pas à ses effets. Dessiné en HTML, comme le reste. */
+.coherence{
+  aspect-ratio:4/3;border-radius:var(--radius);box-shadow:var(--shadow-s);
+  background:
+    radial-gradient(110% 80% at 25% 0%, #FFFFFF 0%, rgba(255,255,255,0) 58%),
+    linear-gradient(160deg,#F1F4FA 0%,#F5F5F7 52%,#EAEDF3 100%);
+  padding:clamp(18px,3vw,30px);
+  display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;
+  gap:clamp(12px,1.6vw,18px);
+}
+.coh{
+  background:var(--white);border-radius:10px;box-shadow:var(--shadow-s);
+  padding:11px 12px;display:flex;flex-direction:column;gap:8px;overflow:hidden;
+}
+.coh__lab{
+  font-size:9px;font-weight:600;letter-spacing:.09em;text-transform:uppercase;
+  color:var(--gray);
+}
+.coh__marque{display:flex;align-items:center;gap:5px}
+.coh__marque i{width:6px;height:6px;border-radius:50%;background:var(--blue);flex:none}
+.coh__marque b{font-size:10px;font-weight:600;letter-spacing:-.01em;color:var(--black)}
+.coh__barres{display:flex;flex-direction:column;gap:4px;margin-top:auto}
+.coh__barres em{display:block;height:3px;border-radius:2px;background:var(--light-gray)}
+.coh__barres em:last-child{width:58%}
+
+/* Le site : une barre d'adresse suffit à le dire */
+.coh--site .coh__url{
+  height:11px;border-radius:999px;background:var(--off-white);
+  border:1px solid var(--rule);
+}
+/* La carte de visite : format paysage, marque centrée */
+.coh--carte{align-items:center;justify-content:center;text-align:center}
+.coh--carte .coh__marque{flex-direction:column;gap:6px}
+.coh--carte .coh__marque i{width:8px;height:8px}
+.coh--carte .coh__marque b{font-size:12px}
+/* L'enseigne : fond sombre, marque en négatif */
+.coh--enseigne{background:var(--black);align-items:center;justify-content:center}
+.coh--enseigne .coh__lab{color:rgba(255,255,255,.45)}
+.coh--enseigne .coh__marque b{color:#fff}
+/* Le réseau social : vignette carrée */
+.coh--reseau .coh__vignette{
+  aspect-ratio:1;border-radius:8px;
+  background:linear-gradient(150deg,#D8E4F7,#EDE9F7);
+  display:grid;place-items:center;
+}
+.coh--reseau .coh__vignette i{width:14px;height:14px;border-radius:50%;background:var(--blue)}
+
+@media (max-width:640px){
+  .coherence{aspect-ratio:1;gap:10px;padding:16px}
+  .coh{padding:9px 10px;gap:6px}
+}
+
+/* ---------- Le duo ----------
+   Deux membres, un objectif. La photo est le point fort du studio — en
+   attendant, un panneau typographique tient la place sans faire vide. */
+.duo{display:grid;grid-template-columns:1fr 1fr;gap:var(--s6);align-items:center;max-width:1180px;margin-inline:auto}
+.duo__portrait{
+  aspect-ratio:4/5;border-radius:var(--radius);overflow:hidden;
+  box-shadow:var(--shadow-m);position:relative;
+  background:linear-gradient(160deg,#1A1A1E 0%,#0D0D0F 60%,#16161A 100%);
+  display:grid;place-items:center;
+}
+.duo__portrait img{width:100%;height:100%;object-fit:cover;display:block}
+/* Les deux initiales tiennent la place de la photo. Un temps retournées
+   pour évoquer le dos à dos : un J en miroir ne se lit plus, la lisibilité
+   passe devant l'idée. Un filet les sépare — deux personnes, une marque. */
+.duo__initiales{
+  display:flex;align-items:center;gap:clamp(14px,2.4vw,30px);
+  font-size:clamp(52px,8.5vw,96px);font-weight:700;letter-spacing:-.04em;
+  color:rgba(255,255,255,.94);line-height:1;
+}
+.duo__initiales::after{
+  content:"";position:absolute;left:50%;top:50%;translate:-50% -50%;
+  width:1px;height:clamp(58px,10vw,110px);background:rgba(255,255,255,.22);
+}
+.duo__legende{
+  position:absolute;left:0;right:0;bottom:0;padding:16px 18px;
+  font-size:13px;color:rgba(255,255,255,.62);text-align:center;
+  background:linear-gradient(to top, rgba(0,0,0,.45), transparent);
+}
+.membres{display:flex;flex-direction:column;gap:var(--s3)}
+.membre{
+  background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow-s);
+  padding:var(--s3) var(--s3) var(--s4);
+}
+.membre__nom{font-size:20px;font-weight:600;letter-spacing:-.018em;color:var(--black)}
+.membre__role{font-size:14px;font-weight:600;color:var(--blue);margin-top:2px}
+.membre__desc{margin-top:10px;color:var(--gray);font-size:16px;line-height:1.55}
+
+@media (max-width:860px){
+  .duo{grid-template-columns:1fr;gap:var(--s4)}
+  .duo__portrait{aspect-ratio:3/2}
+}
+
 /* ---------- Pied de page ---------- */
 .footer{background:rgba(245,245,247,.78);backdrop-filter:blur(8px);padding-top:var(--s6)}
 .footer__big{
@@ -622,6 +719,8 @@ a.work-item:hover .work-item__title{color:var(--blue)}
   .tel-mini{right:3%;width:23%;bottom:12%}
 }
 @media (max-width:420px){
+  /* Huit mots au lieu de trois : le titre respire mieux un cran plus bas. */
+  .hero__title .line>span{font-size:34px;letter-spacing:-.022em}
   .nave__ecran{height:118px}
   .nave__page{padding:9px 10px;gap:7px}
 }
@@ -799,6 +898,17 @@ a.work-item:hover .work-item__title{color:var(--blue)}
   .footer__cols{grid-template-columns:1fr;gap:var(--s4)}
 }
 
+/* Écrans courts (iPhone SE, petits Android) : la hauteur, pas la largeur,
+   est la contrainte. On resserre le haut et la scène de l'objet pour que le
+   premier écran tienne encore le titre, le chapô, les boutons et les
+   chiffres — sans quoi ces derniers passent sous le pli. */
+@media (max-width:900px) and (max-height:800px){
+  .hero{padding-top:88px}
+  .hero__meta{gap:var(--s2)}
+  .hero .trust{padding-bottom:clamp(56px,9vh,110px);margin-top:var(--s4)}
+  .hero .trust{gap:10px var(--s4)}
+}
+
 /* Sur les écrans à encoche, la barre passait sous la découpe. */
 @supports (padding:max(0px)){
   @media (max-width:900px){
@@ -820,7 +930,7 @@ a.work-item:hover .work-item__title{color:var(--blue)}
   /* Les chiffres remontent pour dégager le bas de l'écran : c'est la scène
      de l'objet, qu'on laisse volontairement mordre sur le bord — une forme
      coupée par le pli donne envie de faire défiler. */
-  .hero .trust{margin-top:auto;padding-bottom:clamp(230px,34vh,300px)}
+  .hero .trust{margin-top:auto;padding-bottom:clamp(120px,20vh,260px)}
   .hero__meta .btn,.cta-band .btn{width:100%}
   .work-item{grid-template-columns:1fr;gap:6px;align-items:flex-start}
   .work-item__meta{white-space:normal}
@@ -864,7 +974,7 @@ a.work-item:hover .work-item__title{color:var(--blue)}
     <a href="#" data-go="studio">Le studio</a>
     <a href="#" data-go="contact">Contact</a>
   </nav>
-  <a href="#" data-go="contact" class="nav__cta" data-magnetic="0.3">Prendre RDV <span aria-hidden="true">↗</span></a>
+  <a href="#" data-go="contact" class="nav__cta" data-magnetic="0.3">Parlons de votre projet <span aria-hidden="true">↗</span></a>
   <button class="nav__burger" aria-label="Ouvrir le menu" aria-expanded="false"><span></span><span></span><span></span></button>
 </header>
 
@@ -872,7 +982,7 @@ a.work-item:hover .work-item__title{color:var(--blue)}
   <a href="#" data-go="work"><small>01</small>Réalisations</a>
   <a href="#" data-go="studio"><small>02</small>Le studio</a>
   <a href="#" data-go="contact"><small>03</small>Contact</a>
-  <a href="#" data-go="contact" class="btn btn--glow mobile-menu__cta">Réserver un appel <span class="arw" aria-hidden="true">↗</span></a>
+  <a href="#" data-go="contact" class="btn btn--glow mobile-menu__cta">Parlons de votre projet <span class="arw" aria-hidden="true">↗</span></a>
 </nav>
 
 <main class="wrap">
@@ -883,14 +993,14 @@ a.work-item:hover .work-item__title{color:var(--blue)}
   <!-- HERO -->
   <section class="hero container">
     <h1 class="hero__title display">
-      <span class="eyebrow hero__eyebrow">Agence web à Sète · Hérault</span>
-      <span class="line"><span>Conçu pour durer.</span></span>
+      <span class="eyebrow hero__eyebrow">Agence web · Bassin de Thau &amp; partout en France</span>
+      <span class="line"><span>Le site qui donne envie de vous choisir.</span></span>
     </h1>
     <div class="hero__meta">
-      <p class="lead">Agence web et digitale installée à Sète, nous faisons la création de sites internet et d'identités de marque pour les entreprises de l'Hérault. Une seule équipe, du premier croquis à la mise en ligne.</p>
+      <p class="lead">Nous sommes deux créatifs basés à Sète. Nous concevons des sites web modernes, rapides et pensés pour transformer vos visiteurs en clients — partout en France.</p>
       <div class="hero__actions">
-        <a href="#" data-go="contact" class="btn btn--glow">Réserver un appel</a>
-        <a href="#" data-go="work" class="link-t">Voir nos réalisations <span class="arw" aria-hidden="true">↗</span></a>
+        <a href="#" data-go="contact" class="btn btn--glow">Parlons de votre projet</a>
+        <a href="#" data-go="work" class="link-t">Découvrir nos réalisations <span class="arw" aria-hidden="true">↗</span></a>
       </div>
     </div>
     <ul class="trust" aria-label="Chiffres clés">
@@ -904,9 +1014,9 @@ a.work-item:hover .work-item__title{color:var(--blue)}
   <!-- CE QUE NOUS FAISONS -->
   <section class="container pad-y sep">
     <div class="sec-head reveal">
-      <span class="eyebrow">Nos métiers</span>
-      <h2 class="h2">Site internet, marque et motion<br>— un seul interlocuteur à Sète.</h2>
-      <p class="lead">Tout ce qu’il faut pour exister en ligne, sans passer par cinq prestataires qui ne se parlent pas.</p>
+      <span class="eyebrow">Ce que nous créons pour vous</span>
+      <h2 class="h2">Un site qui attire.<br>Une marque qu’on retient.</h2>
+      <p class="lead">Pour donner envie de vous choisir, votre présence en ligne doit être claire, crédible et mémorable. Nous réunissons tout ce qu’il faut pour y parvenir&nbsp;: site internet, identité visuelle et contenu — depuis Sète, partout en France.</p>
     </div>
 
     <div class="features">
@@ -1054,14 +1164,14 @@ a.work-item:hover .work-item__title{color:var(--blue)}
   <section class="container pad-y sep">
     <div class="sec-head reveal">
       <span class="eyebrow">Comment ça se passe</span>
-      <h2 class="h2">Quatre temps,<br>zéro surprise.</h2>
-      <p class="lead">Un devis fixe, un calendrier annoncé, un interlocuteur qui répond. Le reste, c’est notre affaire.</p>
+      <h2 class="h2">Quatre étapes,<br>zéro surprise.</h2>
+      <p class="lead">Un devis clair, un calendrier annoncé, une équipe disponible. Vous savez où va votre projet à chaque étape.</p>
     </div>
     <div class="steps rs">
-      <div class="step"><div class="step__no">01</div><div class="step__name">Écoute</div><p class="step__desc">Un rendez-vous chez vous. On regarde votre activité, vos clients, ce qui vous distingue.</p></div>
-      <div class="step"><div class="step__no">02</div><div class="step__name">Direction</div><p class="step__desc">Une maquette, une seule idée forte. Vous validez avant qu’une ligne de code soit écrite.</p></div>
-      <div class="step"><div class="step__no">03</div><div class="step__name">Fabrication</div><p class="step__desc">On construit, vous suivez l’avancement sur un lien privé, mis à jour en continu.</p></div>
-      <div class="step"><div class="step__no">04</div><div class="step__name">Mise en ligne</div><p class="step__desc">On publie, on référence, on vous forme. Une heure suffit pour être autonome.</p></div>
+      <div class="step"><div class="step__no">01</div><div class="step__name">Écoute</div><p class="step__desc">Un premier échange en visio, par téléphone ou sur place. On découvre votre activité, vos clients et ce qui vous distingue.</p></div>
+      <div class="step"><div class="step__no">02</div><div class="step__name">Conception</div><p class="step__desc">Nous imaginons une maquette et une direction claire pour votre projet. Vous validez avant que la création commence.</p></div>
+      <div class="step"><div class="step__no">03</div><div class="step__name">Création</div><p class="step__desc">Nous construisons votre site et vous suivez son avancée sur un espace privé, mis à jour régulièrement.</p></div>
+      <div class="step"><div class="step__no">04</div><div class="step__name">Mise en ligne</div><p class="step__desc">Nous publions, optimisons votre référencement et vous formons. Vous repartez autonome avec un site prêt à vous apporter des clients.</p></div>
     </div>
   </section>
 
@@ -1129,9 +1239,9 @@ a.work-item:hover .work-item__title{color:var(--blue)}
     <div class="cta-band reveal">
       <span class="eyebrow">Devis gratuit · Réponse sous 24 h</span>
       <h2 class="h2">Parlons de votre projet.</h2>
-      <p class="lead">Trente minutes au téléphone, sans engagement. On cadre votre besoin et on vous dit franchement ce que ça coûte.</p>
+      <p class="lead">Trente minutes au téléphone, sans engagement. On cadre votre besoin, puis vous recevez une proposition claire, adaptée à ce que vous voulez atteindre.</p>
       <div class="hero__actions">
-        <a href="#" data-go="contact" class="btn btn--glow">Réserver un appel</a>
+        <a href="#" data-go="contact" class="btn btn--glow">Parlons de votre projet</a>
         <a href="tel:+33611718368" class="link-t">06 11 71 83 68</a>
       </div>
     </div>
@@ -1146,8 +1256,8 @@ a.work-item:hover .work-item__title{color:var(--blue)}
   <section class="container" style="padding-top:clamp(130px,18vh,200px);padding-bottom:clamp(36px,5vw,60px)">
     <div class="stack">
       <span class="eyebrow reveal">Portfolio · 2026</span>
-      <h1 class="display reveal">Nos réalisations.</h1>
-      <p class="lead reveal">Nous préférons montrer peu de projets, mais en ligne et consultables. Chacun part d’une contrainte réelle&nbsp;: un budget, un délai, un public.</p>
+      <h1 class="display reveal">Notre réalisation.</h1>
+      <p class="lead reveal">Nous sommes un jeune studio&nbsp;: nous n’affichons que ce qui est réellement en ligne, pas des maquettes. Un projet livré, consultable — et le vôtre peut être le prochain.</p>
     </div>
   </section>
 
@@ -1194,7 +1304,7 @@ a.work-item:hover .work-item__title{color:var(--blue)}
     <div class="cta-band reveal">
       <span class="eyebrow">Votre projet est le prochain</span>
       <h2 class="h2">On en discute&nbsp;?</h2>
-      <a href="#" data-go="contact" class="btn btn--glow" data-magnetic="0.3" data-cursor="Réserver">Réserver un appel <span class="arw">↗</span></a>
+      <a href="#" data-go="contact" class="btn btn--glow" data-magnetic="0.3" data-cursor="Réserver">Parlons de votre projet <span class="arw">↗</span></a>
     </div>
   </section>
 
@@ -1208,18 +1318,35 @@ a.work-item:hover .work-item__title{color:var(--blue)}
     <div class="stack">
       <span class="eyebrow reveal">Le studio</span>
       <h1 class="display reveal">Petite équipe,<br>grandes attentions.</h1>
-      <p class="lead reveal">Studio indépendant installé à Sète. Nous prenons peu de projets à la fois, pour pouvoir nous occuper de chacun comme il faut.</p>
+      <p class="lead reveal">Studio indépendant basé à Sète, nous accompagnons des entreprises du Bassin de Thau et partout en France. Peu de projets à la fois, pour donner à chacun l’attention qu’il mérite.</p>
     </div>
   </section>
 
   <section class="container pad-y sep">
     <div class="split">
-      <div class="figure reveal"><div class="ph ph-5 ph-grid"></div></div>
+      <div class="coherence reveal" aria-hidden="true">
+        <div class="coh coh--site">
+          <span class="coh__lab">Site</span>
+          <div class="coh__marque"><i></i><b>Votre marque</b></div>
+          <div class="coh__url"></div>
+          <div class="coh__barres"><em></em><em></em></div>
+        </div>
+        <div class="coh coh--carte">
+          <div class="coh__marque"><i></i><b>Votre marque</b></div>
+        </div>
+        <div class="coh coh--enseigne">
+          <div class="coh__marque"><i></i><b>Votre marque</b></div>
+        </div>
+        <div class="coh coh--reseau">
+          <span class="coh__lab">Réseaux</span>
+          <div class="coh__vignette"><i></i></div>
+          <div class="coh__barres"><em></em><em></em></div>
+        </div>
+      </div>
       <div class="reveal">
         <span class="eyebrow">Manifeste</span>
         <h2 class="h2 mt-m">Le détail fait<br>toute la différence.</h2>
-        <p class="lead mt-m">Une marque forte n'est pas la somme de ses effets, mais la cohérence de ses intentions. Nous travaillons la matière — typographie, rythme, mouvement, silence — jusqu'à ce que tout paraisse évident.</p>
-        <p class="lead mt-m dim">Le résultat&nbsp;: des identités qui respirent le premium et des interfaces qui donnent envie de rester.</p>
+        <p class="lead mt-m">Une marque forte ne se limite pas à un beau design. Elle doit être claire, cohérente et donner envie de vous choisir. C’est ce que nous construisons, dans chaque détail.</p>
       </div>
     </div>
   </section>
@@ -1234,18 +1361,37 @@ a.work-item:hover .work-item__title{color:var(--blue)}
   </section>
 
   <section class="container pad-y sep">
-    <div class="sec-head">
-      <div class="sec-head__t reveal">
-        <span class="eyebrow">Comment on travaille</span>
-        <h2 class="h2">La méthode</h2>
-      </div>
-      <p class="lead reveal">Quatre temps. Transparent, cadré, sans surprise — sauf sur le résultat.</p>
+    <div class="sec-head reveal">
+      <span class="eyebrow">L’équipe derrière votre projet</span>
+      <h2 class="h2">Deux profils complémentaires.<br>Un même objectif&nbsp;: vous faire choisir.</h2>
+      <p class="lead">Nous sommes deux créatifs basés à Sète. Nous associons stratégie, design et création web pour construire une présence en ligne qui vous ressemble — et qui donne confiance à vos futurs clients.</p>
     </div>
-    <div class="steps rs">
-      <div class="step"><div class="step__no">Étape 1</div><div class="step__name">Écoute</div><p class="step__desc">On comprend votre marché, vos objectifs et ce qui vous rend unique. Tout part de là.</p></div>
-      <div class="step"><div class="step__no">Étape 2</div><div class="step__name">Direction</div><p class="step__desc">On définit une direction claire&nbsp;: territoire, ton, système. Une seule idée forte.</p></div>
-      <div class="step"><div class="step__no">Étape 3</div><div class="step__name">Création</div><p class="step__desc">Design, motion, développement. On façonne chaque détail jusqu'à la justesse.</p></div>
-      <div class="step"><div class="step__no">Étape 4</div><div class="step__name">Lancement</div><p class="step__desc">On livre, on met en ligne, on accompagne. Prêt à faire de l'effet.</p></div>
+
+    <div class="duo">
+      <!-- PHOTO À VENIR — tous les deux en chemise blanche, dos à dos, bras
+           croisés, regard légèrement vers l'objectif, sourire.
+           Une fois la photo prise, la déposer dans assets/img/duo.jpg et
+           remplacer tout le contenu de .duo__portrait par :
+             <img src="assets/img/duo.jpg" alt="Matheis et Jérémy, fondateurs de MJ Agency, à Sète" width="1200" height="1500">
+           En attendant, les deux initiales dos à dos tiennent la place et
+           annoncent la composition, plutôt que de laisser un cadre vide. -->
+      <div class="duo__portrait reveal">
+        <div class="duo__initiales" aria-hidden="true"><span>M</span><span>J</span></div>
+        <p class="duo__legende">Matheis &amp; Jérémy — Sète, Hérault</p>
+      </div>
+
+      <div class="membres rs">
+        <article class="membre">
+          <h3 class="membre__nom">Matheis</h3>
+          <div class="membre__role">Stratégie &amp; développement</div>
+          <p class="membre__desc">Il transforme vos objectifs en un site rapide, clair et simple à utiliser.</p>
+        </article>
+        <article class="membre">
+          <h3 class="membre__nom">Jérémy</h3>
+          <div class="membre__role">Direction artistique &amp; design</div>
+          <p class="membre__desc">Il donne à votre marque une identité reconnaissable et une expérience qui marque les esprits.</p>
+        </article>
+      </div>
     </div>
   </section>
 
@@ -1268,7 +1414,7 @@ a.work-item:hover .work-item__title{color:var(--blue)}
     <div class="cta-band reveal">
       <span class="eyebrow">Prêt à commencer&nbsp;?</span>
       <h2 class="h2">Travaillons<br>ensemble.</h2>
-      <a href="#" data-go="contact" class="btn btn--glow" data-magnetic="0.3" data-cursor="Réserver">Réserver un appel <span class="arw">↗</span></a>
+      <a href="#" data-go="contact" class="btn btn--glow" data-magnetic="0.3" data-cursor="Réserver">Parlons de votre projet <span class="arw">↗</span></a>
     </div>
   </section>
 
@@ -1281,8 +1427,8 @@ a.work-item:hover .work-item__title{color:var(--blue)}
   <section class="container" style="padding-top:clamp(130px,18vh,200px);padding-bottom:clamp(30px,4vw,50px)">
     <div class="stack">
       <span class="eyebrow reveal">Réponse sous 24 h</span>
-      <h1 class="display reveal">Parlons-en.</h1>
-      <p class="lead reveal">Trente minutes au téléphone, sans engagement. On cadre votre besoin et on vous dit franchement ce que ça coûte.</p>
+      <h1 class="display reveal">Parlons de votre projet.</h1>
+      <p class="lead reveal">30 minutes, sans engagement, pour comprendre votre besoin, répondre à vos questions et voir si nous sommes la bonne équipe pour vous accompagner.</p>
     </div>
   </section>
 
@@ -1290,9 +1436,9 @@ a.work-item:hover .work-item__title{color:var(--blue)}
     <div class="sec-head">
       <div class="sec-head__t reveal">
         <span class="eyebrow">Réservation</span>
-        <h2 class="h2">Choisissez un créneau</h2>
+        <h2 class="h2">Choisissez le créneau qui vous convient.</h2>
       </div>
-      <p class="lead reveal">Un appel de 30 minutes, sans engagement. On fait connaissance et on cadre votre projet.</p>
+      <p class="lead reveal">Un échange simple et sans pression pour faire connaissance, clarifier votre projet et vous donner une première direction.</p>
     </div>
 
     <div class="booking reveal">

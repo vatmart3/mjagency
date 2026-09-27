@@ -221,7 +221,7 @@ function page(v) {
     <a href="studio.html">Le studio</a>
     <a href="contact.html">Contact</a>
   </nav>
-  <a href="contact.html" class="nav__cta" data-magnetic="0.3">Prendre RDV <span aria-hidden="true">↗</span></a>
+  <a href="contact.html" class="nav__cta" data-magnetic="0.3">Parlons de votre projet <span aria-hidden="true">↗</span></a>
   <button class="nav__burger" aria-label="Ouvrir le menu" aria-expanded="false"><span></span><span></span><span></span></button>
 </header>
 
@@ -229,7 +229,7 @@ function page(v) {
   <a href="work.html"><small>01</small>Réalisations</a>
   <a href="studio.html"><small>02</small>Le studio</a>
   <a href="contact.html"><small>03</small>Contact</a>
-  <a href="contact.html" class="btn btn--glow mobile-menu__cta">Réserver un appel <span class="arw" aria-hidden="true">↗</span></a>
+  <a href="contact.html" class="btn btn--glow mobile-menu__cta">Parlons de votre projet <span class="arw" aria-hidden="true">↗</span></a>
 </nav>
 
 <main class="wrap">
@@ -311,7 +311,7 @@ function page(v) {
     <div class="cta-band reveal">
       <span class="eyebrow">Devis gratuit · Réponse sous 24 h</span>
       <h2 class="h2">Un projet<br>à ${court}&nbsp;?</h2>
-      <a href="contact.html" class="btn btn--glow" data-magnetic="0.3" data-cursor="Réserver">Réserver un appel <span class="arw" aria-hidden="true">↗</span></a>
+      <a href="contact.html" class="btn btn--glow" data-magnetic="0.3" data-cursor="Réserver">Parlons de votre projet <span class="arw" aria-hidden="true">↗</span></a>
       <p class="dim" style="font-size:14px">ou appelez directement le <a href="tel:${TEL_URI}" style="color:var(--accent-2)">${TEL_AFF}</a></p>
     </div>
   </section>
