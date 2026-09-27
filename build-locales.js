@@ -192,7 +192,7 @@ function pageLegale({ slug, titre, desc, h1, chapo, corps }) {
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23FFFFFF'/%3E%3Ctext x='50' y='68' font-family='Arial' font-weight='700' font-size='54' fill='%230D0D0F' text-anchor='middle'%3EMJ%3C/text%3E%3C/svg%3E">
 <link rel="stylesheet" href="assets/css/fonts.css">
 <link rel="stylesheet" href="assets/css/style.css">
-<noscript><style>.reveal,.rs>*{opacity:1!important;transform:none!important}</style></noscript>
+<noscript><style>.reveal,.rs>*{opacity:1!important;transform:none!important}.masque>span,.hero__title .line>span{transform:none!important}</style></noscript>
 </head>
 <body>
 <canvas id="bg-canvas" aria-hidden="true"></canvas>
@@ -481,6 +481,7 @@ function page(v) {
 <link rel="stylesheet" href="assets/css/style.css">
 <noscript><style>
   .reveal,.rs>*{opacity:1!important;transform:none!important}
+  .masque>span,.hero__title .line>span{transform:none!important}
   .loader{display:none}
 </style></noscript>
 

@@ -401,6 +401,52 @@
     }
   })();
 
+
+  /* =========================================================
+     RÉVÉLATION DES TITRES
+
+     Le découpage se fait ici plutôt que dans les dix fichiers HTML : un
+     seul endroit à maintenir, et les titres restent du texte simple dans
+     la source — lisible par un robot d'indexation comme par un lecteur
+     d'écran.
+
+     On découpe sur les <br> déjà présents dans les titres : chaque ligne
+     obtient son masque et son léger retard. Pas de mesure des lignes
+     réelles, donc rien ne se casse au changement de largeur.
+     ========================================================= */
+  (function revelerTitres() {
+    // Les intertitres des pages légales restent des intertitres.
+    const titres = [...document.querySelectorAll('.h2')]
+      .filter(h => !h.closest('.legal'));
+
+    titres.forEach(h => {
+      if (h.dataset.masque) return;
+      const lignes = h.innerHTML.split(/<br\s*\/?>/i).map(t => t.trim()).filter(Boolean);
+      h.innerHTML = lignes
+        .map(t => `<span class="masque"><span>${t}</span></span>`)
+        .join('');
+      h.dataset.masque = '1';
+    });
+
+    /* Un titre n'est pas toujours dans un conteneur observé (.reveal) :
+       on l'observe alors pour lui-même, sinon il resterait masqué. */
+    const orphelins = titres.filter(h => !h.closest('.reveal, .rs'));
+    const io = new IntersectionObserver(entrees => entrees.forEach(e => {
+      if (!e.isIntersecting) return;
+      e.target.querySelectorAll('.masque').forEach(m => m.classList.add('vu'));
+      io.unobserve(e.target);
+    }), { threshold: 0.2 });
+    orphelins.forEach(h => io.observe(h));
+
+    /* Le titre du hero se découvre au chargement, pas au défilement : il
+       est déjà à l'écran. Un souffle de retard laisse la page se poser. */
+    const hero = document.querySelector('.hero__title');
+    if (hero) {
+      if (reduced) hero.classList.add('vu');
+      else requestAnimationFrame(() => setTimeout(() => hero.classList.add('vu'), 120));
+    }
+  })();
+
   if (document.readyState === 'complete') boot();
   else addEventListener('load', boot);
 })();

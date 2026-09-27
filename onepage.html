@@ -598,6 +598,55 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
   .duo__portrait{aspect-ratio:3/2}
 }
 
+/* ---------- Révélation par masque ----------
+   Presque tous les sites font monter leur texte en fondu. Ici le titre se
+   découvre derrière un bord net, comme une feuille qu'on tire d'une
+   enveloppe : le mot est déjà entier avant d'être visible — il n'a pas
+   l'air de charger, il arrive.
+
+   Réservé aux grands titres. Appliqué à des paragraphes, le procédé
+   devient un tic et la page se met à ramer. Les titres des pages légales
+   en sont exclus : ce sont des intertitres de document, pas des affiches.
+
+   Le texte reste dans le flux : c'est le masque qui le cache, jamais
+   l'opacité. Sans JavaScript, le repli plus bas le montre entier. */
+.masque{display:block;overflow:hidden}
+.masque>span{
+  display:block;
+  transform:translateY(105%);
+  transition:transform .85s var(--ease);
+}
+.reveal.in .masque>span,.masque.vu>span,.rs.in .masque>span{transform:none}
+/* Le décalage entre les lignes fait la phrase, plus que la montée elle-même */
+.masque:nth-child(2)>span{transition-delay:.075s}
+.masque:nth-child(3)>span{transition-delay:.15s}
+.masque:nth-child(4)>span{transition-delay:.225s}
+
+/* Un conteneur qui porte un titre masqué ne se fond plus. Sinon le titre
+   monte en translucide et retrouve exactement l'air de charger que le
+   masque est censé supprimer — mesuré à 59 % d'opacité en pleine montée.
+   Ses autres enfants, eux, gardent leur apparition.
+
+   Sous @supports : là où :has() manque, on retombe sur l'ancien
+   comportement — fondu plus masque. Moins net, jamais cassé. */
+@supports selector(:has(*)){
+  .reveal:has(.masque){opacity:1;transform:none;transition:none}
+  .reveal:has(.masque)>:not(.h2){
+    opacity:0;transform:translateY(16px);
+    transition:opacity .7s var(--ease),transform .7s var(--ease);
+  }
+  .reveal.in:has(.masque)>:not(.h2){opacity:1;transform:none}
+}
+
+/* Le titre du hero avait déjà la bonne structure : une ligne, un bloc. */
+.hero__title .line{overflow:hidden}
+.hero__title .line>span{transform:translateY(105%);transition:transform .95s var(--ease)}
+.hero__title.vu .line>span{transform:none}
+
+@media (prefers-reduced-motion:reduce){
+  .masque>span,.hero__title .line>span{transform:none!important;transition:none}
+}
+
 /* ---------- Pages légales ----------
    Un document, pas une page d'accueil : une seule colonne, mesure de lecture
    contenue, titres qui se repèrent sans crier. */
@@ -2434,6 +2483,52 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
         el.style.transform = `translate3d(0, ${(p * 11).toFixed(2)}px, 0)`;
       });
       requestAnimationFrame(image);
+    }
+  })();
+
+
+  /* =========================================================
+     RÉVÉLATION DES TITRES
+
+     Le découpage se fait ici plutôt que dans les dix fichiers HTML : un
+     seul endroit à maintenir, et les titres restent du texte simple dans
+     la source — lisible par un robot d'indexation comme par un lecteur
+     d'écran.
+
+     On découpe sur les <br> déjà présents dans les titres : chaque ligne
+     obtient son masque et son léger retard. Pas de mesure des lignes
+     réelles, donc rien ne se casse au changement de largeur.
+     ========================================================= */
+  (function revelerTitres() {
+    // Les intertitres des pages légales restent des intertitres.
+    const titres = [...document.querySelectorAll('.h2')]
+      .filter(h => !h.closest('.legal'));
+
+    titres.forEach(h => {
+      if (h.dataset.masque) return;
+      const lignes = h.innerHTML.split(/<br\s*\/?>/i).map(t => t.trim()).filter(Boolean);
+      h.innerHTML = lignes
+        .map(t => `<span class="masque"><span>${t}</span></span>`)
+        .join('');
+      h.dataset.masque = '1';
+    });
+
+    /* Un titre n'est pas toujours dans un conteneur observé (.reveal) :
+       on l'observe alors pour lui-même, sinon il resterait masqué. */
+    const orphelins = titres.filter(h => !h.closest('.reveal, .rs'));
+    const io = new IntersectionObserver(entrees => entrees.forEach(e => {
+      if (!e.isIntersecting) return;
+      e.target.querySelectorAll('.masque').forEach(m => m.classList.add('vu'));
+      io.unobserve(e.target);
+    }), { threshold: 0.2 });
+    orphelins.forEach(h => io.observe(h));
+
+    /* Le titre du hero se découvre au chargement, pas au défilement : il
+       est déjà à l'écran. Un souffle de retard laisse la page se poser. */
+    const hero = document.querySelector('.hero__title');
+    if (hero) {
+      if (reduced) hero.classList.add('vu');
+      else requestAnimationFrame(() => setTimeout(() => hero.classList.add('vu'), 120));
     }
   })();
 
