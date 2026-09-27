@@ -211,14 +211,40 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
 }
 .hero__meta .lead{max-width:44ch}
 
-/* ---------- Apparitions, discrètes ---------- */
-.reveal{opacity:0;transform:translateY(16px);transition:opacity .7s var(--ease),transform .7s var(--ease)}
+/* ---------- Apparitions ----------
+   La course était de 16 px : à peine perceptible. Elle passe à 34 px avec
+   un soupçon d'échelle, ce qui donne une vraie arrivée plutôt qu'un
+   clignement. Même courbe que tout le reste du site. */
+.reveal{
+  opacity:0;transform:translateY(34px) scale(.985);
+  transition:opacity .8s var(--ease),transform .8s var(--ease);
+}
 .reveal.in{opacity:1;transform:none}
-.rs>*{opacity:0;transform:translateY(14px);transition:opacity .6s var(--ease),transform .6s var(--ease)}
+
+.rs>*{
+  opacity:0;transform:translateY(28px) scale(.99);
+  transition:opacity .7s var(--ease),transform .7s var(--ease);
+}
 .rs.in>*{opacity:1;transform:none}
-.rs.in>*:nth-child(2){transition-delay:.06s}
-.rs.in>*:nth-child(3){transition-delay:.12s}
-.rs.in>*:nth-child(4){transition-delay:.18s}
+.rs.in>*:nth-child(2){transition-delay:.07s}
+.rs.in>*:nth-child(3){transition-delay:.14s}
+.rs.in>*:nth-child(4){transition-delay:.21s}
+
+/* ---------- Arrivée à l'unité ----------
+   Une longue liste révélée d'un bloc s'anime en grande partie hors écran :
+   sur téléphone, la FAQ fait huit cents pixels et on ne voit jamais
+   arriver ses dernières questions. Chaque élément est donc observé pour
+   lui-même et arrive au moment où il entre réellement dans le cadre.
+   C'est ce qui fait que la page se construit sous le pouce. */
+.arrive{
+  opacity:0;transform:translateY(38px) scale(.98);
+  transition:opacity .75s var(--ease),transform .75s var(--ease);
+}
+.arrive.vu{opacity:1;transform:none}
+
+@media (prefers-reduced-motion:reduce){
+  .reveal,.rs>*,.arrive{opacity:1!important;transform:none!important;transition:none}
+}
 
 /* ---------- En-tête de section ---------- */
 .sec-head{
@@ -630,12 +656,17 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
    Sous @supports : là où :has() manque, on retombe sur l'ancien
    comportement — fondu plus masque. Moins net, jamais cassé. */
 @supports selector(:has(*)){
-  .reveal:has(.masque){opacity:1;transform:none;transition:none}
-  .reveal:has(.masque)>:not(.h2){
-    opacity:0;transform:translateY(16px);
-    transition:opacity .7s var(--ease),transform .7s var(--ease);
+  /* Enfant direct seulement. Écrit « :has(.masque) », la règle attrapait
+     aussi les conteneurs où le titre est imbriqué plus profond — elle
+     déplaçait alors le fondu sur le bloc qui porte le titre, lequel se
+     remettait à fondre : le contraire du but. Ces conteneurs gardent leur
+     apparition normale, et le masque s'y superpose simplement. */
+  .reveal:has(> .h2 > .masque){opacity:1;transform:none;transition:none}
+  .reveal:has(> .h2 > .masque)>:not(.h2){
+    opacity:0;transform:translateY(34px) scale(.985);
+    transition:opacity .8s var(--ease),transform .8s var(--ease);
   }
-  .reveal.in:has(.masque)>:not(.h2){opacity:1;transform:none}
+  .reveal.in:has(> .h2 > .masque)>:not(.h2){opacity:1;transform:none}
 }
 
 /* Le titre du hero avait déjà la bonne structure : une ligne, un bloc. */
@@ -1321,7 +1352,7 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
       <h2 class="h2">Nos dernières réalisations</h2>
       <a href="#" data-go="work" class="btn">Tout voir</a>
     </div>
-    <div class="work-list reveal">
+    <div class="work-list">
       <a href="https://boucherievatuonefidelite.fr" target="_blank" rel="noopener" class="work-item">
         <span class="work-item__title">Boucherie Vatuone — fidélité</span>
         <span class="work-item__meta">Programme de fidélité en ligne — 2026</span>
@@ -1336,7 +1367,7 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
       <h2 class="h2">Quatre étapes,<br>zéro surprise.</h2>
       <p class="lead">Un devis clair, un calendrier annoncé, une équipe disponible. Vous savez où va votre projet à chaque étape.</p>
     </div>
-    <div class="steps rs">
+    <div class="steps">
       <div class="step"><div class="step__no">01</div><div class="step__name">Écoute</div><p class="step__desc">Un premier échange en visio, par téléphone ou sur place. On découvre votre activité, vos clients et ce qui vous distingue.</p></div>
       <div class="step"><div class="step__no">02</div><div class="step__name">Conception</div><p class="step__desc">Nous imaginons une maquette et une direction claire pour votre projet. Vous validez avant que la création commence.</p></div>
       <div class="step"><div class="step__no">03</div><div class="step__name">Création</div><p class="step__desc">Nous construisons votre site et vous suivez son avancée sur un espace privé, mis à jour régulièrement.</p></div>
@@ -1375,7 +1406,7 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
       <span class="eyebrow">Questions fréquentes</span>
       <h2 class="h2">Ce qu'on nous demande<br>avant de se lancer.</h2>
     </div>
-    <div class="faq reveal">
+    <div class="faq">
       <details class="faq__item">
         <summary class="faq__q"><h3>Combien coûte un site internet à Sète&nbsp;?</h3></summary>
         <p class="faq__a">Cela dépend de trois choses&nbsp;: le nombre de pages, la présence ou non d'une boutique en ligne, et si l'identité de marque est à créer. Un site vitrine d'artisan et une boutique de cinquante produits n'ont rien à voir. Nous donnons un chiffre ferme, écrit, sous 48&nbsp;heures après le premier appel — et ce chiffre ne bouge plus.</p>
@@ -1570,7 +1601,7 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
         <h2 class="h2">Services</h2>
       </div>
     </div>
-    <div class="cap-list reveal">
+    <div class="cap-list">
       <div class="cap"><h3 class="cap__name">Branding</h3><span class="cap__desc">Naming, logo, système d'identité, charte, guidelines. Une marque cohérente sur tous les points de contact.</span></div>
       <div class="cap"><h3 class="cap__name">Web &amp; UI</h3><span class="cap__desc">Sites vitrines, e-commerce, produits SaaS. Design d'interface premium, prototypé et testé.</span></div>
       <div class="cap"><h3 class="cap__name">Motion &amp; 3D</h3><span class="cap__desc">Habillage animé, films de marque, rendus 3D et expériences WebGL temps réel.</span></div>
@@ -2454,7 +2485,8 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
   (function parallaxe() {
     if (reduced) return;
     const cibles = [...document.querySelectorAll(
-      '.feature__viz--nav .nave, .feature__viz--board .board, .feature__viz--3d .gyro, .card--large .fid'
+      '.feature__viz--nav .nave, .feature__viz--board .board, .feature__viz--3d .gyro,'
+      + '.card--large .fid, .duo__portrait, .coherence'
     )];
     if (!cibles.length) return;
 
@@ -2475,12 +2507,17 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
       if (!vus.size) { enCours = false; return; }
       const h = innerHeight;
       vus.forEach(el => {
+        /* Tant que l'élément n'est pas arrivé, on ne touche pas à son
+           transform : le style en ligne de la parallaxe écraserait celui
+           de l'apparition, qui ne se verrait jamais. */
+        const porteur = el.closest('.reveal, .arrive');
+        if (porteur && !porteur.classList.contains('in') && !porteur.classList.contains('vu')) return;
         const r = el.getBoundingClientRect();
         // -1 quand l'élément entre par le bas, +1 quand il sort par le haut
         // Borné : hors écran le rapport dépasse 1 et le décalage filait à
         // vingt pixels au lieu des onze prévus.
         const p = Math.max(-1, Math.min(1, ((r.top + r.height / 2) / h - 0.5) * -2));
-        el.style.transform = `translate3d(0, ${(p * 11).toFixed(2)}px, 0)`;
+        el.style.transform = `translate3d(0, ${(p * 16).toFixed(2)}px, 0)`;
       });
       requestAnimationFrame(image);
     }
@@ -2530,6 +2567,45 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
       if (reduced) hero.classList.add('vu');
       else requestAnimationFrame(() => setTimeout(() => hero.classList.add('vu'), 120));
     }
+  })();
+
+
+  /* =========================================================
+     ARRIVÉE À L'UNITÉ
+
+     Les listes longues étaient révélées d'un bloc : sur téléphone, la
+     moitié de leurs éléments s'animait hors écran et le visiteur ne voyait
+     jamais rien arriver. Chacun est désormais observé pour lui-même.
+
+     Le décalage vient de la position réelle dans la liste, pas d'un
+     compteur global : deux éléments qui entrent ensemble se suivent, un
+     élément isolé n'attend pas.
+     ========================================================= */
+  (function arriveesUnitaires() {
+    const SELECTEURS = [
+      '.work-item', '.faq__item', '.step', '.stat',
+      '.membre', '.cap', '.coh', '.grid-cards .card',
+    ].join(', ');
+
+    const elements = [...document.querySelectorAll(SELECTEURS)]
+      // Un élément déjà pris en charge par un conteneur .rs garderait deux
+      // animations concurrentes.
+      .filter(e => !e.parentElement.classList.contains('rs'));
+
+    if (!elements.length || reduced) return;
+    elements.forEach(e => e.classList.add('arrive'));
+
+    const io = new IntersectionObserver(entrees => {
+      entrees.filter(e => e.isIntersecting).forEach(e => {
+        const freres = [...e.target.parentElement.children];
+        const rang = freres.indexOf(e.target);
+        e.target.style.transitionDelay = Math.min(rang % 4, 3) * 0.07 + 's';
+        e.target.classList.add('vu');
+        io.unobserve(e.target);
+      });
+    }, { threshold: 0.12, rootMargin: '0px 0px -8% 0px' });
+
+    elements.forEach(e => io.observe(e));
   })();
 
   if (document.readyState === 'complete') boot();

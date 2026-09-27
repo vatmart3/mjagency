@@ -369,7 +369,8 @@
   (function parallaxe() {
     if (reduced) return;
     const cibles = [...document.querySelectorAll(
-      '.feature__viz--nav .nave, .feature__viz--board .board, .feature__viz--3d .gyro, .card--large .fid'
+      '.feature__viz--nav .nave, .feature__viz--board .board, .feature__viz--3d .gyro,'
+      + '.card--large .fid, .duo__portrait, .coherence'
     )];
     if (!cibles.length) return;
 
@@ -390,12 +391,17 @@
       if (!vus.size) { enCours = false; return; }
       const h = innerHeight;
       vus.forEach(el => {
+        /* Tant que l'élément n'est pas arrivé, on ne touche pas à son
+           transform : le style en ligne de la parallaxe écraserait celui
+           de l'apparition, qui ne se verrait jamais. */
+        const porteur = el.closest('.reveal, .arrive');
+        if (porteur && !porteur.classList.contains('in') && !porteur.classList.contains('vu')) return;
         const r = el.getBoundingClientRect();
         // -1 quand l'élément entre par le bas, +1 quand il sort par le haut
         // Borné : hors écran le rapport dépasse 1 et le décalage filait à
         // vingt pixels au lieu des onze prévus.
         const p = Math.max(-1, Math.min(1, ((r.top + r.height / 2) / h - 0.5) * -2));
-        el.style.transform = `translate3d(0, ${(p * 11).toFixed(2)}px, 0)`;
+        el.style.transform = `translate3d(0, ${(p * 16).toFixed(2)}px, 0)`;
       });
       requestAnimationFrame(image);
     }
@@ -445,6 +451,45 @@
       if (reduced) hero.classList.add('vu');
       else requestAnimationFrame(() => setTimeout(() => hero.classList.add('vu'), 120));
     }
+  })();
+
+
+  /* =========================================================
+     ARRIVÉE À L'UNITÉ
+
+     Les listes longues étaient révélées d'un bloc : sur téléphone, la
+     moitié de leurs éléments s'animait hors écran et le visiteur ne voyait
+     jamais rien arriver. Chacun est désormais observé pour lui-même.
+
+     Le décalage vient de la position réelle dans la liste, pas d'un
+     compteur global : deux éléments qui entrent ensemble se suivent, un
+     élément isolé n'attend pas.
+     ========================================================= */
+  (function arriveesUnitaires() {
+    const SELECTEURS = [
+      '.work-item', '.faq__item', '.step', '.stat',
+      '.membre', '.cap', '.coh', '.grid-cards .card',
+    ].join(', ');
+
+    const elements = [...document.querySelectorAll(SELECTEURS)]
+      // Un élément déjà pris en charge par un conteneur .rs garderait deux
+      // animations concurrentes.
+      .filter(e => !e.parentElement.classList.contains('rs'));
+
+    if (!elements.length || reduced) return;
+    elements.forEach(e => e.classList.add('arrive'));
+
+    const io = new IntersectionObserver(entrees => {
+      entrees.filter(e => e.isIntersecting).forEach(e => {
+        const freres = [...e.target.parentElement.children];
+        const rang = freres.indexOf(e.target);
+        e.target.style.transitionDelay = Math.min(rang % 4, 3) * 0.07 + 's';
+        e.target.classList.add('vu');
+        io.unobserve(e.target);
+      });
+    }, { threshold: 0.12, rootMargin: '0px 0px -8% 0px' });
+
+    elements.forEach(e => io.observe(e));
   })();
 
   if (document.readyState === 'complete') boot();
