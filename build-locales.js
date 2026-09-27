@@ -140,6 +140,281 @@ const VILLES = [
 
 /* ---------- Gabarit ---------- */
 
+
+/* =========================================================
+   PAGES LÉGALES
+
+   Un site professionnel français doit publier des mentions légales
+   (LCEN, art. 6-III) et informer sur le traitement des données
+   personnelles (RGPD, art. 13). Le formulaire de contact collecte des
+   données : les deux pages sont obligatoires.
+
+   TOUT CE QUI MANQUE SE REMPLIT CI-DESSOUS, ET NULLE PART AILLEURS.
+   Une valeur laissée à null s'affiche en clair comme « à compléter » :
+   c'est volontaire. Mieux vaut un visiteur qui voit un trou qu'une
+   information inventée dans un document qui engage juridiquement.
+   Tant qu'il reste un null, le site n'est pas en règle.
+   ========================================================= */
+const IDENTITE = {
+  denomination: 'MJ Agency',
+  forme:        null,   // ex. 'Entreprise individuelle (EI)', 'SAS', 'SASU'
+  capital:      null,   // ex. '1 000 €' — uniquement pour une société
+  siege:        null,   // adresse postale complète du siège
+  siret:        null,   // 14 chiffres
+  rcs:          null,   // ex. 'RCS Montpellier 123 456 789' — si société
+  tva:          null,   // ex. 'FR12345678901' — ou 'Non assujetti à la TVA'
+  publication:  null,   // nom du responsable de la publication
+  mail:         MAIL,
+  telAff:       TEL_AFF,
+  telUri:       TEL_URI,
+  // Nom certain, adresse à recopier depuis vercel.com : je ne l'ai pas
+  // vérifiée moi-même et une adresse fausse dans des mentions légales est
+  // pire que pas d'adresse du tout.
+  hebergeur:    'Vercel Inc.',
+  hebergeurAdr: null,
+};
+
+const aRemplir = (v, quoi) =>
+  v ? v : `<mark class="aremplir" title="Information obligatoire, à renseigner dans build-locales.js">${quoi} à compléter</mark>`;
+
+function pageLegale({ slug, titre, desc, h1, chapo, corps }) {
+  return `<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
+<title>${titre} | MJ Agency</title>
+<meta name="description" content="${desc}">
+<link rel="canonical" href="${SITE}/${slug}">
+<meta name="theme-color" content="#FFFFFF">
+<meta name="color-scheme" content="light">
+<meta name="robots" content="index, follow">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23FFFFFF'/%3E%3Ctext x='50' y='68' font-family='Arial' font-weight='700' font-size='54' fill='%230D0D0F' text-anchor='middle'%3EMJ%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="assets/css/fonts.css">
+<link rel="stylesheet" href="assets/css/style.css">
+<noscript><style>.reveal,.rs>*{opacity:1!important;transform:none!important}</style></noscript>
+</head>
+<body>
+<canvas id="bg-canvas" aria-hidden="true"></canvas>
+
+${NAV}
+
+<main class="wrap">
+  <section class="container" style="padding-top:clamp(120px,16vh,180px);padding-bottom:clamp(28px,4vw,44px)">
+    <div class="legal-tete">
+      <span class="eyebrow reveal">Informations légales</span>
+      <h1 class="h2 reveal">${h1}</h1>
+      <p class="lead reveal">${chapo}</p>
+    </div>
+  </section>
+
+  <section class="container sep" style="padding-top:var(--sec);padding-bottom:var(--sec)">
+    <div class="legal reveal">
+${corps}
+    </div>
+  </section>
+</main>
+
+<footer class="footer container">
+  <div class="footer__cols">
+    <div class="footer__col">
+      <a href="index.html" class="nav__logo" style="margin-bottom:16px"><span class="dot"></span> MJ Agency</a>
+      <p class="dim" style="max-width:34ch">Agence web et studio créatif à Sète. Sites internet, identité de marque et design pour les entreprises de l'Hérault.</p>
+    </div>
+    <div class="footer__col">
+      <h4>Navigation</h4>
+      <a href="work.html">Réalisations</a>
+      <a href="studio.html">Le studio</a>
+      <a href="contact.html">Contact</a>
+      <a href="index.html#zone">Zone d'intervention</a>
+    </div>
+    <div class="footer__col">
+      <h4>Nos zones</h4>
+${VILLES.map(o => `      <a href="${o.slug}.html">${o.lienPied}</a>`).join('\n')}
+    </div>
+    <div class="footer__col">
+      <h4>Nous trouver</h4>
+      <address class="nap">
+        <span class="nap__line">34200 Sète, Hérault</span>
+        <a href="tel:${TEL_URI}">${TEL_AFF}</a>
+        <a href="mailto:${MAIL}">${MAIL}</a>
+      </address>
+      <p class="dim" style="font-size:13px">Lun — Ven · 9 h à 18 h</p>
+    </div>
+  </div>
+  <div class="footer__bottom">
+    <span>© 2026 MJ Agency — Sète, Hérault</span>
+    <span class="footer__legal"><a href="mentions-legales.html">Mentions légales</a><a href="confidentialite.html">Confidentialité</a></span>
+  </div>
+</footer>
+
+<script src="assets/js/bg.js"></script>
+<script src="assets/js/main.js"></script>
+</body>
+</html>
+`;
+}
+
+
+/* ---------- Contenu des deux pages légales ---------- */
+const MENTIONS = [
+  ['Éditeur du site', `
+      <p>Le présent site est édité par&nbsp;:</p>
+      <ul>
+        <li><b>Dénomination</b> : ${IDENTITE.denomination}</li>
+        <li><b>Forme juridique</b> : ${aRemplir(IDENTITE.forme, 'Forme juridique')}</li>
+        <li><b>Capital social</b> : ${aRemplir(IDENTITE.capital, 'Capital social (si société)')}</li>
+        <li><b>Siège social</b> : ${aRemplir(IDENTITE.siege, 'Adresse du siège')}</li>
+        <li><b>SIRET</b> : ${aRemplir(IDENTITE.siret, 'SIRET')}</li>
+        <li><b>Immatriculation</b> : ${aRemplir(IDENTITE.rcs, 'RCS ou répertoire des métiers')}</li>
+        <li><b>TVA intracommunautaire</b> : ${aRemplir(IDENTITE.tva, 'Numéro de TVA (ou mention de non-assujettissement)')}</li>
+        <li><b>Téléphone</b> : <a href="tel:${IDENTITE.telUri}">${IDENTITE.telAff}</a></li>
+        <li><b>Courriel</b> : <a href="mailto:${IDENTITE.mail}">${IDENTITE.mail}</a></li>
+      </ul>`],
+
+  ['Responsable de la publication', `
+      <p>${aRemplir(IDENTITE.publication, 'Nom du responsable de la publication')}, joignable à
+      l’adresse <a href="mailto:${IDENTITE.mail}">${IDENTITE.mail}</a>.</p>`],
+
+  ['Hébergement', `
+      <p>Le site est hébergé par&nbsp;:</p>
+      <ul>
+        <li><b>Hébergeur</b> : ${IDENTITE.hebergeur}</li>
+        <li><b>Adresse</b> : ${aRemplir(IDENTITE.hebergeurAdr, 'Adresse de l’hébergeur, à recopier depuis vercel.com')}</li>
+        <li><b>Site</b> : <a href="https://vercel.com" target="_blank" rel="noopener">vercel.com</a></li>
+      </ul>`],
+
+  ['Propriété intellectuelle', `
+      <p>L’ensemble des contenus de ce site — textes, images, éléments graphiques,
+      animations, code — est la propriété de ${IDENTITE.denomination}, sauf mention
+      contraire. Toute reproduction, représentation ou adaptation, totale ou
+      partielle, est interdite sans autorisation écrite préalable.</p>
+      <p>Les projets présentés dans la rubrique Réalisations restent la propriété de
+      leurs commanditaires respectifs et sont montrés à titre de référence, avec
+      leur accord.</p>`],
+
+  ['Liens vers d’autres sites', `
+      <p>Ce site renvoie vers des sites que nous avons réalisés et vers ceux de nos
+      prestataires. Nous n’exerçons aucun contrôle sur leur contenu et n’en assumons
+      pas la responsabilité.</p>`],
+
+  ['Droit applicable', `
+      <p>Les présentes mentions sont soumises au droit français. En cas de litige, et
+      à défaut de résolution amiable, les tribunaux français sont seuls compétents.</p>`],
+
+  ['Signalement d’un contenu', `
+      <p>Pour signaler un contenu que vous estimez illicite, écrivez à
+      <a href="mailto:${IDENTITE.mail}">${IDENTITE.mail}</a> en précisant l’adresse de
+      la page concernée et le motif du signalement.</p>`],
+];
+
+const CONFIDENTIALITE = [
+  ['En deux lignes', `
+      <p>Ce site ne dépose <b>aucun cookie</b>, n’utilise <b>aucun outil de mesure
+      d’audience</b> et ne contient <b>aucun traceur publicitaire</b>. Les seules
+      données que nous recevons sont celles que vous nous transmettez volontairement
+      par le formulaire de contact.</p>`],
+
+  ['Responsable du traitement', `
+      <p>${IDENTITE.denomination} — ${aRemplir(IDENTITE.siege, 'Adresse du siège')} —
+      <a href="mailto:${IDENTITE.mail}">${IDENTITE.mail}</a>.</p>`],
+
+  ['Données collectées', `
+      <p>Le formulaire de prise de rendez-vous collecte&nbsp;:</p>
+      <ul>
+        <li>votre <b>nom</b> et votre <b>adresse électronique</b> (obligatoires, pour vous répondre)&nbsp;;</li>
+        <li>votre <b>société</b> et votre <b>budget indicatif</b> (facultatifs)&nbsp;;</li>
+        <li>la <b>description de votre projet</b> (facultative)&nbsp;;</li>
+        <li>la <b>date et l’heure</b> du créneau que vous choisissez.</li>
+      </ul>
+      <p>Aucune autre donnée n’est collectée. Nous ne recueillons ni votre adresse IP
+      à des fins de suivi, ni votre historique de navigation.</p>`],
+
+  ['Pourquoi, et sur quelle base', `
+      <p>Ces données servent <b>uniquement</b> à vous recontacter, préparer notre
+      échange et établir une proposition. Elles ne sont jamais vendues, louées ni
+      cédées à des fins commerciales.</p>
+      <p>La base légale est l’<b>exécution de mesures précontractuelles</b> prises à
+      votre demande (article 6.1.b du RGPD)&nbsp;: vous nous écrivez pour obtenir une
+      proposition.</p>`],
+
+  ['Qui d’autre y a accès', `
+      <p>Pour acheminer votre message, nous faisons appel à des sous-traitants&nbsp;:</p>
+      <ul>
+        <li><b>Vercel Inc.</b> — hébergement du site et de la fonction qui reçoit le formulaire.</li>
+        <li><b>Resend</b> (Plus Five Five, Inc.) — acheminement du courriel vers notre boîte.</li>
+      </ul>
+      <p>Ces deux prestataires sont établis aux États-Unis. Les transferts s’effectuent
+      sur la base des <b>clauses contractuelles types</b> de la Commission européenne
+      et, le cas échéant, du <b>cadre de protection des données UE–États-Unis</b>.
+      Aucun autre destinataire ne reçoit vos données.</p>`],
+
+  ['Combien de temps', `
+      <p>Les échanges liés à une demande sans suite sont supprimés au bout de
+      <b>trois ans</b> à compter du dernier contact. Les données liées à un projet
+      effectivement mené sont conservées pendant la durée de la relation, puis selon
+      les obligations comptables et fiscales applicables (dix ans pour les pièces
+      comptables).</p>`],
+
+  ['Vos droits', `
+      <p>Vous disposez d’un droit d’<b>accès</b>, de <b>rectification</b>,
+      d’<b>effacement</b>, de <b>limitation</b>, d’<b>opposition</b> et de
+      <b>portabilité</b> sur vos données. Pour l’exercer, écrivez à
+      <a href="mailto:${IDENTITE.mail}">${IDENTITE.mail}</a>&nbsp;: nous répondons sous
+      un mois au plus.</p>
+      <p>Si notre réponse ne vous satisfait pas, vous pouvez saisir la
+      <b>CNIL</b> — 3 place de Fontenoy, TSA 80715, 75334 Paris Cedex 07 —
+      <a href="https://www.cnil.fr" target="_blank" rel="noopener">cnil.fr</a>.</p>`],
+
+  ['Cookies', `
+      <p>Aucun cookie n’est déposé sur votre appareil, ni par nous ni par un tiers.
+      Le site ne conserve rien dans le stockage local de votre navigateur. C’est la
+      raison pour laquelle aucune bannière de consentement ne vous est présentée&nbsp;:
+      il n’y a rien à consentir.</p>`],
+
+  ['Sécurité', `
+      <p>Le site est servi exclusivement en HTTPS. Les clés d’accès aux services
+      d’envoi sont conservées côté serveur et n’apparaissent jamais dans les pages.
+      Le formulaire est protégé contre les envois automatisés.</p>`],
+];
+
+const enSections = (blocs) => blocs.map(([t, c]) =>
+  `      <section class="legal__bloc">\n        <h2>${t}</h2>${c}\n      </section>`).join('\n');
+
+const PAGES_LEGALES = [
+  { slug: 'mentions-legales',
+    titre: 'Mentions légales',
+    desc: 'Mentions légales de MJ Agency, agence web à Sète : éditeur, hébergeur, propriété intellectuelle et droit applicable.',
+    h1: 'Mentions légales',
+    chapo: 'Les informations que tout site professionnel doit rendre publiques, réunies sur une page.',
+    corps: enSections(MENTIONS) },
+  { slug: 'confidentialite',
+    titre: 'Politique de confidentialité',
+    desc: 'Comment MJ Agency traite les données du formulaire de contact : finalité, destinataires, durée de conservation et vos droits.',
+    h1: 'Politique de confidentialité',
+    chapo: 'Ce que nous recevons, pourquoi, qui y a accès, combien de temps — et comment reprendre la main.',
+    corps: enSections(CONFIDENTIALITE) },
+];
+
+/* Bandeau et menu, une seule fois pour toutes les pages générées. */
+const NAV = `<header class="nav">
+  <a href="index.html" class="nav__logo"><span class="dot"></span> MJ <em>Agency</em></a>
+  <nav class="nav__links" aria-label="Navigation principale">
+    <a href="work.html">Réalisations</a>
+    <a href="studio.html">Le studio</a>
+    <a href="contact.html">Contact</a>
+  </nav>
+  <a href="contact.html" class="nav__cta" data-magnetic="0.3">Parlons de votre projet <span aria-hidden="true">↗</span></a>
+  <button class="nav__burger" aria-label="Ouvrir le menu" aria-expanded="false"><span></span><span></span><span></span></button>
+</header>
+
+<nav class="mobile-menu" aria-label="Menu mobile">
+  <a href="work.html"><small>01</small>Réalisations</a>
+  <a href="studio.html"><small>02</small>Le studio</a>
+  <a href="contact.html"><small>03</small>Contact</a>
+  <a href="contact.html" class="btn btn--glow mobile-menu__cta">Parlons de votre projet <span class="arw" aria-hidden="true">↗</span></a>
+</nav>`;
+
 const villesAutres = (courant) => VILLES.filter(v => v.slug !== courant);
 
 function page(v) {
@@ -183,7 +458,7 @@ function page(v) {
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
 <title>${v.titre}</title>
 <meta name="description" content="${v.desc}">
 <link rel="canonical" href="${url}">
@@ -200,6 +475,7 @@ function page(v) {
 <meta property="og:image" content="${SITE}/assets/img/og.png">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="theme-color" content="#FFFFFF">
+<meta name="color-scheme" content="light">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23FFFFFF'/%3E%3Ctext x='50' y='68' font-family='Arial' font-weight='700' font-size='54' fill='%230D0D0F' text-anchor='middle'%3EMJ%3C/text%3E%3C/svg%3E">
 <link rel="stylesheet" href="assets/css/fonts.css">
 <link rel="stylesheet" href="assets/css/style.css">
@@ -214,23 +490,7 @@ function page(v) {
 </head>
 <body>
 
-<header class="nav">
-  <a href="index.html" class="nav__logo"><span class="dot"></span> MJ <em>Agency</em></a>
-  <nav class="nav__links" aria-label="Navigation principale">
-    <a href="work.html">Réalisations</a>
-    <a href="studio.html">Le studio</a>
-    <a href="contact.html">Contact</a>
-  </nav>
-  <a href="contact.html" class="nav__cta" data-magnetic="0.3">Parlons de votre projet <span aria-hidden="true">↗</span></a>
-  <button class="nav__burger" aria-label="Ouvrir le menu" aria-expanded="false"><span></span><span></span><span></span></button>
-</header>
-
-<nav class="mobile-menu" aria-label="Menu mobile">
-  <a href="work.html"><small>01</small>Réalisations</a>
-  <a href="studio.html"><small>02</small>Le studio</a>
-  <a href="contact.html"><small>03</small>Contact</a>
-  <a href="contact.html" class="btn btn--glow mobile-menu__cta">Parlons de votre projet <span class="arw" aria-hidden="true">↗</span></a>
-</nav>
+${NAV}
 
 <main class="wrap">
 
@@ -347,7 +607,10 @@ ${VILLES.map(o => `      <a href="${o.slug}.html">${o.lienPied}</a>`).join('\n')
       <p class="dim" style="font-size:13px">Lun — Ven · 9 h à 18 h</p>
     </div>
   </div>
-  <div class="footer__bottom"><span>© 2026 MJ Agency — Sète, Hérault</span><span>Conçu avec intention.</span></div>
+  <div class="footer__bottom">
+    <span>© 2026 MJ Agency — Sète, Hérault</span>
+    <span class="footer__legal"><a href="mentions-legales.html">Mentions légales</a><a href="confidentialite.html">Confidentialité</a></span>
+  </div>
 </footer>
 
 <script src="assets/js/bg.js"></script>
@@ -358,6 +621,11 @@ ${VILLES.map(o => `      <a href="${o.slug}.html">${o.lienPied}</a>`).join('\n')
 }
 
 /* ---------- Écriture ---------- */
+PAGES_LEGALES.forEach(o => {
+  fs.writeFileSync(path.join(__dirname, o.slug + '.html'), pageLegale(o));
+  console.log('  ' + o.slug + '.html');
+});
+
 VILLES.forEach(v => {
   fs.writeFileSync(path.join(__dirname, v.slug + '.html'), page(v));
   console.log('  ' + v.slug + '.html');
@@ -372,6 +640,8 @@ const urls = [
   ['/studio', 'yearly', '0.7'],
   ['/contact', 'yearly', '0.9'],
   ...VILLES.map(v => ['/' + v.slug, 'monthly', '0.8']),
+  ['/mentions-legales', 'yearly', '0.3'],
+  ['/confidentialite', 'yearly', '0.3'],
   ['/au-bon-pain', 'monthly', '0.6'],        /* site client hébergé ici */
 ];
 /* La date de dernière modification aide Google à hiérarchiser ses passages.

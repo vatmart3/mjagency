@@ -71,7 +71,7 @@ const out = `<title>MJ Agency — Studio créatif digital</title>
   if (document.querySelector('meta[name="viewport"]')) return;
   var m = document.createElement('meta');
   m.name = 'viewport';
-  m.content = 'width=device-width, initial-scale=1, viewport-fit=cover';
+  m.content = 'width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content';
   document.head.appendChild(m);
 })();
 </script>

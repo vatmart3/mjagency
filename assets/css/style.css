@@ -44,7 +44,50 @@
 }
 
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-html{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;scroll-behavior:smooth;overflow-x:clip}
+html{
+  -webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;
+  scroll-behavior:smooth;overflow-x:clip;
+
+  /* Le voile gris que le navigateur peint sur tout élément touché : c’est
+     le signal « ceci est un site web » le plus bruyant, et il se bat avec
+     le retour au doigt qu’on définit plus bas. */
+  -webkit-tap-highlight-color:transparent;
+
+  /* Sans quoi iOS grossit les corps de texte en paysage. */
+  -webkit-text-size-adjust:100%;
+}
+
+/* ---------- Socle tactile ----------
+   Ce site est un document qui défile : on ne touche pas à
+   overscroll-behavior sur la racine, le tirer-pour-rafraîchir y a sa place.
+   Il n’est contenu que dans le menu plein écran, plus bas. */
+button,a,[role="button"],summary,.tag,.slot,.cal__day{
+  /* Supprime l’attente de 300 ms pendant laquelle le navigateur guette une
+     seconde tape : sur ces éléments, le double-tap ne zoome jamais. */
+  touch-action:manipulation;
+}
+
+/* iOS zoome dès qu’un champ reçoit le focus sous 16 px, et ne dézoome pas
+   au relâchement. Les champs du formulaire sont à 17 px ; ce plancher couvre
+   tout champ ajouté plus tard sans passer par .field. */
+input,textarea,select{font-size:16px}
+
+/* Le texte d’une commande ne se sélectionne pas — celui d’un contenu, si.
+   Les adresses et les numéros du pied de page restent donc copiables. */
+button,[role="button"],.btn,.tag,.slot,.cal__day,.nav__cta,.nav__burger,
+.faq__q,.mobile-menu__cta,.filters .tag{
+  user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;
+}
+
+/* Un bouton natif répond à l’instant où le doigt se pose. Sans état :active,
+   le retour n’arrive qu’au relâchement — ce qui se lit comme de la latence,
+   même à zéro milliseconde. */
+.tag:active,.slot:active,.cal__day.avail:active,.nav__cta:active,
+.link-t:active,.faq__q:active{transform:scale(.97)}
+.card:active,a.work-item:active{transform:scale(.995)}
+.tag,.slot,.cal__day,.nav__cta,.link-t,.faq__q{
+  transition:transform .12s var(--ease),background .12s var(--ease),color .12s var(--ease);
+}
 body{
   background:transparent;
   color:var(--dark-gray);
@@ -111,17 +154,13 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
   border:1px solid var(--rule-2);color:var(--dark-gray);background:var(--white);
   transition:background .25s var(--ease),color .25s var(--ease),border-color .25s var(--ease),transform .25s var(--ease);
 }
-.btn:hover{background:var(--light-gray);border-color:transparent}
 .btn:active{transform:scale(.98)}
 .btn .arw{font-size:.85em;transition:transform .25s var(--ease)}
-.btn:hover .arw{transform:translateX(2px)}
 
 .btn--glow{background:var(--blue);color:#fff;border-color:var(--blue)}
-.btn--glow:hover{background:var(--blue-dark);border-color:var(--blue-dark);color:#fff}
 
 /* Lien tertiaire — la troisième marche de la charte */
 .link-t{color:var(--blue);font-size:17px;display:inline-flex;align-items:center;gap:5px}
-.link-t:hover{text-decoration:underline}
 
 /* ---------- Hero ---------- */
 .hero{
@@ -168,14 +207,12 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
 .nav__logo em{font-style:normal;font-weight:400;color:var(--gray);font-size:15px}
 .nav__links{display:flex;gap:var(--s4);align-items:center}
 .nav__links a{font-size:14px;color:var(--dark-gray);opacity:.85;transition:opacity .2s}
-.nav__links a:hover{opacity:1}
 .nav__links a.active{color:var(--black);font-weight:500;opacity:1}
 .nav__cta{
   font-size:14px;padding:7px 16px;border-radius:980px;
   background:var(--blue);color:#fff;display:inline-flex;align-items:center;gap:6px;
   transition:background .25s var(--ease);
 }
-.nav__cta:hover{background:var(--blue-dark)}
 .nav__burger{display:none}
 
 @media (max-width:900px){
@@ -191,6 +228,13 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
   position:fixed;inset:0;z-index:490;background:var(--white);
   display:flex;flex-direction:column;justify-content:center;padding:0 clamp(24px,8vw,56px);
   transform:translateY(-101%);transition:transform .45s var(--ease);visibility:hidden;
+
+  /* Le menu occupe tout l’écran : il prend la hauteur visible, qui suit la
+     barre d’adresse, et son défilement ne se propage pas à la page derrière
+     — sinon un geste vers le bas déclenche le tirer-pour-rafraîchir. */
+  height:100dvh;overflow-y:auto;overscroll-behavior:contain;
+  padding-top:max(var(--s6), env(safe-area-inset-top, 0px));
+  padding-bottom:max(var(--s6), env(safe-area-inset-bottom, 0px));
 }
 .mobile-menu.open{transform:translateY(0);visibility:visible}
 .mobile-menu a{
@@ -219,8 +263,6 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
 }
 .work-item__title{font-size:clamp(21px,2.4vw,28px);font-weight:600;letter-spacing:-.021em;color:var(--black);transition:color .25s}
 .work-item__meta{font-size:15px;color:var(--gray);white-space:nowrap}
-a.work-item:hover{background:var(--off-white);padding-left:var(--s3)}
-a.work-item:hover .work-item__title{color:var(--blue)}
 
 
 /* ---------- 08 · Cartes ---------- */
@@ -229,10 +271,8 @@ a.work-item:hover .work-item__title{color:var(--blue)}
   background:var(--white);border-radius:var(--radius);overflow:hidden;
   box-shadow:var(--shadow-s);transition:transform .35s var(--ease),box-shadow .35s var(--ease);
 }
-.card:hover{transform:translateY(-4px);box-shadow:var(--shadow-m)}
 .card .thumb{aspect-ratio:16/10;position:relative;overflow:hidden;background:var(--light-gray)}
 .card .thumb .ph{position:absolute;inset:0;transition:transform .7s var(--ease)}
-.card:hover .thumb .ph{transform:scale(1.03)}
 .card__body{padding:var(--s3);display:flex;justify-content:space-between;align-items:flex-end;gap:var(--s2)}
 .card__meta{font-size:13px;color:var(--gray)}
 .card__title{font-size:22px;font-weight:600;letter-spacing:-.02em;color:var(--black);margin-top:6px}
@@ -240,7 +280,6 @@ a.work-item:hover .work-item__title{color:var(--blue)}
   width:38px;height:38px;border-radius:50%;background:var(--light-gray);color:var(--dark-gray);
   display:grid;place-items:center;flex:none;font-size:14px;transition:background .25s,color .25s;
 }
-.card:hover .card__go{background:var(--blue);color:#fff}
 .col-4{grid-column:span 4}.col-6{grid-column:span 6}.col-8{grid-column:span 8}
 .col-12{grid-column:span 12}
 @media (max-width:860px){.col-4,.col-6,.col-8{grid-column:span 12}}
@@ -288,7 +327,6 @@ a.work-item:hover .work-item__title{color:var(--blue)}
   box-shadow:var(--shadow-s);display:flex;flex-direction:column;gap:var(--s2);
   transition:transform .35s var(--ease),box-shadow .35s var(--ease);
 }
-.cap:hover{transform:translateY(-3px);box-shadow:var(--shadow-m)}
 .cap__name{font-size:24px;font-weight:600;letter-spacing:-.02em;color:var(--black);line-height:1.2}
 .cap__desc{color:var(--gray);font-size:17px;line-height:1.5;max-width:46ch}
 @media (max-width:760px){.cap-list{grid-template-columns:1fr}}
@@ -317,7 +355,6 @@ a.work-item:hover .work-item__title{color:var(--blue)}
 .cal__month{font-size:18px;font-weight:600;letter-spacing:-.018em;color:var(--black)}
 .cal__nav{display:flex;gap:6px}
 .cal__nav button{width:38px;height:38px;border-radius:50%;background:var(--light-gray);display:grid;place-items:center;font-size:16px;color:var(--dark-gray);transition:background .2s}
-.cal__nav button:hover{background:#E4E4E8}
 .cal__grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px}
 .cal__dow{font-size:12px;color:var(--gray);text-align:center;padding-bottom:6px}
 .cal__day{
@@ -326,7 +363,6 @@ a.work-item:hover .work-item__title{color:var(--blue)}
 }
 .cal__day.empty{pointer-events:none}
 .cal__day.disabled{color:#C7C7CC;pointer-events:none}
-.cal__day.avail:hover{background:var(--light-gray)}
 .cal__day.avail::after{content:"";position:absolute;bottom:5px;width:4px;height:4px;border-radius:50%;background:var(--blue)}
 .cal__day.selected{background:var(--blue);color:#fff;font-weight:500}
 .cal__day.selected::after{background:#fff}
@@ -338,7 +374,6 @@ a.work-item:hover .work-item__title{color:var(--blue)}
   background:var(--light-gray);border-radius:var(--radius-s);padding:13px 6px;min-height:48px;
   text-align:center;font-size:15px;color:var(--dark-gray);transition:background .2s,color .2s;
 }
-.slot:hover{background:#E4E4E8}
 .slot.selected{background:var(--blue);color:#fff}
 .slot.disabled{opacity:.4;pointer-events:none;text-decoration:line-through}
 
@@ -380,7 +415,6 @@ a.work-item:hover .work-item__title{color:var(--blue)}
   border-radius:980px;padding:9px 18px;min-height:40px;display:inline-flex;align-items:center;
   transition:background .2s,color .2s;
 }
-.filters .tag:hover{background:#E4E4E8}
 .filters .tag.active{background:var(--blue);color:#fff}
 
 /* ---------- Zone d'intervention ---------- */
@@ -388,7 +422,6 @@ a.work-item:hover .work-item__title{color:var(--blue)}
 .zone__title{font-size:15px;font-weight:600;color:var(--black);margin-bottom:var(--s2)}
 .towns{list-style:none;display:flex;flex-wrap:wrap;gap:var(--s1)}
 .towns li{font-size:15px;color:var(--dark-gray);background:var(--light-gray);border-radius:980px;padding:8px 16px;transition:background .2s}
-.towns li:hover{background:#E4E4E8}
 .towns li a{display:block;margin:-8px -16px;padding:8px 16px;color:inherit}
 .zone__note{margin-top:var(--s2);font-size:15px;color:var(--gray)}
 
@@ -420,14 +453,12 @@ a.work-item:hover .work-item__title{color:var(--blue)}
   background:linear-gradient(var(--blue),var(--blue)) center/13px 1.5px no-repeat;
   transform:rotate(180deg);
 }
-.faq__q:hover h3{color:var(--blue)}
 .faq__a{color:var(--gray);font-size:17px;line-height:1.6;padding-bottom:var(--s3);max-width:70ch}
 
 /* ---------- Coordonnées ---------- */
 .nap{font-style:normal;display:flex;flex-direction:column;gap:4px;margin-bottom:var(--s2)}
 .nap__line,.nap a{font-size:15px;color:var(--gray)}
 .nap a{margin-bottom:0}
-.nap a:hover{color:var(--blue)}
 
 /* ---------- Deux colonnes ---------- */
 .split{display:grid;grid-template-columns:1fr 1fr;gap:var(--s6);align-items:center;max-width:1180px;margin-inline:auto}
@@ -532,6 +563,50 @@ a.work-item:hover .work-item__title{color:var(--blue)}
   .duo__portrait{aspect-ratio:3/2}
 }
 
+/* ---------- Pages légales ----------
+   Un document, pas une page d'accueil : une seule colonne, mesure de lecture
+   contenue, titres qui se repèrent sans crier. */
+.legal-tete{max-width:60ch;display:flex;flex-direction:column;gap:var(--s2)}
+.legal{max-width:74ch;display:flex;flex-direction:column;gap:var(--s6)}
+.legal__bloc{display:flex;flex-direction:column;gap:12px}
+.legal__bloc h2{
+  font-size:clamp(20px,2.2vw,25px);font-weight:600;letter-spacing:-.018em;
+  color:var(--black);line-height:1.25;
+  padding-bottom:10px;border-bottom:1px solid var(--rule);
+}
+.legal p{color:var(--dark-gray);font-size:17px;line-height:1.65}
+.legal b{font-weight:600;color:var(--black)}
+.legal a{color:var(--blue);text-decoration:underline;text-underline-offset:2px}
+.legal ul{list-style:none;display:flex;flex-direction:column;gap:9px;margin-top:2px}
+.legal li{
+  position:relative;padding-left:18px;
+  color:var(--dark-gray);font-size:17px;line-height:1.6;
+}
+.legal li::before{
+  content:"";position:absolute;left:0;top:.66em;
+  width:5px;height:5px;border-radius:50%;background:var(--blue);
+}
+
+/* Information obligatoire encore absente. Volontairement visible : un trou
+   se corrige, une information inventée dans un document qui engage se
+   découvre trop tard. */
+.aremplir{
+  background:#FFF4D6;color:#7A4A00;
+  border:1px solid #E8C05A;border-radius:6px;
+  padding:1px 8px;font-size:15px;font-weight:600;
+  white-space:nowrap;
+}
+
+.footer__legal{display:inline-flex;gap:var(--s2);flex-wrap:wrap}
+.footer__legal a{color:var(--gray)}
+
+@media (max-width:640px){
+  .legal{gap:var(--s4)}
+  .legal__bloc h2{font-size:19px}
+  .legal p,.legal li{font-size:16px}
+  .aremplir{white-space:normal;display:inline-block}
+}
+
 /* ---------- Pied de page ---------- */
 .footer{background:rgba(245,245,247,.78);backdrop-filter:blur(8px);padding-top:var(--s6)}
 .footer__big{
@@ -546,7 +621,6 @@ a.work-item:hover .work-item__title{color:var(--blue)}
 }
 .footer__col h4{font-size:13px;font-weight:600;color:var(--black);margin-bottom:var(--s2)}
 .footer__col a,.footer__col p{display:block;color:var(--gray);font-size:15px;margin-bottom:10px;transition:color .2s}
-.footer__col a:hover{color:var(--blue)}
 .footer__bottom{
   display:flex;justify-content:space-between;flex-wrap:wrap;gap:var(--s2);
   padding-block:var(--s3);border-top:1px solid var(--rule);font-size:13px;color:var(--gray);
@@ -843,8 +917,15 @@ a.work-item:hover .work-item__title{color:var(--blue)}
   /* Le doigt n'a pas la précision du curseur : tout ce qui se touche fait
      au moins 44 px de haut. Les liens tertiaires en faisaient 26, les
      flèches du calendrier 38, les filtres du portfolio 41. */
-  .link-t,.footer__col a,.nav__logo,.nap a,.towns a,.dim a{
+  /* En ligne : ces cibles vivent au fil du texte ou d'une rangée. */
+  .link-t,.nav__logo,.towns a,.footer__legal a{
     min-height:44px;display:inline-flex;align-items:center;
+  }
+  /* En bloc : ces cibles sont des lignes de liste et doivent rester
+     empilées. Avec inline-flex, les quatre liens de navigation du pied de
+     page se remettaient côte à côte sur une seule ligne. */
+  .footer__col a,.nap a{
+    min-height:44px;display:flex;align-items:center;
   }
   .footer__col a{padding-block:2px}
   .cal__nav button{width:44px;height:44px}
@@ -924,4 +1005,38 @@ a.work-item:hover .work-item__title{color:var(--blue)}
   .reveal,.rs>*{opacity:1!important;transform:none!important}
   *,*::before,*::after{animation:none!important;transition-duration:.01ms!important}
   html{scroll-behavior:auto}
+}
+
+
+/* =========================================================
+   SURVOL — réservé aux pointeurs précis
+
+   Le tactile n’a pas de survol : le navigateur en simule un et le laisse
+   collé après la première tape, jusqu’à ce qu’on tape ailleurs. Une carte
+   qui se soulève au survol restait soulevée après avoir été touchée. Ces
+   règles ne s’appliquent donc qu’à un pointeur qui sait survoler et qui
+   est précis — ce qui exclut au passage les stylets et les téléphones qui
+   déclarent un faux survol. Le retour au doigt passe par :active.
+   ========================================================= */
+@media (hover: hover) and (pointer: fine){
+  .btn:hover{background:var(--light-gray);border-color:transparent}
+  .btn:hover .arw{transform:translateX(2px)}
+  .btn--glow:hover{background:var(--blue-dark);border-color:var(--blue-dark);color:#fff}
+  .link-t:hover{text-decoration:underline}
+  .nav__links a:hover{opacity:1}
+  .nav__cta:hover{background:var(--blue-dark)}
+  a.work-item:hover{background:var(--off-white);padding-left:var(--s3)}
+  a.work-item:hover .work-item__title{color:var(--blue)}
+  .card:hover{transform:translateY(-4px);box-shadow:var(--shadow-m)}
+  .card:hover .thumb .ph{transform:scale(1.03)}
+  .card:hover .card__go{background:var(--blue);color:#fff}
+  .cap:hover{transform:translateY(-3px);box-shadow:var(--shadow-m)}
+  .cal__nav button:hover{background:#E4E4E8}
+  .cal__day.avail:hover{background:var(--light-gray)}
+  .slot:hover{background:#E4E4E8}
+  .filters .tag:hover{background:#E4E4E8}
+  .towns li:hover{background:#E4E4E8}
+  .faq__q:hover h3{color:var(--blue)}
+  .nap a:hover{color:var(--blue)}
+  .footer__col a:hover{color:var(--blue)}
 }
