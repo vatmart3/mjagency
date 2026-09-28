@@ -1,7 +1,7 @@
 "use client";
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Button } from "@/components/ui/Button";
+import { Button, buttonClass } from "@/components/ui/Button";
 import { Icon } from "@/components/ui/Icon";
 import { Tag } from "@/components/ui/primitives";
 import { celebrate, toast, toastError } from "@/components/ui/Toast";
@@ -73,12 +73,10 @@ export function PromptPanel({ prospect, onReport }: { prospect: Prospect; onRepo
     if (current && (await copy(current.prompt))) toast("Prompt copié", "Collez-le dans Claude ou ChatGPT.");
   }
 
-  async function openIn(target: "claude" | "chatgpt") {
+  // Vrai lien <a> (window.open est bloqué dans certains cadres) : on copie au clic, le lien s'ouvre ensuite.
+  function copyBeforeOpen() {
     if (!current) return;
-    await copy(current.prompt);
-    const url = target === "claude" ? "https://claude.ai/new" : "https://chatgpt.com/";
-    toast("Prompt copié", "Il ne reste qu'à coller (⌘V / appui long).");
-    window.open(url, "_blank", "noopener");
+    void copy(current.prompt).then((ok) => ok && toast("Prompt copié", "Il ne reste qu'à coller (⌘V / appui long)."));
   }
 
   async function saveReport(raw: string, source: "manuel" | "api") {
@@ -158,12 +156,12 @@ export function PromptPanel({ prospect, onReport }: { prospect: Prospect; onRepo
           <Button onClick={doCopy} disabled={!current}>
             <Icon name="copy" size={18} /> Copier le prompt
           </Button>
-          <Button variant="secondary" onClick={() => openIn("claude")} disabled={!current}>
+          <a href="https://claude.ai/new" target="_blank" rel="noopener noreferrer" onClick={copyBeforeOpen} className={buttonClass("secondary", "md", "active:scale-[0.96] transition-transform")}>
             Ouvrir Claude <Icon name="external" size={16} />
-          </Button>
-          <Button variant="secondary" onClick={() => openIn("chatgpt")} disabled={!current}>
+          </a>
+          <a href="https://chatgpt.com/" target="_blank" rel="noopener noreferrer" onClick={copyBeforeOpen} className={buttonClass("secondary", "md", "active:scale-[0.96] transition-transform")}>
             Ouvrir ChatGPT <Icon name="external" size={16} />
-          </Button>
+          </a>
           {ai && (
             <Button variant="ink" onClick={runHere} disabled={!current || running}>
               <Icon name="sparkle" size={18} /> {running ? "Recherche en cours (1 à 3 min)…" : "Lancer la recherche ici"}

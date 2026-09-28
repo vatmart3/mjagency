@@ -1,4 +1,5 @@
 "use client";
+import { ask } from "@/components/ui/Confirm";
 import { useFill } from "@/lib/useFill";
 import { AnimatePresence, motion } from "framer-motion";
 import Link from "next/link";
@@ -253,7 +254,7 @@ function Scripts({ s }: { s: SectorSheet }) {
   }
 
   async function restore() {
-    if (!custom || !confirm("Revenir au script d'origine ? Vos modifications seront supprimées.")) return;
+    if (!custom || !(await ask("Revenir au script d'origine ? Vos modifications seront supprimées.", { action: "Restaurer" }))) return;
     for (const c of customs.filter((c) => c.base_key === baseKey(s.id, channel))) await db.remove("custom_scripts", c.id);
     toast("Script d'origine restauré");
   }
@@ -317,7 +318,7 @@ function Scripts({ s }: { s: SectorSheet }) {
                   <Button size="sm" variant="ghost" onClick={() => setEditing({ mode: "edit-variant", base: v, id: v.id })}>
                     <Icon name="edit" size={14} />
                   </Button>
-                  <Button size="sm" variant="ghost" onClick={() => confirm("Supprimer cette variante ?") && db.remove("custom_scripts", v.id)}>
+                  <Button size="sm" variant="ghost" onClick={async () => (await ask("Supprimer cette variante ?", { action: "Supprimer" })) && db.remove("custom_scripts", v.id)}>
                     <Icon name="trash" size={14} />
                   </Button>
                 </span>

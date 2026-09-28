@@ -1,4 +1,5 @@
 "use client";
+import { ask } from "@/components/ui/Confirm";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Button, ButtonLink } from "@/components/ui/Button";
@@ -16,6 +17,7 @@ import { usePrefs } from "@/store/prefs";
 import { csvEscape, todayISO } from "@/lib/format";
 import { statusLabel } from "@/lib/types";
 import { useAiEnabled } from "@/lib/ai";
+import { IS_ARTIFACT } from "@/lib/target";
 import type { SettingsData } from "@/lib/types";
 
 export default function Settings() {
@@ -115,7 +117,7 @@ export default function Settings() {
         <Cities cities={draft.cities} onChange={(cities) => set({ cities })} />
 
         <Device />
-        <Exports />
+        {IS_ARTIFACT ? <ArtifactNote /> : <Exports />}
         <Account />
       </div>
     </div>
@@ -197,7 +199,7 @@ function Offers({ offers, onChange }: { offers: Offer[]; onChange: (o: Offer[]) 
           </div>
         ))}
       </div>
-      <button className="mt-3 text-[13px] text-ink-3 hover:text-ink" onClick={() => confirm("Revenir aux prix par défaut ?") && onChange(DEFAULT_SETTINGS.offers)}>
+      <button className="mt-3 text-[13px] text-ink-3 hover:text-ink" onClick={async () => (await ask("Revenir aux prix par défaut ?", { action: "Revenir aux défauts" })) && onChange(DEFAULT_SETTINGS.offers)}>
         Revenir aux prix par défaut
       </button>
     </section>
@@ -347,7 +349,7 @@ function Account() {
           <Icon name="logout" size={16} /> Se déconnecter
         </Button>
         {demo && (
-          <Button variant="danger" onClick={() => confirm("Remettre les données de démonstration à zéro ?") && (resetDemoData(), toast("Données de démo réinitialisées"))}>
+          <Button variant="danger" onClick={async () => (await ask("Remettre les données de démonstration à zéro ?", { action: "Réinitialiser" })) && (resetDemoData(), toast("Données de démo réinitialisées"))}>
             Réinitialiser la démo
           </Button>
         )}
@@ -355,6 +357,20 @@ function Account() {
           Charte éthique
         </ButtonLink>
       </div>
+    </section>
+  );
+}
+
+function ArtifactNote() {
+  return (
+    <section>
+      <SectionTitle kicker="Version de démonstration" title="Ce qui change ici" />
+      <ul className="space-y-2 text-[15px] leading-relaxed text-ink-2">
+        <li>Les données restent dans ce navigateur, sur cet appareil. Rien n&apos;est partagé avec votre associé.</li>
+        <li>L&apos;export CSV et l&apos;export PDF d&apos;une fiche sont disponibles dans la version installée (Vercel + Supabase).</li>
+        <li>Le mode Duo se synchronise entre deux onglets du même navigateur ; entre deux téléphones, il faut la version installée.</li>
+        <li>Appel et SMS depuis l&apos;app peuvent ne pas s&apos;ouvrir ici : le numéro reste affiché, à composer à la main.</li>
+      </ul>
     </section>
   );
 }

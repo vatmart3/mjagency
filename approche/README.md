@@ -140,6 +140,16 @@ Si la recherche IA dépasse le temps alloué sur le plan gratuit de Vercel, la r
 
 ---
 
+## Version page unique (artefact claude.ai)
+
+```bash
+npm run build:artifact   # → artifact/dist/approche.html (≈ 2 Mo, tout est inclus)
+```
+
+Construit l'app entière en un seul fichier HTML qui s'ouvre sans serveur, par exemple publié comme artefact claude.ai et ouvert dans Safari. Les mêmes pages sont réutilisées ; seuls le routage (`artifact/router.tsx`) et trois modules Next.js (`artifact/shims/`) sont remplacés.
+
+Cette version est toujours en **mode démo** : les données restent dans le navigateur de chaque appareil, le Duo ne se synchronise qu'entre onglets du même navigateur, et l'impression PDF, l'export CSV et l'API Claude n'y sont pas disponibles.
+
 ## Faire évoluer le contenu
 
 | Pour… | Modifier |

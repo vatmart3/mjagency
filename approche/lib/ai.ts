@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
+import { IS_ARTIFACT } from "@/lib/target";
 
 let cached: Promise<boolean> | null = null;
 
@@ -7,6 +8,7 @@ let cached: Promise<boolean> | null = null;
 export function useAiEnabled() {
   const [on, setOn] = useState(false);
   useEffect(() => {
+    if (IS_ARTIFACT) return; // pas de serveur dans la version page unique
     cached ??= fetch("/api/ai")
       .then((r) => r.json())
       .then((j: { enabled?: boolean }) => Boolean(j.enabled))

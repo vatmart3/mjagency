@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { SessionProvider } from "@/lib/session";
 import { usePrefs } from "@/store/prefs";
 import { Toaster } from "@/components/ui/Toast";
+import { ConfirmHost } from "@/components/ui/Confirm";
 
 export function Providers({ children }: { children: React.ReactNode }) {
   const motion = usePrefs((s) => s.motion);
@@ -15,6 +16,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
       <SessionProvider>
         {children}
         <Toaster />
+        <ConfirmHost />
       </SessionProvider>
     </MotionConfig>
   );

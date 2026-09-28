@@ -1,4 +1,5 @@
 "use client";
+import { ask } from "@/components/ui/Confirm";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
@@ -19,6 +20,7 @@ import { eur, frDate, relativeDay } from "@/lib/format";
 import { getSector, sectorLabel } from "@/content/sectors";
 import { profileById } from "@/content/profiles";
 import { slotVerdict, VERDICT_LABEL } from "@/lib/timing";
+import { IS_ARTIFACT } from "@/lib/target";
 
 type Tab = "fiche" | "intel" | "prompt" | "historique" | "photos";
 
@@ -61,7 +63,7 @@ function DossierPage() {
   }
 
   async function remove() {
-    if (!confirm(`Supprimer définitivement le dossier « ${p!.name} » et tout son historique ?`)) return;
+    if (!(await ask(`Supprimer définitivement le dossier « ${p!.name} » et tout son historique ?`, { action: "Supprimer" }))) return;
     await db.remove("prospects", p!.id);
     router.replace("/clients");
   }
@@ -115,9 +117,11 @@ function DossierPage() {
               <Button variant="secondary" onClick={() => setEditing(true)} aria-label="Modifier">
                 <Icon name="edit" size={18} />
               </Button>
-              <ButtonLink href={`/clients/${p.id}/imprimer`} variant="secondary">
-                <Icon name="printer" size={18} /> PDF
-              </ButtonLink>
+              {!IS_ARTIFACT && (
+                <ButtonLink href={`/clients/${p.id}/imprimer`} variant="secondary">
+                  <Icon name="printer" size={18} /> PDF
+                </ButtonLink>
+              )}
             </div>
           </div>
 

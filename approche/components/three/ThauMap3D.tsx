@@ -1,5 +1,5 @@
 "use client";
-import { Html, OrbitControls } from "@react-three/drei";
+import { OrbitControls } from "@react-three/drei";
 import { Canvas, useFrame } from "@react-three/fiber";
 import { useMemo, useRef, useState } from "react";
 import * as THREE from "three";
@@ -24,6 +24,52 @@ const LABEL_OFFSET: Record<string, [number, number]> = {
   sete: [0.6, 0.5],
   frontignan: [0.2, 0.5],
 };
+
+/**
+ * Étiquette dessinée dans une texture (pas de <Html> de drei : ses racines React
+ * se démontent mal lors d'une navigation, et le texte reste net en 3D).
+ */
+function Label({ text, sub, position, size = 0.55, strong = false }: { text: string; sub?: string; position: [number, number, number]; size?: number; strong?: boolean }) {
+  const { tex, aspect } = useMemo(() => {
+    const scale = 4;
+    const font = `${strong ? 600 : 500} ${28 * scale}px -apple-system, "SF Pro Text", "Geist", system-ui, sans-serif`;
+    const subFont = `400 ${24 * scale}px -apple-system, "SF Pro Text", "Geist", system-ui, sans-serif`;
+    const c = document.createElement("canvas");
+    const ctx = c.getContext("2d")!;
+    ctx.font = font;
+    const w1 = ctx.measureText(text).width;
+    ctx.font = subFont;
+    const w2 = sub ? ctx.measureText("  " + sub).width : 0;
+    const padX = strong ? 22 * scale : 4 * scale;
+    c.width = Math.ceil(w1 + w2 + padX * 2);
+    c.height = 48 * scale;
+    if (strong) {
+      ctx.fillStyle = "rgba(255,255,255,0.96)";
+      const r = c.height / 2;
+      ctx.beginPath();
+      ctx.roundRect(0, 0, c.width, c.height, r);
+      ctx.fill();
+    }
+    ctx.textBaseline = "middle";
+    ctx.font = font;
+    ctx.fillStyle = strong ? "#1d1d1f" : "#6e6e73";
+    ctx.fillText(text, padX, c.height / 2 + scale);
+    if (sub) {
+      ctx.font = subFont;
+      ctx.fillStyle = "#6e6e73";
+      ctx.fillText("  " + sub, padX + w1, c.height / 2 + scale);
+    }
+    const t = new THREE.CanvasTexture(c);
+    t.colorSpace = THREE.SRGBColorSpace;
+    t.anisotropy = 4;
+    return { tex: t, aspect: c.width / c.height };
+  }, [text, sub, strong]);
+  return (
+    <sprite position={position} scale={[size * aspect, size, 1]} renderOrder={strong ? 10 : 5}>
+      <spriteMaterial map={tex} transparent depthTest={!strong} toneMapped={false} />
+    </sprite>
+  );
+}
 
 function shapeFrom(points: [number, number][]) {
   const s = new THREE.Shape();
@@ -70,14 +116,7 @@ function Point({ p, onSelect, selected, animate }: { p: MapPoint; onSelect: (id:
         <ringGeometry args={[0.2, 0.26, 40]} />
         <meshBasicMaterial color={color} transparent opacity={0.4} depthWrite={false} />
       </mesh>
-      {selected && (
-        <Html position={[0, 0.7, 0]} center distanceFactor={14} zIndexRange={[20, 0]}>
-          <div className="pointer-events-none whitespace-nowrap rounded-full bg-white/95 px-3 py-1.5 text-[13px] font-semibold shadow-[var(--shadow-soft)]">
-            {p.label}
-            {p.sub && <span className="ml-1.5 font-normal text-ink-2">{p.sub}</span>}
-          </div>
-        </Html>
-      )}
+      {selected && <Label text={p.label} sub={p.sub} position={[0, 0.9, 0]} size={0.62} strong />}
     </group>
   );
 }
@@ -104,9 +143,7 @@ function Scene({ points, animate, onSelect, selected }: { points: MapPoint[]; an
               <circleGeometry args={[0.07, 16]} />
               <meshBasicMaterial color="#1d1d1f" />
             </mesh>
-            <Html position={[LABEL_OFFSET[c.id]?.[0] ?? 0, 0.05, LABEL_OFFSET[c.id]?.[1] ?? 0.5]} center distanceFactor={16} zIndexRange={[10, 0]}>
-              <span className="pointer-events-none whitespace-nowrap text-[12px] font-medium tracking-tight text-ink-2">{c.name}</span>
-            </Html>
+            <Label text={c.name} position={[LABEL_OFFSET[c.id]?.[0] ?? 0, 0.05, LABEL_OFFSET[c.id]?.[1] ?? 0.5]} size={0.5} />
           </group>
         );
       })}

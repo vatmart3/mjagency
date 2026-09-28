@@ -61,7 +61,7 @@ export default function BriefPage() {
   const byId = new Map(prospects.map((p) => [p.id, p]));
   const headline: string[] = [];
   if (data.callsPlanned) headline.push(plural(data.callsPlanned, "appel"));
-  if (data.tourCity) headline.push(`1 tournée ${data.tourCity[0].replace(/-/g, "\u2011")}`);
+  if (data.tourCity) headline.push(`1 tournée ${data.tourCity[0]}`);
   if (data.myTasks.length) headline.push(plural(data.myTasks.length, "relance"));
   if (!headline.length) headline.push("journée libre, prenez de l'avance");
 
@@ -79,7 +79,7 @@ export default function BriefPage() {
           <span className="h-3 w-px bg-fog" />
           <span>Le Brief de {me?.display_name}</span>
         </motion.p>
-        <motion.h1 {...fade(1)} className="display mt-4 max-w-5xl text-[46px] sm:text-[64px] md:text-[96px]">
+        <motion.h1 {...fade(1)} className="display mt-4 max-w-5xl text-[44px] [overflow-wrap:anywhere] [text-wrap:balance] sm:text-[64px] md:text-[96px]">
           Aujourd&apos;hui&nbsp;: <span className="text-blue">{headline.join(", ")}</span>.
         </motion.h1>
         <motion.div {...fade(2)} className="mt-8 grid gap-x-10 gap-y-4 border-t border-line pt-6 text-[17px] leading-snug md:grid-cols-3 md:text-[19px]">
