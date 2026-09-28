@@ -4,6 +4,12 @@ Site multi-page pour le studio créatif MJ Agency (Sète, Hérault).
 HTML/CSS/JS pur, sans framework ni étape de build. Une seule fonction
 serverless, pour l'envoi du formulaire.
 
+## Application interne APPROCHE
+
+Le dossier `approche/` contient l'outil de prospection de Jérémy et Matheis
+(Next.js + Supabase), déployé comme un projet Vercel séparé (Root Directory :
+`approche`). Il ne partage rien avec le site. Voir `approche/README.md`.
+
 ## Pages
 
 | Fichier | Rôle |

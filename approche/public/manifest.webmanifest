@@ -1,0 +1,10 @@
+{
+  "name": "APPROCHE — MJAGENCY",
+  "short_name": "APPROCHE",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#ffffff",
+  "lang": "fr",
+  "icons": [{ "src": "/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }]
+}
