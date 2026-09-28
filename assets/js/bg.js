@@ -46,7 +46,6 @@
   uniform float u_taille;      // échelle de l'objet
   uniform float u_petit;       // 1 sur téléphone
   uniform float u_elan;        // vitesse de défilement, lissée — la souris du doigt
-  uniform float u_sombre;      // 0 clair, 1 sombre — transition continue
 
   mat2 rot(float a){ float c = cos(a), s = sin(a); return mat2(c, -s, s, c); }
 
@@ -113,12 +112,9 @@
      une dominante bleutée dans les parties basses. */
   vec3 environnement(vec3 n){
     float h = n.y * 0.5 + 0.5;
-    vec3 clair = mix(vec3(0.855, 0.870, 0.905), vec3(1.0), smoothstep(0.38, 1.0, h));
-    clair = mix(clair, vec3(0.800, 0.860, 0.960), smoothstep(0.46, 0.0, h) * 0.55);
-    /* En thème sombre le studio devient une pièce noire : seul le plafond
-       renvoie un peu de lumière, sinon l'objet perd tout relief. */
-    vec3 nuit = mix(vec3(0.16, 0.17, 0.20), vec3(0.72, 0.75, 0.82), smoothstep(0.30, 1.0, h));
-    return mix(clair, nuit, u_sombre);
+    vec3 c = mix(vec3(0.855, 0.870, 0.905), vec3(1.0), smoothstep(0.38, 1.0, h));
+    c = mix(c, vec3(0.800, 0.860, 0.960), smoothstep(0.46, 0.0, h) * 0.55);
+    return c;
   }
 
   void main(){
@@ -135,13 +131,10 @@
     vec2 w2 = vec2(fbm(d * 1.35 + w1 * 1.2 + t * 0.023), fbm(d * 1.35 + w1 * 1.2 - t * 0.018));
     float f = fbm(d * 1.20 + w2 * 1.1);
 
-    /* Deux palettes, interpolées par u_sombre : la bascule de thème se fait
-       donc en fondu au lieu de sauter d'une image à l'autre. */
-    float S = u_sombre;
-    vec3 blanc   = mix(vec3(1.000, 1.000, 1.000), vec3(0.043, 0.043, 0.055), S);
-    vec3 casse   = mix(vec3(0.961, 0.961, 0.969), vec3(0.063, 0.063, 0.078), S);
-    vec3 bleute  = mix(vec3(0.898, 0.933, 0.984), vec3(0.063, 0.086, 0.129), S);
-    vec3 lavande = mix(vec3(0.941, 0.925, 0.973), vec3(0.082, 0.071, 0.110), S);
+    vec3 blanc   = vec3(1.000, 1.000, 1.000);
+    vec3 casse   = vec3(0.961, 0.961, 0.969);   // #F5F5F7
+    vec3 bleute  = vec3(0.898, 0.933, 0.984);
+    vec3 lavande = vec3(0.941, 0.925, 0.973);
 
     vec3 col = mix(blanc, casse, smoothstep(0.22, 0.78, f));
     col = mix(col, bleute,  smoothstep(0.30, 0.80, w2.x));
@@ -155,7 +148,7 @@
     float rayon = 0.78 * u_taille;
     float ombre = smoothstep(rayon, 0.0, length((p2 - vec2(0.06, -0.07)) * vec2(1.0, 1.15)));
     ombre *= mix(1.0, 1.0 - smoothstep(0.22, 0.80, u_scroll), u_petit);
-    col = mix(col, mix(vec3(0.878, 0.890, 0.914), vec3(0.118, 0.125, 0.153), S), ombre * 0.55);
+    col = mix(col, vec3(0.878, 0.890, 0.914), ombre * 0.55);
 
     /* Sur un téléphone il n'y a pas de curseur à suivre : c'est l'élan du
        défilement qui prend sa place. Un balayage rapide fait tourner la forme
@@ -204,11 +197,11 @@
       float spe2 = pow(max(dot(reflect(-l2, n), -rd), 0.0), 18.0);
       float fres = pow(1.0 - max(dot(n, -rd), 0.0), 2.6);
 
-      vec3 mat = mix(vec3(1.0), vec3(0.30, 0.30, 0.34), S);
+      vec3 mat = vec3(1.0);
       vec3 o = mat * environnement(n) * (0.34 + 0.60 * dif1);
       o += mat * dif2 * vec3(0.78, 0.85, 1.00) * 0.28;
       o *= mix(0.55, 1.0, ao);
-      o += spe1 * mix(0.62, 0.80, S);
+      o += spe1 * 0.62;
       o += spe2 * vec3(0.30, 0.58, 1.00) * 0.22;
       o += fres * vec3(0.00, 0.44, 0.89) * 0.75;      // liseré bleu de la charte
 
@@ -233,7 +226,7 @@
     float bx = 1.0 - smoothstep(0.19, 0.44, abs(sx + 0.04));
     float by = 1.0 - smoothstep(0.20, 0.48, abs(q.y - 0.16));
     float degage = bx * by * (1.0 - smoothstep(0.05, 0.85, u_scroll));
-    col = mix(col, blanc, degage * 0.88);   // blanc suit déjà le thème
+    col = mix(col, blanc, degage * 0.88);
 
     // Léger tramage : sans lui, des dégradés aussi doux montrent des bandes
     float grain = (hash(gl_FragCoord.xy + fract(u_time)) - 0.5) * 0.006;
@@ -273,7 +266,6 @@
   const uTaille = gl.getUniformLocation(prog, 'u_taille');
   const uPetit  = gl.getUniformLocation(prog, 'u_petit');
   const uElan   = gl.getUniformLocation(prog, 'u_elan');
-  const uSombre = gl.getUniformLocation(prog, 'u_sombre');
 
   gl.uniform1f(uTaille, petit ? 0.22 : 0.40);
   gl.uniform1f(uPetit, petit ? 1 : 0);
@@ -281,20 +273,6 @@
   let souris = [0.5, 0.5], cible = [0.5, 0.5];
   let defile = 0, defileCible = 0;
   let elan = 0, dernierY = scrollY;
-
-  /* Thème : lu sur le document, pas déduit. Un attribut data-theme est un
-     choix explicite du visiteur et l'emporte sur la préférence système. La
-     valeur est lissée pour que la bascule se fasse en fondu. */
-  const racine = document.documentElement;
-  const nuitMedia = matchMedia('(prefers-color-scheme: dark)');
-  const estSombre = () => {
-    const a = racine.getAttribute('data-theme');
-    return a ? a === 'dark' : nuitMedia.matches;
-  };
-  let sombre = estSombre() ? 1 : 0, sombreCible = sombre;
-  const relireTheme = () => { sombreCible = estSombre() ? 1 : 0; };
-  nuitMedia.addEventListener('change', relireTheme);
-  new MutationObserver(relireTheme).observe(racine, { attributeFilter: ['data-theme'] });
   const lireScroll = () => { defileCible = scrollY / Math.max(innerHeight, 1); };
   addEventListener('scroll', lireScroll, { passive: true });
   lireScroll();
@@ -350,9 +328,7 @@
 
     gl.uniform1f(uTime, (now - t0) / 1000);
     gl.uniform2f(uMouse, souris[0], souris[1]);
-    sombre += (sombreCible - sombre) * 0.10;
     gl.uniform1f(uElan, elan);
-    gl.uniform1f(uSombre, sombre);
     gl.uniform1f(uScroll, defile);
     gl.uniform2f(uDecal, x, y);
     gl.drawArrays(gl.TRIANGLES, 0, 3);
@@ -362,17 +338,6 @@
 
   /* Sans WebGL — ou sans animation demandée — un dégradé fixe équivalent. */
   function degrade(){
-    const nuit = (document.documentElement.getAttribute('data-theme') === 'dark')
-      || (!document.documentElement.getAttribute('data-theme')
-          && matchMedia('(prefers-color-scheme: dark)').matches);
-    if (nuit) {
-      canvas.style.background =
-        'radial-gradient(70% 55% at 18% 12%, #121A28 0%, rgba(18,26,40,0) 60%),' +
-        'radial-gradient(60% 50% at 84% 30%, #171426 0%, rgba(23,20,38,0) 62%),' +
-        'radial-gradient(80% 60% at 50% 100%, #101014 0%, rgba(16,16,20,0) 70%),' +
-        '#0B0B0E';
-      return;
-    }
     canvas.style.background =
       'radial-gradient(70% 55% at 18% 12%, #E8F0FB 0%, rgba(232,240,251,0) 60%),' +
       'radial-gradient(60% 50% at 84% 30%, #F0EDF8 0%, rgba(240,237,248,0) 62%),' +

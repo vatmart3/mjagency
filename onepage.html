@@ -52,13 +52,6 @@
   --black:      #0D0D0F;
   --blue:       #0071E3;
   --blue-dark:  #0058B0;
-  /* L'encre posée SUR un aplat bleu, et SUR un aplat d'encre. En thème
-     sombre le bleu s'éclaircit et l'encre devient claire : un blanc figé
-     dessus tomberait à 2,75:1. Ces deux jetons suivent le thème. */
-  --sur-bleu:   #FFFFFF;
-  --sur-encre:  #FFFFFF;
-  /* Teinte du surlignage des résultats de recherche */
-  --surlignage: rgba(0,113,227,.16);
 
   --rule:  rgba(0,0,0,.08);
   --rule-2:rgba(0,0,0,.14);
@@ -199,7 +192,7 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
 .btn:active{transform:scale(.98)}
 .btn .arw{font-size:.85em;transition:transform .25s var(--ease)}
 
-.btn--glow{background:var(--blue);color:var(--sur-bleu);border-color:var(--blue)}
+.btn--glow{background:var(--blue);color:#fff;border-color:var(--blue)}
 
 /* Lien tertiaire — la troisième marche de la charte */
 .link-t{color:var(--blue);font-size:17px;display:inline-flex;align-items:center;gap:5px}
@@ -266,7 +259,7 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
   position:fixed;top:0;left:0;right:0;z-index:500;height:52px;
   display:flex;align-items:center;justify-content:space-between;
   padding:0 clamp(18px,4vw,44px);
-  background:var(--nav-bg);backdrop-filter:saturate(180%) blur(20px);
+  background:rgba(255,255,255,.72);backdrop-filter:saturate(180%) blur(20px);
   border-bottom:1px solid var(--rule);
   transition:transform .4s var(--ease);
 }
@@ -278,7 +271,7 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
 .nav__links a.active{color:var(--black);font-weight:500;opacity:1}
 .nav__cta{
   font-size:14px;padding:7px 16px;border-radius:980px;
-  background:var(--blue);color:var(--sur-bleu);display:inline-flex;align-items:center;gap:6px;
+  background:var(--blue);color:#fff;display:inline-flex;align-items:center;gap:6px;
   transition:background .25s var(--ease);
 }
 .nav__burger{display:none}
@@ -311,9 +304,10 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
 }
 .mobile-menu a small{font-size:14px;color:var(--gray);font-weight:400}
 .mobile-menu .btn{font-size:17px;padding:14px 26px;border-bottom:0;align-self:flex-start;margin-top:var(--s4)}
-/* .mobile-menu a ci-dessus est plus spécifique que .btn--glow : sans cette
-   ligne le bouton bleu du menu reprend l'encre des liens — 2,55:1 en sombre. */
-.mobile-menu .btn--glow{color:var(--sur-bleu)}
+/* .mobile-menu a plus haut est plus spécifique que .btn--glow : sans cette
+   ligne le bouton bleu du menu reprend l'encre des liens, soit du gris
+   foncé sur bleu — 4,13:1, sous le minimum lisible. */
+.mobile-menu .btn--glow{color:#fff}
 
 /* ---------- Chiffres ---------- */
 .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:var(--gutter)}
@@ -433,9 +427,9 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
   font-size:15px;color:var(--dark-gray);position:relative;transition:background .2s,color .2s;
 }
 .cal__day.empty{pointer-events:none}
-.cal__day.disabled{color:var(--inactif);pointer-events:none}
+.cal__day.disabled{color:#C7C7CC;pointer-events:none}
 .cal__day.avail::after{content:"";position:absolute;bottom:5px;width:4px;height:4px;border-radius:50%;background:var(--blue)}
-.cal__day.selected{background:var(--blue);color:var(--sur-bleu);font-weight:500}
+.cal__day.selected{background:var(--blue);color:#fff;font-weight:500}
 .cal__day.selected::after{background:#fff}
 
 .slots{margin-top:var(--s3)}
@@ -445,7 +439,7 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
   background:var(--light-gray);border-radius:var(--radius-s);padding:13px 6px;min-height:48px;
   text-align:center;font-size:15px;color:var(--dark-gray);transition:background .2s,color .2s;
 }
-.slot.selected{background:var(--blue);color:var(--sur-bleu)}
+.slot.selected{background:var(--blue);color:#fff}
 .slot.disabled{opacity:.4;pointer-events:none;text-decoration:line-through}
 
 /* ---------- Formulaire ---------- */
@@ -474,7 +468,7 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
   background:rgba(0,113,227,.08);color:#0B4F9E;display:none;
 }
 .form-msg.show{display:block}
-.form-msg--erreur{background:var(--err-bg);color:var(--err-txt)}
+.form-msg--erreur{background:rgba(255,59,48,.08);color:#B3261E}
 .form-msg a{text-decoration:underline}
 /* Référence de panne : lisible si on la cherche, muette sinon. */
 .form-msg__ref{display:block;margin-top:6px;font-size:12px;opacity:.6;letter-spacing:.02em}
@@ -486,7 +480,7 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
   border-radius:980px;padding:9px 18px;min-height:40px;display:inline-flex;align-items:center;
   transition:background .2s,color .2s;
 }
-.filters .tag.active{background:var(--blue);color:var(--sur-bleu)}
+.filters .tag.active{background:var(--blue);color:#fff}
 
 /* ---------- Zone d'intervention ---------- */
 .zone{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--s4)}
@@ -577,8 +571,8 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
 .coh--carte .coh__marque b{font-size:12px}
 /* L'enseigne : fond sombre, marque en négatif */
 .coh--enseigne{background:var(--black);align-items:center;justify-content:center}
-.coh--enseigne .coh__lab{color:var(--sur-encre);opacity:.45}
-.coh--enseigne .coh__marque b{color:var(--sur-encre)}
+.coh--enseigne .coh__lab{color:rgba(255,255,255,.45)}
+.coh--enseigne .coh__marque b{color:#fff}
 /* Le réseau social : vignette carrée */
 .coh--reseau .coh__vignette{
   aspect-ratio:1;border-radius:8px;
@@ -649,17 +643,17 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
 .masque{display:block;overflow:hidden}
 .masque>span{display:block}
 
-/* Réservée au tactile. Sur ordinateur, où l'on découvre la page au
-   défilement long d'une molette, le procédé sautait aux yeux et
-   n'apportait rien — retiré à la demande. Le masque reste inerte : la
-   structure ne change pas, seul l'effet disparaît. */
+/* Sur ordinateur, la montée des titres n'apportait rien — retirée à la
+   demande. Le masque reste inerte : le texte est là, entier, tout de suite.
+   Sur téléphone elle a sa raison d'être, c'est le seul endroit où la page
+   se construit sous le pouce. */
 @media (max-width:900px){
   .masque>span{
     transform:translateY(105%);
     transition:transform .85s var(--ease);
   }
+  .reveal.in .masque>span,.masque.vu>span,.rs.in .masque>span{transform:none}
 }
-.reveal.in .masque>span,.masque.vu>span,.rs.in .masque>span{transform:none}
 /* Le décalage entre les lignes fait la phrase, plus que la montée elle-même */
 .masque:nth-child(2)>span{transition-delay:.075s}
 .masque:nth-child(3)>span{transition-delay:.15s}
@@ -699,280 +693,6 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
   .masque>span,.hero__title .line>span{transform:none!important;transition:none}
 }
 
-/* =========================================================
-   THÈME SOMBRE
-
-   Les noms de variables sont restés littéraux (--white, --black) parce
-   qu'ils sont employés des centaines de fois : les renommer serait un
-   diff énorme pour rien. En thème sombre, lire --white comme « la
-   surface » et --black comme « l'encre des titres ».
-
-   Trois états, et c'est volontaire : sans attribut, le site suit la
-   préférence du système ; avec data-theme, le choix du visiteur gagne
-   dans les deux sens. Une seule règle ne suffirait pas — un visiteur qui
-   veut le clair sur un système sombre serait ignoré.
-
-   Les maquettes (navigateur, planche de charte) restent claires : elles
-   représentent un site clair, comme une photographie. Un artefact clair
-   sur une page sombre, c'est juste.
-   ========================================================= */
-@media (prefers-color-scheme: dark){
-  :root:not([data-theme="light"]){ color-scheme: dark; }
-}
-:root[data-theme="dark"]{ color-scheme: dark; }
-
-@media (prefers-color-scheme: dark){
-  :root:not([data-theme="light"]){
-    --white:      #16161A;   /* surface des cartes */
-    --off-white:  #101014;   /* fond des bandes */
-    --light-gray: #1E1E23;
-    --gray:       #91919A;
-    --dark-gray:  #E4E4E9;   /* texte courant */
-    --black:      #F6F6F8;   /* titres */
-    --blue:       #4C9EFF;
-    --blue-dark:  #7FBAFF;
-    --sur-bleu:   #0B0B0E;
-    --sur-encre:  #16161A;
-    --surlignage: rgba(76,158,255,.28);
-    --rule:  rgba(255,255,255,.11);
-    --rule-2:rgba(255,255,255,.20);
-    --survol:    #26262C;
-    --nav-bg:    rgba(14,14,17,.74);
-    --footer-bg: rgba(16,16,20,.80);
-    --inactif:   #4A4A52;
-    --err-bg:    rgba(255,99,90,.12);
-    --err-txt:   #FF8A80;
-    --avert-bg:   #3A2E14;
-    --avert-bord: #6E5622;
-    --avert-txt:  #F2D89A;
-    --shadow-s: 0 1px 3px rgba(0,0,0,.40), 0 6px 18px rgba(0,0,0,.34);
-    --shadow-m: 0 2px 8px rgba(0,0,0,.44), 0 14px 38px rgba(0,0,0,.40);
-  }
-}
-:root[data-theme="dark"]{
-  --white:      #16161A;
-  --off-white:  #101014;
-  --light-gray: #1E1E23;
-  --gray:       #91919A;
-  --dark-gray:  #E4E4E9;
-  --black:      #F6F6F8;
-  --blue:       #4C9EFF;
-  --blue-dark:  #7FBAFF;
-  --sur-bleu:   #0B0B0E;
-  --sur-encre:  #16161A;
-  --surlignage: rgba(76,158,255,.28);
-  --rule:  rgba(255,255,255,.11);
-  --rule-2:rgba(255,255,255,.20);
-  --survol:    #26262C;
-  --nav-bg:    rgba(14,14,17,.74);
-  --footer-bg: rgba(16,16,20,.80);
-  --inactif:   #4A4A52;
-  --err-bg:    rgba(255,99,90,.12);
-  --err-txt:   #FF8A80;
-  --avert-bg:   #3A2E14;
-  --avert-bord: #6E5622;
-  --avert-txt:  #F2D89A;
-  --shadow-s: 0 1px 3px rgba(0,0,0,.40), 0 6px 18px rgba(0,0,0,.34);
-  --shadow-m: 0 2px 8px rgba(0,0,0,.44), 0 14px 38px rgba(0,0,0,.40);
-}
-
-/* Le fond du document, qui était transparent pour laisser passer le canvas :
-   il lui faut une couleur propre, sinon la page emprunte celle de l'hôte. */
-@media (prefers-color-scheme: dark){
-  :root:not([data-theme="light"]) body{ background:#0B0B0E }
-}
-:root[data-theme="dark"] body{ background:#0B0B0E }
-
-/* Les surfaces qui restent claires par intention : ce sont des objets
-   représentés, pas des surfaces de l'interface. */
-:root[data-theme="dark"] .board,
-:root[data-theme="dark"] .nave,
-:root[data-theme="dark"] .nave__barre,
-:root[data-theme="dark"] .coh{ color-scheme: light }
-
-/* Bascule douce, jamais sur les transformations (elles animent déjà) */
-body,.nav,.footer,.feature,.card,.step,.stat,.cta-band,.cal,.membre,.faq__item{
-  transition:background-color .35s var(--ease),border-color .35s var(--ease),color .35s var(--ease);
-}
-@media (prefers-reduced-motion:reduce){
-  body,.nav,.footer,.feature,.card,.step,.stat,.cta-band,.cal,.membre,.faq__item{transition:none}
-}
-
-/* =========================================================
-   COMMANDES DE L'INTERFACE
-   Barre de progression, retour en haut, bascule de thème,
-   recherche, chargement, avis sur le stockage.
-   ========================================================= */
-
-/* ---------- Barre de progression ----------
-   Posée sous la barre de navigation, elle suit le défilement. Animée par
-   scaleX plutôt que par width : une seule propriété, composée par le GPU,
-   donc aucun recalcul de mise en page à chaque image. */
-.progres{
-  position:fixed;top:52px;left:0;right:0;height:2px;z-index:501;
-  transform:scaleX(0);transform-origin:left center;
-  background:var(--blue);
-  will-change:transform;pointer-events:none;
-}
-.nav.cachee + .progres{transform:scaleX(var(--p,0)) translateY(-54px)}
-
-/* ---------- Retour en haut ----------
-   --avis-h vaut 0 sauf pendant l'avis de stockage, qui tient le même coin :
-   main.js y pose sa hauteur mesurée et le bouton passe au-dessus. */
-.remonter{
-  position:fixed;z-index:480;
-  right:max(18px, env(safe-area-inset-right, 0px));
-  bottom:calc(max(18px, env(safe-area-inset-bottom, 0px)) + var(--avis-h, 0px));
-  width:48px;height:48px;border-radius:50%;
-  background:var(--white);color:var(--black);
-  border:1px solid var(--rule-2);box-shadow:var(--shadow-m);
-  display:grid;place-items:center;font-size:17px;line-height:1;
-  opacity:0;transform:translateY(12px) scale(.9);pointer-events:none;
-  transition:opacity .3s var(--ease),transform .3s var(--ease),
-              bottom .3s var(--ease),background .25s var(--ease);
-}
-.remonter.visible{opacity:1;transform:none;pointer-events:auto}
-.remonter:active{transform:scale(.94)}
-
-/* ---------- Boutons ronds de la barre ---------- */
-.nav__outil{
-  width:40px;height:40px;border-radius:50%;flex:none;
-  display:grid;place-items:center;color:var(--dark-gray);
-  transition:background .25s var(--ease),color .25s var(--ease);
-}
-.nav__outil svg{width:19px;height:19px;display:block;fill:none;
-  stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
-.nav__outils{display:flex;align-items:center;gap:2px}
-/* Un seul jeu d'icônes dans le document : on montre celle qui correspond. */
-.nav__outil .lune{display:none}
-:root[data-theme="dark"] .nav__outil .lune{display:block}
-:root[data-theme="dark"] .nav__outil .soleil{display:none}
-@media (prefers-color-scheme: dark){
-  :root:not([data-theme="light"]) .nav__outil .lune{display:block}
-  :root:not([data-theme="light"]) .nav__outil .soleil{display:none}
-}
-
-/* ---------- Recherche ---------- */
-.rech{
-  position:fixed;inset:0;z-index:600;display:none;
-  padding-top:max(10vh, env(safe-area-inset-top, 0px));
-  padding-inline:var(--pad);
-  background:color-mix(in srgb, var(--off-white) 84%, transparent);
-  backdrop-filter:blur(18px) saturate(180%);
-}
-.rech.ouverte{display:block}
-.rech__boite{
-  max-width:640px;margin-inline:auto;
-  background:var(--white);border:1px solid var(--rule);
-  border-radius:var(--radius);box-shadow:var(--shadow-m);overflow:hidden;
-}
-.rech__haut{display:flex;align-items:center;gap:12px;padding:14px 16px;border-bottom:1px solid var(--rule)}
-.rech__haut svg{width:19px;height:19px;flex:none;fill:none;stroke:var(--gray);stroke-width:1.8;stroke-linecap:round}
-.rech__champ{
-  flex:1;border:none;background:none;outline:none;
-  font:inherit;font-size:17px;color:var(--black);
-}
-.rech__champ::placeholder{color:var(--gray)}
-.rech__fermer{
-  font-size:12px;color:var(--gray);border:1px solid var(--rule-2);
-  border-radius:6px;padding:3px 7px;flex:none;
-}
-.rech__liste{max-height:min(52vh,420px);overflow-y:auto;overscroll-behavior:contain}
-.rech__item{
-  display:block;padding:13px 16px;border-bottom:1px solid var(--rule);
-  min-height:44px;
-}
-.rech__item:last-child{border-bottom:none}
-.rech__item.actif{background:var(--off-white)}
-.rech__t{font-size:16px;font-weight:600;color:var(--black);letter-spacing:-.012em}
-.rech__x{font-size:13px;color:var(--gray);margin-top:3px;display:block}
-/* Sans cette règle le <mark> du titre repasse au jaune du navigateur —
-   qui n'appartient pas à la charte. Les deux emplacements sont couverts. */
-.rech__t mark,.rech__x mark{
-  background:var(--surlignage);color:inherit;border-radius:3px;padding:0 2px;
-}
-/* La croix native de <input type="search"> n'est pas stylable et doublait
-   la puce « esc » juste à côté. Rouvrir la recherche vide le champ. */
-.rech__champ::-webkit-search-cancel-button,
-.rech__champ::-webkit-search-decoration{-webkit-appearance:none;appearance:none}
-.rech__vide{padding:26px 16px;text-align:center;color:var(--gray);font-size:15px}
-.rech__aide{
-  max-width:640px;margin:12px auto 0;text-align:center;
-  font-size:12.5px;color:var(--gray);
-}
-
-/* ---------- Chargement ----------
-   Barre indéterminée en haut de fenêtre. Elle n'apparaît que si la page
-   tarde : affichée systématiquement, elle clignoterait sur un chargement
-   rapide, ce qui donne l'impression que le site est lent. */
-.chargement{
-  position:fixed;top:0;left:0;right:0;height:2px;z-index:700;
-  overflow:hidden;display:none;background:var(--rule);
-}
-.chargement.visible{display:block}
-.chargement::after{
-  content:"";position:absolute;inset:0;width:38%;
-  background:var(--blue);border-radius:2px;
-  animation:chargement 1.1s var(--ease) infinite;
-}
-@keyframes chargement{
-  0%{transform:translateX(-105%)}
-  100%{transform:translateX(300%)}
-}
-
-/* ---------- Avis sur le stockage ---------- */
-.avis{
-  position:fixed;z-index:560;
-  left:max(12px, env(safe-area-inset-left, 0px));
-  right:max(12px, env(safe-area-inset-right, 0px));
-  bottom:max(12px, env(safe-area-inset-bottom, 0px));
-  max-width:560px;margin-inline:auto;
-  background:var(--white);border:1px solid var(--rule-2);
-  border-radius:var(--radius-s);box-shadow:var(--shadow-m);
-  padding:14px 16px;
-  display:none;align-items:center;gap:14px;flex-wrap:wrap;
-}
-.avis.visible{display:flex}
-.avis__t{flex:1;min-width:200px;font-size:14px;line-height:1.5;color:var(--dark-gray)}
-.avis__t a{color:var(--blue);text-decoration:underline}
-.avis__ok{
-  font-size:14px;font-weight:500;padding:9px 18px;min-height:44px;
-  border-radius:980px;background:var(--blue);color:var(--sur-bleu);flex:none;
-  display:inline-flex;align-items:center;
-}
-
-@media (max-width:520px){
-  .rech{padding-top:max(6vh, env(safe-area-inset-top, 0px))}
-  .rech__liste{max-height:58vh}
-  .remonter{width:46px;height:46px}
-  .avis{padding:13px 14px;gap:10px}
-  .avis__ok{width:100%;justify-content:center}
-}
-
-/* ---------- Survol enrichi ----------
-   La charte reste sobre : pas de lueur, pas de rebond. Un bouton se
-   soulève d'un pixel et son ombre s'ouvre — assez pour signaler qu'il est
-   cliquable, jamais assez pour distraire. */
-@media (hover: hover) and (pointer: fine){
-  .btn{transition:background .25s var(--ease),color .25s var(--ease),
-       border-color .25s var(--ease),transform .25s var(--ease),box-shadow .25s var(--ease)}
-  .btn:hover{transform:translateY(-1px);box-shadow:var(--shadow-s)}
-  .btn--glow:hover{box-shadow:0 6px 18px rgba(0,113,227,.28)}
-  .nav__outil:hover{background:var(--survol);color:var(--black)}
-  .remonter:hover{background:var(--survol)}
-  .rech__item:hover{background:var(--off-white)}
-  .avis__ok:hover{background:var(--blue-dark)}
-  /* Le trait se dessine depuis la gauche, il n'apparaît pas d'un coup. */
-  .link-t{position:relative;text-decoration:none}
-  .link-t::after{
-    content:"";position:absolute;left:0;right:0;bottom:2px;height:1px;
-    background:currentColor;transform:scaleX(0);transform-origin:left;
-    transition:transform .3s var(--ease);
-  }
-  .link-t:hover{text-decoration:none}
-  .link-t:hover::after{transform:scaleX(1)}
-}
-
 /* ---------- Pages légales ----------
    Un document, pas une page d'accueil : une seule colonne, mesure de lecture
    contenue, titres qui se repèrent sans crier. */
@@ -986,11 +706,6 @@ body,.nav,.footer,.feature,.card,.step,.stat,.cta-band,.cal,.membre,.faq__item{
 }
 .legal p{color:var(--dark-gray);font-size:17px;line-height:1.65}
 .legal b{font-weight:600;color:var(--black)}
-.legal code{
-  font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:14px;
-  background:var(--light-gray);border:1px solid var(--rule);
-  border-radius:5px;padding:1px 6px;color:var(--dark-gray);
-}
 .legal a{color:var(--blue);text-decoration:underline;text-underline-offset:2px}
 .legal ul{list-style:none;display:flex;flex-direction:column;gap:9px;margin-top:2px}
 .legal li{
@@ -1006,8 +721,8 @@ body,.nav,.footer,.feature,.card,.step,.stat,.cta-band,.cal,.membre,.faq__item{
    se corrige, une information inventée dans un document qui engage se
    découvre trop tard. */
 .aremplir{
-  background:var(--avert-bg);color:var(--avert-txt);
-  border:1px solid var(--avert-bord);border-radius:6px;
+  background:#FFF4D6;color:#7A4A00;
+  border:1px solid #E8C05A;border-radius:6px;
   padding:1px 8px;font-size:15px;font-weight:600;
   white-space:nowrap;
 }
@@ -1023,7 +738,7 @@ body,.nav,.footer,.feature,.card,.step,.stat,.cta-band,.cal,.membre,.faq__item{
 }
 
 /* ---------- Pied de page ---------- */
-.footer{background:var(--footer-bg);backdrop-filter:blur(8px);padding-top:var(--s6)}
+.footer{background:rgba(245,245,247,.78);backdrop-filter:blur(8px);padding-top:var(--s6)}
 .footer__big{
   font-size:clamp(32px,4.4vw,52px);font-weight:700;letter-spacing:-.024em;
   color:var(--black);text-align:center;line-height:1.1;
@@ -1123,7 +838,7 @@ body,.nav,.footer,.feature,.card,.step,.stat,.cta-band,.cal,.membre,.faq__item{
 .nave__cta{
   width:74px;height:17px;border-radius:999px;background:var(--blue);
   display:flex;align-items:center;justify-content:center;
-  font-size:7px;color:var(--sur-bleu);letter-spacing:.01em;
+  font-size:7px;color:#fff;letter-spacing:.01em;
 }
 .nave__cartes{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:2px}
 .nave__carte{
@@ -1198,7 +913,7 @@ body,.nav,.footer,.feature,.card,.step,.stat,.cta-band,.cal,.membre,.faq__item{
   padding-bottom:12px;border-bottom:1px solid var(--rule);
 }
 .board__mark{
-  width:22px;height:22px;border-radius:6px;background:var(--black);color:var(--sur-encre);
+  width:22px;height:22px;border-radius:6px;background:var(--black);color:#fff;
   display:grid;place-items:center;flex:none;
 }
 .board__grid{display:grid;grid-template-columns:1fr 1fr;gap:var(--s2)}
@@ -1332,11 +1047,6 @@ body,.nav,.footer,.feature,.card,.step,.stat,.cta-band,.cal,.membre,.faq__item{
   /* Le doigt n'a pas la précision du curseur : tout ce qui se touche fait
      au moins 44 px de haut. Les liens tertiaires en faisaient 26, les
      flèches du calendrier 38, les filtres du portfolio 41. */
-  /* Les boutons ronds de la barre : 40 px suffisent à la souris, pas au
-     doigt. Ils s'élargissent, la barre a la place (mesuré jusqu'à 320 px). */
-  .nav__outil{width:44px;height:44px}
-  .nav__outils{gap:0}
-
   /* En ligne : ces cibles vivent au fil du texte ou d'une rangée. */
   .link-t,.nav__logo,.towns a,.footer__legal a{
     min-height:44px;display:inline-flex;align-items:center;
@@ -1441,7 +1151,7 @@ body,.nav,.footer,.feature,.card,.step,.stat,.cta-band,.cal,.membre,.faq__item{
 @media (hover: hover) and (pointer: fine){
   .btn:hover{background:var(--light-gray);border-color:transparent}
   .btn:hover .arw{transform:translateX(2px)}
-  .btn--glow:hover{background:var(--blue-dark);border-color:var(--blue-dark);color:var(--sur-bleu)}
+  .btn--glow:hover{background:var(--blue-dark);border-color:var(--blue-dark);color:#fff}
   .link-t:hover{text-decoration:underline}
   .nav__links a:hover{opacity:1}
   .nav__cta:hover{background:var(--blue-dark)}
@@ -1449,13 +1159,13 @@ body,.nav,.footer,.feature,.card,.step,.stat,.cta-band,.cal,.membre,.faq__item{
   a.work-item:hover .work-item__title{color:var(--blue)}
   .card:hover{transform:translateY(-4px);box-shadow:var(--shadow-m)}
   .card:hover .thumb .ph{transform:scale(1.03)}
-  .card:hover .card__go{background:var(--blue);color:var(--sur-bleu)}
+  .card:hover .card__go{background:var(--blue);color:#fff}
   .cap:hover{transform:translateY(-3px);box-shadow:var(--shadow-m)}
-  .cal__nav button:hover{background:var(--survol)}
+  .cal__nav button:hover{background:#E4E4E8}
   .cal__day.avail:hover{background:var(--light-gray)}
-  .slot:hover{background:var(--survol)}
-  .filters .tag:hover{background:var(--survol)}
-  .towns li:hover{background:var(--survol)}
+  .slot:hover{background:#E4E4E8}
+  .filters .tag:hover{background:#E4E4E8}
+  .towns li:hover{background:#E4E4E8}
   .faq__q:hover h3{color:var(--blue)}
   .nap a:hover{color:var(--blue)}
   .footer__col a:hover{color:var(--blue)}
@@ -2069,9 +1779,6 @@ body,.nav,.footer,.feature,.card,.step,.stat,.cta-band,.cal,.membre,.faq__item{
 </footer>
 
 <script>
-/* Généré par build-locales.js — ne pas modifier à la main. */
-window.MJ_INDEX = [{"u":"index.html","s":"Accueil","t":"Agence web à Sète — création de site internet","x":"Agence web · Bassin de Thau & partout en France Le site qui donne envie de vous choisir. Nous sommes deux créatifs basés à Sète. Nous concevons des sites web modernes, rapides et p"},{"u":"index.html","s":"Accueil","t":"Un site qui attire. Une marque qu’on retient.","x":"Pour donner envie de vous choisir, votre présence en ligne doit être claire, crédible et mémorable. Nous réunissons tout ce qu’il faut pour y parvenir : site internet, id"},{"u":"index.html","s":"Accueil","t":"Sites internet","x":"Vitrines, boutiques en ligne et pages de vente. Rapides, pensés pour le mobile, et référencés sur Google dès le jour de la mise en ligne. Design sur-mesure, aucun thème a"},{"u":"index.html","s":"Accueil","t":"Identité de marque","x":"Logo, couleurs, typographies, supports imprimés. Une image cohérente en ligne comme en boutique, qui tient dans le temps. Charte graphique complète et livrée Déclinaisons"},{"u":"index.html","s":"Accueil","t":"Motion & 3D","x":"Habillage animé, vidéos de marque, rendus 3D. Ce qui fait qu’on se souvient de vous plutôt que du concurrent d’à côté. Animations pour vos réseaux Rendus produit et volum"},{"u":"index.html","s":"Accueil","t":"Nos dernières réalisations","x":"Tout voir Boucherie Vatuone — fidélité Programme de fidélité en ligne — 2026"},{"u":"index.html","s":"Accueil","t":"Quatre étapes, zéro surprise.","x":"Un devis clair, un calendrier annoncé, une équipe disponible. Vous savez où va votre projet à chaque étape. 01 Écoute Un premier échange en visio, par téléphone ou sur pl"},{"u":"index.html","s":"Accueil","t":"Installés à Sète, au bord de l’étang.","x":"Nous nous déplaçons dans tout l’Hérault, sans frais. Voir votre local, vos produits et votre façon de travailler change tout au moment de concevoir le site. Prendre rende"},{"u":"index.html","s":"Accueil","t":"Ce qu'on nous demande avant de se lancer.","x":"Combien coûte un site internet à Sète ? Cela dépend de trois choses : le nombre de pages, la présence ou non d'une boutique en ligne, et si l'identité de marque est à cré"},{"u":"index.html","s":"Accueil","t":"Combien coûte un site internet à Sète ?","x":"Cela dépend de trois choses : le nombre de pages, la présence ou non d'une boutique en ligne, et si l'identité de marque est à créer. Un site vitrine d'artisan et une bou"},{"u":"index.html","s":"Accueil","t":"Quelle différence entre une agence web et une agence digitale ?","x":"Dans les faits, aucune : les deux termes désignent la même chose et les gens tapent l'un ou l'autre. Ce qui compte, c'est le périmètre réel. Le nôtre : sites internet, id"},{"u":"index.html","s":"Accueil","t":"Le référencement sur Google est-il compris ?","x":"Les fondations le sont toujours : structure des pages, vitesse de chargement, balises, données locales, plan de site. Nous vous aidons aussi à créer et remplir votre fich"},{"u":"index.html","s":"Accueil","t":"En combien de temps le site est-il en ligne ?","x":"Trois à quatre semaines pour un site vitrine, à partir du moment où nous avons vos textes et vos photos. Six à huit semaines pour une boutique en ligne ou une refonte com"},{"u":"index.html","s":"Accueil","t":"Travaillez-vous avec les commerçants et artisans de Sète ?","x":"C'est même l'essentiel de notre activité locale : restaurants des quais, artisans, indépendants, entreprises du port. Nous nous déplaçons sans frais dans tout le bassin d"},{"u":"index.html","s":"Accueil","t":"Faut-il être à Sète pour travailler avec vous ?","x":"Non. Nous intervenons sur place à Sète, Frontignan, Mèze, Agde, Montpellier et Béziers, et entièrement à distance partout ailleurs. La moitié de nos projets se mènent en "},{"u":"index.html","s":"Accueil","t":"Parlons de votre projet.","x":"Trente minutes au téléphone, sans engagement. On cadre votre besoin, puis vous recevez une proposition claire, adaptée à ce que vous voulez atteindre. Parlons de votre pr"},{"u":"work.html","s":"Réalisations","t":"Réalisations — agence web à Sète","x":"Portfolio · 2026 Notre réalisation. Nous sommes un jeune studio : nous n’affichons que ce qui est réellement en ligne, pas des maquettes. Un projet livré, consultable — et le vôtre"},{"u":"work.html","s":"Réalisations","t":"Boucherie Vatuone — fidélité","x":"Carte de fidélité 7 / 10 Boucherie · Programme de fidélité — 2026 · en ligne"},{"u":"work.html","s":"Réalisations","t":"On en discute ?","x":"Votre projet est le prochain"},{"u":"studio.html","s":"Le studio","t":"Le studio — agence de communication à Sète","x":"Le studio Petite équipe, grandes attentions. Studio indépendant basé à Sète, nous accompagnons des entreprises du Bassin de Thau et partout en France. Peu de projets à la fois, pou"},{"u":"studio.html","s":"Le studio","t":"Le détail fait toute la différence.","x":"Une marque forte ne se limite pas à un beau design. Elle doit être claire, cohérente et donner envie de vous choisir. C’est ce que nous construisons, dans chaque détail."},{"u":"studio.html","s":"Le studio","t":"Deux profils complémentaires. Un même objectif : vous faire choisir.","x":"Nous sommes deux créatifs basés à Sète. Nous associons stratégie, design et création web pour construire une présence en ligne qui vous ressemble — et qui donne confiance"},{"u":"studio.html","s":"Le studio","t":"Matheis","x":"Stratégie & développement Il transforme vos objectifs en un site rapide, clair et simple à utiliser."},{"u":"studio.html","s":"Le studio","t":"Jérémy","x":"Direction artistique & design Il donne à votre marque une identité reconnaissable et une expérience qui marque les esprits."},{"u":"studio.html","s":"Le studio","t":"Services","x":"Branding Naming, logo, système d'identité, charte, guidelines. Une marque cohérente sur tous les points de contact. Web & UI Sites vitrines, e-commerce, produits SaaS. De"},{"u":"studio.html","s":"Le studio","t":"Branding","x":"Naming, logo, système d'identité, charte, guidelines. Une marque cohérente sur tous les points de contact."},{"u":"studio.html","s":"Le studio","t":"Web & UI","x":"Sites vitrines, e-commerce, produits SaaS. Design d'interface premium, prototypé et testé."},{"u":"studio.html","s":"Le studio","t":"Motion & 3D","x":"Habillage animé, films de marque, rendus 3D et expériences WebGL temps réel."},{"u":"studio.html","s":"Le studio","t":"Développement","x":"Intégration front-end soignée, performante, animée et accessible. Du pixel au déploiement."},{"u":"studio.html","s":"Le studio","t":"Travaillons ensemble.","x":"Parlons de votre projet ↗"},{"u":"contact.html","s":"Contact","t":"Contact — agence web à Sète (34)","x":"Réponse sous 24 h Parlons de votre projet. 30 minutes, sans engagement, pour comprendre votre besoin, répondre à vos questions et voir si nous sommes la bonne équipe pour vous acco"},{"u":"contact.html","s":"Contact","t":"Choisissez le créneau qui vous convient.","x":"Un échange simple et sans pression pour faire connaissance, clarifier votre projet et vous donner une première direction. — ‹ › Créneaux disponibles Date À choisir Heure "},{"u":"contact.html","s":"Contact","t":"Ou écrivez-nous directement.","x":"mjagency.officiel@gmail.com Email 06 11 71 83 68 Téléphone Sète, Hérault 34200 · Hérault"},{"u":"creation-site-internet-sete.html","s":"Sète","t":"Création de site internet à Sète — agence web","x":"Agence web · Sète, Hérault Agence web à Sète, création de site internet Nous sommes installés à Sète. Pas de plateforme à distance ni de commercial de passage : on se voit, on rega"},{"u":"creation-site-internet-sete.html","s":"Sète","t":"Travailler à Sète","x":"Sète vit du port, de la pêche, du tourisme et d'un centre-ville commerçant dense. Trois économies avec trois publics différents — un restaurant des quais, un artisan du q"},{"u":"creation-site-internet-sete.html","s":"Sète","t":"Ce que nous voyons le plus","x":"Restaurants & commerces Carte à jour, horaires visibles, réservation en un geste. La plupart des recherches se font sur mobile, à moins de dix minutes de chez vous. Artis"},{"u":"creation-site-internet-sete.html","s":"Sète","t":"Restaurants & commerces","x":"Carte à jour, horaires visibles, réservation en un geste. La plupart des recherches se font sur mobile, à moins de dix minutes de chez vous."},{"u":"creation-site-internet-sete.html","s":"Sète","t":"Artisans & indépendants","x":"Un site simple qui prouve votre sérieux et donne envie d'appeler. Photos de vos réalisations, zone d'intervention, devis en ligne."},{"u":"creation-site-internet-sete.html","s":"Sète","t":"Entreprises du port","x":"Un site professionnel en français et en anglais, pensé pour des interlocuteurs qui ne sont pas forcément dans la région."},{"u":"creation-site-internet-sete.html","s":"Sète","t":"Inclus dans chaque projet","x":"Design sur-mesure Aucun thème acheté, aucun gabarit recyclé. Le site est dessiné pour votre activité et pour vos clients. Mobile d'abord La majorité de vos visiteurs arri"},{"u":"creation-site-internet-sete.html","s":"Sète","t":"Design sur-mesure","x":"Aucun thème acheté, aucun gabarit recyclé. Le site est dessiné pour votre activité et pour vos clients."},{"u":"creation-site-internet-sete.html","s":"Sète","t":"Mobile d'abord","x":"La majorité de vos visiteurs arrivent depuis un téléphone. C'est là que nous concevons en premier, pas en dernier."},{"u":"creation-site-internet-sete.html","s":"Sète","t":"Référencement local","x":"Structure, vitesse, données locales et accompagnement sur votre fiche Google Business Profile."},{"u":"creation-site-internet-sete.html","s":"Sète","t":"Formation et suivi","x":"Vous repartez en sachant modifier vos textes, vos photos et vos horaires vous-même."},{"u":"creation-site-internet-sete.html","s":"Sète","t":"Vous vous demandez","x":"Combien de temps pour un site à Sète ? Comptez trois à quatre semaines pour un site vitrine, à partir du moment où nous avons vos textes et vos photos. Une refonte complè"},{"u":"creation-site-internet-sete.html","s":"Sète","t":"Combien de temps pour un site à Sète ?","x":"Comptez trois à quatre semaines pour un site vitrine, à partir du moment où nous avons vos textes et vos photos. Une refonte complète avec e-commerce demande plutôt six à"},{"u":"creation-site-internet-sete.html","s":"Sète","t":"Vous vous déplacez dans Sète ?","x":"Oui, sans frais. Nous préférons même commencer par un rendez-vous chez vous : voir votre local, vos produits et votre façon de travailler change tout au moment de concevo"},{"u":"creation-site-internet-sete.html","s":"Sète","t":"Le référencement est-il compris ?","x":"Les bases le sont toujours : structure, vitesse, balises, données locales, et l'aide à la mise en place de votre fiche Google Business Profile. Le référencement local se "},{"u":"creation-site-internet-sete.html","s":"Sète","t":"Agence web, agence digitale, agence de communication : laquelle êtes-vous ?","x":"Les trois mots désignent le même métier, et chacun est tapé par des gens différents. Ce qui compte est le périmètre : nous faisons les sites internet, l'identité de marqu"},{"u":"creation-site-internet-sete.html","s":"Sète","t":"Reprenez-vous un site existant ?","x":"Oui, la refonte représente une bonne moitié de notre activité à Sète. Nous récupérons vos contenus, redirigeons les anciennes adresses vers les nouvelles pour ne perdre a"},{"u":"creation-site-internet-sete.html","s":"Sète","t":"Autres villes","x":"Montpellier Frontignan Agde Toute la zone"},{"u":"creation-site-internet-sete.html","s":"Sète","t":"Un projet à Sète ?","x":"Parlons de votre projet ↗ ou appelez directement le 06 11 71 83 68"},{"u":"agence-web-montpellier.html","s":"Montpellier","t":"Agence web à Montpellier — site internet","x":"Agence web · Montpellier, Hérault Agence web à Montpellier Montpellier est à trente minutes. Nous y intervenons avec un avantage simple : les tarifs d'un studio indépendant, et un "},{"u":"agence-web-montpellier.html","s":"Montpellier","t":"Travailler à Montpellier","x":"Le marché montpelliérain est dense et concurrentiel. Sur la plupart des métiers, être bien placé sur Google ne suffit plus : il faut un site qui convainc en quelques seco"},{"u":"agence-web-montpellier.html","s":"Montpellier","t":"Ce que nous voyons le plus","x":"Se démarquer Sur un marché saturé, un site générique vous range parmi les autres. Une identité forte vous en sort. Professions libérales Avocats, thérapeutes, architectes"},{"u":"agence-web-montpellier.html","s":"Montpellier","t":"Se démarquer","x":"Sur un marché saturé, un site générique vous range parmi les autres. Une identité forte vous en sort."},{"u":"agence-web-montpellier.html","s":"Montpellier","t":"Professions libérales","x":"Avocats, thérapeutes, architectes : un site sobre, rassurant, avec prise de rendez-vous en ligne."},{"u":"agence-web-montpellier.html","s":"Montpellier","t":"Jeunes entreprises","x":"Une première image crédible sans budget d'agence parisienne, et une base qui pourra grandir avec vous."},{"u":"agence-web-montpellier.html","s":"Montpellier","t":"Inclus dans chaque projet","x":"Design sur-mesure Aucun thème acheté, aucun gabarit recyclé. Le site est dessiné pour votre activité et pour vos clients. Mobile d'abord La majorité de vos visiteurs arri"},{"u":"agence-web-montpellier.html","s":"Montpellier","t":"Design sur-mesure","x":"Aucun thème acheté, aucun gabarit recyclé. Le site est dessiné pour votre activité et pour vos clients."},{"u":"agence-web-montpellier.html","s":"Montpellier","t":"Mobile d'abord","x":"La majorité de vos visiteurs arrivent depuis un téléphone. C'est là que nous concevons en premier, pas en dernier."},{"u":"agence-web-montpellier.html","s":"Montpellier","t":"Référencement local","x":"Structure, vitesse, données locales et accompagnement sur votre fiche Google Business Profile."},{"u":"agence-web-montpellier.html","s":"Montpellier","t":"Formation et suivi","x":"Vous repartez en sachant modifier vos textes, vos photos et vos horaires vous-même."},{"u":"agence-web-montpellier.html","s":"Montpellier","t":"Vous vous demandez","x":"Vous êtes à Sète, est-ce un problème ? Non. Nous nous déplaçons à Montpellier sur rendez-vous, et le reste du suivi se fait en visio et par téléphone — comme avec la plup"},{"u":"agence-web-montpellier.html","s":"Montpellier","t":"Vous êtes à Sète, est-ce un problème ?","x":"Non. Nous nous déplaçons à Montpellier sur rendez-vous, et le reste du suivi se fait en visio et par téléphone — comme avec la plupart des agences montpelliéraines, qui t"},{"u":"agence-web-montpellier.html","s":"Montpellier","t":"Vos tarifs sont-ils ceux d'une agence montpelliéraine ?","x":"Ils sont généralement plus bas, à qualité équivalente : nous sommes un studio indépendant, sans les frais de structure d'une grosse agence."},{"u":"agence-web-montpellier.html","s":"Montpellier","t":"Reprenez-vous un site existant ?","x":"Oui. Beaucoup de nos demandes sont des refontes : le site existe, il fonctionne, mais il date ou ne convertit pas. On repart de ce qui marche plutôt que de tout jeter."},{"u":"agence-web-montpellier.html","s":"Montpellier","t":"Autres villes","x":"Sète Frontignan Agde Toute la zone"},{"u":"agence-web-montpellier.html","s":"Montpellier","t":"Un projet à Montpellier ?","x":"Parlons de votre projet ↗ ou appelez directement le 06 11 71 83 68"},{"u":"creation-site-internet-frontignan-bassin-de-thau.html","s":"Frontignan et le bassin de Thau","t":"Site internet à Frontignan et bassin de Thau","x":"Agence web · Frontignan, Hérault Sites internet autour du bassin de Thau Frontignan, Balaruc, Bouzigues, Mèze, Marseillan : nous sommes à dix minutes de chez vous. Le bassin vit de"},{"u":"creation-site-internet-frontignan-bassin-de-thau.html","s":"Frontignan et le bassin de Thau","t":"Travailler à Frontignan","x":"Ici, les activités sont souvent familiales et enracinées : domaines viticoles, mas conchylicoles, caveaux, artisans. Le point commun, c'est un produit dont on est fier et"},{"u":"creation-site-internet-frontignan-bassin-de-thau.html","s":"Frontignan et le bassin de Thau","t":"Ce que nous voyons le plus","x":"Domaines & caveaux Présentation du domaine, des cuvées, et vente en ligne avec expédition. Une boutique qu'on met à jour en cinq minutes entre deux vendanges. Conchylicul"},{"u":"creation-site-internet-frontignan-bassin-de-thau.html","s":"Frontignan et le bassin de Thau","t":"Domaines & caveaux","x":"Présentation du domaine, des cuvées, et vente en ligne avec expédition. Une boutique qu'on met à jour en cinq minutes entre deux vendanges."},{"u":"creation-site-internet-frontignan-bassin-de-thau.html","s":"Frontignan et le bassin de Thau","t":"Conchyliculteurs","x":"Vos huîtres et vos moules en vitrine, avec commande, retrait sur place et horaires du mas. Simple, y compris sur mobile."},{"u":"creation-site-internet-frontignan-bassin-de-thau.html","s":"Frontignan et le bassin de Thau","t":"Commerces & artisans","x":"Un site clair qui vous rend trouvable sur Google quand quelqu'un cherche votre métier dans votre commune."},{"u":"creation-site-internet-frontignan-bassin-de-thau.html","s":"Frontignan et le bassin de Thau","t":"Inclus dans chaque projet","x":"Design sur-mesure Aucun thème acheté, aucun gabarit recyclé. Le site est dessiné pour votre activité et pour vos clients. Mobile d'abord La majorité de vos visiteurs arri"},{"u":"creation-site-internet-frontignan-bassin-de-thau.html","s":"Frontignan et le bassin de Thau","t":"Design sur-mesure","x":"Aucun thème acheté, aucun gabarit recyclé. Le site est dessiné pour votre activité et pour vos clients."},{"u":"creation-site-internet-frontignan-bassin-de-thau.html","s":"Frontignan et le bassin de Thau","t":"Mobile d'abord","x":"La majorité de vos visiteurs arrivent depuis un téléphone. C'est là que nous concevons en premier, pas en dernier."},{"u":"creation-site-internet-frontignan-bassin-de-thau.html","s":"Frontignan et le bassin de Thau","t":"Référencement local","x":"Structure, vitesse, données locales et accompagnement sur votre fiche Google Business Profile."},{"u":"creation-site-internet-frontignan-bassin-de-thau.html","s":"Frontignan et le bassin de Thau","t":"Formation et suivi","x":"Vous repartez en sachant modifier vos textes, vos photos et vos horaires vous-même."},{"u":"creation-site-internet-frontignan-bassin-de-thau.html","s":"Frontignan et le bassin de Thau","t":"Vous vous demandez","x":"Peut-on vendre en ligne depuis un domaine viticole ? Oui, et c'est souvent le meilleur investissement. Nous mettons en place la boutique, les frais de port et les mention"},{"u":"creation-site-internet-frontignan-bassin-de-thau.html","s":"Frontignan et le bassin de Thau","t":"Peut-on vendre en ligne depuis un domaine viticole ?","x":"Oui, et c'est souvent le meilleur investissement. Nous mettons en place la boutique, les frais de port et les mentions obligatoires liées à l'alcool. Vous gérez vos stock"},{"u":"creation-site-internet-frontignan-bassin-de-thau.html","s":"Frontignan et le bassin de Thau","t":"Notre activité est très saisonnière, est-ce adapté ?","x":"C'est justement l'intérêt. On peut ouvrir et fermer la vente en ligne selon la saison, afficher un message d'attente hors période, et concentrer vos efforts au bon moment"},{"u":"creation-site-internet-frontignan-bassin-de-thau.html","s":"Frontignan et le bassin de Thau","t":"Nous ne sommes pas à l'aise avec l'informatique.","x":"C'est le cas de la plupart de nos clients. Nous livrons une interface réduite au strict nécessaire et nous vous formons sur place, une heure suffit généralement."},{"u":"creation-site-internet-frontignan-bassin-de-thau.html","s":"Frontignan et le bassin de Thau","t":"Autres villes","x":"Sète Montpellier Agde Toute la zone"},{"u":"creation-site-internet-frontignan-bassin-de-thau.html","s":"Frontignan et le bassin de Thau","t":"Un projet à Frontignan ?","x":"Parlons de votre projet ↗ ou appelez directement le 06 11 71 83 68"},{"u":"agence-web-agde-cap-d-agde.html","s":"Agde et le Cap d'Agde","t":"Agence web à Agde et Cap d'Agde — site internet","x":"Agence web · Agde, Hérault Sites internet à Agde et au Cap d'Agde Agde vit du tourisme, et le tourisme se décide en ligne, souvent des mois à l'avance et depuis un autre pays. Votr"},{"u":"agence-web-agde-cap-d-agde.html","s":"Agde et le Cap d'Agde","t":"Travailler à Agde","x":"Hôtels, campings, restaurants, locations, activités nautiques : sur cette zone, la réservation se joue en grande partie avant l'arrivée du visiteur, sur son téléphone, da"},{"u":"agence-web-agde-cap-d-agde.html","s":"Agde et le Cap d'Agde","t":"Ce que nous voyons le plus","x":"Hébergements Photos qui donnent envie, disponibilités claires, réservation directe. Chaque réservation en direct est une commission économisée. Restaurants Carte, horaire"},{"u":"agence-web-agde-cap-d-agde.html","s":"Agde et le Cap d'Agde","t":"Hébergements","x":"Photos qui donnent envie, disponibilités claires, réservation directe. Chaque réservation en direct est une commission économisée."},{"u":"agence-web-agde-cap-d-agde.html","s":"Agde et le Cap d'Agde","t":"Restaurants","x":"Carte, horaires, réservation. En saison, tout doit se lire en dix secondes sur un téléphone, en plein soleil."},{"u":"agence-web-agde-cap-d-agde.html","s":"Agde et le Cap d'Agde","t":"Multilingue","x":"Vos visiteurs viennent d'Allemagne, des Pays-Bas, du Royaume-Uni. Un site en plusieurs langues élargit franchement votre audience."},{"u":"agence-web-agde-cap-d-agde.html","s":"Agde et le Cap d'Agde","t":"Inclus dans chaque projet","x":"Design sur-mesure Aucun thème acheté, aucun gabarit recyclé. Le site est dessiné pour votre activité et pour vos clients. Mobile d'abord La majorité de vos visiteurs arri"},{"u":"agence-web-agde-cap-d-agde.html","s":"Agde et le Cap d'Agde","t":"Design sur-mesure","x":"Aucun thème acheté, aucun gabarit recyclé. Le site est dessiné pour votre activité et pour vos clients."},{"u":"agence-web-agde-cap-d-agde.html","s":"Agde et le Cap d'Agde","t":"Mobile d'abord","x":"La majorité de vos visiteurs arrivent depuis un téléphone. C'est là que nous concevons en premier, pas en dernier."},{"u":"agence-web-agde-cap-d-agde.html","s":"Agde et le Cap d'Agde","t":"Référencement local","x":"Structure, vitesse, données locales et accompagnement sur votre fiche Google Business Profile."},{"u":"agence-web-agde-cap-d-agde.html","s":"Agde et le Cap d'Agde","t":"Formation et suivi","x":"Vous repartez en sachant modifier vos textes, vos photos et vos horaires vous-même."},{"u":"agence-web-agde-cap-d-agde.html","s":"Agde et le Cap d'Agde","t":"Vous vous demandez","x":"Peut-on faire un site en plusieurs langues ? Oui. Français et anglais au minimum, souvent allemand et néerlandais sur ce secteur. Le tout dans un seul site, avec un sélec"},{"u":"agence-web-agde-cap-d-agde.html","s":"Agde et le Cap d'Agde","t":"Peut-on faire un site en plusieurs langues ?","x":"Oui. Français et anglais au minimum, souvent allemand et néerlandais sur ce secteur. Le tout dans un seul site, avec un sélecteur de langue, sans multiplier les coûts."},{"u":"agence-web-agde-cap-d-agde.html","s":"Agde et le Cap d'Agde","t":"Peut-on prendre les réservations en direct ?","x":"Oui, et c'est généralement le cœur du projet. Nous branchons un moteur de réservation ou un système de demande, selon votre volume et vos habitudes."},{"u":"agence-web-agde-cap-d-agde.html","s":"Agde et le Cap d'Agde","t":"Faut-il un site si nous sommes déjà sur les plateformes ?","x":"Oui, justement. Beaucoup de voyageurs découvrent un établissement sur une plateforme puis cherchent son site pour réserver moins cher. Sans site, cette réservation part a"},{"u":"agence-web-agde-cap-d-agde.html","s":"Agde et le Cap d'Agde","t":"Autres villes","x":"Sète Montpellier Frontignan Toute la zone"},{"u":"agence-web-agde-cap-d-agde.html","s":"Agde et le Cap d'Agde","t":"Un projet à Agde ?","x":"Parlons de votre projet ↗ ou appelez directement le 06 11 71 83 68"},{"u":"mentions-legales.html","s":"Mentions légales","t":"Mentions légales","x":"Informations légales Mentions légales Les informations que tout site professionnel doit rendre publiques, réunies sur une page. Éditeur du site Le présent site est édité par : Déno"},{"u":"mentions-legales.html","s":"Mentions légales","t":"Éditeur du site","x":"Le présent site est édité par : Dénomination : MJ Agency Forme juridique : Forme juridique à compléter Capital social : Capital social (si société) à compléter Siège soci"},{"u":"mentions-legales.html","s":"Mentions légales","t":"Responsable de la publication","x":"Nom du responsable de la publication à compléter , joignable à l’adresse mjagency.officiel@gmail.com ."},{"u":"mentions-legales.html","s":"Mentions légales","t":"Hébergement","x":"Le site est hébergé par : Hébergeur : Vercel Inc. Adresse : Adresse de l’hébergeur, à recopier depuis vercel.com à compléter Site : vercel.com"},{"u":"mentions-legales.html","s":"Mentions légales","t":"Propriété intellectuelle","x":"L’ensemble des contenus de ce site — textes, images, éléments graphiques, animations, code — est la propriété de MJ Agency, sauf mention contraire. Toute reproduction, re"},{"u":"mentions-legales.html","s":"Mentions légales","t":"Liens vers d’autres sites","x":"Ce site renvoie vers des sites que nous avons réalisés et vers ceux de nos prestataires. Nous n’exerçons aucun contrôle sur leur contenu et n’en assumons pas la responsab"},{"u":"mentions-legales.html","s":"Mentions légales","t":"Droit applicable","x":"Les présentes mentions sont soumises au droit français. En cas de litige, et à défaut de résolution amiable, les tribunaux français sont seuls compétents."},{"u":"mentions-legales.html","s":"Mentions légales","t":"Signalement d’un contenu","x":"Pour signaler un contenu que vous estimez illicite, écrivez à mjagency.officiel@gmail.com en précisant l’adresse de la page concernée et le motif du signalement."},{"u":"confidentialite.html","s":"Confidentialité","t":"Politique de confidentialité","x":"Informations légales Politique de confidentialité Ce que nous recevons, pourquoi, qui y a accès, combien de temps — et comment reprendre la main. En deux lignes Ce site ne dépose a"},{"u":"confidentialite.html","s":"Confidentialité","t":"En deux lignes","x":"Ce site ne dépose aucun cookie , n’utilise aucun outil de mesure d’audience et ne contient aucun traceur publicitaire . Les seules données que nous recevons sont celles q"},{"u":"confidentialite.html","s":"Confidentialité","t":"Responsable du traitement","x":"MJ Agency — Adresse du siège à compléter — mjagency.officiel@gmail.com ."},{"u":"confidentialite.html","s":"Confidentialité","t":"Données collectées","x":"Le formulaire de prise de rendez-vous collecte : votre nom et votre adresse électronique (obligatoires, pour vous répondre) ; votre société et votre budget indicatif (fac"},{"u":"confidentialite.html","s":"Confidentialité","t":"Pourquoi, et sur quelle base","x":"Ces données servent uniquement à vous recontacter, préparer notre échange et établir une proposition. Elles ne sont jamais vendues, louées ni cédées à des fins commercial"},{"u":"confidentialite.html","s":"Confidentialité","t":"Qui d’autre y a accès","x":"Pour acheminer votre message, nous faisons appel à des sous-traitants : Vercel Inc. — hébergement du site et de la fonction qui reçoit le formulaire. Resend (Plus Five Fi"},{"u":"confidentialite.html","s":"Confidentialité","t":"Combien de temps","x":"Les échanges liés à une demande sans suite sont supprimés au bout de trois ans à compter du dernier contact. Les données liées à un projet effectivement mené sont conserv"},{"u":"confidentialite.html","s":"Confidentialité","t":"Vos droits","x":"Vous disposez d’un droit d’ accès , de rectification , d’ effacement , de limitation , d’ opposition et de portabilité sur vos données. Pour l’exercer, écrivez à mjagency"},{"u":"confidentialite.html","s":"Confidentialité","t":"Cookies et stockage local","x":"Aucun cookie n’est déposé sur votre appareil, ni par nous ni par un tiers. Aucun traceur, aucune mesure d’audience. Le site conserve deux valeurs dans le stockage local d"},{"u":"confidentialite.html","s":"Confidentialité","t":"Sécurité","x":"Le site est servi exclusivement en HTTPS. Les clés d’accès aux services d’envoi sont conservées côté serveur et n’apparaissent jamais dans les pages. Le formulaire est pr"}];
-
 /* =========================================================
    MJ AGENCY — Objet 3D temps réel
 
@@ -2120,7 +1827,6 @@ window.MJ_INDEX = [{"u":"index.html","s":"Accueil","t":"Agence web à Sète — 
   uniform float u_taille;      // échelle de l'objet
   uniform float u_petit;       // 1 sur téléphone
   uniform float u_elan;        // vitesse de défilement, lissée — la souris du doigt
-  uniform float u_sombre;      // 0 clair, 1 sombre — transition continue
 
   mat2 rot(float a){ float c = cos(a), s = sin(a); return mat2(c, -s, s, c); }
 
@@ -2187,12 +1893,9 @@ window.MJ_INDEX = [{"u":"index.html","s":"Accueil","t":"Agence web à Sète — 
      une dominante bleutée dans les parties basses. */
   vec3 environnement(vec3 n){
     float h = n.y * 0.5 + 0.5;
-    vec3 clair = mix(vec3(0.855, 0.870, 0.905), vec3(1.0), smoothstep(0.38, 1.0, h));
-    clair = mix(clair, vec3(0.800, 0.860, 0.960), smoothstep(0.46, 0.0, h) * 0.55);
-    /* En thème sombre le studio devient une pièce noire : seul le plafond
-       renvoie un peu de lumière, sinon l'objet perd tout relief. */
-    vec3 nuit = mix(vec3(0.16, 0.17, 0.20), vec3(0.72, 0.75, 0.82), smoothstep(0.30, 1.0, h));
-    return mix(clair, nuit, u_sombre);
+    vec3 c = mix(vec3(0.855, 0.870, 0.905), vec3(1.0), smoothstep(0.38, 1.0, h));
+    c = mix(c, vec3(0.800, 0.860, 0.960), smoothstep(0.46, 0.0, h) * 0.55);
+    return c;
   }
 
   void main(){
@@ -2209,13 +1912,10 @@ window.MJ_INDEX = [{"u":"index.html","s":"Accueil","t":"Agence web à Sète — 
     vec2 w2 = vec2(fbm(d * 1.35 + w1 * 1.2 + t * 0.023), fbm(d * 1.35 + w1 * 1.2 - t * 0.018));
     float f = fbm(d * 1.20 + w2 * 1.1);
 
-    /* Deux palettes, interpolées par u_sombre : la bascule de thème se fait
-       donc en fondu au lieu de sauter d'une image à l'autre. */
-    float S = u_sombre;
-    vec3 blanc   = mix(vec3(1.000, 1.000, 1.000), vec3(0.043, 0.043, 0.055), S);
-    vec3 casse   = mix(vec3(0.961, 0.961, 0.969), vec3(0.063, 0.063, 0.078), S);
-    vec3 bleute  = mix(vec3(0.898, 0.933, 0.984), vec3(0.063, 0.086, 0.129), S);
-    vec3 lavande = mix(vec3(0.941, 0.925, 0.973), vec3(0.082, 0.071, 0.110), S);
+    vec3 blanc   = vec3(1.000, 1.000, 1.000);
+    vec3 casse   = vec3(0.961, 0.961, 0.969);   // #F5F5F7
+    vec3 bleute  = vec3(0.898, 0.933, 0.984);
+    vec3 lavande = vec3(0.941, 0.925, 0.973);
 
     vec3 col = mix(blanc, casse, smoothstep(0.22, 0.78, f));
     col = mix(col, bleute,  smoothstep(0.30, 0.80, w2.x));
@@ -2229,7 +1929,7 @@ window.MJ_INDEX = [{"u":"index.html","s":"Accueil","t":"Agence web à Sète — 
     float rayon = 0.78 * u_taille;
     float ombre = smoothstep(rayon, 0.0, length((p2 - vec2(0.06, -0.07)) * vec2(1.0, 1.15)));
     ombre *= mix(1.0, 1.0 - smoothstep(0.22, 0.80, u_scroll), u_petit);
-    col = mix(col, mix(vec3(0.878, 0.890, 0.914), vec3(0.118, 0.125, 0.153), S), ombre * 0.55);
+    col = mix(col, vec3(0.878, 0.890, 0.914), ombre * 0.55);
 
     /* Sur un téléphone il n'y a pas de curseur à suivre : c'est l'élan du
        défilement qui prend sa place. Un balayage rapide fait tourner la forme
@@ -2278,11 +1978,11 @@ window.MJ_INDEX = [{"u":"index.html","s":"Accueil","t":"Agence web à Sète — 
       float spe2 = pow(max(dot(reflect(-l2, n), -rd), 0.0), 18.0);
       float fres = pow(1.0 - max(dot(n, -rd), 0.0), 2.6);
 
-      vec3 mat = mix(vec3(1.0), vec3(0.30, 0.30, 0.34), S);
+      vec3 mat = vec3(1.0);
       vec3 o = mat * environnement(n) * (0.34 + 0.60 * dif1);
       o += mat * dif2 * vec3(0.78, 0.85, 1.00) * 0.28;
       o *= mix(0.55, 1.0, ao);
-      o += spe1 * mix(0.62, 0.80, S);
+      o += spe1 * 0.62;
       o += spe2 * vec3(0.30, 0.58, 1.00) * 0.22;
       o += fres * vec3(0.00, 0.44, 0.89) * 0.75;      // liseré bleu de la charte
 
@@ -2307,7 +2007,7 @@ window.MJ_INDEX = [{"u":"index.html","s":"Accueil","t":"Agence web à Sète — 
     float bx = 1.0 - smoothstep(0.19, 0.44, abs(sx + 0.04));
     float by = 1.0 - smoothstep(0.20, 0.48, abs(q.y - 0.16));
     float degage = bx * by * (1.0 - smoothstep(0.05, 0.85, u_scroll));
-    col = mix(col, blanc, degage * 0.88);   // blanc suit déjà le thème
+    col = mix(col, blanc, degage * 0.88);
 
     // Léger tramage : sans lui, des dégradés aussi doux montrent des bandes
     float grain = (hash(gl_FragCoord.xy + fract(u_time)) - 0.5) * 0.006;
@@ -2347,7 +2047,6 @@ window.MJ_INDEX = [{"u":"index.html","s":"Accueil","t":"Agence web à Sète — 
   const uTaille = gl.getUniformLocation(prog, 'u_taille');
   const uPetit  = gl.getUniformLocation(prog, 'u_petit');
   const uElan   = gl.getUniformLocation(prog, 'u_elan');
-  const uSombre = gl.getUniformLocation(prog, 'u_sombre');
 
   gl.uniform1f(uTaille, petit ? 0.22 : 0.40);
   gl.uniform1f(uPetit, petit ? 1 : 0);
@@ -2355,20 +2054,6 @@ window.MJ_INDEX = [{"u":"index.html","s":"Accueil","t":"Agence web à Sète — 
   let souris = [0.5, 0.5], cible = [0.5, 0.5];
   let defile = 0, defileCible = 0;
   let elan = 0, dernierY = scrollY;
-
-  /* Thème : lu sur le document, pas déduit. Un attribut data-theme est un
-     choix explicite du visiteur et l'emporte sur la préférence système. La
-     valeur est lissée pour que la bascule se fasse en fondu. */
-  const racine = document.documentElement;
-  const nuitMedia = matchMedia('(prefers-color-scheme: dark)');
-  const estSombre = () => {
-    const a = racine.getAttribute('data-theme');
-    return a ? a === 'dark' : nuitMedia.matches;
-  };
-  let sombre = estSombre() ? 1 : 0, sombreCible = sombre;
-  const relireTheme = () => { sombreCible = estSombre() ? 1 : 0; };
-  nuitMedia.addEventListener('change', relireTheme);
-  new MutationObserver(relireTheme).observe(racine, { attributeFilter: ['data-theme'] });
   const lireScroll = () => { defileCible = scrollY / Math.max(innerHeight, 1); };
   addEventListener('scroll', lireScroll, { passive: true });
   lireScroll();
@@ -2424,9 +2109,7 @@ window.MJ_INDEX = [{"u":"index.html","s":"Accueil","t":"Agence web à Sète — 
 
     gl.uniform1f(uTime, (now - t0) / 1000);
     gl.uniform2f(uMouse, souris[0], souris[1]);
-    sombre += (sombreCible - sombre) * 0.10;
     gl.uniform1f(uElan, elan);
-    gl.uniform1f(uSombre, sombre);
     gl.uniform1f(uScroll, defile);
     gl.uniform2f(uDecal, x, y);
     gl.drawArrays(gl.TRIANGLES, 0, 3);
@@ -2436,17 +2119,6 @@ window.MJ_INDEX = [{"u":"index.html","s":"Accueil","t":"Agence web à Sète — 
 
   /* Sans WebGL — ou sans animation demandée — un dégradé fixe équivalent. */
   function degrade(){
-    const nuit = (document.documentElement.getAttribute('data-theme') === 'dark')
-      || (!document.documentElement.getAttribute('data-theme')
-          && matchMedia('(prefers-color-scheme: dark)').matches);
-    if (nuit) {
-      canvas.style.background =
-        'radial-gradient(70% 55% at 18% 12%, #121A28 0%, rgba(18,26,40,0) 60%),' +
-        'radial-gradient(60% 50% at 84% 30%, #171426 0%, rgba(23,20,38,0) 62%),' +
-        'radial-gradient(80% 60% at 50% 100%, #101014 0%, rgba(16,16,20,0) 70%),' +
-        '#0B0B0E';
-      return;
-    }
     canvas.style.background =
       'radial-gradient(70% 55% at 18% 12%, #E8F0FB 0%, rgba(232,240,251,0) 60%),' +
       'radial-gradient(60% 50% at 84% 30%, #F0EDF8 0%, rgba(240,237,248,0) 62%),' +
@@ -2949,313 +2621,6 @@ window.MJ_INDEX = [{"u":"index.html","s":"Accueil","t":"Agence web à Sète — 
     }, { threshold: 0.12, rootMargin: '0px 0px -8% 0px' });
 
     elements.forEach(e => io.observe(e));
-  })();
-
-
-  /* =========================================================
-     COMMANDES DE L'INTERFACE
-
-     Tout est créé ici plutôt que recopié dans dix fichiers HTML : une
-     seule source, et aucune page ne peut se retrouver sans. Ce sont de
-     toute façon des fonctions qui n'existent que si le JavaScript tourne.
-     ========================================================= */
-  (function commandes() {
-    const nav = document.querySelector('.nav');
-    if (!nav) return;
-
-    const el = (balise, classe, dedans) => {
-      const n = document.createElement(balise);
-      if (classe) n.className = classe;
-      if (dedans !== undefined) n.innerHTML = dedans;
-      return n;
-    };
-
-    /* ---------- Thème ----------
-       Trois états : « auto » suit le système, « light » et « dark » sont un
-       choix explicite du visiteur. On ne stocke rien tant qu'il n'a pas
-       choisi — c'est ce qui permet de n'afficher l'avis de stockage qu'à ce
-       moment-là, et pas dès l'arrivée. */
-    const CLE = 'mj-theme';
-    let memoire = null;
-    try { memoire = localStorage.getItem(CLE); } catch { /* navigation privée */ }
-    if (memoire === 'dark' || memoire === 'light') {
-      document.documentElement.setAttribute('data-theme', memoire);
-    }
-
-    const sombreActif = () => {
-      const a = document.documentElement.getAttribute('data-theme');
-      if (a) return a === 'dark';
-      return matchMedia('(prefers-color-scheme: dark)').matches;
-    };
-
-    const ICONES = `
-      <svg class="soleil" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.6v2.2M12 19.2v2.2M2.6 12h2.2M19.2 12h2.2M5.4 5.4l1.6 1.6M17 17l1.6 1.6M18.6 5.4L17 7M7 17l-1.6 1.6"/></svg>
-      <svg class="lune" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.5 14.6A8.6 8.6 0 1 1 9.4 3.5a7 7 0 0 0 11.1 11.1Z"/></svg>`;
-
-    const boutonTheme = el('button', 'nav__outil', ICONES);
-    boutonTheme.type = 'button';
-    const majEtiquette = () => boutonTheme.setAttribute('aria-label',
-      sombreActif() ? 'Passer au thème clair' : 'Passer au thème sombre');
-    majEtiquette();
-    boutonTheme.addEventListener('click', () => {
-      const vers = sombreActif() ? 'light' : 'dark';
-      document.documentElement.setAttribute('data-theme', vers);
-      try { localStorage.setItem(CLE, vers); avis.montrerUneFois(); } catch {}
-      majEtiquette();
-      const m = document.querySelector('meta[name="theme-color"]');
-      if (m) m.content = vers === 'dark' ? '#0B0B0E' : '#FFFFFF';
-    });
-    // Le système change d'avis pendant la visite : on suit, sauf choix explicite.
-    matchMedia('(prefers-color-scheme: dark)').addEventListener('change', majEtiquette);
-
-    /* ---------- Recherche ---------- */
-    const boutonRech = el('button', 'nav__outil',
-      '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.4 15.4 20 20"/></svg>');
-    boutonRech.type = 'button';
-    boutonRech.setAttribute('aria-label', 'Rechercher sur le site');
-
-    const outils = el('span', 'nav__outils');
-    outils.append(boutonRech, boutonTheme);
-    const burger = nav.querySelector('.nav__burger');
-    const cta = nav.querySelector('.nav__cta');
-    nav.insertBefore(outils, cta || burger);
-
-    const rech = el('div', 'rech', `
-      <div class="rech__boite" role="dialog" aria-modal="true" aria-label="Recherche">
-        <div class="rech__haut">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.4 15.4 20 20"/></svg>
-          <input class="rech__champ" type="search" placeholder="Rechercher une page, un service, une ville…"
-                 aria-label="Rechercher" autocomplete="off" enterkeyhint="search">
-          <span class="rech__fermer">esc</span>
-        </div>
-        <div class="rech__liste" role="listbox"></div>
-      </div>
-      <p class="rech__aide">Flèches pour parcourir · Entrée pour ouvrir</p>`);
-    document.body.appendChild(rech);
-
-    const champ = rech.querySelector('.rech__champ');
-    const liste = rech.querySelector('.rech__liste');
-    let resultats = [], actif = 0;
-
-    const sansAccent = (t) => t.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
-
-    function chercher(q) {
-      const index = window.MJ_INDEX || [];
-      const mots = sansAccent(q).split(/\s+/).filter(Boolean);
-      if (!mots.length) return [];
-      return index
-        .map(e => {
-          const t = sansAccent(e.t), x = sansAccent(e.x), s = sansAccent(e.s);
-          let score = 0;
-          for (const m of mots) {
-            if (t.startsWith(m)) score += 12;
-            else if (t.includes(m)) score += 8;
-            else if (s.includes(m)) score += 4;
-            else if (x.includes(m)) score += 2;
-            else return null;            // tous les mots doivent être présents
-          }
-          return { ...e, score };
-        })
-        .filter(Boolean)
-        .sort((a, b) => b.score - a.score)
-        .slice(0, 8);
-    }
-
-    function surligner(texte, q) {
-      const mots = sansAccent(q).split(/\s+/).filter(Boolean);
-      const brut = texte.replace(/[<>&]/g, c => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;' }[c]));
-      if (!mots.length) return brut;
-      // On cherche sur la version sans accent, on découpe sur l'originale :
-      // les positions se correspondent, NFD mis à part les diacritiques.
-      const plat = sansAccent(brut);
-      let sortie = '', i = 0;
-      while (i < brut.length) {
-        const trouve = mots
-          .map(m => ({ m, p: plat.indexOf(m, i) }))
-          .filter(o => o.p === i)
-          .sort((a, b) => b.m.length - a.m.length)[0];
-        if (trouve) {
-          sortie += '<mark>' + brut.slice(i, i + trouve.m.length) + '</mark>';
-          i += trouve.m.length;
-        } else { sortie += brut[i]; i++; }
-      }
-      return sortie;
-    }
-
-    function afficher(q) {
-      resultats = chercher(q);
-      actif = 0;
-      if (!q.trim()) {
-        liste.innerHTML = '<p class="rech__vide">Tapez pour chercher dans tout le site.</p>';
-        return;
-      }
-      if (!resultats.length) {
-        liste.innerHTML = '<p class="rech__vide">Aucun résultat pour « ' +
-          q.replace(/[<>&]/g, '') + ' ».</p>';
-        return;
-      }
-      liste.innerHTML = resultats.map((r, i) => `
-        <a class="rech__item${i === 0 ? ' actif' : ''}" href="${r.u}" role="option">
-          <span class="rech__t">${surligner(r.t, q)}</span>
-          <span class="rech__x">${r.s} — ${surligner(r.x.slice(0, 96), q)}…</span>
-        </a>`).join('');
-    }
-
-    function ouvrir() {
-      rech.classList.add('ouverte');
-      document.body.style.overflow = 'hidden';
-      afficher('');
-      champ.value = '';
-      champ.focus();
-    }
-    function fermer() {
-      rech.classList.remove('ouverte');
-      document.body.style.overflow = '';
-      boutonRech.focus();
-    }
-    boutonRech.addEventListener('click', ouvrir);
-    rech.querySelector('.rech__fermer').addEventListener('click', fermer);
-    rech.addEventListener('click', e => { if (e.target === rech) fermer(); });
-    champ.addEventListener('input', () => afficher(champ.value));
-
-    function surligneActif() {
-      liste.querySelectorAll('.rech__item').forEach((n, i) =>
-        n.classList.toggle('actif', i === actif));
-      const n = liste.querySelectorAll('.rech__item')[actif];
-      if (n) n.scrollIntoView({ block: 'nearest' });
-    }
-    champ.addEventListener('keydown', e => {
-      if (e.key === 'Escape') { fermer(); return; }
-      if (!resultats.length) return;
-      if (e.key === 'ArrowDown') { e.preventDefault(); actif = (actif + 1) % resultats.length; surligneActif(); }
-      if (e.key === 'ArrowUp')   { e.preventDefault(); actif = (actif - 1 + resultats.length) % resultats.length; surligneActif(); }
-      if (e.key === 'Enter') {
-        const n = liste.querySelectorAll('.rech__item')[actif];
-        if (n) n.click();
-      }
-    });
-    addEventListener('keydown', e => {
-      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') { e.preventDefault(); ouvrir(); }
-      if (e.key === 'Escape' && rech.classList.contains('ouverte')) fermer();
-    });
-
-    /* ---------- Barre de progression ---------- */
-    const progres = el('div', 'progres');
-    progres.setAttribute('aria-hidden', 'true');
-    document.body.appendChild(progres);
-
-    /* ---------- Retour en haut ---------- */
-    const remonter = el('button', 'remonter', '<span aria-hidden="true">↑</span>');
-    remonter.type = 'button';
-    remonter.setAttribute('aria-label', 'Revenir en haut de la page');
-    remonter.addEventListener('click', () =>
-      scrollTo({ top: 0, behavior: reduced ? 'auto' : 'smooth' }));
-    document.body.appendChild(remonter);
-
-    let enAttente = false;
-    function surDefilement() {
-      if (enAttente) return;
-      enAttente = true;
-      requestAnimationFrame(() => {
-        enAttente = false;
-        const course = document.documentElement.scrollHeight - innerHeight;
-        const p = course > 0 ? Math.min(1, scrollY / course) : 0;
-        progres.style.transform = `scaleX(${p})`;
-        remonter.classList.toggle('visible', scrollY > innerHeight * 0.9);
-      });
-    }
-    addEventListener('scroll', surDefilement, { passive: true });
-    addEventListener('resize', surDefilement);
-    surDefilement();
-
-    /* ---------- Avis sur le stockage ----------
-       Ce site ne dépose aucun cookie et n'embarque aucun traceur : il n'y
-       a donc rien à faire consentir, et une bannière de consentement
-       serait mensongère. L'avis n'apparaît qu'au moment où le visiteur
-       choisit un thème, puisque c'est la seule chose que le site retienne
-       — une préférence d'affichage qu'il a demandée, exemptée de
-       consentement. Il ne revient pas une fois lu. */
-    const avis = (function () {
-      const CLE_AVIS = 'mj-avis-stockage';
-      let vu = null;
-      try { vu = localStorage.getItem(CLE_AVIS); } catch {}
-      const boite = el('div', 'avis', `
-        <p class="avis__t">Ce site ne dépose aucun cookie et n’utilise aucun traceur.
-        Votre choix de thème est le seul élément conservé, dans votre navigateur.
-        <a href="confidentialite.html">En savoir plus</a></p>
-        <button type="button" class="avis__ok">J’ai compris</button>`);
-      document.body.appendChild(boite);
-
-      /* L'avis et le retour en haut occupent le même coin. L'avis gagne, et
-         le bouton monte au-dessus de lui — de sa hauteur réelle, qui va de
-         une à trois lignes selon la largeur, donc mesurée plutôt que devinée. */
-      const place = () => document.documentElement.style.setProperty(
-        '--avis-h', boite.classList.contains('visible')
-          ? Math.ceil(boite.getBoundingClientRect().height) + 10 + 'px' : '0px');
-
-      boite.querySelector('.avis__ok').addEventListener('click', () => {
-        boite.classList.remove('visible');
-        place();
-        try { localStorage.setItem(CLE_AVIS, '1'); } catch {}
-        // Le bouton lu disparaît du flux : sans cela le focus retombe sur
-        // le document et le visiteur au clavier repart du haut.
-        boutonTheme.focus({ preventScroll: true });
-      });
-      addEventListener('resize', place, { passive: true });
-      return {
-        montrerUneFois() { if (!vu) { boite.classList.add('visible'); place(); } },
-      };
-    })();
-  })();
-
-  /* ---------- Animation de chargement ----------
-     Elle n'apparaît que si la page tarde. Affichée systématiquement, elle
-     clignoterait sur un chargement rapide — ce qui donne l'impression
-     inverse de celle recherchée. Sur ce site, sans image lourde, elle ne
-     devrait presque jamais se voir : c'est le but. */
-  (function chargement() {
-    const barre = document.createElement('div');
-    barre.className = 'chargement';
-    barre.setAttribute('aria-hidden', 'true');
-    document.body.appendChild(barre);
-
-    let minuteur = null;
-    const montrer = () => {
-      clearTimeout(minuteur);
-      minuteur = setTimeout(() => barre.classList.add('visible'), 420);
-    };
-    const cacher = () => { clearTimeout(minuteur); barre.classList.remove('visible'); };
-
-    // 1 — le premier affichage, s'il tarde.
-    if (document.readyState !== 'complete') {
-      montrer();
-      addEventListener('load', cacher, { once: true });
-    }
-
-    /* 2 — le passage d'une page à l'autre. C'est la seule attente réelle ici :
-       le site n'embarque aucune image ni police à télécharger, donc son
-       premier chargement est immédiat et la barre ne s'y verrait jamais —
-       alors que changer de page redemande un aller-retour au serveur, et
-       c'est précisément là qu'un visiteur en 4G faible reste sans réponse. */
-    addEventListener('click', e => {
-      if (e.defaultPrevented || e.button || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
-      const a = e.target.closest && e.target.closest('a[href]');
-      if (!a || a.target === '_blank' || a.hasAttribute('download')) return;
-      const brut = a.getAttribute('href') || '';
-      if (/^(#|mailto:|tel:|javascript:)/i.test(brut)) return;
-      let u;
-      try { u = new URL(a.href, location.href); } catch { return; }
-      if (u.origin !== location.origin) return;
-      // Même document : une ancre, ou un lien du routeur du fichier unique.
-      // Rien ne part sur le réseau, la barre tournerait dans le vide.
-      if (u.pathname === location.pathname && u.search === location.search) return;
-      montrer();
-    }, true);
-
-    // Retour arrière : la page revient du cache telle qu'elle a été quittée,
-    // barre en cours comprise. On la coupe à l'arrivée comme au départ.
-    addEventListener('pageshow', e => { if (e.persisted) cacher(); });
-    addEventListener('pagehide', cacher);
   })();
 
   if (document.readyState === 'complete') boot();

@@ -248,7 +248,6 @@ ${VILLES.map(o => `      <a href="${o.slug}.html">${o.lienPied}</a>`).join('\n')
   </div>
 </footer>
 
-<script src="assets/js/recherche-index.js"></script>
 <script src="assets/js/bg.js"></script>
 <script src="assets/js/main.js"></script>
 </body>
@@ -314,10 +313,7 @@ const CONFIDENTIALITE = [
       <p>Ce site ne dépose <b>aucun cookie</b>, n’utilise <b>aucun outil de mesure
       d’audience</b> et ne contient <b>aucun traceur publicitaire</b>. Les seules
       données que nous recevons sont celles que vous nous transmettez volontairement
-      par le formulaire de contact.</p>
-      <p>Deux préférences d’affichage sont conservées dans votre navigateur, et n’en
-      sortent jamais&nbsp;: le thème que vous avez choisi, et le fait que vous avez lu
-      l’avis en bas de page. Nous n’y avons pas accès.</p>`],
+      par le formulaire de contact.</p>`],
 
   ['Responsable du traitement', `
       <p>${IDENTITE.denomination} — ${aRemplir(IDENTITE.siege, 'Adresse du siège')} —
@@ -370,18 +366,11 @@ const CONFIDENTIALITE = [
       <b>CNIL</b> — 3 place de Fontenoy, TSA 80715, 75334 Paris Cedex 07 —
       <a href="https://www.cnil.fr" target="_blank" rel="noopener">cnil.fr</a>.</p>`],
 
-  ['Cookies et stockage local', `
+  ['Cookies', `
       <p>Aucun cookie n’est déposé sur votre appareil, ni par nous ni par un tiers.
-      Aucun traceur, aucune mesure d’audience.</p>
-      <p>Le site conserve deux valeurs dans le stockage local de votre navigateur&nbsp;:
-      <code>mj-theme</code>, le thème clair ou sombre que vous avez choisi, et
-      <code>mj-avis-stockage</code>, qui évite de vous remontrer l’avis déjà lu. Ces
-      valeurs restent sur votre appareil, ne sont jamais transmises et ne permettent
-      pas de vous identifier.</p>
-      <p>C’est la raison pour laquelle aucune bannière de consentement ne vous est
-      présentée&nbsp;: une préférence d’affichage que vous avez vous-même demandée est
-      <b>exemptée de consentement</b>, et il n’y a rien d’autre à consentir. Pour les
-      effacer, videz les données de site pour ce domaine dans votre navigateur.</p>`],
+      Le site ne conserve rien dans le stockage local de votre navigateur. C’est la
+      raison pour laquelle aucune bannière de consentement ne vous est présentée&nbsp;:
+      il n’y a rien à consentir.</p>`],
 
   ['Sécurité', `
       <p>Le site est servi exclusivement en HTTPS. Les clés d’accès aux services
@@ -625,96 +614,11 @@ ${VILLES.map(o => `      <a href="${o.slug}.html">${o.lienPied}</a>`).join('\n')
   </div>
 </footer>
 
-<script src="assets/js/recherche-index.js"></script>
 <script src="assets/js/bg.js"></script>
 <script src="assets/js/main.js"></script>
 </body>
 </html>
 `;
-}
-
-
-/* =========================================================
-   INDEX DE RECHERCHE
-
-   Construit à partir du contenu réel des pages, pas d'une liste tenue à
-   la main : une page ajoutée est indexée sans qu'on y pense, et un texte
-   modifié l'est aussi. Le fichier produit est un simple tableau, chargé
-   avec le reste — pas de service, pas de requête.
-
-   On indexe les titres et un extrait par section : de quoi retrouver une
-   page, sans embarquer le site entier dans un fichier JavaScript.
-   ========================================================= */
-function indexer() {
-  const PAGES = [
-    ['index.html', 'Accueil'],
-    ['work.html', 'Réalisations'],
-    ['studio.html', 'Le studio'],
-    ['contact.html', 'Contact'],
-    ...VILLES.map(v => [v.slug + '.html', v.ville]),
-    ['mentions-legales.html', 'Mentions légales'],
-    ['confidentialite.html', 'Confidentialité'],
-  ];
-
-  const nu = (h) => h
-    .replace(/<script[\s\S]*?<\/script>/gi, ' ')
-    .replace(/<style[\s\S]*?<\/style>/gi, ' ')
-    .replace(/<[^>]+>/g, ' ')
-    .replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&')
-    .replace(/&eacute;/g, 'é').replace(/&agrave;/g, 'à')
-    .replace(/&#39;|&rsquo;/g, "'").replace(/&quot;/g, '"')
-    .replace(/\s+/g, ' ').trim();
-
-  const entrees = [];
-  PAGES.forEach(([fichier, section]) => {
-    let html;
-    try { html = fs.readFileSync(path.join(__dirname, fichier), 'utf8'); }
-    catch { return; }
-
-    const corps = (html.match(/<main[\s\S]*?<\/main>/i) || [''])[0];
-    const titre = nu((html.match(/<title>([\s\S]*?)<\/title>/i) || [, ''])[1])
-      .replace(/\s*\|\s*MJ Agency$/, '');
-    const url = fichier.replace(/\.html$/, '') === 'index' ? 'index.html' : fichier;
-
-    // Une entrée pour la page elle-même
-    entrees.push({ u: url, s: section, t: titre, x: nu(corps).slice(0, 180) });
-
-    // Une entrée par titre, avec le texte de SA section — pas celui de la
-    // suivante. Sans la coupure au titre suivant, une carte sans descriptif
-    // se décrivait avec la bannière d'appel qui la suit dans la source.
-    const blocs = [...corps.matchAll(/<h([23])[^>]*>([\s\S]*?)<\/h\1>/gi)];
-    blocs.forEach(m => {
-      const t = nu(m[2]);
-      if (!t || t.length < 3) return;
-      // Une section se termine aussi par sa balise : un chapeau en <span>
-      // n'est pas un titre et ne couperait pas le texte.
-      const coupe = /<h[23][\s>]|<\/section>|<section[\s>]/i;
-      let x = nu(corps.slice(m.index + m[0].length).split(coupe)[0]).slice(0, 170);
-      // Une carte porte son descriptif AVANT son titre : rien d'utile après,
-      // on reprend donc ce qui précède immédiatement le titre.
-      if (x.replace(/[^\p{L}\p{N}]/gu, '').length < 24) {
-        // split() mange la balise de coupure : le fragment commence alors au
-        // milieu d'un <section ...>, dont les attributs se liraient comme du
-        // texte. On jette ce reste de balise ouvrante.
-        const avant = corps.slice(0, m.index).split(coupe).pop().replace(/^[^<>]*>/, '');
-        x = nu(avant).slice(-170);
-      }
-      // Un titre de section suivi directement de ses sous-titres n'a ni texte
-      // après (coupé au premier <h3>) ni avant (juste un chapeau). On rouvre
-      // alors jusqu'à la fin de la section : ses sous-titres la décrivent bien.
-      if (x.replace(/[^\p{L}\p{N}]/gu, '').length < 24) {
-        const large = corps.slice(m.index + m[0].length).split(/<\/section>|<section[\s>]/i)[0];
-        const y = nu(large).slice(0, 170);
-        if (y.length > x.length) x = y;
-      }
-      entrees.push({ u: url, s: section, t, x });
-    });
-  });
-
-  fs.writeFileSync(path.join(__dirname, 'assets/js/recherche-index.js'),
-    '/* Généré par build-locales.js — ne pas modifier à la main. */\n' +
-    'window.MJ_INDEX = ' + JSON.stringify(entrees) + ';\n');
-  console.log('  assets/js/recherche-index.js — ' + entrees.length + ' entrées');
 }
 
 /* ---------- Écriture ---------- */
@@ -766,5 +670,4 @@ ${urls.map(([u, f, p]) => {
 </urlset>
 `);
 
-indexer();
 console.log(`${VILLES.length} pages locales + sitemap.xml (${urls.length} URL)`);
