@@ -17,6 +17,13 @@
   --black:      #0D0D0F;
   --blue:       #0071E3;
   --blue-dark:  #0058B0;
+  /* L'encre posée SUR un aplat bleu, et SUR un aplat d'encre. En thème
+     sombre le bleu s'éclaircit et l'encre devient claire : un blanc figé
+     dessus tomberait à 2,75:1. Ces deux jetons suivent le thème. */
+  --sur-bleu:   #FFFFFF;
+  --sur-encre:  #FFFFFF;
+  /* Teinte du surlignage des résultats de recherche */
+  --surlignage: rgba(0,113,227,.16);
 
   --rule:  rgba(0,0,0,.08);
   --rule-2:rgba(0,0,0,.14);
@@ -157,7 +164,7 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
 .btn:active{transform:scale(.98)}
 .btn .arw{font-size:.85em;transition:transform .25s var(--ease)}
 
-.btn--glow{background:var(--blue);color:#fff;border-color:var(--blue)}
+.btn--glow{background:var(--blue);color:var(--sur-bleu);border-color:var(--blue)}
 
 /* Lien tertiaire — la troisième marche de la charte */
 .link-t{color:var(--blue);font-size:17px;display:inline-flex;align-items:center;gap:5px}
@@ -224,7 +231,7 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
   position:fixed;top:0;left:0;right:0;z-index:500;height:52px;
   display:flex;align-items:center;justify-content:space-between;
   padding:0 clamp(18px,4vw,44px);
-  background:rgba(255,255,255,.72);backdrop-filter:saturate(180%) blur(20px);
+  background:var(--nav-bg);backdrop-filter:saturate(180%) blur(20px);
   border-bottom:1px solid var(--rule);
   transition:transform .4s var(--ease);
 }
@@ -236,7 +243,7 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
 .nav__links a.active{color:var(--black);font-weight:500;opacity:1}
 .nav__cta{
   font-size:14px;padding:7px 16px;border-radius:980px;
-  background:var(--blue);color:#fff;display:inline-flex;align-items:center;gap:6px;
+  background:var(--blue);color:var(--sur-bleu);display:inline-flex;align-items:center;gap:6px;
   transition:background .25s var(--ease);
 }
 .nav__burger{display:none}
@@ -269,6 +276,9 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
 }
 .mobile-menu a small{font-size:14px;color:var(--gray);font-weight:400}
 .mobile-menu .btn{font-size:17px;padding:14px 26px;border-bottom:0;align-self:flex-start;margin-top:var(--s4)}
+/* .mobile-menu a ci-dessus est plus spécifique que .btn--glow : sans cette
+   ligne le bouton bleu du menu reprend l'encre des liens — 2,55:1 en sombre. */
+.mobile-menu .btn--glow{color:var(--sur-bleu)}
 
 /* ---------- Chiffres ---------- */
 .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:var(--gutter)}
@@ -388,9 +398,9 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
   font-size:15px;color:var(--dark-gray);position:relative;transition:background .2s,color .2s;
 }
 .cal__day.empty{pointer-events:none}
-.cal__day.disabled{color:#C7C7CC;pointer-events:none}
+.cal__day.disabled{color:var(--inactif);pointer-events:none}
 .cal__day.avail::after{content:"";position:absolute;bottom:5px;width:4px;height:4px;border-radius:50%;background:var(--blue)}
-.cal__day.selected{background:var(--blue);color:#fff;font-weight:500}
+.cal__day.selected{background:var(--blue);color:var(--sur-bleu);font-weight:500}
 .cal__day.selected::after{background:#fff}
 
 .slots{margin-top:var(--s3)}
@@ -400,7 +410,7 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
   background:var(--light-gray);border-radius:var(--radius-s);padding:13px 6px;min-height:48px;
   text-align:center;font-size:15px;color:var(--dark-gray);transition:background .2s,color .2s;
 }
-.slot.selected{background:var(--blue);color:#fff}
+.slot.selected{background:var(--blue);color:var(--sur-bleu)}
 .slot.disabled{opacity:.4;pointer-events:none;text-decoration:line-through}
 
 /* ---------- Formulaire ---------- */
@@ -429,7 +439,7 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
   background:rgba(0,113,227,.08);color:#0B4F9E;display:none;
 }
 .form-msg.show{display:block}
-.form-msg--erreur{background:rgba(255,59,48,.08);color:#B3261E}
+.form-msg--erreur{background:var(--err-bg);color:var(--err-txt)}
 .form-msg a{text-decoration:underline}
 /* Référence de panne : lisible si on la cherche, muette sinon. */
 .form-msg__ref{display:block;margin-top:6px;font-size:12px;opacity:.6;letter-spacing:.02em}
@@ -441,7 +451,7 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
   border-radius:980px;padding:9px 18px;min-height:40px;display:inline-flex;align-items:center;
   transition:background .2s,color .2s;
 }
-.filters .tag.active{background:var(--blue);color:#fff}
+.filters .tag.active{background:var(--blue);color:var(--sur-bleu)}
 
 /* ---------- Zone d'intervention ---------- */
 .zone{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--s4)}
@@ -532,8 +542,8 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
 .coh--carte .coh__marque b{font-size:12px}
 /* L'enseigne : fond sombre, marque en négatif */
 .coh--enseigne{background:var(--black);align-items:center;justify-content:center}
-.coh--enseigne .coh__lab{color:rgba(255,255,255,.45)}
-.coh--enseigne .coh__marque b{color:#fff}
+.coh--enseigne .coh__lab{color:var(--sur-encre);opacity:.45}
+.coh--enseigne .coh__marque b{color:var(--sur-encre)}
 /* Le réseau social : vignette carrée */
 .coh--reseau .coh__vignette{
   aspect-ratio:1;border-radius:8px;
@@ -602,10 +612,17 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
    Le texte reste dans le flux : c'est le masque qui le cache, jamais
    l'opacité. Sans JavaScript, le repli plus bas le montre entier. */
 .masque{display:block;overflow:hidden}
-.masque>span{
-  display:block;
-  transform:translateY(105%);
-  transition:transform .85s var(--ease);
+.masque>span{display:block}
+
+/* Réservée au tactile. Sur ordinateur, où l'on découvre la page au
+   défilement long d'une molette, le procédé sautait aux yeux et
+   n'apportait rien — retiré à la demande. Le masque reste inerte : la
+   structure ne change pas, seul l'effet disparaît. */
+@media (max-width:900px){
+  .masque>span{
+    transform:translateY(105%);
+    transition:transform .85s var(--ease);
+  }
 }
 .reveal.in .masque>span,.masque.vu>span,.rs.in .masque>span{transform:none}
 /* Le décalage entre les lignes fait la phrase, plus que la montée elle-même */
@@ -620,7 +637,8 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
 
    Sous @supports : là où :has() manque, on retombe sur l'ancien
    comportement — fondu plus masque. Moins net, jamais cassé. */
-@supports selector(:has(*)){
+@media (max-width:900px){
+ @supports selector(:has(*)){
   /* Enfant direct seulement. Écrit « :has(.masque) », la règle attrapait
      aussi les conteneurs où le titre est imbriqué plus profond — elle
      déplaçait alors le fondu sur le bloc qui porte le titre, lequel se
@@ -632,15 +650,292 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
     transition:opacity .8s var(--ease),transform .8s var(--ease);
   }
   .reveal.in:has(> .h2 > .masque)>:not(.h2){opacity:1;transform:none}
+ }
 }
 
 /* Le titre du hero avait déjà la bonne structure : une ligne, un bloc. */
 .hero__title .line{overflow:hidden}
-.hero__title .line>span{transform:translateY(105%);transition:transform .95s var(--ease)}
-.hero__title.vu .line>span{transform:none}
+@media (max-width:900px){
+  .hero__title .line>span{transform:translateY(105%);transition:transform .95s var(--ease)}
+  .hero__title.vu .line>span{transform:none}
+}
 
 @media (prefers-reduced-motion:reduce){
   .masque>span,.hero__title .line>span{transform:none!important;transition:none}
+}
+
+/* =========================================================
+   THÈME SOMBRE
+
+   Les noms de variables sont restés littéraux (--white, --black) parce
+   qu'ils sont employés des centaines de fois : les renommer serait un
+   diff énorme pour rien. En thème sombre, lire --white comme « la
+   surface » et --black comme « l'encre des titres ».
+
+   Trois états, et c'est volontaire : sans attribut, le site suit la
+   préférence du système ; avec data-theme, le choix du visiteur gagne
+   dans les deux sens. Une seule règle ne suffirait pas — un visiteur qui
+   veut le clair sur un système sombre serait ignoré.
+
+   Les maquettes (navigateur, planche de charte) restent claires : elles
+   représentent un site clair, comme une photographie. Un artefact clair
+   sur une page sombre, c'est juste.
+   ========================================================= */
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){ color-scheme: dark; }
+}
+:root[data-theme="dark"]{ color-scheme: dark; }
+
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --white:      #16161A;   /* surface des cartes */
+    --off-white:  #101014;   /* fond des bandes */
+    --light-gray: #1E1E23;
+    --gray:       #91919A;
+    --dark-gray:  #E4E4E9;   /* texte courant */
+    --black:      #F6F6F8;   /* titres */
+    --blue:       #4C9EFF;
+    --blue-dark:  #7FBAFF;
+    --sur-bleu:   #0B0B0E;
+    --sur-encre:  #16161A;
+    --surlignage: rgba(76,158,255,.28);
+    --rule:  rgba(255,255,255,.11);
+    --rule-2:rgba(255,255,255,.20);
+    --survol:    #26262C;
+    --nav-bg:    rgba(14,14,17,.74);
+    --footer-bg: rgba(16,16,20,.80);
+    --inactif:   #4A4A52;
+    --err-bg:    rgba(255,99,90,.12);
+    --err-txt:   #FF8A80;
+    --avert-bg:   #3A2E14;
+    --avert-bord: #6E5622;
+    --avert-txt:  #F2D89A;
+    --shadow-s: 0 1px 3px rgba(0,0,0,.40), 0 6px 18px rgba(0,0,0,.34);
+    --shadow-m: 0 2px 8px rgba(0,0,0,.44), 0 14px 38px rgba(0,0,0,.40);
+  }
+}
+:root[data-theme="dark"]{
+  --white:      #16161A;
+  --off-white:  #101014;
+  --light-gray: #1E1E23;
+  --gray:       #91919A;
+  --dark-gray:  #E4E4E9;
+  --black:      #F6F6F8;
+  --blue:       #4C9EFF;
+  --blue-dark:  #7FBAFF;
+  --sur-bleu:   #0B0B0E;
+  --sur-encre:  #16161A;
+  --surlignage: rgba(76,158,255,.28);
+  --rule:  rgba(255,255,255,.11);
+  --rule-2:rgba(255,255,255,.20);
+  --survol:    #26262C;
+  --nav-bg:    rgba(14,14,17,.74);
+  --footer-bg: rgba(16,16,20,.80);
+  --inactif:   #4A4A52;
+  --err-bg:    rgba(255,99,90,.12);
+  --err-txt:   #FF8A80;
+  --avert-bg:   #3A2E14;
+  --avert-bord: #6E5622;
+  --avert-txt:  #F2D89A;
+  --shadow-s: 0 1px 3px rgba(0,0,0,.40), 0 6px 18px rgba(0,0,0,.34);
+  --shadow-m: 0 2px 8px rgba(0,0,0,.44), 0 14px 38px rgba(0,0,0,.40);
+}
+
+/* Le fond du document, qui était transparent pour laisser passer le canvas :
+   il lui faut une couleur propre, sinon la page emprunte celle de l'hôte. */
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]) body{ background:#0B0B0E }
+}
+:root[data-theme="dark"] body{ background:#0B0B0E }
+
+/* Les surfaces qui restent claires par intention : ce sont des objets
+   représentés, pas des surfaces de l'interface. */
+:root[data-theme="dark"] .board,
+:root[data-theme="dark"] .nave,
+:root[data-theme="dark"] .nave__barre,
+:root[data-theme="dark"] .coh{ color-scheme: light }
+
+/* Bascule douce, jamais sur les transformations (elles animent déjà) */
+body,.nav,.footer,.feature,.card,.step,.stat,.cta-band,.cal,.membre,.faq__item{
+  transition:background-color .35s var(--ease),border-color .35s var(--ease),color .35s var(--ease);
+}
+@media (prefers-reduced-motion:reduce){
+  body,.nav,.footer,.feature,.card,.step,.stat,.cta-band,.cal,.membre,.faq__item{transition:none}
+}
+
+/* =========================================================
+   COMMANDES DE L'INTERFACE
+   Barre de progression, retour en haut, bascule de thème,
+   recherche, chargement, avis sur le stockage.
+   ========================================================= */
+
+/* ---------- Barre de progression ----------
+   Posée sous la barre de navigation, elle suit le défilement. Animée par
+   scaleX plutôt que par width : une seule propriété, composée par le GPU,
+   donc aucun recalcul de mise en page à chaque image. */
+.progres{
+  position:fixed;top:52px;left:0;right:0;height:2px;z-index:501;
+  transform:scaleX(0);transform-origin:left center;
+  background:var(--blue);
+  will-change:transform;pointer-events:none;
+}
+.nav.cachee + .progres{transform:scaleX(var(--p,0)) translateY(-54px)}
+
+/* ---------- Retour en haut ----------
+   --avis-h vaut 0 sauf pendant l'avis de stockage, qui tient le même coin :
+   main.js y pose sa hauteur mesurée et le bouton passe au-dessus. */
+.remonter{
+  position:fixed;z-index:480;
+  right:max(18px, env(safe-area-inset-right, 0px));
+  bottom:calc(max(18px, env(safe-area-inset-bottom, 0px)) + var(--avis-h, 0px));
+  width:48px;height:48px;border-radius:50%;
+  background:var(--white);color:var(--black);
+  border:1px solid var(--rule-2);box-shadow:var(--shadow-m);
+  display:grid;place-items:center;font-size:17px;line-height:1;
+  opacity:0;transform:translateY(12px) scale(.9);pointer-events:none;
+  transition:opacity .3s var(--ease),transform .3s var(--ease),
+              bottom .3s var(--ease),background .25s var(--ease);
+}
+.remonter.visible{opacity:1;transform:none;pointer-events:auto}
+.remonter:active{transform:scale(.94)}
+
+/* ---------- Boutons ronds de la barre ---------- */
+.nav__outil{
+  width:40px;height:40px;border-radius:50%;flex:none;
+  display:grid;place-items:center;color:var(--dark-gray);
+  transition:background .25s var(--ease),color .25s var(--ease);
+}
+.nav__outil svg{width:19px;height:19px;display:block;fill:none;
+  stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.nav__outils{display:flex;align-items:center;gap:2px}
+/* Un seul jeu d'icônes dans le document : on montre celle qui correspond. */
+.nav__outil .lune{display:none}
+:root[data-theme="dark"] .nav__outil .lune{display:block}
+:root[data-theme="dark"] .nav__outil .soleil{display:none}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]) .nav__outil .lune{display:block}
+  :root:not([data-theme="light"]) .nav__outil .soleil{display:none}
+}
+
+/* ---------- Recherche ---------- */
+.rech{
+  position:fixed;inset:0;z-index:600;display:none;
+  padding-top:max(10vh, env(safe-area-inset-top, 0px));
+  padding-inline:var(--pad);
+  background:color-mix(in srgb, var(--off-white) 84%, transparent);
+  backdrop-filter:blur(18px) saturate(180%);
+}
+.rech.ouverte{display:block}
+.rech__boite{
+  max-width:640px;margin-inline:auto;
+  background:var(--white);border:1px solid var(--rule);
+  border-radius:var(--radius);box-shadow:var(--shadow-m);overflow:hidden;
+}
+.rech__haut{display:flex;align-items:center;gap:12px;padding:14px 16px;border-bottom:1px solid var(--rule)}
+.rech__haut svg{width:19px;height:19px;flex:none;fill:none;stroke:var(--gray);stroke-width:1.8;stroke-linecap:round}
+.rech__champ{
+  flex:1;border:none;background:none;outline:none;
+  font:inherit;font-size:17px;color:var(--black);
+}
+.rech__champ::placeholder{color:var(--gray)}
+.rech__fermer{
+  font-size:12px;color:var(--gray);border:1px solid var(--rule-2);
+  border-radius:6px;padding:3px 7px;flex:none;
+}
+.rech__liste{max-height:min(52vh,420px);overflow-y:auto;overscroll-behavior:contain}
+.rech__item{
+  display:block;padding:13px 16px;border-bottom:1px solid var(--rule);
+  min-height:44px;
+}
+.rech__item:last-child{border-bottom:none}
+.rech__item.actif{background:var(--off-white)}
+.rech__t{font-size:16px;font-weight:600;color:var(--black);letter-spacing:-.012em}
+.rech__x{font-size:13px;color:var(--gray);margin-top:3px;display:block}
+/* Sans cette règle le <mark> du titre repasse au jaune du navigateur —
+   qui n'appartient pas à la charte. Les deux emplacements sont couverts. */
+.rech__t mark,.rech__x mark{
+  background:var(--surlignage);color:inherit;border-radius:3px;padding:0 2px;
+}
+/* La croix native de <input type="search"> n'est pas stylable et doublait
+   la puce « esc » juste à côté. Rouvrir la recherche vide le champ. */
+.rech__champ::-webkit-search-cancel-button,
+.rech__champ::-webkit-search-decoration{-webkit-appearance:none;appearance:none}
+.rech__vide{padding:26px 16px;text-align:center;color:var(--gray);font-size:15px}
+.rech__aide{
+  max-width:640px;margin:12px auto 0;text-align:center;
+  font-size:12.5px;color:var(--gray);
+}
+
+/* ---------- Chargement ----------
+   Barre indéterminée en haut de fenêtre. Elle n'apparaît que si la page
+   tarde : affichée systématiquement, elle clignoterait sur un chargement
+   rapide, ce qui donne l'impression que le site est lent. */
+.chargement{
+  position:fixed;top:0;left:0;right:0;height:2px;z-index:700;
+  overflow:hidden;display:none;background:var(--rule);
+}
+.chargement.visible{display:block}
+.chargement::after{
+  content:"";position:absolute;inset:0;width:38%;
+  background:var(--blue);border-radius:2px;
+  animation:chargement 1.1s var(--ease) infinite;
+}
+@keyframes chargement{
+  0%{transform:translateX(-105%)}
+  100%{transform:translateX(300%)}
+}
+
+/* ---------- Avis sur le stockage ---------- */
+.avis{
+  position:fixed;z-index:560;
+  left:max(12px, env(safe-area-inset-left, 0px));
+  right:max(12px, env(safe-area-inset-right, 0px));
+  bottom:max(12px, env(safe-area-inset-bottom, 0px));
+  max-width:560px;margin-inline:auto;
+  background:var(--white);border:1px solid var(--rule-2);
+  border-radius:var(--radius-s);box-shadow:var(--shadow-m);
+  padding:14px 16px;
+  display:none;align-items:center;gap:14px;flex-wrap:wrap;
+}
+.avis.visible{display:flex}
+.avis__t{flex:1;min-width:200px;font-size:14px;line-height:1.5;color:var(--dark-gray)}
+.avis__t a{color:var(--blue);text-decoration:underline}
+.avis__ok{
+  font-size:14px;font-weight:500;padding:9px 18px;min-height:44px;
+  border-radius:980px;background:var(--blue);color:var(--sur-bleu);flex:none;
+  display:inline-flex;align-items:center;
+}
+
+@media (max-width:520px){
+  .rech{padding-top:max(6vh, env(safe-area-inset-top, 0px))}
+  .rech__liste{max-height:58vh}
+  .remonter{width:46px;height:46px}
+  .avis{padding:13px 14px;gap:10px}
+  .avis__ok{width:100%;justify-content:center}
+}
+
+/* ---------- Survol enrichi ----------
+   La charte reste sobre : pas de lueur, pas de rebond. Un bouton se
+   soulève d'un pixel et son ombre s'ouvre — assez pour signaler qu'il est
+   cliquable, jamais assez pour distraire. */
+@media (hover: hover) and (pointer: fine){
+  .btn{transition:background .25s var(--ease),color .25s var(--ease),
+       border-color .25s var(--ease),transform .25s var(--ease),box-shadow .25s var(--ease)}
+  .btn:hover{transform:translateY(-1px);box-shadow:var(--shadow-s)}
+  .btn--glow:hover{box-shadow:0 6px 18px rgba(0,113,227,.28)}
+  .nav__outil:hover{background:var(--survol);color:var(--black)}
+  .remonter:hover{background:var(--survol)}
+  .rech__item:hover{background:var(--off-white)}
+  .avis__ok:hover{background:var(--blue-dark)}
+  /* Le trait se dessine depuis la gauche, il n'apparaît pas d'un coup. */
+  .link-t{position:relative;text-decoration:none}
+  .link-t::after{
+    content:"";position:absolute;left:0;right:0;bottom:2px;height:1px;
+    background:currentColor;transform:scaleX(0);transform-origin:left;
+    transition:transform .3s var(--ease);
+  }
+  .link-t:hover{text-decoration:none}
+  .link-t:hover::after{transform:scaleX(1)}
 }
 
 /* ---------- Pages légales ----------
@@ -656,6 +951,11 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
 }
 .legal p{color:var(--dark-gray);font-size:17px;line-height:1.65}
 .legal b{font-weight:600;color:var(--black)}
+.legal code{
+  font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:14px;
+  background:var(--light-gray);border:1px solid var(--rule);
+  border-radius:5px;padding:1px 6px;color:var(--dark-gray);
+}
 .legal a{color:var(--blue);text-decoration:underline;text-underline-offset:2px}
 .legal ul{list-style:none;display:flex;flex-direction:column;gap:9px;margin-top:2px}
 .legal li{
@@ -671,8 +971,8 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
    se corrige, une information inventée dans un document qui engage se
    découvre trop tard. */
 .aremplir{
-  background:#FFF4D6;color:#7A4A00;
-  border:1px solid #E8C05A;border-radius:6px;
+  background:var(--avert-bg);color:var(--avert-txt);
+  border:1px solid var(--avert-bord);border-radius:6px;
   padding:1px 8px;font-size:15px;font-weight:600;
   white-space:nowrap;
 }
@@ -688,7 +988,7 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
 }
 
 /* ---------- Pied de page ---------- */
-.footer{background:rgba(245,245,247,.78);backdrop-filter:blur(8px);padding-top:var(--s6)}
+.footer{background:var(--footer-bg);backdrop-filter:blur(8px);padding-top:var(--s6)}
 .footer__big{
   font-size:clamp(32px,4.4vw,52px);font-weight:700;letter-spacing:-.024em;
   color:var(--black);text-align:center;line-height:1.1;
@@ -788,7 +1088,7 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
 .nave__cta{
   width:74px;height:17px;border-radius:999px;background:var(--blue);
   display:flex;align-items:center;justify-content:center;
-  font-size:7px;color:#fff;letter-spacing:.01em;
+  font-size:7px;color:var(--sur-bleu);letter-spacing:.01em;
 }
 .nave__cartes{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:2px}
 .nave__carte{
@@ -863,7 +1163,7 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
   padding-bottom:12px;border-bottom:1px solid var(--rule);
 }
 .board__mark{
-  width:22px;height:22px;border-radius:6px;background:var(--black);color:#fff;
+  width:22px;height:22px;border-radius:6px;background:var(--black);color:var(--sur-encre);
   display:grid;place-items:center;flex:none;
 }
 .board__grid{display:grid;grid-template-columns:1fr 1fr;gap:var(--s2)}
@@ -997,6 +1297,11 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
   /* Le doigt n'a pas la précision du curseur : tout ce qui se touche fait
      au moins 44 px de haut. Les liens tertiaires en faisaient 26, les
      flèches du calendrier 38, les filtres du portfolio 41. */
+  /* Les boutons ronds de la barre : 40 px suffisent à la souris, pas au
+     doigt. Ils s'élargissent, la barre a la place (mesuré jusqu'à 320 px). */
+  .nav__outil{width:44px;height:44px}
+  .nav__outils{gap:0}
+
   /* En ligne : ces cibles vivent au fil du texte ou d'une rangée. */
   .link-t,.nav__logo,.towns a,.footer__legal a{
     min-height:44px;display:inline-flex;align-items:center;
@@ -1101,7 +1406,7 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
 @media (hover: hover) and (pointer: fine){
   .btn:hover{background:var(--light-gray);border-color:transparent}
   .btn:hover .arw{transform:translateX(2px)}
-  .btn--glow:hover{background:var(--blue-dark);border-color:var(--blue-dark);color:#fff}
+  .btn--glow:hover{background:var(--blue-dark);border-color:var(--blue-dark);color:var(--sur-bleu)}
   .link-t:hover{text-decoration:underline}
   .nav__links a:hover{opacity:1}
   .nav__cta:hover{background:var(--blue-dark)}
@@ -1109,13 +1414,13 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
   a.work-item:hover .work-item__title{color:var(--blue)}
   .card:hover{transform:translateY(-4px);box-shadow:var(--shadow-m)}
   .card:hover .thumb .ph{transform:scale(1.03)}
-  .card:hover .card__go{background:var(--blue);color:#fff}
+  .card:hover .card__go{background:var(--blue);color:var(--sur-bleu)}
   .cap:hover{transform:translateY(-3px);box-shadow:var(--shadow-m)}
-  .cal__nav button:hover{background:#E4E4E8}
+  .cal__nav button:hover{background:var(--survol)}
   .cal__day.avail:hover{background:var(--light-gray)}
-  .slot:hover{background:#E4E4E8}
-  .filters .tag:hover{background:#E4E4E8}
-  .towns li:hover{background:#E4E4E8}
+  .slot:hover{background:var(--survol)}
+  .filters .tag:hover{background:var(--survol)}
+  .towns li:hover{background:var(--survol)}
   .faq__q:hover h3{color:var(--blue)}
   .nap a:hover{color:var(--blue)}
   .footer__col a:hover{color:var(--blue)}

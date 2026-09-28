@@ -104,6 +104,7 @@ ${bodies}
 ${footer}
 
 <script>
+${read('assets/js/recherche-index.js')}
 ${read('assets/js/bg.js')}
 </script>
 <script>

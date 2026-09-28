@@ -492,6 +492,313 @@
     elements.forEach(e => io.observe(e));
   })();
 
+
+  /* =========================================================
+     COMMANDES DE L'INTERFACE
+
+     Tout est créé ici plutôt que recopié dans dix fichiers HTML : une
+     seule source, et aucune page ne peut se retrouver sans. Ce sont de
+     toute façon des fonctions qui n'existent que si le JavaScript tourne.
+     ========================================================= */
+  (function commandes() {
+    const nav = document.querySelector('.nav');
+    if (!nav) return;
+
+    const el = (balise, classe, dedans) => {
+      const n = document.createElement(balise);
+      if (classe) n.className = classe;
+      if (dedans !== undefined) n.innerHTML = dedans;
+      return n;
+    };
+
+    /* ---------- Thème ----------
+       Trois états : « auto » suit le système, « light » et « dark » sont un
+       choix explicite du visiteur. On ne stocke rien tant qu'il n'a pas
+       choisi — c'est ce qui permet de n'afficher l'avis de stockage qu'à ce
+       moment-là, et pas dès l'arrivée. */
+    const CLE = 'mj-theme';
+    let memoire = null;
+    try { memoire = localStorage.getItem(CLE); } catch { /* navigation privée */ }
+    if (memoire === 'dark' || memoire === 'light') {
+      document.documentElement.setAttribute('data-theme', memoire);
+    }
+
+    const sombreActif = () => {
+      const a = document.documentElement.getAttribute('data-theme');
+      if (a) return a === 'dark';
+      return matchMedia('(prefers-color-scheme: dark)').matches;
+    };
+
+    const ICONES = `
+      <svg class="soleil" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.6v2.2M12 19.2v2.2M2.6 12h2.2M19.2 12h2.2M5.4 5.4l1.6 1.6M17 17l1.6 1.6M18.6 5.4L17 7M7 17l-1.6 1.6"/></svg>
+      <svg class="lune" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.5 14.6A8.6 8.6 0 1 1 9.4 3.5a7 7 0 0 0 11.1 11.1Z"/></svg>`;
+
+    const boutonTheme = el('button', 'nav__outil', ICONES);
+    boutonTheme.type = 'button';
+    const majEtiquette = () => boutonTheme.setAttribute('aria-label',
+      sombreActif() ? 'Passer au thème clair' : 'Passer au thème sombre');
+    majEtiquette();
+    boutonTheme.addEventListener('click', () => {
+      const vers = sombreActif() ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', vers);
+      try { localStorage.setItem(CLE, vers); avis.montrerUneFois(); } catch {}
+      majEtiquette();
+      const m = document.querySelector('meta[name="theme-color"]');
+      if (m) m.content = vers === 'dark' ? '#0B0B0E' : '#FFFFFF';
+    });
+    // Le système change d'avis pendant la visite : on suit, sauf choix explicite.
+    matchMedia('(prefers-color-scheme: dark)').addEventListener('change', majEtiquette);
+
+    /* ---------- Recherche ---------- */
+    const boutonRech = el('button', 'nav__outil',
+      '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.4 15.4 20 20"/></svg>');
+    boutonRech.type = 'button';
+    boutonRech.setAttribute('aria-label', 'Rechercher sur le site');
+
+    const outils = el('span', 'nav__outils');
+    outils.append(boutonRech, boutonTheme);
+    const burger = nav.querySelector('.nav__burger');
+    const cta = nav.querySelector('.nav__cta');
+    nav.insertBefore(outils, cta || burger);
+
+    const rech = el('div', 'rech', `
+      <div class="rech__boite" role="dialog" aria-modal="true" aria-label="Recherche">
+        <div class="rech__haut">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.4 15.4 20 20"/></svg>
+          <input class="rech__champ" type="search" placeholder="Rechercher une page, un service, une ville…"
+                 aria-label="Rechercher" autocomplete="off" enterkeyhint="search">
+          <span class="rech__fermer">esc</span>
+        </div>
+        <div class="rech__liste" role="listbox"></div>
+      </div>
+      <p class="rech__aide">Flèches pour parcourir · Entrée pour ouvrir</p>`);
+    document.body.appendChild(rech);
+
+    const champ = rech.querySelector('.rech__champ');
+    const liste = rech.querySelector('.rech__liste');
+    let resultats = [], actif = 0;
+
+    const sansAccent = (t) => t.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+
+    function chercher(q) {
+      const index = window.MJ_INDEX || [];
+      const mots = sansAccent(q).split(/\s+/).filter(Boolean);
+      if (!mots.length) return [];
+      return index
+        .map(e => {
+          const t = sansAccent(e.t), x = sansAccent(e.x), s = sansAccent(e.s);
+          let score = 0;
+          for (const m of mots) {
+            if (t.startsWith(m)) score += 12;
+            else if (t.includes(m)) score += 8;
+            else if (s.includes(m)) score += 4;
+            else if (x.includes(m)) score += 2;
+            else return null;            // tous les mots doivent être présents
+          }
+          return { ...e, score };
+        })
+        .filter(Boolean)
+        .sort((a, b) => b.score - a.score)
+        .slice(0, 8);
+    }
+
+    function surligner(texte, q) {
+      const mots = sansAccent(q).split(/\s+/).filter(Boolean);
+      const brut = texte.replace(/[<>&]/g, c => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;' }[c]));
+      if (!mots.length) return brut;
+      // On cherche sur la version sans accent, on découpe sur l'originale :
+      // les positions se correspondent, NFD mis à part les diacritiques.
+      const plat = sansAccent(brut);
+      let sortie = '', i = 0;
+      while (i < brut.length) {
+        const trouve = mots
+          .map(m => ({ m, p: plat.indexOf(m, i) }))
+          .filter(o => o.p === i)
+          .sort((a, b) => b.m.length - a.m.length)[0];
+        if (trouve) {
+          sortie += '<mark>' + brut.slice(i, i + trouve.m.length) + '</mark>';
+          i += trouve.m.length;
+        } else { sortie += brut[i]; i++; }
+      }
+      return sortie;
+    }
+
+    function afficher(q) {
+      resultats = chercher(q);
+      actif = 0;
+      if (!q.trim()) {
+        liste.innerHTML = '<p class="rech__vide">Tapez pour chercher dans tout le site.</p>';
+        return;
+      }
+      if (!resultats.length) {
+        liste.innerHTML = '<p class="rech__vide">Aucun résultat pour « ' +
+          q.replace(/[<>&]/g, '') + ' ».</p>';
+        return;
+      }
+      liste.innerHTML = resultats.map((r, i) => `
+        <a class="rech__item${i === 0 ? ' actif' : ''}" href="${r.u}" role="option">
+          <span class="rech__t">${surligner(r.t, q)}</span>
+          <span class="rech__x">${r.s} — ${surligner(r.x.slice(0, 96), q)}…</span>
+        </a>`).join('');
+    }
+
+    function ouvrir() {
+      rech.classList.add('ouverte');
+      document.body.style.overflow = 'hidden';
+      afficher('');
+      champ.value = '';
+      champ.focus();
+    }
+    function fermer() {
+      rech.classList.remove('ouverte');
+      document.body.style.overflow = '';
+      boutonRech.focus();
+    }
+    boutonRech.addEventListener('click', ouvrir);
+    rech.querySelector('.rech__fermer').addEventListener('click', fermer);
+    rech.addEventListener('click', e => { if (e.target === rech) fermer(); });
+    champ.addEventListener('input', () => afficher(champ.value));
+
+    function surligneActif() {
+      liste.querySelectorAll('.rech__item').forEach((n, i) =>
+        n.classList.toggle('actif', i === actif));
+      const n = liste.querySelectorAll('.rech__item')[actif];
+      if (n) n.scrollIntoView({ block: 'nearest' });
+    }
+    champ.addEventListener('keydown', e => {
+      if (e.key === 'Escape') { fermer(); return; }
+      if (!resultats.length) return;
+      if (e.key === 'ArrowDown') { e.preventDefault(); actif = (actif + 1) % resultats.length; surligneActif(); }
+      if (e.key === 'ArrowUp')   { e.preventDefault(); actif = (actif - 1 + resultats.length) % resultats.length; surligneActif(); }
+      if (e.key === 'Enter') {
+        const n = liste.querySelectorAll('.rech__item')[actif];
+        if (n) n.click();
+      }
+    });
+    addEventListener('keydown', e => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') { e.preventDefault(); ouvrir(); }
+      if (e.key === 'Escape' && rech.classList.contains('ouverte')) fermer();
+    });
+
+    /* ---------- Barre de progression ---------- */
+    const progres = el('div', 'progres');
+    progres.setAttribute('aria-hidden', 'true');
+    document.body.appendChild(progres);
+
+    /* ---------- Retour en haut ---------- */
+    const remonter = el('button', 'remonter', '<span aria-hidden="true">↑</span>');
+    remonter.type = 'button';
+    remonter.setAttribute('aria-label', 'Revenir en haut de la page');
+    remonter.addEventListener('click', () =>
+      scrollTo({ top: 0, behavior: reduced ? 'auto' : 'smooth' }));
+    document.body.appendChild(remonter);
+
+    let enAttente = false;
+    function surDefilement() {
+      if (enAttente) return;
+      enAttente = true;
+      requestAnimationFrame(() => {
+        enAttente = false;
+        const course = document.documentElement.scrollHeight - innerHeight;
+        const p = course > 0 ? Math.min(1, scrollY / course) : 0;
+        progres.style.transform = `scaleX(${p})`;
+        remonter.classList.toggle('visible', scrollY > innerHeight * 0.9);
+      });
+    }
+    addEventListener('scroll', surDefilement, { passive: true });
+    addEventListener('resize', surDefilement);
+    surDefilement();
+
+    /* ---------- Avis sur le stockage ----------
+       Ce site ne dépose aucun cookie et n'embarque aucun traceur : il n'y
+       a donc rien à faire consentir, et une bannière de consentement
+       serait mensongère. L'avis n'apparaît qu'au moment où le visiteur
+       choisit un thème, puisque c'est la seule chose que le site retienne
+       — une préférence d'affichage qu'il a demandée, exemptée de
+       consentement. Il ne revient pas une fois lu. */
+    const avis = (function () {
+      const CLE_AVIS = 'mj-avis-stockage';
+      let vu = null;
+      try { vu = localStorage.getItem(CLE_AVIS); } catch {}
+      const boite = el('div', 'avis', `
+        <p class="avis__t">Ce site ne dépose aucun cookie et n’utilise aucun traceur.
+        Votre choix de thème est le seul élément conservé, dans votre navigateur.
+        <a href="confidentialite.html">En savoir plus</a></p>
+        <button type="button" class="avis__ok">J’ai compris</button>`);
+      document.body.appendChild(boite);
+
+      /* L'avis et le retour en haut occupent le même coin. L'avis gagne, et
+         le bouton monte au-dessus de lui — de sa hauteur réelle, qui va de
+         une à trois lignes selon la largeur, donc mesurée plutôt que devinée. */
+      const place = () => document.documentElement.style.setProperty(
+        '--avis-h', boite.classList.contains('visible')
+          ? Math.ceil(boite.getBoundingClientRect().height) + 10 + 'px' : '0px');
+
+      boite.querySelector('.avis__ok').addEventListener('click', () => {
+        boite.classList.remove('visible');
+        place();
+        try { localStorage.setItem(CLE_AVIS, '1'); } catch {}
+        // Le bouton lu disparaît du flux : sans cela le focus retombe sur
+        // le document et le visiteur au clavier repart du haut.
+        boutonTheme.focus({ preventScroll: true });
+      });
+      addEventListener('resize', place, { passive: true });
+      return {
+        montrerUneFois() { if (!vu) { boite.classList.add('visible'); place(); } },
+      };
+    })();
+  })();
+
+  /* ---------- Animation de chargement ----------
+     Elle n'apparaît que si la page tarde. Affichée systématiquement, elle
+     clignoterait sur un chargement rapide — ce qui donne l'impression
+     inverse de celle recherchée. Sur ce site, sans image lourde, elle ne
+     devrait presque jamais se voir : c'est le but. */
+  (function chargement() {
+    const barre = document.createElement('div');
+    barre.className = 'chargement';
+    barre.setAttribute('aria-hidden', 'true');
+    document.body.appendChild(barre);
+
+    let minuteur = null;
+    const montrer = () => {
+      clearTimeout(minuteur);
+      minuteur = setTimeout(() => barre.classList.add('visible'), 420);
+    };
+    const cacher = () => { clearTimeout(minuteur); barre.classList.remove('visible'); };
+
+    // 1 — le premier affichage, s'il tarde.
+    if (document.readyState !== 'complete') {
+      montrer();
+      addEventListener('load', cacher, { once: true });
+    }
+
+    /* 2 — le passage d'une page à l'autre. C'est la seule attente réelle ici :
+       le site n'embarque aucune image ni police à télécharger, donc son
+       premier chargement est immédiat et la barre ne s'y verrait jamais —
+       alors que changer de page redemande un aller-retour au serveur, et
+       c'est précisément là qu'un visiteur en 4G faible reste sans réponse. */
+    addEventListener('click', e => {
+      if (e.defaultPrevented || e.button || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+      const a = e.target.closest && e.target.closest('a[href]');
+      if (!a || a.target === '_blank' || a.hasAttribute('download')) return;
+      const brut = a.getAttribute('href') || '';
+      if (/^(#|mailto:|tel:|javascript:)/i.test(brut)) return;
+      let u;
+      try { u = new URL(a.href, location.href); } catch { return; }
+      if (u.origin !== location.origin) return;
+      // Même document : une ancre, ou un lien du routeur du fichier unique.
+      // Rien ne part sur le réseau, la barre tournerait dans le vide.
+      if (u.pathname === location.pathname && u.search === location.search) return;
+      montrer();
+    }, true);
+
+    // Retour arrière : la page revient du cache telle qu'elle a été quittée,
+    // barre en cours comprise. On la coupe à l'arrivée comme au départ.
+    addEventListener('pageshow', e => { if (e.persisted) cacher(); });
+    addEventListener('pagehide', cacher);
+  })();
+
   if (document.readyState === 'complete') boot();
   else addEventListener('load', boot);
 })();
