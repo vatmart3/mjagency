@@ -94,18 +94,21 @@ Dans **Authentication → Sign In / Providers → Email** :
 
 Même si quelqu'un obtenait un compte, les règles d'accès ne s'ouvrent qu'aux adresses de la table `associates`. Un compte étranger ne voit rien et ne peut rien écrire, photos comprises.
 
-### 3. Créer les 2 comptes
+### 3. Créer les comptes
 
-**Authentication → Users → Add user → Create new user**, une fois pour chacun :
+La connexion se fait en deux temps : le **compte commun** de l'agence (`mjagency.officiel@gmail.com`) ouvre la porte, puis on choisit **Jérémy** ou **Matheis**. L'app bascule alors sur le compte personnel de l'associé choisi, pour que chacun ait ses propres chiffres. La session du compte commun est refermée aussitôt.
 
-| Email | Mot de passe | Auto Confirm User |
-|---|---|---|
-| l'adresse de Jérémy (identique à `associates`) | au choix, 12 caractères minimum | coché |
-| l'adresse de Matheis | au choix | coché |
+**Authentication → Users → Add user → Create new user**, trois fois, avec **le même mot de passe** et « Auto Confirm User » coché :
 
-Le profil (nom affiché, couleur) est créé automatiquement à la création du compte.
+| Email | Rôle |
+|---|---|
+| `mjagency.officiel@gmail.com` | compte commun, ouvre la porte |
+| `mjagency.officiel+jeremy@gmail.com` | Jérémy |
+| `mjagency.officiel+matheis@gmail.com` | Matheis |
 
-Pour ajouter une personne plus tard : `insert into public.associates values ('email@…', 'Prénom');`, puis créez son compte.
+Les trois adresses figurent dans `associates` (migrations `…_approche_init` et `…_approche_comptes_associes`). Le profil (nom affiché, couleur) est créé automatiquement à la création du compte. Pour changer le mot de passe, changez-le sur les trois comptes.
+
+Pour ajouter une personne plus tard : `insert into public.associates values ('mjagency.officiel+prenom@gmail.com', 'Prénom');`, puis créez son compte avec le même mot de passe. Elle apparaît d'elle-même dans le choix.
 
 ### 4. Brancher l'app
 
