@@ -1,6 +1,6 @@
 -- =====================================================================
 -- APPROCHE — seed de démonstration : 8 prospects fictifs sur le Bassin de Thau.
--- Facultatif. À exécuter APRÈS 0001_init.sql, dans Supabase → SQL Editor.
+-- Facultatif. À exécuter APRÈS les migrations, dans Supabase → SQL Editor.
 -- Les numéros (04 67 00 00 0X) et emails sont fictifs. Supprimez ces fiches
 -- avant de travailler pour de vrai :  delete from public.prospects where phone like '04 67 00 00 0%' or phone = '06 00 00 00 08';
 -- =====================================================================

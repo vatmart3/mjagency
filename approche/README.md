@@ -42,7 +42,8 @@ approche/
 ├── lib/                  données (Supabase ou démo), prompt.ts, report.ts, stats.ts, timing.ts…
 ├── store/                Zustand
 └── supabase/
-    ├── migrations/0001_init.sql   schéma complet + RLS + stockage + realtime
+    ├── migrations/               schéma complet + RLS + stockage + realtime (horodatées)
+    ├── config.toml              configuration (inscriptions fermées)
     └── seed.sql                   8 prospects fictifs (facultatif)
 ```
 
@@ -64,16 +65,24 @@ Pour tester le mode Duo en local, ouvrez deux onglets. L'un crée la session, l'
 
 ## Mise en service avec Supabase
 
+> **État actuel** : le projet Supabase **« approche »** (organisation MJAGENCY, Paris, réf. `glgczlkecncpivublwlu`) existe déjà, avec les deux migrations appliquées, et il est relié au dépôt GitHub. Les étapes ci-dessous servent à recréer un projet de zéro.
+
+### Intégration GitHub (branches Supabase)
+
+- **Supabase directory** (Project Settings → Integrations → GitHub) : `approche`, le dossier qui contient `supabase/`.
+- Branche de production : la branche par défaut du dépôt. Les migrations de `approche/supabase/migrations/` s'appliquent quand APPROCHE y est fusionnée. Les pull requests ouvrent une base de prévisualisation, remplie avec `seed.sql`.
+- Les noms des migrations reprennent l'historique du projet (`20260929075620_…`, `20260929075726_…`) : elles ne sont pas rejouées. Toute nouvelle migration se crée avec `npx supabase migration new <nom>`.
+
 ### 1. Créer le projet
 
 1. Sur [supabase.com](https://supabase.com), créez un projet (région : Europe, par exemple `eu-west-3` Paris).
-2. La table `associates` de `supabase/migrations/0001_init.sql` autorise `mjagency.officiel@gmail.com`. Pour donner à chacun son propre compte (et ses propres chiffres), ajoutez les adresses :
+2. La table `associates` de `supabase/migrations/20260929075620_approche_init.sql` autorise `mjagency.officiel@gmail.com`. Pour donner à chacun son propre compte (et ses propres chiffres), ajoutez les adresses :
    ```sql
    insert into public.associates (email, display_name) values
      ('jeremy@…', 'Jérémy'),
      ('matheis@…', 'Matheis');
    ```
-3. Dans **SQL Editor**, collez tout le fichier et lancez-le. On peut le relancer sans risque.
+3. Dans **SQL Editor**, collez les fichiers de `supabase/migrations/` dans l'ordre et lancez-les. On peut les relancer sans risque.
 4. *(Facultatif)* Lancez `supabase/seed.sql` pour avoir les 8 prospects de démonstration.
 
 ### 2. Fermer les inscriptions
