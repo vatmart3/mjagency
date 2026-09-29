@@ -17,6 +17,8 @@ import { runAnalysis } from "@/lib/analysis.server";
 
 export const runtime = "nodejs";
 export const maxDuration = 300;
+/** Au-delà, une analyse « en cours » a forcément été interrompue (la fonction est coupée à 300 s). */
+const ANALYSIS_STALE_MS = 330_000;
 
 async function authorized(): Promise<boolean> {
   if (!isSupabaseConfigured) {
@@ -64,7 +66,7 @@ export async function POST(req: Request) {
       const sb = await getServerSupabase();
       const { data: p } = await sb.from("prospects").select("id, analysis_status, analysis_at").eq("id", id).maybeSingle();
       if (!p) return NextResponse.json({ error: "Fiche introuvable." }, { status: 404 });
-      const running = p.analysis_status === "en_cours" && p.analysis_at && Date.now() - new Date(p.analysis_at).getTime() < 8 * 60_000;
+      const running = p.analysis_status === "en_cours" && p.analysis_at && Date.now() - new Date(p.analysis_at).getTime() < ANALYSIS_STALE_MS;
       if (running) return NextResponse.json({ started: false, running: true }, { status: 202 });
       await sb
         .from("prospects")

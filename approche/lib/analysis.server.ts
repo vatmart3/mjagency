@@ -66,8 +66,16 @@ function scriptBrief(p: Prospect, reportRaw: string, settings: SettingsData) {
     .join("\n");
 }
 
+/**
+ * Vercel coupe la fonction à 300 s. On garde de la marge : la recherche a
+ * 190 s au plus, le script le temps qui reste (sinon, assemblage automatique).
+ */
+const RESEARCH_BUDGET_MS = 190_000;
+const TOTAL_BUDGET_MS = 270_000;
+
 export async function runAnalysis(sb: SupabaseClient, prospectId: string, authorName?: string) {
   const client = claudeClient();
+  const startedAt = Date.now();
   try {
     const [{ data: p }, { data: inter }, { data: settingsRow }, { data: prompts }] = await Promise.all([
       sb.from("prospects").select("*").eq("id", prospectId).single(),
@@ -89,7 +97,7 @@ export async function runAnalysis(sb: SupabaseClient, prospectId: string, author
 
     // 2. Recherche approfondie
     await step(sb, prospectId, "Recherche sur le web");
-    const raw = await research(client, prompt);
+    const raw = await research(client, prompt, AbortSignal.timeout(RESEARCH_BUDGET_MS));
     const parsed = parseReport(raw);
     if (parsed.found.length < 3) throw new Error("Le rapport de recherche est inexploitable (titres manquants).");
     await sb.from("research_reports").insert({ prospect_id: prospectId, prompt_id: promptRow?.id ?? null, raw, parsed, source: "api" });
@@ -99,7 +107,9 @@ export async function runAnalysis(sb: SupabaseClient, prospectId: string, author
     const enriched = { ...prospect, intel: parsed };
     let scripts: { physique: ReturnType<typeof assembleScript>["steps"]; telephone: ReturnType<typeof assembleScript>["steps"] };
     try {
-      scripts = await writeScripts(client, scriptBrief(enriched, raw, settings));
+      const left = TOTAL_BUDGET_MS - (Date.now() - startedAt);
+      if (left < 15_000) throw new Error("Plus le temps de rédiger : assemblage automatique.");
+      scripts = await writeScripts(client, scriptBrief(enriched, raw, settings), AbortSignal.timeout(left));
     } catch {
       scripts = { physique: assembleScript(enriched, parsed, "physique").steps, telephone: assembleScript(enriched, parsed, "telephone").steps };
     }

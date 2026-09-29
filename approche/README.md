@@ -129,7 +129,7 @@ Avec `ANTHROPIC_API_KEY` (sur Vercel : **Settings → Environment Variables**, p
 2. recherche sur le web par Claude, rapport rangé dans l'onglet **Intel** ;
 3. rédaction d'un **script terrain et d'un script téléphone uniques** pour ce client, dans l'onglet **Script**. Le téléprompteur et le mode Appel les utilisent en priorité.
 
-Le travail tourne côté serveur (2 à 4 minutes) et l'avancement s'affiche en temps réel dans la fiche. On peut quitter la page. Le bouton **Refaire l'analyse** relance le tout après ajout d'informations.
+Le travail tourne côté serveur (1 à 2 minutes : 2 à 5 recherches web ciblées, puis le script ; jamais plus de 4 min 30, sinon la fiche le signale) et l'avancement s'affiche en temps réel dans la fiche. On peut quitter la page. Le bouton **Refaire l'analyse** relance le tout après ajout d'informations.
 
 Sans clé API, le même onglet **Script** se remplit dès qu'on colle le rapport obtenu via claude.ai ou ChatGPT : le script est alors assemblé automatiquement à partir des constats, questions et objections du rapport.
 

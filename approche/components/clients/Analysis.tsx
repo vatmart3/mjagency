@@ -39,6 +39,11 @@ export async function assembleAndSave(p: Prospect, existing: CustomScript[]) {
  * Bandeau d'analyse : se lance tout seul pour un nouveau client (si l'API est branchée),
  * suit l'avancement en temps réel et annonce quand le script est prêt.
  */
+/** Vrai tant qu'une analyse tourne réellement (le serveur la coupe au bout de 300 s). */
+export function analysisRunning(p: Prospect) {
+  return p.analysis_status === "en_cours" && Boolean(p.analysis_at) && Date.now() - new Date(p.analysis_at!).getTime() < 330_000;
+}
+
 export function AnalysisBanner({ prospect, autoStart, onDone }: { prospect: Prospect; autoStart: boolean; onDone: () => void }) {
   const ai = useAiStatus();
   const started = useRef(false);
@@ -72,7 +77,19 @@ export function AnalysisBanner({ prospect, autoStart, onDone }: { prospect: Pros
     prev.current = prospect.analysis_status;
   }, [prospect.analysis_status, onDone]);
 
-  const status = prospect.analysis_status;
+  // Chrono : le temps écoulé depuis le lancement, rafraîchi chaque seconde
+  const [now, setNow] = useState(() => Date.now());
+  useEffect(() => {
+    if (prospect.analysis_status !== "en_cours") return;
+    const t = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(t);
+  }, [prospect.analysis_status]);
+  const elapsed = prospect.analysis_at ? Math.max(0, Math.floor((now - new Date(prospect.analysis_at).getTime()) / 1000)) : 0;
+  // Le serveur coupe à 300 s : passé ce délai, l'analyse ne reviendra plus
+  const stale = prospect.analysis_status === "en_cours" && elapsed > 330;
+
+  const status = stale ? "erreur" : prospect.analysis_status;
+  const error = stale ? "elle s'est interrompue avant la fin." : prospect.analysis_error;
   if (!ai.analyse && status !== "en_cours") return null;
 
   const current = Math.max(0, STEPS.indexOf(prospect.analysis_step ?? ""));
@@ -83,6 +100,9 @@ export function AnalysisBanner({ prospect, autoStart, onDone }: { prospect: Pros
           <div className="flex items-center gap-3">
             <motion.span className="size-5 rounded-full border-2 border-white/30 border-t-white" animate={{ rotate: 360 }} transition={{ repeat: Infinity, duration: 0.9, ease: "linear" }} />
             <p className="text-[17px] font-semibold">Analyse approfondie en cours</p>
+            <span className="ml-auto font-mono text-[14px] tabular-nums text-white/60">
+              {Math.floor(elapsed / 60)}:{String(elapsed % 60).padStart(2, "0")}
+            </span>
           </div>
           <ol className="mt-4 space-y-2">
             {STEPS.map((s, i) => (
@@ -92,11 +112,11 @@ export function AnalysisBanner({ prospect, autoStart, onDone }: { prospect: Pros
               </li>
             ))}
           </ol>
-          <p className="mt-4 text-[13px] text-white/60">Compter 2 à 4 minutes. Vous pouvez quitter la page : le script sera rangé dans la fiche.</p>
+          <p className="mt-4 text-[13px] text-white/60">Environ 1 à 2 minutes. Vous pouvez quitter la page : le script sera rangé dans la fiche.</p>
         </motion.div>
       ) : status === "erreur" ? (
         <motion.div key="err" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="mt-8 flex flex-wrap items-center justify-between gap-3 rounded-2xl bg-signal/10 p-4">
-          <p className="text-[15px] text-signal">L&apos;analyse a échoué : {prospect.analysis_error ?? "erreur inconnue"}</p>
+          <p className="text-[15px] text-signal">L&apos;analyse a échoué : {error ?? "erreur inconnue"}</p>
           <Button size="sm" variant="danger" onClick={launch} disabled={busy}>
             Relancer
           </Button>
@@ -141,7 +161,7 @@ export function ProspectScriptsPanel({ prospect, goPrompt }: { prospect: Prospec
         {ai.analyse ? (
           <>
             <p>Lancez l&apos;analyse approfondie : Claude cherche sur le web puis écrit un script terrain et un script téléphone pour ce client.</p>
-            <Button className="mt-4" onClick={relaunch} disabled={busy || prospect.analysis_status === "en_cours"}>
+            <Button className="mt-4" onClick={relaunch} disabled={busy || analysisRunning(prospect)}>
               <Icon name="sparkle" size={16} /> Analyse approfondie
             </Button>
           </>
@@ -191,7 +211,7 @@ export function ProspectScriptsPanel({ prospect, goPrompt }: { prospect: Prospec
             <Icon name="edit" size={14} /> Modifier
           </Button>
           {ai.analyse ? (
-            <Button size="sm" variant="quiet" onClick={relaunch} disabled={busy || prospect.analysis_status === "en_cours"}>
+            <Button size="sm" variant="quiet" onClick={relaunch} disabled={busy || analysisRunning(prospect)}>
               <Icon name="sparkle" size={14} /> Refaire l&apos;analyse
             </Button>
           ) : (

@@ -11,7 +11,7 @@ import { parseReport } from "@/lib/report";
 import { useSettings } from "@/lib/settings";
 import { useSession } from "@/lib/session";
 import { aiCall, startAnalysis, useAiStatus } from "@/lib/ai";
-import { assembleAndSave, useProspectScripts } from "@/components/clients/Analysis";
+import { analysisRunning, assembleAndSave, useProspectScripts } from "@/components/clients/Analysis";
 import { frDate, frTime } from "@/lib/format";
 import type { Prospect } from "@/lib/types";
 
@@ -104,7 +104,7 @@ export function PromptPanel({ prospect, onReport }: { prospect: Prospect; onRepo
       // Avec Supabase : analyse complète en arrière-plan (rapport + script sur mesure)
       if (ai.analyse) {
         await startAnalysis(prospect.id);
-        toast("Analyse lancée", "Rapport et script sur mesure arrivent dans 2 à 4 minutes.");
+        toast("Analyse lancée", "Rapport et script sur mesure arrivent dans 1 à 2 minutes.");
         return;
       }
       const { text } = await aiCall<{ text: string }>({ mode: "research", prompt: current.prompt });
@@ -174,9 +174,9 @@ export function PromptPanel({ prospect, onReport }: { prospect: Prospect; onRepo
             Ouvrir ChatGPT <Icon name="external" size={16} />
           </a>
           {ai.enabled && (
-            <Button variant="ink" onClick={runHere} disabled={!current || running || prospect.analysis_status === "en_cours"}>
+            <Button variant="ink" onClick={runHere} disabled={!current || running || analysisRunning(prospect)}>
               <Icon name="sparkle" size={18} />{" "}
-              {prospect.analysis_status === "en_cours" ? "Analyse en cours…" : running ? "Recherche en cours (1 à 3 min)…" : ai.analyse ? "Analyse approfondie + script" : "Lancer la recherche ici"}
+              {analysisRunning(prospect) ? "Analyse en cours…" : running ? "Recherche en cours (1 à 3 min)…" : ai.analyse ? "Analyse approfondie + script" : "Lancer la recherche ici"}
             </Button>
           )}
         </div>

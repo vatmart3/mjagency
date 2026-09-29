@@ -20,6 +20,8 @@ export function claudeClient() {
 
 /** Message d'erreur lisible dans la fiche client. */
 export function aiErrorMessage(err: unknown) {
+  if (err instanceof Anthropic.APIUserAbortError || err instanceof Anthropic.APIConnectionTimeoutError)
+    return "La recherche a pris trop de temps : relancez l'analyse (ajouter le site web ou l'Instagram du commerce l'accélère).";
   if (err instanceof Anthropic.AuthenticationError) return "Clé API refusée : vérifiez ANTHROPIC_API_KEY sur Vercel (elle commence par sk-ant-).";
   if (err instanceof Anthropic.PermissionDeniedError) return "Cette clé API n'a pas accès au modèle demandé.";
   if (err instanceof Anthropic.RateLimitError) return "Trop de requêtes d'un coup : relancez l'analyse dans une minute.";
@@ -43,27 +45,32 @@ export function textOf(content: Anthropic.Beta.BetaContentBlock[]) {
     .trim();
 }
 
-/** Recherche approfondie avec recherche web ; reprend le tour si l'API le met en pause. */
-export async function research(client: Anthropic, prompt: string): Promise<string> {
+/** Consignes de rythme : l'analyse doit tenir en une à deux minutes. */
+const RESEARCH_SYSTEM =
+  "Tu prépares une visite de prospection qui a lieu aujourd'hui : va à l'essentiel. Fais 2 à 5 recherches web ciblées (fiche Google, site, réseaux sociaux, avis), sans t'attarder, puis rédige. Rapport dense : quelques puces factuelles par section, aucune répétition, aucune introduction ni conclusion. Respecte exactement les titres de sections demandés.";
+
+/** Recherche sur le web ; reprend le tour si l'API le met en pause. `signal` coupe au-delà du temps imparti. */
+export async function research(client: Anthropic, prompt: string, signal?: AbortSignal): Promise<string> {
   const messages: Anthropic.Beta.BetaMessageParam[] = [{ role: "user", content: prompt }];
   let final: Anthropic.Beta.BetaMessage | null = null;
   for (let turn = 0; turn < 4; turn++) {
     const stream = client.beta.messages.stream({
       model: MODEL,
-      max_tokens: 32000,
+      max_tokens: 16000,
       thinking: { type: "adaptive" },
-      output_config: { effort: "high" },
+      output_config: { effort: "medium" },
+      system: RESEARCH_SYSTEM,
       tools: [
         {
           type: "web_search_20260209",
           name: "web_search",
-          max_uses: 15,
+          max_uses: 5,
           user_location: { type: "approximate", city: "Sète", region: "Occitanie", country: "FR", timezone: "Europe/Paris" },
         },
       ],
       messages,
       ...FALLBACK,
-    } as unknown as Anthropic.Beta.MessageCreateParamsStreaming);
+    } as unknown as Anthropic.Beta.MessageCreateParamsStreaming, { signal });
     final = await stream.finalMessage();
     if (final.stop_reason !== "pause_turn") break;
     messages.push({ role: "assistant", content: final.content as Anthropic.Beta.BetaContentBlockParam[] });
@@ -108,17 +115,17 @@ const toSteps = (raw: RawStep[], prefix: string): ScriptStep[] =>
     }));
 
 /** Rédige les deux scripts sur mesure (terrain + téléphone) en JSON structuré. */
-export async function writeScripts(client: Anthropic, brief: string): Promise<{ physique: ScriptStep[]; telephone: ScriptStep[] }> {
+export async function writeScripts(client: Anthropic, brief: string, signal?: AbortSignal): Promise<{ physique: ScriptStep[]; telephone: ScriptStep[] }> {
   const stream = client.beta.messages.stream({
     model: MODEL,
-    max_tokens: 16000,
+    max_tokens: 8000,
     thinking: { type: "adaptive" },
-    output_config: { effort: "high", format: { type: "json_schema", schema: SCRIPT_SCHEMA } },
+    output_config: { effort: "low", format: { type: "json_schema", schema: SCRIPT_SCHEMA } },
     system:
       "Tu es le directeur commercial de MJAGENCY, agence web et marketing digital de Sète. Tu écris des scripts de prospection oraux, en français, au vouvoiement, pour Jérémy et Matheis. Chaque réplique est une phrase qu'on dit vraiment à voix haute à ce commerçant précis : courte, naturelle, sans jargon marketing, sans flatterie creuse, sans fausse urgence ni statistique inventée.",
     messages: [{ role: "user", content: brief }],
     ...FALLBACK,
-  } as unknown as Anthropic.Beta.MessageCreateParamsStreaming);
+  } as unknown as Anthropic.Beta.MessageCreateParamsStreaming, { signal });
   const msg = await stream.finalMessage();
   if (msg.stop_reason === "refusal") throw new Error("La rédaction du script a été refusée par le modèle.");
   const text = textOf(msg.content);
