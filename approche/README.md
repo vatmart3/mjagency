@@ -65,7 +65,7 @@ Pour tester le mode Duo en local, ouvrez deux onglets. L'un crée la session, l'
 
 ## Mise en service avec Supabase
 
-> **État actuel** : le projet Supabase **« approche »** (organisation MJAGENCY, Paris, réf. `glgczlkecncpivublwlu`) existe déjà, avec les deux migrations appliquées, et il est relié au dépôt GitHub. Les étapes ci-dessous servent à recréer un projet de zéro.
+> **État actuel** : le projet Supabase **« approche »** (organisation MJAGENCY, Paris, réf. `glgczlkecncpivublwlu`) existe déjà, avec les deux migrations appliquées, et il est relié au dépôt GitHub. L'app est déployée par un projet Vercel dédié (Root Directory `approche`, branche de production `claude/funny-keller-rgmjgv`). Les étapes ci-dessous servent à recréer un projet de zéro.
 
 ### Intégration GitHub (branches Supabase)
 
