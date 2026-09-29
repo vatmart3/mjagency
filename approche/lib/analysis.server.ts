@@ -6,13 +6,12 @@
  * L'avancement est écrit dans prospects.analysis_status / analysis_step :
  * l'interface le suit en temps réel, même si l'utilisateur change de page.
  */
-import Anthropic from "@anthropic-ai/sdk";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { buildResearchPrompt } from "@/lib/prompt";
 import { parseReport } from "@/lib/report";
 import { assembleScript } from "@/lib/customScript";
 import { mergeSettings, pricingOfOffers } from "@/lib/settings-core";
-import { research, writeScripts } from "@/lib/claude.server";
+import { aiErrorMessage, claudeClient, research, writeScripts } from "@/lib/claude.server";
 import { getSector } from "@/content/sectors";
 import { profileById } from "@/content/profiles";
 import type { Interaction, Prospect, SettingsData } from "@/lib/types";
@@ -68,7 +67,7 @@ function scriptBrief(p: Prospect, reportRaw: string, settings: SettingsData) {
 }
 
 export async function runAnalysis(sb: SupabaseClient, prospectId: string, authorName?: string) {
-  const client = new Anthropic();
+  const client = claudeClient();
   try {
     const [{ data: p }, { data: inter }, { data: settingsRow }, { data: prompts }] = await Promise.all([
       sb.from("prospects").select("*").eq("id", prospectId).single(),
@@ -114,7 +113,7 @@ export async function runAnalysis(sb: SupabaseClient, prospectId: string, author
   } catch (err) {
     await sb
       .from("prospects")
-      .update({ analysis_status: "erreur", analysis_step: null, analysis_error: (err as Error).message.slice(0, 300) })
+      .update({ analysis_status: "erreur", analysis_step: null, analysis_error: aiErrorMessage(err).slice(0, 300) })
       .eq("id", prospectId);
   }
 }

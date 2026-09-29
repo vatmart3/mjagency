@@ -12,7 +12,7 @@ import Anthropic from "@anthropic-ai/sdk";
 import { after, NextResponse } from "next/server";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
 import { getServerSupabase } from "@/lib/supabase/server";
-import { aiEnabled, MODEL, research, textOf } from "@/lib/claude.server";
+import { aiEnabled, aiErrorMessage, claudeClient, MODEL, research, textOf } from "@/lib/claude.server";
 import { runAnalysis } from "@/lib/analysis.server";
 
 export const runtime = "nodejs";
@@ -54,7 +54,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Requête invalide." }, { status: 400 });
   }
 
-  const client = new Anthropic();
+  const client = claudeClient();
 
   try {
     if (body.mode === "analyse") {
@@ -103,8 +103,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Mode inconnu." }, { status: 400 });
   } catch (err) {
     if (err instanceof Anthropic.RateLimitError) return NextResponse.json({ error: "Trop de requêtes, réessayez dans une minute." }, { status: 429 });
-    if (err instanceof Anthropic.AuthenticationError) return NextResponse.json({ error: "Clé API invalide." }, { status: 500 });
-    if (err instanceof Anthropic.APIError) return NextResponse.json({ error: `Erreur API (${err.status ?? "?"}) : ${err.message}` }, { status: 502 });
+    if (err instanceof Anthropic.APIError) return NextResponse.json({ error: aiErrorMessage(err) }, { status: 502 });
     return NextResponse.json({ error: (err as Error).message }, { status: 500 });
   }
 }

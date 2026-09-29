@@ -137,7 +137,7 @@ Sans clé API, le même onglet **Script** se remplit dès qu'on colle le rapport
 
 Ajoutez `ANTHROPIC_API_KEY=sk-ant-…` pour activer :
 
-- **Lancer la recherche ici** sur un dossier client (modèle `claude-opus-5` avec recherche web, compter 1 à 3 minutes) ;
+- **Lancer la recherche ici** sur un dossier client (modèle `claude-opus-5-5` avec recherche web, compter 1 à 3 minutes) ;
 - le **Prospect IA** en salle d'entraînement.
 
 La route `/api/ai` vérifie la session Supabase et l'appartenance à `associates` avant chaque appel. Si la requête est déclinée par un filtre de sécurité, le repli serveur (`fallbacks: "default"`) relance automatiquement la même requête sur un autre modèle. Sans clé, rien ne casse : les boutons « Copier le prompt », « Ouvrir Claude » et « Ouvrir ChatGPT » suffisent.

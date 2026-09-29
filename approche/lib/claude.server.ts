@@ -4,8 +4,33 @@
 import Anthropic from "@anthropic-ai/sdk";
 import type { ScriptStep } from "@/content/types";
 
-export const MODEL = process.env.ANTHROPIC_MODEL || "claude-opus-5";
-export const aiEnabled = () => Boolean(process.env.ANTHROPIC_API_KEY);
+export const MODEL = process.env.ANTHROPIC_MODEL || "claude-opus-5-5";
+
+/** La clé telle que collée dans Vercel, débarrassée d'éventuels espaces, guillemets ou texte autour. */
+function apiKey() {
+  const raw = process.env.ANTHROPIC_API_KEY ?? "";
+  return raw.match(/sk-ant-[\w-]+/)?.[0] ?? raw.trim();
+}
+export const aiEnabled = () => Boolean(apiKey());
+
+/** Client unique : clé nettoyée, et quelques relances de plus en cas d'indisponibilité passagère. */
+export function claudeClient() {
+  return new Anthropic({ apiKey: apiKey(), maxRetries: 4 });
+}
+
+/** Message d'erreur lisible dans la fiche client. */
+export function aiErrorMessage(err: unknown) {
+  if (err instanceof Anthropic.AuthenticationError) return "Clé API refusée : vérifiez ANTHROPIC_API_KEY sur Vercel (elle commence par sk-ant-).";
+  if (err instanceof Anthropic.PermissionDeniedError) return "Cette clé API n'a pas accès au modèle demandé.";
+  if (err instanceof Anthropic.RateLimitError) return "Trop de requêtes d'un coup : relancez l'analyse dans une minute.";
+  if (err instanceof Anthropic.APIError) {
+    const msg = err.message ?? "";
+    if (err.status === 402 || /credit balance|billing/i.test(msg)) return "Crédits API épuisés : rechargez le compte sur la console Claude, puis relancez l'analyse.";
+    if ((err.status ?? 0) >= 500) return `Service Claude momentanément indisponible (${err.status}) : relancez l'analyse dans quelques minutes.`;
+    return `Erreur API (${err.status ?? "?"}) : ${msg}`;
+  }
+  return (err as Error)?.message ?? String(err);
+}
 
 /** Repli automatique vers un autre modèle si la requête est déclinée par un filtre de sécurité. */
 const FALLBACK = { betas: ["server-side-fallback-2026-07-01"], fallbacks: "default" } as const;
