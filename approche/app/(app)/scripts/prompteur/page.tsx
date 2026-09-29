@@ -9,7 +9,7 @@ import { getSector } from "@/content/sectors";
 import { phoneScripts } from "@/content/phone-method";
 import type { Channel } from "@/content/types";
 import { useTable } from "@/lib/data/hooks";
-import { effectiveScript, stepsToSections, type PrompterSection } from "@/lib/scripts";
+import { effectiveScript, prospectScript, stepsToSections, type PrompterSection } from "@/lib/scripts";
 import { useSession } from "@/lib/session";
 import { fillPlaceholders } from "@/lib/format";
 import { useRouter } from "next/navigation";
@@ -37,6 +37,9 @@ function Prompteur() {
       const c = customs.find((x) => x.id === customId);
       return c ? { title: c.title, sections: stepsToSections(c.steps) } : { title: "", sections: [] };
     }
+    // Client avec un script sur mesure : c'est lui qu'on lit
+    const own = prospectScript(prospect?.id, channel, customs);
+    if (own) return { title: `${prospect!.name} · sur mesure`, sections: stepsToSections(own.steps) };
     const out: PrompterSection[] = [];
     if (prospect?.intel?.accroche) out.push({ title: "Accroche personnalisée", lines: [prospect.intel.accroche] });
     if (prospect?.intel?.questions?.length) out.push({ title: "Questions à poser", lines: prospect.intel.questions });

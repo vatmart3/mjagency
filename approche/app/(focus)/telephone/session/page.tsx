@@ -12,7 +12,7 @@ import { phoneScripts, outcomes, type CallOutcome } from "@/content/phone-method
 import { getSector, sectorLabel } from "@/content/sectors";
 import { profileById } from "@/content/profiles";
 import { db, useTable } from "@/lib/data/hooks";
-import { effectiveScript, stepsToSections, type PrompterSection } from "@/lib/scripts";
+import { effectiveScript, prospectScript, stepsToSections, type PrompterSection } from "@/lib/scripts";
 import { useSession } from "@/lib/session";
 import { useSettings } from "@/lib/settings";
 import { callsToNextRdv, computeStats } from "@/lib/stats";
@@ -70,9 +70,14 @@ export default function CallMode() {
     if (!current) return [];
     const sector = getSector(current.sector);
     const out: PrompterSection[] = [];
-    if (current.hook) out.push({ title: "Accroche perso", lines: [current.hook] });
-    if (sector) out.push(...stepsToSections(effectiveScript(sector, "telephone", customs).script.steps));
-    else {
+    // Priorité au script sur mesure du client, sinon script du secteur (ou générique)
+    const own = prospectScript(current.id, "telephone", customs);
+    if (own) out.push(...stepsToSections(own.steps));
+    else if (sector) {
+      if (current.hook) out.push({ title: "Accroche perso", lines: [current.hook] });
+      out.push(...stepsToSections(effectiveScript(sector, "telephone", customs).script.steps));
+    } else {
+      if (current.hook) out.push({ title: "Accroche perso", lines: [current.hook] });
       const o = phoneScripts.find((p) => p.id === "ouverture");
       const r = phoneScripts.find((p) => p.id === "prise-rdv");
       [o, r].forEach((x) => x && out.push({ title: x.title, lines: x.lines, tip: x.tip }));

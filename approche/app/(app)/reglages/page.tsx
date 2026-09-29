@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { Button, ButtonLink } from "@/components/ui/Button";
 import { Icon } from "@/components/ui/Icon";
 import { Chip, Field, PageHeader, SectionTitle, Tag } from "@/components/ui/primitives";
+import { NumberInput } from "@/components/ui/NumberInput";
 import { toast } from "@/components/ui/Toast";
 import { DEFAULT_OFFERS, pricingSummary, type Offer } from "@/content/offers";
 import { SECTORS } from "@/content/sectors";
@@ -65,16 +66,16 @@ export default function Settings() {
           <SectionTitle kicker="Objectifs" title="Ce qu'on vise" />
           <div className="grid gap-4 md:grid-cols-3">
             <Field label="Objectif mensuel par personne (€)">
-              <input className="field" inputMode="numeric" value={draft.goalPerPerson} onChange={(e) => set({ goalPerPerson: Number(e.target.value) || 0 })} />
+              <NumberInput value={draft.goalPerPerson} min={0} onChange={(n) => set({ goalPerPerson: n ?? 0 })} />
             </Field>
             <Field label="Panier moyen par défaut (€)" hint="Utilisé tant qu'il y a moins de 2 signatures.">
-              <input className="field" inputMode="numeric" value={draft.defaultBasket} onChange={(e) => set({ defaultBasket: Number(e.target.value) || 0 })} />
+              <NumberInput value={draft.defaultBasket} min={0} onChange={(n) => set({ defaultBasket: n ?? 0 })} />
             </Field>
             <Field label="Jours de prospection par semaine">
-              <input className="field" inputMode="numeric" value={draft.workingDaysPerWeek} onChange={(e) => set({ workingDaysPerWeek: Math.max(1, Math.min(7, Number(e.target.value) || 5)) })} />
+              <NumberInput value={draft.workingDaysPerWeek} min={1} max={7} onChange={(n) => set({ workingDaysPerWeek: n ?? 5 })} />
             </Field>
             <Field label="Durée d'une session d'appels (min)">
-              <input className="field" inputMode="numeric" value={draft.callSessionMinutes} onChange={(e) => set({ callSessionMinutes: Number(e.target.value) || 45 })} />
+              <NumberInput value={draft.callSessionMinutes} min={5} max={240} onChange={(n) => set({ callSessionMinutes: n ?? 45 })} />
             </Field>
           </div>
           <p className="kicker mt-8">Taux par défaut (avant d&apos;avoir assez d&apos;historique)</p>
@@ -88,11 +89,11 @@ export default function Settings() {
               ] as const
             ).map(([k, label]) => (
               <Field key={k} label={`${label} (%)`}>
-                <input
-                  className="field"
-                  inputMode="numeric"
+                <NumberInput
                   value={Math.round(draft.defaultRates[k] * 100)}
-                  onChange={(e) => set({ defaultRates: { ...draft.defaultRates, [k]: Math.max(1, Math.min(100, Number(e.target.value) || 1)) / 100 } })}
+                  min={1}
+                  max={100}
+                  onChange={(n) => n !== null && set({ defaultRates: { ...draft.defaultRates, [k]: n / 100 } })}
                 />
               </Field>
             ))}
@@ -127,7 +128,6 @@ export default function Settings() {
 function Offers({ offers, onChange }: { offers: Offer[]; onChange: (o: Offer[]) => void }) {
   const [open, setOpen] = useState<string | null>(null);
   const upd = (id: string, fn: (o: Offer) => Offer) => onChange(offers.map((o) => (o.id === id ? fn(o) : o)));
-  const n = (v: string) => Math.max(0, Number(v.replace(",", ".")) || 0);
   return (
     <section>
       <SectionTitle kicker="Catalogue" title="Offres et prix">
@@ -149,7 +149,7 @@ function Offers({ offers, onChange }: { offers: Offer[]; onChange: (o: Offer[]) 
                 >
                   {o.pricing.direct && (
                     <Field label="Prix (€)">
-                      <input className="field" inputMode="decimal" value={o.pricing.direct.price} onChange={(e) => upd(o.id, (x) => ({ ...x, pricing: { ...x.pricing, direct: { price: n(e.target.value) } } }))} />
+                      <NumberInput decimal value={o.pricing.direct.price} min={0} onChange={(v) => upd(o.id, (x) => ({ ...x, pricing: { ...x.pricing, direct: { price: (v ?? 0) } } }))} />
                     </Field>
                   )}
                 </Formula>
@@ -161,10 +161,10 @@ function Offers({ offers, onChange }: { offers: Offer[]; onChange: (o: Offer[]) 
                   {o.pricing.abonnement && (
                     <div className="grid grid-cols-2 gap-2">
                       <Field label="€/mois">
-                        <input className="field" inputMode="decimal" value={o.pricing.abonnement.monthly} onChange={(e) => upd(o.id, (x) => ({ ...x, pricing: { ...x.pricing, abonnement: { ...x.pricing.abonnement!, monthly: n(e.target.value) } } }))} />
+                        <NumberInput decimal value={o.pricing.abonnement.monthly} min={0} onChange={(v) => upd(o.id, (x) => ({ ...x, pricing: { ...x.pricing, abonnement: { ...x.pricing.abonnement!, monthly: (v ?? 0) } } }))} />
                       </Field>
                       <Field label="Durée (mois)">
-                        <input className="field" inputMode="numeric" value={o.pricing.abonnement.months} onChange={(e) => upd(o.id, (x) => ({ ...x, pricing: { ...x.pricing, abonnement: { ...x.pricing.abonnement!, months: n(e.target.value) } } }))} />
+                        <NumberInput value={o.pricing.abonnement.months} min={0} onChange={(v) => upd(o.id, (x) => ({ ...x, pricing: { ...x.pricing, abonnement: { ...x.pricing.abonnement!, months: (v ?? 0) } } }))} />
                       </Field>
                     </div>
                   )}
@@ -177,13 +177,13 @@ function Offers({ offers, onChange }: { offers: Offer[]; onChange: (o: Offer[]) 
                   {o.pricing.mixte && (
                     <div className="grid grid-cols-3 gap-2">
                       <Field label="Acompte">
-                        <input className="field" inputMode="decimal" value={o.pricing.mixte.upfront} onChange={(e) => upd(o.id, (x) => ({ ...x, pricing: { ...x.pricing, mixte: { ...x.pricing.mixte!, upfront: n(e.target.value) } } }))} />
+                        <NumberInput decimal value={o.pricing.mixte.upfront} min={0} onChange={(v) => upd(o.id, (x) => ({ ...x, pricing: { ...x.pricing, mixte: { ...x.pricing.mixte!, upfront: (v ?? 0) } } }))} />
                       </Field>
                       <Field label="€/mois">
-                        <input className="field" inputMode="decimal" value={o.pricing.mixte.monthly} onChange={(e) => upd(o.id, (x) => ({ ...x, pricing: { ...x.pricing, mixte: { ...x.pricing.mixte!, monthly: n(e.target.value) } } }))} />
+                        <NumberInput decimal value={o.pricing.mixte.monthly} min={0} onChange={(v) => upd(o.id, (x) => ({ ...x, pricing: { ...x.pricing, mixte: { ...x.pricing.mixte!, monthly: (v ?? 0) } } }))} />
                       </Field>
                       <Field label="Mois">
-                        <input className="field" inputMode="numeric" value={o.pricing.mixte.months} onChange={(e) => upd(o.id, (x) => ({ ...x, pricing: { ...x.pricing, mixte: { ...x.pricing.mixte!, months: n(e.target.value) } } }))} />
+                        <NumberInput value={o.pricing.mixte.months} min={0} onChange={(v) => upd(o.id, (x) => ({ ...x, pricing: { ...x.pricing, mixte: { ...x.pricing.mixte!, months: (v ?? 0) } } }))} />
                       </Field>
                     </div>
                   )}

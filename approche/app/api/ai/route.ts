@@ -4,19 +4,19 @@
  * répond { enabled: false } et l'interface propose le copier-coller vers
  * claude.ai / ChatGPT à la place. Toute l'app fonctionne sans.
  *
- * POST { mode: "research", prompt }                 → rapport de recherche (avec recherche web)
- * POST { mode: "chat", system, messages[] }         → réplique du prospect IA (entraînement)
+ * POST { mode: "analyse", prospectId }          → analyse complète en arrière-plan (recherche web + script sur mesure)
+ * POST { mode: "research", prompt }             → rapport de recherche (avec recherche web)
+ * POST { mode: "chat", system, messages[] }     → réplique du prospect IA (entraînement)
  */
 import Anthropic from "@anthropic-ai/sdk";
-import { NextResponse } from "next/server";
+import { after, NextResponse } from "next/server";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
 import { getServerSupabase } from "@/lib/supabase/server";
+import { aiEnabled, MODEL, research, textOf } from "@/lib/claude.server";
+import { runAnalysis } from "@/lib/analysis.server";
 
 export const runtime = "nodejs";
 export const maxDuration = 300;
-
-const MODEL = process.env.ANTHROPIC_MODEL || "claude-opus-5";
-const enabled = () => Boolean(process.env.ANTHROPIC_API_KEY);
 
 async function authorized(): Promise<boolean> {
   if (!isSupabaseConfigured) {
@@ -31,27 +31,20 @@ async function authorized(): Promise<boolean> {
 }
 
 export async function GET() {
-  return NextResponse.json({ enabled: enabled(), model: enabled() ? MODEL : null });
+  return NextResponse.json({ enabled: aiEnabled(), analyse: aiEnabled() && isSupabaseConfigured, model: aiEnabled() ? MODEL : null });
 }
 
 type ChatMessage = { role: "user" | "assistant"; content: string };
 interface Body {
-  mode: "research" | "chat";
+  mode: "analyse" | "research" | "chat";
+  prospectId?: string;
   prompt?: string;
   system?: string;
   messages?: ChatMessage[];
 }
 
-function textOf(content: Anthropic.Beta.BetaContentBlock[]) {
-  return content
-    .filter((b): b is Anthropic.Beta.BetaTextBlock => b.type === "text")
-    .map((b) => b.text)
-    .join("")
-    .trim();
-}
-
 export async function POST(req: Request) {
-  if (!enabled()) return NextResponse.json({ error: "Aucune clé API configurée." }, { status: 404 });
+  if (!aiEnabled()) return NextResponse.json({ error: "Aucune clé API configurée." }, { status: 404 });
   if (!(await authorized())) return NextResponse.json({ error: "Non autorisé." }, { status: 401 });
 
   let body: Body;
@@ -64,30 +57,30 @@ export async function POST(req: Request) {
   const client = new Anthropic();
 
   try {
+    if (body.mode === "analyse") {
+      if (!isSupabaseConfigured) return NextResponse.json({ error: "L'analyse automatique nécessite Supabase." }, { status: 400 });
+      const id = body.prospectId;
+      if (!id) return NextResponse.json({ error: "Client manquant." }, { status: 400 });
+      const sb = await getServerSupabase();
+      const { data: p } = await sb.from("prospects").select("id, analysis_status, analysis_at").eq("id", id).maybeSingle();
+      if (!p) return NextResponse.json({ error: "Fiche introuvable." }, { status: 404 });
+      const running = p.analysis_status === "en_cours" && p.analysis_at && Date.now() - new Date(p.analysis_at).getTime() < 8 * 60_000;
+      if (running) return NextResponse.json({ started: false, running: true }, { status: 202 });
+      await sb
+        .from("prospects")
+        .update({ analysis_status: "en_cours", analysis_step: "Préparation du prompt", analysis_error: null, analysis_at: new Date().toISOString() })
+        .eq("id", id);
+      const { data: auth } = await sb.auth.getUser();
+      const { data: profile } = auth.user ? await sb.from("profiles").select("display_name").eq("id", auth.user.id).maybeSingle() : { data: null };
+      // Le travail continue après la réponse : l'interface suit l'avancement en temps réel.
+      after(() => runAnalysis(sb, id, profile?.display_name ?? undefined));
+      return NextResponse.json({ started: true }, { status: 202 });
+    }
+
     if (body.mode === "research") {
       if (!body.prompt || body.prompt.length > 60_000) return NextResponse.json({ error: "Prompt manquant ou trop long." }, { status: 400 });
-      const messages: Anthropic.Beta.BetaMessageParam[] = [{ role: "user", content: body.prompt }];
-      let final: Anthropic.Beta.BetaMessage | null = null;
-      // La recherche web tourne côté serveur ; on reprend si l'API met le tour en pause.
-      for (let turn = 0; turn < 4; turn++) {
-        const stream = client.beta.messages.stream({
-          model: MODEL,
-          max_tokens: 32000,
-          thinking: { type: "adaptive" },
-          output_config: { effort: "high" },
-          betas: ["server-side-fallback-2026-07-01"],
-          tools: [{ type: "web_search_20260209", name: "web_search", max_uses: 15, user_location: { type: "approximate", city: "Sète", region: "Occitanie", country: "FR", timezone: "Europe/Paris" } }],
-          messages,
-          // Repli automatique sur un autre modèle si la requête est déclinée par un filtre de sécurité.
-          fallbacks: "default",
-        } as unknown as Anthropic.Beta.MessageCreateParamsStreaming);
-        final = await stream.finalMessage();
-        if (final.stop_reason !== "pause_turn") break;
-        messages.push({ role: "assistant", content: final.content as Anthropic.Beta.BetaContentBlockParam[] });
-      }
-      if (!final) throw new Error("Aucune réponse.");
-      if (final.stop_reason === "refusal") return NextResponse.json({ error: "La recherche a été refusée par le modèle." }, { status: 422 });
-      return NextResponse.json({ text: textOf(final.content), model: final.model });
+      const text = await research(client, body.prompt);
+      return NextResponse.json({ text, model: MODEL });
     }
 
     if (body.mode === "chat") {

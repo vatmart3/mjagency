@@ -11,6 +11,7 @@ import { celebrate, toast } from "@/components/ui/Toast";
 import { Dossier } from "@/components/clients/Dossier";
 import { PromptPanel } from "@/components/clients/PromptPanel";
 import { HistoryPanel, IntelPanel, PhotosPanel } from "@/components/clients/Panels";
+import { AnalysisBanner, ProspectScriptsPanel } from "@/components/clients/Analysis";
 import { ProspectForm } from "@/components/clients/ProspectForm";
 import { DebriefForm } from "@/components/DebriefForm";
 import { db, useTable } from "@/lib/data/hooks";
@@ -22,7 +23,7 @@ import { profileById } from "@/content/profiles";
 import { slotVerdict, VERDICT_LABEL } from "@/lib/timing";
 import { IS_ARTIFACT } from "@/lib/target";
 
-type Tab = "fiche" | "intel" | "prompt" | "historique" | "photos";
+type Tab = "fiche" | "script" | "intel" | "prompt" | "historique" | "photos";
 
 function DossierPage() {
   const { id } = useParams<{ id: string }>();
@@ -31,7 +32,7 @@ function DossierPage() {
   const { rows, loading } = useTable("prospects");
   const { me, nameOf } = useSession();
   const p = rows.find((r) => r.id === id);
-  const [tab, setTab] = useState<Tab>(search.get("nouveau") ? "prompt" : "fiche");
+  const [tab, setTab] = useState<Tab>(search.get("nouveau") ? "script" : "fiche");
   const [editing, setEditing] = useState(false);
   const [debrief, setDebrief] = useState(false);
 
@@ -139,6 +140,8 @@ function DossierPage() {
             ))}
           </div>
 
+          <AnalysisBanner prospect={p} autoStart={!!search.get("nouveau")} onDone={() => setTab("script")} />
+
           {p.hook && tab !== "intel" && (
             <button onClick={() => setTab("intel")} className="mt-8 block w-full rounded-2xl bg-blue-soft p-5 text-left">
               <p className="kicker text-blue">Accroche personnalisée</p>
@@ -152,6 +155,7 @@ function DossierPage() {
               onChange={setTab}
               options={[
                 { value: "fiche", label: "Fiche" },
+                { value: "script", label: "Script" },
                 { value: "intel", label: "Intel" },
                 { value: "prompt", label: "Prompt" },
                 { value: "historique", label: "Historique" },
@@ -166,6 +170,7 @@ function DossierPage() {
             {tab === "prompt" && <PromptPanel prospect={p} onReport={() => setTab("intel")} />}
             {tab === "historique" && <HistoryPanel prospect={p} />}
             {tab === "photos" && <PhotosPanel prospect={p} />}
+            {tab === "script" && <ProspectScriptsPanel prospect={p} goPrompt={() => setTab("prompt")} />}
           </div>
         </div>
       </Dossier>

@@ -71,6 +71,11 @@ export interface Prospect {
   lng: number | null;
   hook: string | null;
   intel: ParsedReport | null;
+  /** Analyse automatique (recherche web + script sur mesure) */
+  analysis_status?: "en_cours" | "fait" | "erreur" | null;
+  analysis_step?: string | null;
+  analysis_error?: string | null;
+  analysis_at?: string | null;
   created_by: string | null;
   created_at: string;
   updated_at: string;
@@ -162,6 +167,8 @@ export interface ResearchReport {
 export interface CustomScript {
   id: string;
   sector: string;
+  /** Script unique d'un client (issu de l'analyse), sinon null */
+  prospect_id?: string | null;
   channel: Channel;
   base_key: string | null;
   title: string;

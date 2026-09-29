@@ -118,7 +118,19 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJ…
 
 Relancez `npm run dev` : l'écran de connexion demande maintenant un email et un mot de passe.
 
-### 5. *(Facultatif)* API Claude
+### 5. Analyse automatique des nouveaux clients (API Claude)
+
+Avec `ANTHROPIC_API_KEY` (sur Vercel : **Settings → Environment Variables**, puis redéployer), chaque nouveau dossier client déclenche tout seul une **analyse approfondie** :
+
+1. prompt de recherche unique (fiche, secteur, historique, grille de prix) ;
+2. recherche sur le web par Claude, rapport rangé dans l'onglet **Intel** ;
+3. rédaction d'un **script terrain et d'un script téléphone uniques** pour ce client, dans l'onglet **Script**. Le téléprompteur et le mode Appel les utilisent en priorité.
+
+Le travail tourne côté serveur (2 à 4 minutes) et l'avancement s'affiche en temps réel dans la fiche. On peut quitter la page. Le bouton **Refaire l'analyse** relance le tout après ajout d'informations.
+
+Sans clé API, le même onglet **Script** se remplit dès qu'on colle le rapport obtenu via claude.ai ou ChatGPT : le script est alors assemblé automatiquement à partir des constats, questions et objections du rapport.
+
+### 6. *(Facultatif)* API Claude : autres usages
 
 Ajoutez `ANTHROPIC_API_KEY=sk-ant-…` pour activer :
 

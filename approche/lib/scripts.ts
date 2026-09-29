@@ -15,7 +15,13 @@ export function effectiveScript(sector: SectorSheet, channel: Channel, customs: 
 }
 
 export function variantsOf(sectorId: string, customs: CustomScript[]) {
-  return customs.filter((c) => c.sector === sectorId && !c.base_key);
+  return customs.filter((c) => c.sector === sectorId && !c.base_key && !c.prospect_id);
+}
+
+/** Script sur mesure d'un client pour un canal (issu de l'analyse), s'il existe. */
+export function prospectScript(prospectId: string | null | undefined, channel: Channel, customs: CustomScript[]) {
+  if (!prospectId) return null;
+  return customs.filter((c) => c.prospect_id === prospectId && c.channel === channel).sort((a, b) => b.updated_at.localeCompare(a.updated_at))[0] ?? null;
 }
 
 export interface PrompterSection {
@@ -70,6 +76,7 @@ export function searchLibrary(query: string, customs: CustomScript[] = []): Sear
     for (const p of s.proofs) if (match(p)) hits.push({ sector: s, kind: "preuve", label: `${s.short} · Argument`, excerpt: p, anchor: "#preuves" });
   }
   for (const c of customs) {
+    if (c.prospect_id) continue; // les scripts d'un client vivent dans son dossier
     const s = getSector(c.sector);
     if (!s) continue;
     const text = [c.title, ...c.steps.flatMap((x) => [x.title, ...x.lines])].join(" ");

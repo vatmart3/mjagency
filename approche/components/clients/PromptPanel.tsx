@@ -10,7 +10,8 @@ import { buildResearchPrompt } from "@/lib/prompt";
 import { parseReport } from "@/lib/report";
 import { useSettings } from "@/lib/settings";
 import { useSession } from "@/lib/session";
-import { aiCall, useAiEnabled } from "@/lib/ai";
+import { aiCall, startAnalysis, useAiStatus } from "@/lib/ai";
+import { assembleAndSave, useProspectScripts } from "@/components/clients/Analysis";
 import { frDate, frTime } from "@/lib/format";
 import type { Prospect } from "@/lib/types";
 
@@ -34,7 +35,8 @@ export function PromptPanel({ prospect, onReport }: { prospect: Prospect; onRepo
   const { rows: allInteractions } = useTable("interactions");
   const { settings, loading: settingsLoading } = useSettings();
   const { me } = useSession();
-  const ai = useAiEnabled();
+  const ai = useAiStatus();
+  const prospectScripts = useProspectScripts(prospect.id);
   const prompts = useMemo(() => allPrompts.filter((p) => p.prospect_id === prospect.id).sort((a, b) => b.version - a.version), [allPrompts, prospect.id]);
   const interactions = useMemo(() => allInteractions.filter((i) => i.prospect_id === prospect.id), [allInteractions, prospect.id]);
   const [versionId, setVersionId] = useState<string | null>(null);
@@ -87,8 +89,11 @@ export function PromptPanel({ prospect, onReport }: { prospect: Prospect; onRepo
     }
     await db.insert("research_reports", { prospect_id: prospect.id, prompt_id: current?.id ?? null, raw, parsed, source });
     await db.update("prospects", prospect.id, { intel: parsed, hook: parsed.accroche ?? prospect.hook });
+    // Script sur mesure assemblé à partir du rapport (on ne remplace pas un script déjà écrit)
+    const fresh = !prospectScripts.all.length;
+    if (fresh) await assembleAndSave({ ...prospect, intel: parsed }, []);
     setReport("");
-    celebrate("Dossier enrichi", `${parsed.found.length} sections rangées${parsed.missing.length ? `, ${parsed.missing.length} manquantes` : ""}.`);
+    celebrate("Dossier enrichi", `${parsed.found.length} sections rangées${fresh ? ", script sur mesure prêt" : ""}.`);
     onReport();
   }
 
@@ -96,6 +101,12 @@ export function PromptPanel({ prospect, onReport }: { prospect: Prospect; onRepo
     if (!current) return;
     setRunning(true);
     try {
+      // Avec Supabase : analyse complète en arrière-plan (rapport + script sur mesure)
+      if (ai.analyse) {
+        await startAnalysis(prospect.id);
+        toast("Analyse lancée", "Rapport et script sur mesure arrivent dans 2 à 4 minutes.");
+        return;
+      }
       const { text } = await aiCall<{ text: string }>({ mode: "research", prompt: current.prompt });
       await saveReport(text, "api");
     } catch (e) {
@@ -162,9 +173,10 @@ export function PromptPanel({ prospect, onReport }: { prospect: Prospect; onRepo
           <a href="https://chatgpt.com/" target="_blank" rel="noopener noreferrer" onClick={copyBeforeOpen} className={buttonClass("secondary", "md", "active:scale-[0.96] transition-transform")}>
             Ouvrir ChatGPT <Icon name="external" size={16} />
           </a>
-          {ai && (
-            <Button variant="ink" onClick={runHere} disabled={!current || running}>
-              <Icon name="sparkle" size={18} /> {running ? "Recherche en cours (1 à 3 min)…" : "Lancer la recherche ici"}
+          {ai.enabled && (
+            <Button variant="ink" onClick={runHere} disabled={!current || running || prospect.analysis_status === "en_cours"}>
+              <Icon name="sparkle" size={18} />{" "}
+              {prospect.analysis_status === "en_cours" ? "Analyse en cours…" : running ? "Recherche en cours (1 à 3 min)…" : ai.analyse ? "Analyse approfondie + script" : "Lancer la recherche ici"}
             </Button>
           )}
         </div>

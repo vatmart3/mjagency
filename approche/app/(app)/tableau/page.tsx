@@ -2,6 +2,7 @@
 import { motion } from "framer-motion";
 import { useMemo, useState } from "react";
 import { Field, PageHeader, SectionTitle, Segmented } from "@/components/ui/primitives";
+import { NumberInput } from "@/components/ui/NumberInput";
 import { useTable } from "@/lib/data/hooks";
 import { useSession } from "@/lib/session";
 import { useSettings } from "@/lib/settings";
@@ -102,10 +103,10 @@ export default function Dashboard() {
           <aside className="space-y-4 rounded-[22px] bg-mist p-5">
             <p className="kicker">Et si…</p>
             <Field label="Objectif mensuel (€)">
-              <input className="field bg-white" inputMode="numeric" placeholder={String(settings.goalPerPerson)} value={goal ?? ""} onChange={(e) => setGoal(e.target.value ? Number(e.target.value) : null)} />
+              <NumberInput className="field bg-white" placeholder={String(settings.goalPerPerson)} value={goal} min={0} onChange={(n) => setGoal(n && n > 0 ? n : null)} />
             </Field>
             <Field label="Panier moyen (€)">
-              <input className="field bg-white" inputMode="numeric" placeholder={String(Math.round(averageBasket(prospects, settings).value))} value={basketOverride ?? ""} onChange={(e) => setBasketOverride(e.target.value ? Number(e.target.value) : null)} />
+              <NumberInput className="field bg-white" placeholder={String(Math.round(averageBasket(prospects, settings).value))} value={basketOverride} min={0} onChange={(n) => setBasketOverride(n && n > 0 ? n : null)} />
             </Field>
             <p className="text-[13px] leading-relaxed text-ink-2">Monter le panier moyen (abonnements, offres groupées) fait fondre le nombre d&apos;appels plus vite que n&apos;importe quel effort de volume.</p>
           </aside>

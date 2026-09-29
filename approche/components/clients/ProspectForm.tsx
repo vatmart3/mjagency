@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/Button";
 import { Field, Segmented } from "@/components/ui/primitives";
+import { NumberInput } from "@/components/ui/NumberInput";
 import { SECTORS } from "@/content/sectors";
 import { CITY_NAMES, cityByName } from "@/content/cities";
 import { profiles } from "@/content/profiles";
@@ -34,13 +35,12 @@ export function ProspectForm({
     value: (d[k] as string | null | undefined) ?? "",
     onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => set(k, (e.target.value || null) as never),
   });
-  const numField = (k: keyof Prospect) => ({
-    value: d[k] === null || d[k] === undefined ? "" : String(d[k]),
-    inputMode: "decimal" as const,
-    onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
-      const v = e.target.value.replace(",", ".");
-      set(k, (v === "" ? null : Number(v)) as never);
-    },
+  const numField = (k: keyof Prospect, decimal = false, min?: number, max?: number) => ({
+    value: (d[k] as number | null | undefined) ?? null,
+    decimal,
+    min,
+    max,
+    onChange: (n: number | null) => set(k, n as never),
   });
 
   function submit(e: React.FormEvent) {
@@ -115,10 +115,10 @@ export function ProspectForm({
           <input className="field" inputMode="url" {...txt("google_url")} />
         </Field>
         <Field label="Note Google">
-          <input className="field" placeholder="4,3" {...numField("google_rating")} />
+          <NumberInput placeholder="4,3" {...numField("google_rating", true, 0, 5)} />
         </Field>
         <Field label="Nombre d'avis">
-          <input className="field" {...numField("google_reviews")} />
+          <NumberInput placeholder="58" {...numField("google_reviews", false, 0)} />
         </Field>
         <Field label="Instagram">
           <input className="field" placeholder="@compte" {...txt("instagram")} />
@@ -133,10 +133,10 @@ export function ProspectForm({
 
       <Block title="L'entreprise">
         <Field label="Année de création">
-          <input className="field" placeholder="2015" {...numField("founded_year")} />
+          <NumberInput placeholder="2015" {...numField("founded_year", false, 1800, 2100)} />
         </Field>
         <Field label="Salariés">
-          <input className="field" {...numField("employees")} />
+          <NumberInput placeholder="3" {...numField("employees", false, 0)} />
         </Field>
         <Field label="Concurrents connus" className="md:col-span-2">
           <input className="field" placeholder="Qui, où, ce qu'ils font mieux" {...txt("competitors")} />
@@ -186,11 +186,11 @@ export function ProspectForm({
           </select>
         </Field>
         <Field label="Montant potentiel (€)">
-          <input className="field" {...numField("potential_amount")} />
+          <NumberInput placeholder="1 500" {...numField("potential_amount", true, 0)} />
         </Field>
         {d.status === "signe" && (
           <Field label="Montant signé (€)">
-            <input className="field" {...numField("signed_amount")} />
+            <NumberInput placeholder="1 500" {...numField("signed_amount", true, 0)} />
           </Field>
         )}
         <Field label="Suivi par">
