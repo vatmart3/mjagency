@@ -152,6 +152,7 @@ L'app est un **projet Vercel distinct** du site vitrine, dans le même dépôt G
    - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
    - `ANTHROPIC_API_KEY` (facultatif)
 4. **Deploy**. Chaque push sur la branche principale redéploie ensuite l'app.
+   Sans les deux variables Supabase, un déploiement Vercel refuse tout accès (le mode démo sans mot de passe ne fonctionne qu'en local).
 5. *(Conseillé)* Ajoutez un sous-domaine, par exemple `approche.mjagency.eu`, dans **Settings → Domains**.
 6. Dans Supabase → **Authentication → URL Configuration**, mettez l'URL Vercel (ou le sous-domaine) comme **Site URL**.
 
