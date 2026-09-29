@@ -4,8 +4,9 @@
 -- Idempotent autant que possible : on peut le relancer sans casser.
 --
 -- Principe de sécurité : seules les adresses listées dans `associates`
--- (Jérémy et Matheis) ont accès aux données. Tout le monde voit tout
--- entre associés, personne d'autre ne voit rien (RLS partout).
+-- (le compte de l'agence, puis chaque associé ajouté) ont accès aux
+-- données. Tout le monde voit tout entre associés, personne d'autre ne
+-- voit rien (RLS partout).
 -- =====================================================================
 
 create extension if not exists pgcrypto;
@@ -19,10 +20,10 @@ create table if not exists public.associates (
   created_at timestamptz not null default now()
 );
 
--- ⚠️ Remplacez ces deux adresses par les vôtres AVANT de créer les comptes.
+-- Compte partagé de l'agence. Pour ajouter une personne plus tard :
+--   insert into public.associates values ('prenom@exemple.fr', 'Prénom');
 insert into public.associates (email, display_name) values
-  ('jeremy@mjagency.eu', 'Jérémy'),
-  ('matheis@mjagency.eu', 'Matheis')
+  ('mjagency.officiel@gmail.com', 'MJAGENCY')
 on conflict (email) do nothing;
 
 -- Vrai si l'utilisateur connecté est un associé. SECURITY DEFINER pour
@@ -40,7 +41,8 @@ as $$
   );
 $$;
 
-revoke all on function public.is_associate() from public;
+-- Appelée par les règles d'accès : seuls les utilisateurs connectés en ont besoin.
+revoke all on function public.is_associate() from public, anon;
 grant execute on function public.is_associate() to authenticated;
 
 -- ---------------------------------------------------------------------
@@ -75,6 +77,9 @@ begin
   return new;
 end;
 $$;
+
+-- Réservée au déclencheur : jamais appelable depuis l'API.
+revoke execute on function public.handle_new_user() from public, anon, authenticated;
 
 drop trigger if exists on_auth_user_created on auth.users;
 create trigger on_auth_user_created
@@ -298,7 +303,7 @@ create table if not exists public.flashcard_reviews (
 -- 11. updated_at automatique
 -- ---------------------------------------------------------------------
 create or replace function public.touch_updated_at()
-returns trigger language plpgsql as $$
+returns trigger language plpgsql set search_path = '' as $$
 begin
   new.updated_at = now();
   return new;

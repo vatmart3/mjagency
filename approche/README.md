@@ -67,11 +67,11 @@ Pour tester le mode Duo en local, ouvrez deux onglets. L'un crée la session, l'
 ### 1. Créer le projet
 
 1. Sur [supabase.com](https://supabase.com), créez un projet (région : Europe, par exemple `eu-west-3` Paris).
-2. **Avant toute chose**, ouvrez `supabase/migrations/0001_init.sql` et remplacez les deux adresses de la table `associates` par vos vraies adresses :
+2. La table `associates` de `supabase/migrations/0001_init.sql` autorise `mjagency.officiel@gmail.com`. Pour donner à chacun son propre compte (et ses propres chiffres), ajoutez les adresses :
    ```sql
    insert into public.associates (email, display_name) values
-     ('jeremy@votre-domaine.fr', 'Jérémy'),
-     ('matheis@votre-domaine.fr', 'Matheis')
+     ('jeremy@…', 'Jérémy'),
+     ('matheis@…', 'Matheis');
    ```
 3. Dans **SQL Editor**, collez tout le fichier et lancez-le. On peut le relancer sans risque.
 4. *(Facultatif)* Lancez `supabase/seed.sql` pour avoir les 8 prospects de démonstration.
