@@ -312,6 +312,9 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
 }
 .col-4{grid-column:span 4}.col-6{grid-column:span 6}.col-8{grid-column:span 8}
 .col-12{grid-column:span 12}
+/* Un tiers de largeur devient trop étroit pour une vignette détaillée bien
+   avant le seuil du mobile : on passe à la moitié entre les deux. */
+@media (max-width:1080px){.col-4{grid-column:span 6}}
 @media (max-width:860px){.col-4,.col-6,.col-8{grid-column:span 12}}
 
 /* Carte pleine largeur : le 16/10 deviendrait un mur, on aplatit le visuel */
@@ -1232,6 +1235,59 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
 
 @media (prefers-reduced-motion:reduce){
   .tem__page > *,.tem__cite .mot{opacity:1!important;transform:none!important;transition:none}
+}
+
+/* ---------- Vignette « Brume » (institut de soins) ----------
+   Palette exacte du site présenté : lait, sable, argile et sauge. Elle est
+   claire là où les deux autres vignettes sont sombres — les trois cartes se
+   distinguent au premier coup d'œil, sans avoir à lire les titres.
+   La goutte reprend la signature du site, une goutte de verre en 3D. */
+.ph-brume{background:linear-gradient(160deg,#f8f5f2 0%,#efe6df 54%,#f5e8e0 100%)}
+.brm{
+  position:absolute;inset:0;
+  display:flex;align-items:center;justify-content:center;
+  gap:clamp(11px,2.4vw,24px);padding:clamp(13px,3vw,26px);
+}
+/* Une pointe franche se lisait comme un repère de carte, pas comme une
+   goutte. Forme organique, sans rotation : le reflet reste en haut à
+   gauche, là où une source de lumière unique le placerait. */
+.brm__goutte{
+  flex:none;width:clamp(38px,6vw,64px);aspect-ratio:1;
+  border-radius:58% 42% 46% 54% / 48% 44% 56% 52%;
+  background:
+    radial-gradient(circle at 34% 28%, rgba(255,255,255,.96) 0 15%, rgba(255,255,255,0) 55%),
+    linear-gradient(145deg,#efdcd0 0%,#d4a78f 48%,#9caf9a 100%);
+  box-shadow:0 10px 20px rgba(34,27,29,.15), inset 0 0 0 1px rgba(255,255,255,.55);
+}
+.brm__carte{
+  flex:1 1 auto;max-width:290px;
+  background:rgba(255,255,255,.74);
+  border:1px solid rgba(34,27,29,.10);
+  border-radius:11px;padding:11px 13px;
+  display:flex;flex-direction:column;gap:9px;
+  backdrop-filter:blur(3px);
+}
+.brm__tete{display:flex;align-items:baseline;justify-content:space-between;gap:10px}
+.brm__nom{
+  font-size:12.5px;font-weight:600;letter-spacing:.15em;text-transform:uppercase;
+  color:#221b1d;
+}
+.brm__lieu{font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;color:#8a543d}
+.brm__ligne{
+  display:flex;align-items:baseline;justify-content:space-between;gap:10px;
+  font-size:11px;color:#5f5457;
+}
+.brm__ligne em{font-style:normal;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.brm__ligne b{font-weight:600;color:#4e644c;font-variant-numeric:tabular-nums;flex:none}
+.brm__duo{
+  align-self:flex-start;font-size:9px;letter-spacing:.07em;text-transform:uppercase;
+  padding:4px 10px;border-radius:999px;background:#e3e9e1;color:#4e644c;
+}
+
+@media (max-width:420px){
+  .brm{gap:10px;padding:12px}
+  .brm__carte{padding:9px 10px;gap:7px}
+  .brm__ligne{font-size:10.5px}
 }
 
 /* ---------- Vignette « Dégradé » (barbier) ----------
