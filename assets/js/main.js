@@ -420,6 +420,48 @@
      obtient son masque et son léger retard. Pas de mesure des lignes
      réelles, donc rien ne se casse au changement de largeur.
      ========================================================= */
+  /* ---------------- La citation qui s'écrit ----------------
+     Chaque mot devient un <span> qui apparaît après le précédent. Le
+     découpage garde les séparateurs tels quels : une espace insécable
+     avant un deux-points est une règle de typographie française, la
+     perdre déplacerait la ponctuation à la ligne suivante.
+
+     On ne touche pas à une citation qui contient déjà du balisage : y
+     réécrire le HTML mot à mot casserait ses liens ou ses emphases. Et
+     rien du tout si le visiteur demande moins d'animations. */
+  (function motsDesAvis() {
+    if (reduced) return;
+    document.querySelectorAll('.tem__cite').forEach(p => {
+      if (p.dataset.mots) return;
+
+      // On n'enveloppe que les nœuds de texte, sans réécrire le HTML autour :
+      // une citation qui contient un lien ou une emphase garde sa structure,
+      // et la puce « à remplir » s'anime comme le fera la vraie phrase.
+      const textes = [];
+      const w = document.createTreeWalker(p, NodeFilter.SHOW_TEXT);
+      while (w.nextNode()) textes.push(w.currentNode);
+
+      let i = 0;
+      textes.forEach(n => {
+        if (!n.nodeValue.trim()) return;
+        const frag = document.createDocumentFragment();
+        n.nodeValue.split(/(\s+)/).forEach(m => {
+          if (!m) return;
+          if (!m.trim()) { frag.appendChild(document.createTextNode(m)); return; }
+          const s = document.createElement('span');
+          s.className = 'mot';
+          // 0,42 s : le temps que la maquette d'à côté finisse de s'assembler.
+          s.style.transitionDelay = (0.42 + i * 0.028).toFixed(3) + 's';
+          s.textContent = m;          // textContent, donc rien à échapper
+          i++;
+          frag.appendChild(s);
+        });
+        n.parentNode.replaceChild(frag, n);
+      });
+      p.dataset.mots = '1';
+    });
+  })();
+
   (function revelerTitres() {
     // Les intertitres des pages légales restent des intertitres.
     const titres = [...document.querySelectorAll('.h2')]
