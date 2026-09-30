@@ -21,7 +21,7 @@ const EXPEDITEUR_PAR_DEFAUT   = 'MJ Agency <onboarding@resend.dev>';
 
 /* Bornes volontairement larges : elles n'existent que pour empêcher
    qu'un automate ne pousse mégaoctet sur mégaoctet dans la boîte. */
-const MAX = { nom: 120, email: 160, societe: 160, budget: 60, message: 4000 };
+const MAX = { nom: 120, email: 160, societe: 160, budget: 60, message: 4000, lien: 300 };
 
 const coupe = (v, n) => String(v == null ? '' : v).trim().slice(0, n);
 const estEmail = v => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v);
@@ -60,7 +60,10 @@ async function alerter(c) {
   const complet = String(process.env.ALERTE_DETAIL || '').toLowerCase() === 'complet';
 
   const texte = [
-    `Nouvelle demande — ${c.nom}`,
+    // La demande d'audit porte un lien et pas de créneau : l'alerte doit dire
+    // laquelle des deux arrive, sinon les deux se ressemblent sur l'écran.
+    c.lien ? `Audit demandé — ${c.nom}` : `Nouvelle demande — ${c.nom}`,
+    c.lien ? `Site : ${c.lien}` : null,
     c.date ? `Créneau : ${c.date} ${c.heure}` : null,
     complet ? `Email : ${c.email}` : null,
     complet && c.societe ? `Société : ${c.societe}` : null,
@@ -187,6 +190,11 @@ module.exports = async (req, res) => {
   // pour ne pas lui apprendre qu'il a été repéré.
   if (coupe(b.site, 50)) return res.status(200).json({ ok: true });
 
+  // Deux formulaires arrivent ici : la demande de rendez-vous, et la
+  // demande d'audit offert de la fenêtre d'accueil. Elles n'ont ni les mêmes
+  // champs obligatoires ni le même objet d'email.
+  const audit = coupe(b.type, 20) === 'audit';
+
   const c = {
     nom:     coupe(b.nom, MAX.nom),
     email:   coupe(b.email, MAX.email),
@@ -194,11 +202,25 @@ module.exports = async (req, res) => {
     budget:  coupe(b.budget, MAX.budget),
     message: coupe(b.message, MAX.message),
     date:    coupe(b.date, 40),
-    heure:   coupe(b.heure, 20)
+    heure:   coupe(b.heure, 20),
+    lien:    coupe(b.lien, MAX.lien)
   };
 
-  if (!c.nom)             return res.status(400).json({ ok: false, error: 'Nom manquant', code: 'NOM' });
   if (!estEmail(c.email)) return res.status(400).json({ ok: false, error: 'Email invalide', code: 'EMAIL' });
+
+  if (audit) {
+    // Un lien cliquable dans l'email ne doit pas pouvoir être autre chose
+    // qu'une adresse web : ni javascript:, ni data:, ni mailto:.
+    let u = null;
+    try { u = new URL(c.lien); } catch { /* invalide */ }
+    if (!u || !/^https?:$/.test(u.protocol) || !/^[a-z0-9-]+(\.[a-z0-9-]+)+$/i.test(u.hostname)) {
+      return res.status(400).json({ ok: false, error: 'Adresse de site invalide', code: 'LIEN' });
+    }
+    c.lien = u.href;
+    c.nom = c.nom || u.hostname;   // sert d'intitulé dans l'objet de l'email
+  } else if (!c.nom) {
+    return res.status(400).json({ ok: false, error: 'Nom manquant', code: 'NOM' });
+  }
 
   const cle = process.env.RESEND_API_KEY;
   if (!cle) {
@@ -206,29 +228,43 @@ module.exports = async (req, res) => {
     return res.status(500).json({ ok: false, error: 'Service indisponible', code: 'CLE-ABSENTE' });
   }
 
-  const sujet = uneLigne(
-    `Demande de rendez-vous — ${c.nom}${c.date ? ` (${c.date} ${c.heure})` : ''}`
+  const sujet = uneLigne(audit
+    ? `Audit offert — ${c.lien.replace(/^https?:\/\//, '').replace(/\/$/, '')}`
+    : `Demande de rendez-vous — ${c.nom}${c.date ? ` (${c.date} ${c.heure})` : ''}`
   );
 
-  const lignes = [
-    ['Nom', c.nom], ['Email', c.email], ['Société', c.societe],
-    ['Budget', c.budget], ['Rendez-vous', c.date ? `${c.date} à ${c.heure}` : '']
-  ].filter(([, v]) => v);
+  const lignes = audit
+    ? [['Email', c.email], ['Site à auditer', c.lien]]
+    : [['Nom', c.nom], ['Email', c.email], ['Société', c.societe],
+       ['Budget', c.budget], ['Rendez-vous', c.date ? `${c.date} à ${c.heure}` : '']
+      ].filter(([, v]) => v);
+
+  const titre = audit ? 'Demande d\'audit offert' : 'Nouvelle demande depuis le site';
+  const blocLabel = audit ? 'À faire' : 'Projet';
+  const blocTexte = audit
+    ? ['Relire le site en 5 points :',
+       '  1. vitesse de chargement',
+       '  2. rendu sur téléphone',
+       '  3. référencement local',
+       "  4. clarté de l'offre",
+       '  5. freins à la prise de contact',
+       '', 'Réponse annoncée au visiteur : sous 48 h.'].join('\n')
+    : (c.message || '(non renseigné)');
 
   const texte = [
     ...lignes.map(([k, v]) => `${k} : ${v}`),
-    '', 'Projet :', c.message || '(non renseigné)'
+    '', blocLabel + ' :', blocTexte
   ].join('\n');
 
   const html = `<div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;font-size:15px;line-height:1.6;color:#1D1D1F">
-  <h2 style="font-size:19px;margin:0 0 16px">Nouvelle demande depuis le site</h2>
+  <h2 style="font-size:19px;margin:0 0 16px">${echappe(titre)}</h2>
   <table style="border-collapse:collapse">${
     lignes.map(([k, v]) =>
       `<tr><td style="padding:4px 16px 4px 0;color:#86868B">${k}</td><td style="padding:4px 0"><b>${echappe(v)}</b></td></tr>`
     ).join('')
   }</table>
-  <p style="margin:20px 0 4px;color:#86868B">Projet</p>
-  <p style="margin:0;white-space:pre-wrap">${echappe(c.message || '(non renseigné)')}</p>
+  <p style="margin:20px 0 4px;color:#86868B">${echappe(blocLabel)}</p>
+  <p style="margin:0;white-space:pre-wrap">${echappe(blocTexte)}</p>
 </div>`;
 
   try {

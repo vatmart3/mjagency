@@ -67,20 +67,12 @@
   <section class="container" style="padding-top:clamp(130px,18vh,200px);padding-bottom:clamp(30px,4vw,50px)">
     <div class="stack">
       <span class="eyebrow reveal">Réponse sous 24 h</span>
-      <h1 class="display reveal">Parlons de votre projet.</h1>
+      <h1 class="display reveal">Choisissez le créneau<br>qui vous convient.</h1>
       <p class="lead reveal">30 minutes, sans engagement, pour comprendre votre besoin, répondre à vos questions et voir si nous sommes la bonne équipe pour vous accompagner.</p>
     </div>
   </section>
 
   <section class="container pad-y sep" id="booking">
-    <div class="sec-head">
-      <div class="sec-head__t reveal">
-        <span class="eyebrow">Réservation</span>
-        <h2 class="h2">Choisissez le créneau qui vous convient.</h2>
-      </div>
-      <p class="lead reveal">Un échange simple et sans pression pour faire connaissance, clarifier votre projet et vous donner une première direction.</p>
-    </div>
-
     <div class="booking reveal">
       <div>
         <div class="cal" data-calendar>
@@ -134,24 +126,24 @@
     </div>
   </section>
 
+  <!-- Coordonnées directes : une seule colonne, centrée avec le titre.
+       Les lignes restent des liens pleine largeur — sur téléphone, appeler
+       ou écrire doit rester une cible facile à viser. -->
   <section class="container pad-y sep">
-    <div class="split">
-      <div class="reveal">
-        <span class="eyebrow">Ou directement</span>
-        <h2 class="h2 mt-m">Ou écrivez-nous directement.</h2>
-      </div>
-      <div class="reveal">
-        <a href="mailto:mjagency.officiel@gmail.com" class="work-item" data-cursor="Email">
-          <span class="work-item__title" style="font-size:clamp(20px,3vw,32px)">mjagency.officiel@gmail.com</span>
-          <span class="work-item__meta">Email</span>
+    <div class="direct">
+      <h2 class="h2 reveal">Ou écrivez-nous directement.</h2>
+      <div class="direct__liste reveal">
+        <a href="mailto:mjagency.officiel@gmail.com" class="direct__ligne" data-cursor="Email">
+          <span class="direct__val">mjagency.officiel@gmail.com</span>
+          <span class="direct__lab">Email</span>
         </a>
-        <a href="tel:+33611718368" class="work-item" data-cursor="Appeler">
-          <span class="work-item__title" style="font-size:clamp(20px,3vw,32px)">06 11 71 83 68</span>
-          <span class="work-item__meta">Téléphone</span>
+        <a href="tel:+33611718368" class="direct__ligne" data-cursor="Appeler">
+          <span class="direct__val">06 11 71 83 68</span>
+          <span class="direct__lab">Téléphone</span>
         </a>
-        <div class="work-item" style="border-bottom:1px solid var(--line)">
-          <span class="work-item__title" style="font-size:clamp(20px,3vw,32px)">Sète, Hérault</span>
-          <span class="work-item__meta">34200 · Hérault</span>
+        <div class="direct__ligne">
+          <span class="direct__val">Sète, Hérault</span>
+          <span class="direct__lab">34200 · Hérault</span>
         </div>
       </div>
     </div>
@@ -160,7 +152,8 @@
 </main>
 
 <footer class="footer container">
-  <div class="footer__big reveal"><a href="mailto:mjagency.officiel@gmail.com" data-cursor="Écrire">Say hi <span class="arw">↗</span></a></div>
+  <!-- Pas de grand appel en pied de page ici : sur la page contact, il
+       renverrait au formulaire qui est juste au-dessus. -->
   <div class="footer__cols">
     <div class="footer__col">
       <a href="index.html" class="nav__logo" style="margin-bottom:16px"><span class="dot"></span> MJ Agency</a>

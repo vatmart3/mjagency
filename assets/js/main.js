@@ -492,6 +492,259 @@
     elements.forEach(e => io.observe(e));
   })();
 
+  /* =========================================================
+     CONSENTEMENT ET AUDIT OFFERT
+
+     Deux fenêtres, et un ordre : le bandeau d'abord, la proposition
+     d'audit ensuite. Les afficher ensemble, c'est deux couches par-dessus
+     la page dès l'arrivée — personne ne lit ni l'une ni l'autre.
+
+     Ce que le site garde dans le navigateur, et rien d'autre :
+       mj-cookies  oui | non — le choix fait dans le bandeau
+       mj-audit    1 — la fenêtre d'audit a été vue, elle ne revient pas
+
+     En cas de refus, le second n'est jamais écrit : la fenêtre d'audit ne
+     s'ouvre pas du tout. C'est la seule façon honnête de tenir un refus
+     sans avoir à mémoriser quelque chose pour s'en souvenir.
+     ========================================================= */
+  (function consentement() {
+    const CLE_C = 'mj-cookies';
+    const CLE_A = 'mj-audit';
+
+    const lire = c => { try { return localStorage.getItem(c); } catch { return null; } };
+    const ecrire = (c, v) => { try { localStorage.setItem(c, v); } catch { /* navigation privée */ } };
+
+    const noeud = (balise, classe, html) => {
+      const n = document.createElement(balise);
+      if (classe) n.className = classe;
+      if (html) n.innerHTML = html;
+      return n;
+    };
+
+    /* Le cookie est dessiné, pas écrit en emoji : un emoji change de dessin
+       à chaque système et n'a pas la couleur de la marque. Une pépite reprend
+       le bleu du logo — c'est ce qui le rattache au studio. */
+    const COOKIE = `
+      <svg class="bandeau__cookie" viewBox="0 0 32 32" aria-hidden="true">
+        <circle cx="16" cy="16" r="13" fill="#F3E3C6" stroke="#D8B887" stroke-width="1.4"/>
+        <circle cx="11.4" cy="11.8" r="2.1" fill="#7A4A21"/>
+        <circle cx="20.3" cy="11.1" r="1.6" fill="#7A4A21"/>
+        <circle cx="17.1" cy="18.6" r="2.3" fill="var(--blue)"/>
+        <circle cx="10.9" cy="20.8" r="1.5" fill="#7A4A21"/>
+        <circle cx="23"   cy="18.2" r="1.3" fill="#7A4A21"/>
+      </svg>`;
+
+    /* ---------------- Le bandeau ---------------- */
+    function bandeau(apres) {
+      // Second argument : le visiteur vient-il de répondre, ou avait-il déjà
+      // répondu lors d'une visite précédente ? Le délai d'ouverture en dépend.
+      if (lire(CLE_C)) { apres(lire(CLE_C), false); return; }
+
+      const b = noeud('div', 'bandeau', `
+        <div class="bandeau__tete">
+          ${COOKIE}
+          <span class="bandeau__marque"><i></i> MJ&nbsp;Agency <em>· Cookies</em></span>
+        </div>
+        <p class="bandeau__t">Aucune publicité, aucun traceur. Nous gardons seulement
+        en mémoire votre choix et, si vous acceptez, le fait de vous avoir déjà proposé
+        notre audit offert. <a href="confidentialite.html">Politique de confidentialité</a></p>
+        <div class="bandeau__actions">
+          <button type="button" class="bandeau__btn bandeau__btn--non">Refuser</button>
+          <button type="button" class="bandeau__btn bandeau__btn--ok">Accepter</button>
+        </div>`);
+      b.setAttribute('role', 'region');
+      b.setAttribute('aria-label', 'Cookies');
+      document.body.appendChild(b);
+
+      b.classList.add('montre');
+      requestAnimationFrame(() => b.classList.add('vu'));
+
+      const repondre = v => {
+        ecrire(CLE_C, v);
+        b.classList.remove('vu');
+        setTimeout(() => b.remove(), reduced ? 0 : 400);
+        apres(v, true);
+      };
+      b.querySelector('.bandeau__btn--ok').addEventListener('click', () => repondre('oui'));
+      b.querySelector('.bandeau__btn--non').addEventListener('click', () => repondre('non'));
+    }
+
+    /* ---------------- La fenêtre d'audit ---------------- */
+    function audit() {
+      // Pas de fenêtre promotionnelle par-dessus une page légale : c'est là
+      // qu'on vient lire ce que le site fait de ses données.
+      if (document.querySelector('.legal')) return;
+      if (lire(CLE_A)) return;
+
+      const p = noeud('div', 'pop', `
+        <div class="pop__boite" role="dialog" aria-modal="true" aria-labelledby="pop-t">
+          <button type="button" class="pop__fermer" aria-label="Fermer">✕</button>
+          <span class="pop__marque"><i></i> MJ&nbsp;Agency <em>· Offert</em></span>
+          <h2 class="pop__t" id="pop-t">Votre site relu en 5&nbsp;points. Offert.</h2>
+          <p class="pop__d">Laissez-nous son adresse&nbsp;: nous le passons en revue et
+          vous envoyons nos observations sous 48&nbsp;h. Sans engagement, et sans suite
+          commerciale si vous n'en voulez pas.</p>
+          <ol class="pop__pts">
+            <li><b>1</b> La vitesse de chargement, sur téléphone comme sur ordinateur</li>
+            <li><b>2</b> Le rendu et le confort de lecture sur mobile</li>
+            <li><b>3</b> Le référencement local&nbsp;: ce que Google comprend de vous</li>
+            <li><b>4</b> La clarté de l'offre dès le premier écran</li>
+            <li><b>5</b> Ce qui retient vos visiteurs de vous contacter</li>
+          </ol>
+          <form class="pop__form" novalidate>
+            <div class="field">
+              <input type="email" id="pop-email" name="email" placeholder=" " autocomplete="email" required>
+              <label for="pop-email">Votre email</label>
+            </div>
+            <div class="field">
+              <input type="text" id="pop-lien" name="lien" placeholder=" " inputmode="url" autocomplete="url" required>
+              <label for="pop-lien">L'adresse de votre site</label>
+            </div>
+            <input type="text" name="site" tabindex="-1" autocomplete="off" aria-hidden="true"
+                   style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0">
+            <div class="form-msg" role="status"></div>
+            <button type="submit" class="btn btn--glow">Recevoir mon audit <span class="arw" aria-hidden="true">↗</span></button>
+            <p class="pop__note">Votre email et l'adresse de votre site ne servent qu'à
+            réaliser et vous envoyer cet audit. Aucune inscription à une liste de diffusion.
+            <a href="confidentialite.html">Politique de confidentialité</a></p>
+          </form>
+        </div>`);
+      document.body.appendChild(p);
+
+      const boite = p.querySelector('.pop__boite');
+      const form  = p.querySelector('form');
+      const msg   = p.querySelector('.form-msg');
+      const btn   = p.querySelector('button[type="submit"]');
+      const btnHtml = btn.innerHTML;
+      let ouverte = false;
+      let avant = null;
+
+      function ouvrir() {
+        avant = document.activeElement;
+        p.classList.add('montre');
+        requestAnimationFrame(() => p.classList.add('vu'));
+        document.body.style.overflow = 'hidden';
+        ouverte = true;
+        p.querySelector('#pop-email').focus({ preventScroll: true });
+      }
+
+      function fermer() {
+        if (!ouverte) return;
+        ouverte = false;
+        ecrire(CLE_A, '1');            // vue une fois, elle ne revient plus
+        p.classList.remove('vu');
+        document.body.style.overflow = '';
+        setTimeout(() => p.remove(), reduced ? 0 : 350);
+        if (avant && avant.focus) avant.focus({ preventScroll: true });
+      }
+
+      p.querySelector('.pop__fermer').addEventListener('click', fermer);
+      p.addEventListener('click', e => { if (e.target === p) fermer(); });
+
+      // Échap ferme, et Tab reste enfermé dans la fenêtre : sans cela le
+      // focus part derrière le voile, sur une page qu'on ne peut plus voir.
+      p.addEventListener('keydown', e => {
+        if (e.key === 'Escape') { fermer(); return; }
+        if (e.key !== 'Tab') return;
+        const f = [...boite.querySelectorAll('button, input:not([tabindex="-1"]), a[href]')]
+          .filter(n => n.offsetParent !== null);
+        if (!f.length) return;
+        const premier = f[0], dernier = f[f.length - 1];
+        if (e.shiftKey && document.activeElement === premier) { e.preventDefault(); dernier.focus(); }
+        else if (!e.shiftKey && document.activeElement === dernier) { e.preventDefault(); premier.focus(); }
+      });
+
+      function dire(texte, erreur, html) {
+        msg.classList.add('show');
+        msg.classList.toggle('form-msg--erreur', Boolean(erreur));
+        if (html) msg.innerHTML = html; else msg.textContent = texte;
+      }
+
+      /* « monsite.fr » est une réponse parfaitement normale à « l'adresse de
+         votre site ». On complète le schéma nous-mêmes plutôt que de renvoyer
+         le visiteur à sa copie pour un détail de syntaxe. */
+      function normalise(v) {
+        const t = v.trim().replace(/\s+/g, '');
+        if (!t) return '';
+        const avecSchema = /^https?:\/\//i.test(t) ? t : 'https://' + t;
+        try {
+          const u = new URL(avecSchema);
+          if (!/^[a-z0-9-]+(\.[a-z0-9-]+)+$/i.test(u.hostname)) return '';
+          return u.href;
+        } catch { return ''; }
+      }
+
+      form.addEventListener('submit', async e => {
+        e.preventDefault();
+        if (form.querySelector('[name="site"]').value) return;   // automate
+
+        const email = form.querySelector('[name="email"]').value.trim();
+        const champLien = form.querySelector('[name="lien"]');
+        const lien = normalise(champLien.value);
+
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) {
+          dire('Vérifiez votre adresse email.', true);
+          form.querySelector('[name="email"]').focus();
+          return;
+        }
+        if (!lien) {
+          dire("Indiquez l'adresse de votre site, par exemple monsite.fr.", true);
+          champLien.focus();
+          return;
+        }
+        champLien.value = lien;
+
+        btn.disabled = true;
+        btn.textContent = 'Envoi…';
+        dire('Envoi en cours…', false);
+
+        try {
+          const rep = await fetch(POINT_ENVOI, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+            body: JSON.stringify({ type: 'audit', email, lien, site: '' })
+          });
+          const data = await rep.json().catch(() => ({}));
+          if (!rep.ok || !data.ok) {
+            const err = new Error(data.error || `HTTP ${rep.status}`);
+            err.code = data.code || (rep.status === 404 ? 'ROUTE-ABSENTE' : 'HTTP-' + rep.status);
+            throw err;
+          }
+          ecrire(CLE_A, '1');
+          form.innerHTML = '<p class="pop__d" role="status">C\'est noté&nbsp;! Nous regardons ' +
+            'votre site et vous écrivons sous 48&nbsp;h à cette adresse.</p>';
+          setTimeout(fermer, 3600);
+        } catch (err) {
+          const corps = `Bonjour,\n\nJe souhaite l'audit offert en 5 points.\n\n` +
+            `Email : ${email}\nSite : ${lien}\n`;
+          const mailto = `mailto:${DESTINATAIRE}?subject=${encodeURIComponent('Audit offert — ' + lien)}` +
+            `&body=${encodeURIComponent(corps)}`;
+          dire(null, true,
+            `L'envoi a échoué. <a href="${mailto}">Envoyez-le depuis votre messagerie</a> ` +
+            `— tout est déjà rempli. <small class="form-msg__ref">réf. ${err.code || 'RESEAU'}</small>`);
+          console.warn('Audit :', err.code || 'RESEAU', err);
+        } finally {
+          btn.disabled = false;
+          btn.innerHTML = btnHtml;
+        }
+      });
+
+      return ouvrir;
+    }
+
+    /* Le bandeau répond, puis la fenêtre s'ouvre — tout de suite si le
+       visiteur vient de cliquer « Accepter », après un temps de lecture s'il
+       avait déjà répondu lors d'une visite précédente. */
+    bandeau((choix, vientDeRepondre) => {
+      if (choix !== 'oui') return;
+      const ouvrir = audit();
+      if (!ouvrir) return;
+      // 900 ms laisse le bandeau finir de s'effacer (400 ms) avant que la
+      // fenêtre n'arrive ; 4,5 s laissent le temps de commencer à lire.
+      setTimeout(ouvrir, vientDeRepondre ? 900 : 4500);
+    });
+  })();
+
   if (document.readyState === 'complete') boot();
   else addEventListener('load', boot);
 })();

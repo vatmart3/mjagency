@@ -1103,6 +1103,132 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
 }
 
 
+/* ---------- Coordonnées directes (page contact) ----------
+   Une colonne centrée, titre et lignes sur le même axe. L'email tient
+   vingt-sept caractères : il peut se couper, sinon il sort du cadre sur
+   les petits écrans. */
+.direct{max-width:640px;margin-inline:auto;text-align:center;display:flex;flex-direction:column;gap:var(--s4)}
+.direct__liste{border-top:1px solid var(--rule)}
+.direct__ligne{
+  display:flex;flex-direction:column;align-items:center;gap:3px;
+  padding:var(--s3) var(--s2);border-bottom:1px solid var(--rule);
+  border-radius:var(--radius-s);min-height:44px;
+  transition:background .25s var(--ease),color .25s var(--ease);
+}
+.direct__val{
+  font-size:clamp(19px,2.6vw,28px);font-weight:600;letter-spacing:-.02em;
+  color:var(--black);line-height:1.2;overflow-wrap:anywhere;
+  transition:color .25s var(--ease);
+}
+.direct__lab{font-size:14px;color:var(--gray)}
+
+/* ---------- Bandeau cookies ----------
+   À l'enseigne du studio : la pastille bleue du logo et un cookie dessiné
+   en SVG, pas un emoji — un emoji change de tête à chaque système.
+
+   « Refuser » a exactement la taille et le poids d'« Accepter ». La CNIL
+   demande que refuser soit aussi simple qu'accepter : un bouton discret à
+   côté d'un bouton plein rend le bandeau non conforme, et c'est le défaut
+   le plus fréquent sur les sites qu'on reprend. */
+.bandeau{
+  position:fixed;z-index:600;
+  left:max(12px, env(safe-area-inset-left, 0px));
+  right:max(12px, env(safe-area-inset-right, 0px));
+  bottom:max(12px, env(safe-area-inset-bottom, 0px));
+  max-width:540px;margin-inline:auto;
+  background:var(--white);border:1px solid var(--rule-2);
+  border-radius:var(--radius);box-shadow:var(--shadow-m);
+  padding:var(--s3);
+  display:none;flex-direction:column;gap:14px;
+  opacity:0;transform:translateY(14px);
+  transition:opacity .4s var(--ease),transform .4s var(--ease);
+}
+.bandeau.montre{display:flex}
+.bandeau.vu{opacity:1;transform:none}
+.bandeau__tete{display:flex;align-items:center;gap:11px}
+.bandeau__cookie{width:32px;height:32px;flex:none;display:block}
+.bandeau__marque{
+  font-size:16px;font-weight:600;letter-spacing:-.02em;color:var(--black);
+  display:inline-flex;align-items:center;gap:7px;
+}
+.bandeau__marque i{width:7px;height:7px;border-radius:50%;background:var(--blue);flex:none}
+.bandeau__marque em{font-style:normal;font-weight:400;color:var(--gray)}
+.bandeau__t{font-size:14.5px;line-height:1.5;color:var(--dark-gray)}
+.bandeau__t a{color:var(--blue);text-decoration:underline;text-underline-offset:2px}
+.bandeau__actions{display:flex;gap:10px}
+.bandeau__btn{
+  flex:1 1 0;min-height:44px;border-radius:980px;
+  font-size:15px;font-weight:500;padding:11px 18px;
+  display:inline-flex;align-items:center;justify-content:center;
+  transition:background .25s var(--ease),border-color .25s var(--ease);
+}
+.bandeau__btn--ok{background:var(--blue);color:#fff;border:1px solid var(--blue)}
+.bandeau__btn--non{background:var(--white);color:var(--dark-gray);border:1px solid var(--rule-2)}
+
+@media (max-width:400px){
+  .bandeau{padding:var(--s2)}
+  .bandeau__actions{flex-direction:column}
+}
+
+/* ---------- Fenêtre d'audit offert ----------
+   Une fenêtre qui s'impose doit se refermer aussi facilement qu'elle
+   s'ouvre : croix visible, Échap, clic sur le fond. Elle ne revient pas
+   une fois fermée ou remplie. */
+.pop{
+  position:fixed;inset:0;z-index:620;
+  display:none;align-items:center;justify-content:center;
+  padding:max(16px, env(safe-area-inset-top, 0px)) 16px max(16px, env(safe-area-inset-bottom, 0px));
+  background:rgba(13,13,15,.44);
+  opacity:0;transition:opacity .35s var(--ease);
+}
+.pop.montre{display:flex}
+.pop.vu{opacity:1}
+.pop__boite{
+  width:100%;max-width:470px;position:relative;
+  background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow-m);
+  padding:clamp(22px,4vw,32px);
+  max-height:calc(100dvh - 32px);overflow-y:auto;overscroll-behavior:contain;
+  transform:translateY(18px) scale(.985);
+  transition:transform .4s var(--ease);
+}
+.pop.vu .pop__boite{transform:none}
+.pop__fermer{
+  position:absolute;top:6px;right:6px;width:44px;height:44px;border-radius:50%;
+  display:grid;place-items:center;color:var(--gray);font-size:19px;line-height:1;
+  transition:background .2s var(--ease),color .2s var(--ease);
+}
+.pop__marque{
+  font-size:15px;font-weight:600;letter-spacing:-.02em;color:var(--black);
+  display:inline-flex;align-items:center;gap:7px;margin-bottom:var(--s3);
+}
+.pop__marque i{width:7px;height:7px;border-radius:50%;background:var(--blue);flex:none}
+.pop__marque em{font-style:normal;font-weight:400;color:var(--gray)}
+.pop__t{
+  font-size:clamp(23px,3.4vw,29px);font-weight:700;letter-spacing:-.022em;
+  line-height:1.15;color:var(--black);text-wrap:balance;
+}
+.pop__d{margin-top:10px;font-size:15.5px;line-height:1.5;color:var(--gray)}
+.pop__pts{list-style:none;display:flex;flex-direction:column;gap:9px;margin:var(--s3) 0}
+.pop__pts li{display:flex;align-items:flex-start;gap:10px;font-size:15px;line-height:1.4;color:var(--dark-gray)}
+.pop__pts b{
+  flex:none;width:21px;height:21px;border-radius:50%;margin-top:1px;
+  background:rgba(0,113,227,.1);color:var(--blue);
+  font-size:11px;font-weight:700;display:grid;place-items:center;
+}
+.pop__form{display:flex;flex-direction:column;gap:12px}
+.pop__note{font-size:12.5px;line-height:1.45;color:var(--gray)}
+.pop__note a{color:var(--blue);text-decoration:underline;text-underline-offset:2px}
+
+@media (max-width:400px){
+  .pop__boite{padding:var(--s2) var(--s2) var(--s3)}
+  .pop__pts li{font-size:14.5px}
+}
+
+@media (prefers-reduced-motion:reduce){
+  .bandeau,.pop,.pop__boite{transition:none}
+  .bandeau{transform:none}
+}
+
 /* =========================================================
    SURVOL — réservé aux pointeurs précis
 
@@ -1134,4 +1260,9 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
   .faq__q:hover h3{color:var(--blue)}
   .nap a:hover{color:var(--blue)}
   .footer__col a:hover{color:var(--blue)}
+  a.direct__ligne:hover{background:var(--off-white)}
+  a.direct__ligne:hover .direct__val{color:var(--blue)}
+  .bandeau__btn--ok:hover{background:var(--blue-dark);border-color:var(--blue-dark)}
+  .bandeau__btn--non:hover{background:var(--off-white)}
+  .pop__fermer:hover{background:var(--off-white);color:var(--black)}
 }
