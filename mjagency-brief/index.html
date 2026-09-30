@@ -1,0 +1,2050 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#F3F5F8" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0A0D12" media="(prefers-color-scheme: dark)">
+<title>Brief site web · MJAGENCY</title>
+<meta name="description" content="Décrivez le site que vous voulez en quelques minutes : MJAGENCY, agence web à Sète.">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='15' fill='%230B1220'/%3E%3Ctext x='9' y='42' font-family='Poppins,Arial,sans-serif' font-weight='700' font-size='26' fill='%23fff'%3EMJ%3C/text%3E%3Ccircle cx='51' cy='39' r='4' fill='%230071E3'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=JetBrains+Mono:wght@500&family=Onest:wght@400;500;600&family=Poppins:wght@700&display=swap">
+<style>
+:root {
+  color-scheme: light;
+  --bg: #F3F5F8;
+  --surface: #FFFFFF;
+  --ink: #0B1220;
+  --muted: #5A6475;
+  --line: #DFE4EB;
+  --accent: #0071E3;
+  --accent-soft: #E6EFFC;
+  --danger: #C62F2F;
+  --ok: #0F8A5F;
+  --on-accent: #FFFFFF;
+  --field: #FFFFFF;
+  --hover-line: #B9C2CE;
+  --shadow-card: 0 1px 2px rgba(11, 18, 32, .04), 0 12px 40px -18px rgba(11, 18, 32, .16);
+  --shadow-mock: 0 2px 4px rgba(11, 18, 32, .05), 0 24px 48px -16px rgba(11, 18, 32, .22), 0 60px 90px -40px rgba(11, 18, 32, .32);
+
+  --font-display: "Bricolage Grotesque", "Avenir Next", "Segoe UI Variable Display", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --font-text: "Onest", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+  --font-logo: "Poppins", "Avenir Next", Futura, "Century Gothic", "Segoe UI", system-ui, sans-serif;
+
+  --radius: 22px;
+  --ease: cubic-bezier(.2, .8, .2, 1);
+  --top-h: 60px;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: dark;
+    --bg: #0A0D12;
+    --surface: #12161D;
+    --ink: #EDF1F6;
+    --muted: #98A2B3;
+    --line: #252C37;
+    --accent: #3B93F5;
+    --accent-soft: #10243F;
+    --danger: #EF6A6A;
+    --ok: #34B889;
+    --on-accent: #FFFFFF;
+    --field: #0E1218;
+    --hover-line: #3A4352;
+    --shadow-card: 0 1px 0 rgba(255, 255, 255, .03) inset, 0 20px 50px -24px rgba(0, 0, 0, .7);
+    --shadow-mock: 0 2px 4px rgba(0, 0, 0, .3), 0 28px 56px -18px rgba(0, 0, 0, .7), 0 60px 100px -40px rgba(0, 0, 0, .8);
+  }
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-text);
+  font-size: 16px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+@supports (overflow: clip) { body { overflow-x: clip; } }
+button, input, textarea { font: inherit; color: inherit; }
+button { cursor: pointer; -webkit-tap-highlight-color: transparent; }
+[hidden] { display: none !important; }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+:focus { outline: none; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 8px; }
+::selection { background: var(--accent-soft); color: var(--ink); }
+
+/* ---------- Barre du haut ---------- */
+.top {
+  position: sticky; top: 0; z-index: 40;
+  background: color-mix(in srgb, var(--bg) 78%, transparent);
+  -webkit-backdrop-filter: saturate(170%) blur(18px);
+  backdrop-filter: saturate(170%) blur(18px);
+  border-bottom: 1px solid color-mix(in srgb, var(--line) 70%, transparent);
+}
+.top-in {
+  max-width: 1280px; margin: 0 auto; height: var(--top-h);
+  padding: 0 max(16px, env(safe-area-inset-left)) 0 max(16px, env(safe-area-inset-right));
+  display: flex; align-items: center; justify-content: space-between; gap: 16px;
+}
+@media (min-width: 700px) { .top-in { padding: 0 32px; } }
+.brand { display: flex; align-items: center; gap: 14px; min-width: 0; }
+.logo { font-family: var(--font-logo); font-weight: 700; font-size: 23px; letter-spacing: -.02em; line-height: 1; color: var(--ink); }
+.logo .dot { color: var(--accent); }
+.brand-sep { width: 1px; height: 18px; background: var(--line); }
+.brand-title { font-size: 14px; font-weight: 500; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+@media (max-width: 640px) { .brand-sep, .brand-title { display: none; } }
+.step-count { font-family: var(--font-mono); font-weight: 500; font-size: 12px; letter-spacing: .06em; color: var(--muted); white-space: nowrap; }
+.step-count b { color: var(--ink); font-weight: 500; }
+.progress { position: absolute; left: 0; right: 0; bottom: -1px; height: 2px; background: transparent; }
+.progress-bar { height: 100%; width: 12.5%; background: var(--accent); border-radius: 0 2px 2px 0; transition: width .6s var(--ease); }
+
+/* ---------- Mise en page ---------- */
+.layout {
+  max-width: 1280px; margin: 0 auto;
+  padding: 28px 16px 72px;
+  display: grid; grid-template-columns: minmax(0, 1fr); gap: 32px;
+}
+@media (min-width: 700px) { .layout { padding: 36px 32px 96px; } }
+@media (min-width: 1000px) {
+  .layout { grid-template-columns: minmax(0, 1fr) 430px; gap: 48px; align-items: start; }
+}
+
+/* ---------- Rail des étapes ---------- */
+.rail { margin: 0 0 20px; }
+.rail ol { position: relative; list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; }
+@media (max-width: 999px) {
+  .rail { margin: 0 -16px 18px; }
+  .rail ol {
+    flex-wrap: nowrap; overflow-x: auto; padding: 4px 16px 6px;
+    scroll-snap-type: x proximity; scrollbar-width: none; -ms-overflow-style: none;
+    scroll-padding-inline: 16px;
+  }
+  .rail ol::-webkit-scrollbar { display: none; }
+  .rail li { scroll-snap-align: start; flex: none; }
+}
+@media (min-width: 700px) and (max-width: 999px) { .rail { margin: 0 -32px 18px; } .rail ol { padding: 4px 32px 6px; scroll-padding-inline: 32px; } }
+.rail-btn {
+  position: relative; display: inline-flex; align-items: center; gap: 8px;
+  height: 38px; padding: 0 14px 0 12px;
+  border-radius: 999px; border: 1px solid var(--line);
+  background: var(--surface); color: var(--ink);
+  font-size: 14px; font-weight: 500; white-space: nowrap;
+  transition: border-color .2s, box-shadow .2s, background .2s;
+}
+.rail-btn:hover { border-color: var(--hover-line); }
+.rail-num { font-family: var(--font-mono); font-size: 11px; color: var(--muted); letter-spacing: .02em; }
+.rail-btn[aria-current="step"] { border-color: var(--ink); box-shadow: 0 0 0 1px var(--ink); }
+.rail-check {
+  display: none; width: 16px; height: 16px; border-radius: 50%;
+  background: var(--accent); color: #fff; align-items: center; justify-content: center; margin-left: 2px;
+}
+.rail-btn.is-done .rail-check { display: inline-flex; }
+.rail-check svg { width: 10px; height: 10px; }
+
+/* ---------- Carte formulaire ---------- */
+.card {
+  background: var(--surface); border: 1px solid var(--line);
+  border-radius: var(--radius); box-shadow: var(--shadow-card);
+  padding: 28px 20px 24px;
+  scroll-margin-top: calc(var(--top-h) + 16px);
+}
+@media (min-width: 700px) { .card { padding: 44px 44px 32px; } }
+.step[data-enter] > * { animation: stepIn .5s var(--ease) both; }
+.step[data-enter] > *:nth-child(2) { animation-delay: .04s; }
+.step[data-enter] > *:nth-child(3) { animation-delay: .08s; }
+.step[data-enter] > *:nth-child(n+4) { animation-delay: .12s; }
+@keyframes stepIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+
+.eyebrow { margin: 0 0 14px; font-family: var(--font-mono); font-weight: 500; font-size: 12px; letter-spacing: .12em; color: var(--accent); }
+.step-title {
+  margin: 0; font-family: var(--font-display); font-weight: 700;
+  font-size: clamp(30px, 2.4vw + 18px, 48px); line-height: 1.04; letter-spacing: -.025em;
+  text-wrap: balance; font-variation-settings: "opsz" 72;
+}
+.step-title:focus, .step-title:focus-visible, #success-title:focus, .alert:focus { outline: none; }
+.step-intro { margin: 14px 0 0; max-width: 58ch; color: var(--muted); font-size: 17px; line-height: 1.55; text-wrap: pretty; }
+
+/* ---------- Champs ---------- */
+.fields { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 26px 18px; margin-top: 36px; }
+.field { position: relative; grid-column: 1 / -1; min-width: 0; }
+@media (min-width: 640px) { .field.half { grid-column: auto; } }
+.label { display: block; margin: 0 0 9px; font-size: 15px; font-weight: 600; line-height: 1.35; color: var(--ink); }
+.req { color: var(--accent); margin-left: 2px; }
+.input {
+  display: block; width: 100%; min-height: 50px;
+  padding: 12px 15px; border-radius: 13px;
+  border: 1px solid var(--line); background: var(--field); color: var(--ink);
+  font-size: 16px; line-height: 1.45;
+  transition: border-color .18s, box-shadow .18s;
+  -webkit-appearance: none; appearance: none;
+}
+.input::placeholder { color: color-mix(in srgb, var(--muted) 72%, transparent); }
+.input:hover { border-color: var(--hover-line); }
+.input:focus, .input:focus-visible { outline: none; border-color: var(--accent); box-shadow: 0 0 0 4px var(--accent-soft); }
+textarea.input { resize: vertical; min-height: 0; }
+input[type="date"].input { min-width: 0; }
+input[type="date"].input::-webkit-date-and-time-value { text-align: left; }
+.input[aria-invalid="true"] { border-color: var(--danger); }
+.input[aria-invalid="true"]:focus { box-shadow: 0 0 0 4px color-mix(in srgb, var(--danger) 16%, transparent); }
+.help { margin: 8px 0 0; font-size: 13.5px; color: var(--muted); line-height: 1.45; }
+.err { margin: 8px 0 0; font-size: 13.5px; color: var(--danger); font-weight: 500; display: flex; gap: 6px; align-items: flex-start; }
+.err::before {
+  content: ""; flex: none; width: 14px; height: 14px; margin-top: 2px; border-radius: 50%;
+  border: 1.5px solid currentColor;
+  background-image: linear-gradient(currentColor, currentColor), linear-gradient(currentColor, currentColor);
+  background-size: 1.5px 5px, 1.5px 1.5px; background-position: 50% 2.2px, 50% 8.4px; background-repeat: no-repeat;
+}
+.limit-msg { color: var(--danger); font-weight: 500; }
+
+/* Pastilles */
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip {
+  display: inline-flex; align-items: center; min-height: 40px;
+  padding: 8px 15px; border-radius: 999px;
+  border: 1px solid var(--line); background: var(--field); color: var(--ink);
+  font-size: 14.5px; font-weight: 500; line-height: 1.25; text-align: left;
+  transition: background .18s, color .18s, border-color .18s, transform .12s;
+}
+.chip:hover { border-color: var(--hover-line); }
+.chip:active { transform: scale(.97); }
+.chip[aria-pressed="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+.chip[aria-disabled="true"] { opacity: .45; }
+
+/* Couleurs */
+.colors { display: flex; flex-wrap: wrap; gap: 10px; }
+.swatch {
+  display: inline-flex; align-items: center; gap: 10px;
+  height: 46px; padding: 0 6px 0 6px; border-radius: 999px;
+  border: 1px solid var(--line); background: var(--field);
+}
+.swatch-pick { position: relative; width: 34px; height: 34px; border-radius: 50%; flex: none; box-shadow: inset 0 0 0 1px rgba(0,0,0,.12); }
+.swatch-pick input { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; border: 0; padding: 0; }
+.swatch-pick:focus-within { outline: 2px solid var(--accent); outline-offset: 3px; }
+.swatch-hex { font-family: var(--font-mono); font-size: 13px; font-weight: 500; letter-spacing: .02em; min-width: 62px; }
+.swatch-rm {
+  width: 30px; height: 30px; border-radius: 50%; border: 0; background: transparent; color: var(--muted);
+  display: inline-flex; align-items: center; justify-content: center;
+}
+.swatch-rm:hover { background: var(--accent-soft); color: var(--ink); }
+.swatch-rm svg { width: 14px; height: 14px; }
+.add-color {
+  height: 46px; padding: 0 18px; border-radius: 999px;
+  border: 1.5px dashed var(--hover-line); background: transparent; color: var(--ink);
+  font-size: 14.5px; font-weight: 500;
+  transition: border-color .18s, color .18s;
+}
+.add-color:hover { border-color: var(--accent); color: var(--accent); }
+
+/* ---------- Pied d'étape ---------- */
+.step-foot {
+  display: flex; align-items: center; justify-content: space-between; gap: 16px;
+  margin-top: 44px; padding-top: 22px; border-top: 1px solid var(--line);
+}
+.foot-note { margin: 0; font-size: 13.5px; color: var(--muted); max-width: 26ch; line-height: 1.4; }
+@media (min-width: 640px) { .foot-note { max-width: none; } }
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  min-height: 48px; padding: 0 24px; border-radius: 999px; border: 1px solid transparent;
+  font-size: 15.5px; font-weight: 600; letter-spacing: -.005em; white-space: nowrap; text-decoration: none;
+  transition: background .2s, border-color .2s, color .2s, transform .12s, box-shadow .2s;
+}
+.btn:active { transform: scale(.98); }
+.btn-primary { background: var(--accent); color: var(--on-accent); box-shadow: 0 6px 18px -8px color-mix(in srgb, var(--accent) 70%, transparent); }
+.btn-primary:hover { background: color-mix(in srgb, var(--accent) 88%, #000); }
+.btn-secondary { background: var(--surface); color: var(--ink); border-color: var(--line); }
+.btn-secondary:hover { border-color: var(--hover-line); }
+.btn-ghost { background: transparent; color: var(--ink); padding: 0 10px; margin-left: -10px; }
+.btn-ghost:hover { color: var(--accent); }
+.btn-sm { min-height: 38px; padding: 0 16px; font-size: 14px; }
+.link-btn { border: 0; background: none; padding: 4px 2px; color: var(--accent); font-weight: 600; font-size: 14px; }
+.link-btn:hover { text-decoration: underline; text-underline-offset: 3px; }
+.arrow { transition: transform .2s var(--ease); display: inline-block; }
+.btn:hover .arrow { transform: translateX(3px); }
+
+/* ---------- Étape 8 ---------- */
+.recap { list-style: none; margin: 34px 0 0; padding: 0; border: 1px solid var(--line); border-radius: 16px; overflow: hidden; }
+.recap li { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 4px 14px; padding: 14px 16px; border-top: 1px solid var(--line); }
+.recap li:first-child { border-top: 0; }
+.recap-num { font-family: var(--font-mono); font-size: 12px; color: var(--muted); }
+.recap-title { font-weight: 600; font-size: 15px; line-height: 1.3; }
+.recap-meta { display: block; font-size: 13.5px; font-weight: 400; color: var(--muted); margin-top: 2px; }
+.recap-meta.is-missing { color: var(--danger); font-weight: 500; }
+.sub-h { margin: 36px 0 12px; font-family: var(--font-display); font-weight: 700; font-size: 21px; letter-spacing: -.015em; }
+.sig-wrap { margin-top: 26px; }
+.sig-sheet {
+  position: relative; height: 200px; border-radius: 16px; overflow: hidden;
+  background: #FFFFFF; border: 1px solid var(--line);
+  box-shadow: inset 0 1px 3px rgba(11, 18, 32, .05);
+}
+.sig-sheet canvas { position: absolute; inset: 0; width: 100%; height: 100%; touch-action: none; cursor: crosshair; display: block; }
+.sig-base { position: absolute; left: 24px; right: 24px; bottom: 52px; border-top: 1.5px dashed #C5CDD8; pointer-events: none; }
+.sig-x { position: absolute; left: 24px; bottom: 58px; font-family: var(--font-mono); font-size: 13px; color: #98A2B3; pointer-events: none; }
+.sig-hint { position: absolute; left: 0; right: 0; bottom: 20px; text-align: center; font-size: 13px; color: #8A94A6; pointer-events: none; }
+.sig-tools { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-top: 8px; flex-wrap: wrap; }
+.check {
+  display: grid; grid-template-columns: 24px minmax(0, 1fr); gap: 12px; align-items: start;
+  margin-top: 28px; padding: 16px; border-radius: 14px; border: 1px solid var(--line); cursor: pointer;
+  transition: border-color .2s, background .2s;
+}
+.check:hover { border-color: var(--hover-line); }
+.check input { appearance: none; -webkit-appearance: none; margin: 1px 0 0; width: 22px; height: 22px; border-radius: 7px; border: 1.5px solid var(--hover-line); background: var(--field); display: grid; place-content: center; cursor: pointer; transition: background .15s, border-color .15s; }
+.check input::after { content: ""; width: 11px; height: 6px; border-left: 2px solid #fff; border-bottom: 2px solid #fff; transform: rotate(-45deg) translate(1px, -1px) scale(0); transition: transform .15s var(--ease); }
+.check input:checked { background: var(--accent); border-color: var(--accent); }
+.check input:checked::after { transform: rotate(-45deg) translate(1px, -1px) scale(1); }
+.check input:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+.check input[aria-invalid="true"] { border-color: var(--danger); }
+.check span { font-size: 15px; line-height: 1.5; }
+.check:has(input:checked) { border-color: color-mix(in srgb, var(--accent) 45%, var(--line)); background: color-mix(in srgb, var(--accent-soft) 45%, transparent); }
+.validate-row { margin-top: 26px; display: flex; justify-content: flex-end; }
+@media (max-width: 520px) { .validate-row .btn { width: 100%; } }
+.alert {
+  margin-top: 24px; padding: 16px 18px; border-radius: 14px;
+  border: 1px solid color-mix(in srgb, var(--danger) 45%, transparent);
+  background: color-mix(in srgb, var(--danger) 7%, var(--surface));
+}
+.alert-title { margin: 0 0 8px; font-weight: 600; color: var(--danger); }
+.alert ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 6px; }
+.alert li { display: flex; justify-content: space-between; align-items: center; gap: 12px; font-size: 14.5px; }
+
+/* Succès */
+.success { text-align: center; padding: 16px 0 4px; }
+.success-mark { width: 76px; height: 76px; margin: 0 auto 22px; border-radius: 50%; background: var(--accent); display: grid; place-items: center; animation: pop .55s var(--ease) both; }
+.success-mark svg { width: 38px; height: 38px; }
+.success-mark path { stroke-dasharray: 40; stroke-dashoffset: 40; animation: draw .5s .3s var(--ease) forwards; }
+@keyframes pop { from { transform: scale(.6); opacity: 0; } to { transform: none; opacity: 1; } }
+@keyframes draw { to { stroke-dashoffset: 0; } }
+.success h2 { margin: 0; font-family: var(--font-display); font-weight: 700; font-size: clamp(30px, 2.4vw + 18px, 44px); letter-spacing: -.025em; line-height: 1.05; }
+.ref { display: inline-block; margin-top: 14px; padding: 6px 12px; border-radius: 999px; background: var(--accent-soft); color: var(--accent); font-family: var(--font-mono); font-weight: 500; font-size: 13px; letter-spacing: .04em; }
+.success p.lead { margin: 18px auto 0; max-width: 46ch; color: var(--muted); font-size: 16.5px; text-wrap: pretty; }
+.success-actions { margin-top: 26px; display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; }
+@media (max-width: 520px) { .success-actions .btn { width: 100%; } }
+.contact-box { margin: 30px auto 0; max-width: 460px; text-align: left; border: 1px solid var(--line); border-radius: 16px; padding: 16px 18px; }
+.contact-box .k { font-family: var(--font-mono); font-size: 11px; letter-spacing: .1em; color: var(--muted); margin: 0 0 10px; }
+.contact-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 8px 0; border-top: 1px solid var(--line); flex-wrap: wrap; }
+.contact-row:first-of-type { border-top: 0; padding-top: 0; }
+.contact-row a { color: var(--ink); font-weight: 600; text-decoration: none; overflow-wrap: anywhere; }
+.contact-row a:hover { color: var(--accent); }
+.success-more { margin-top: 26px; display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 6px 22px; }
+.confirm-inline { display: inline-flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 8px 10px; font-size: 14.5px; }
+.link-danger { color: var(--danger); }
+
+/* ---------- Aperçu ---------- */
+.preview { min-width: 0; }
+@media (min-width: 1000px) { .preview { position: sticky; top: calc(var(--top-h) + 24px); } }
+.preview-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; font-family: var(--font-mono); font-weight: 500; font-size: 11px; letter-spacing: .1em; color: var(--muted); }
+.live { display: inline-flex; align-items: center; gap: 7px; color: var(--accent); }
+.live-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent) 50%, transparent); animation: pulse 2s ease-out infinite; }
+@keyframes pulse { 0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent) 45%, transparent); } 70%, 100% { box-shadow: 0 0 0 8px color-mix(in srgb, var(--accent) 0%, transparent); } }
+.stage { perspective: 1500px; padding: 18px 6px 30px; }
+.browser {
+  position: relative; border-radius: 14px; overflow: hidden; background: #FFFFFF;
+  border: 1px solid rgba(11, 18, 32, .08); box-shadow: var(--shadow-mock);
+  transform: rotateX(5deg) rotateY(-9deg); transform-origin: 50% 50%;
+  transition: transform .7s var(--ease);
+  will-change: transform;
+}
+.browser.is-tracking { transition: transform .18s ease-out; }
+.chrome { height: 34px; display: flex; align-items: center; gap: 10px; padding: 0 12px; background: #F1F3F6; border-bottom: 1px solid #E2E6EC; }
+.dots { display: flex; gap: 6px; flex: none; }
+.dots i { width: 9px; height: 9px; border-radius: 50%; background: #D3D8DF; display: block; }
+.url { flex: 1; min-width: 0; display: flex; align-items: center; justify-content: center; gap: 6px; height: 22px; padding: 0 10px; border-radius: 6px; background: #FFFFFF; color: #5A6475; font-family: var(--font-mono); font-size: 10.5px; }
+.url svg { width: 9px; height: 9px; flex: none; opacity: .6; }
+.url span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.dots-spacer { width: 39px; flex: none; }
+.viewport-wrap { position: relative; height: 450px; }
+.viewport-wrap::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 90px; background: linear-gradient(to bottom, rgba(255, 255, 255, 0), #FFFFFF 92%); pointer-events: none; }
+.viewport { height: 100%; overflow-y: auto; overflow-x: hidden; scrollbar-width: none; overscroll-behavior: contain; }
+.viewport::-webkit-scrollbar { display: none; }
+
+/* Mini-site */
+.ms {
+  --ms-accent: #0071E3; --ms-on: #FFFFFF; --ms-img: #0071E3; --ms-r: 8px;
+  --ms-ink: #0B1220; --ms-muted: #6B7485; --ms-block: #F4F6F9; --ms-line: #E9ECF1;
+  color: var(--ms-ink); font-family: var(--font-text); font-size: 10px; line-height: 1.4; padding-bottom: 70px;
+}
+.ms.round { --ms-r: 16px; }
+.ms-nav { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 12px 16px; border-bottom: 1px solid var(--ms-line); }
+.ms-brand { font-family: var(--font-display); font-weight: 700; font-size: 12px; letter-spacing: -.01em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; max-width: 46%; }
+.ms-brand.is-empty { color: #B3BAC5; }
+.ms-links { display: flex; align-items: center; gap: 10px; font-size: 9px; color: var(--ms-muted); white-space: nowrap; flex: none; }
+.ms-links .more { padding: 1px 6px; border-radius: 999px; background: var(--ms-block); font-family: var(--font-mono); font-size: 8px; }
+.ms-links .cta-dot { width: 18px; height: 8px; border-radius: 999px; background: var(--ms-accent); }
+.ms-hero {
+  margin: 10px; padding: 22px 16px 20px 18px; border-radius: var(--ms-r);
+  background: color-mix(in srgb, var(--ms-accent) 7%, #FFFFFF);
+  display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); gap: 14px; align-items: center;
+  transition: background .4s, border-radius .4s, color .4s;
+}
+.ms-hero.sand { background: #F3EADC; }
+.ms-hero.sage { background: #E3EADF; }
+.ms-hero.minimal { background: transparent; border: 1px solid var(--ms-line); }
+.ms-hero.dark { background: #0F1115; color: #F4F5F7; }
+.ms-kicker { font-family: var(--font-mono); font-size: 7.5px; letter-spacing: .12em; text-transform: uppercase; color: var(--ms-accent); margin-bottom: 7px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ms-hero.dark .ms-kicker { color: color-mix(in srgb, var(--ms-accent) 60%, #FFFFFF); }
+.ms-h { margin: 0; font-family: var(--font-display); font-weight: 700; font-size: 21px; line-height: 1.02; letter-spacing: -.025em; overflow-wrap: anywhere; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.ms-h.is-empty { color: #B3BAC5; }
+.ms-hero.dark .ms-h.is-empty { color: #5C6370; }
+.ms-lines { margin: 10px 0 12px; display: grid; gap: 5px; }
+.ln { display: block; height: 4.5px; border-radius: 3px; background: rgba(11, 18, 32, .11); }
+.ms-hero.dark .ln { background: rgba(255, 255, 255, .18); }
+.ln.w90 { width: 90%; } .ln.w80 { width: 80%; } .ln.w70 { width: 70%; } .ln.w60 { width: 60%; } .ln.w50 { width: 50%; } .ln.w40 { width: 40%; } .ln.w30 { width: 30%; }
+.ln.dk { background: rgba(11, 18, 32, .26); height: 5.5px; }
+.ms-btn { display: inline-block; max-width: 100%; padding: 6px 11px; border-radius: max(5px, calc(var(--ms-r) - 2px)); background: var(--ms-accent); color: var(--ms-on); font-size: 8.5px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; transition: background .4s, color .4s; }
+.img {
+  display: block; border-radius: max(4px, calc(var(--ms-r) - 3px));
+  background:
+    radial-gradient(circle at 72% 30%, rgba(255, 255, 255, .55) 0 9%, transparent 10%),
+    linear-gradient(160deg, color-mix(in srgb, var(--ms-img) 26%, #FFFFFF), color-mix(in srgb, var(--ms-img) 48%, #FFFFFF));
+  transition: background .4s;
+}
+.ms-hero .img { height: 104px; }
+.ms-hero.dark .img { background: linear-gradient(160deg, color-mix(in srgb, var(--ms-img) 50%, #1B1E24), color-mix(in srgb, var(--ms-img) 25%, #1B1E24)); }
+.ms-secs { display: grid; }
+.ms-sec { margin: 0 10px 10px; padding: 14px; border-radius: var(--ms-r); background: var(--ms-block); transition: background .4s, border-radius .4s; }
+.ms.minimal .ms-sec { background: transparent; border-radius: 0; border-top: 1px solid var(--ms-line); margin-bottom: 0; padding: 16px 8px; }
+.ms.colore .ms-sec:nth-child(even) { background: color-mix(in srgb, var(--ms-accent) 13%, #FFFFFF); }
+.ms-sec.is-new { animation: msIn .6s var(--ease) both; }
+@keyframes msIn { from { opacity: 0; transform: translateY(18px) scale(.94); } to { opacity: 1; transform: none; } }
+.ms-sec h4 { margin: 0 0 10px; font-family: var(--font-display); font-weight: 700; font-size: 11.5px; letter-spacing: -.01em; display: flex; align-items: baseline; gap: 6px; }
+.ms-sec h4 small { font-family: var(--font-mono); font-weight: 500; font-size: 7px; letter-spacing: .1em; color: var(--ms-accent); }
+.wf-split { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr); gap: 12px; align-items: center; }
+.wf-split .img { height: 62px; }
+.wf-3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.wf-card { background: #FFFFFF; border-radius: max(4px, calc(var(--ms-r) - 3px)); padding: 6px; display: grid; gap: 5px; }
+.ms.minimal .wf-card { border: 1px solid var(--ms-line); }
+.wf-card .img { height: 32px; }
+.wf-card .img.sq { height: 44px; }
+.wf-price { font-family: var(--font-mono); font-size: 7.5px; color: var(--ms-accent); font-weight: 500; }
+.wf-mini-btn { height: 9px; border-radius: 999px; background: var(--ms-accent); width: 60%; }
+.wf-rows { display: grid; gap: 7px; }
+.wf-row { display: flex; align-items: center; gap: 8px; }
+.wf-row .ln { flex: none; }
+.wf-row .fill { flex: 1; border-bottom: 1px dotted rgba(11, 18, 32, .22); height: 0; margin-top: 2px; }
+.wf-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 5px; }
+.wf-grid .img { height: 40px; }
+.wf-grid .img:nth-child(2n) { background: linear-gradient(200deg, color-mix(in srgb, var(--ms-img) 18%, #FFFFFF), color-mix(in srgb, var(--ms-img) 38%, #FFFFFF)); }
+.wf-grid .img:nth-child(3n) { background: linear-gradient(120deg, color-mix(in srgb, var(--ms-accent) 22%, #FFFFFF), color-mix(in srgb, var(--ms-img) 44%, #FFFFFF)); }
+.wf-tiers { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; align-items: center; }
+.tier { background: #FFFFFF; border-radius: max(4px, calc(var(--ms-r) - 3px)); padding: 9px 7px; display: grid; gap: 5px; }
+.ms.minimal .tier { border: 1px solid var(--ms-line); }
+.tier .big { height: 9px; width: 55%; border-radius: 3px; background: rgba(11, 18, 32, .3); }
+.tier.hi { background: var(--ms-accent); padding: 14px 7px; transform: scale(1.04); box-shadow: 0 6px 14px -8px rgba(11, 18, 32, .4); }
+.tier.hi .ln, .tier.hi .big { background: color-mix(in srgb, var(--ms-on) 55%, transparent); }
+.wf-reviews { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.review { background: #FFFFFF; border-radius: max(4px, calc(var(--ms-r) - 3px)); padding: 8px; display: grid; gap: 5px; }
+.ms.minimal .review { border: 1px solid var(--ms-line); }
+.stars { color: var(--ms-accent); font-size: 8.5px; letter-spacing: 1px; line-height: 1; }
+.wf-faq .wf-row { justify-content: space-between; padding: 5px 0; border-bottom: 1px solid var(--ms-line); }
+.wf-faq .plus { font-family: var(--font-mono); font-size: 10px; color: var(--ms-accent); line-height: 1; }
+.wf-team { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; justify-items: center; text-align: center; }
+.avatar { width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(160deg, color-mix(in srgb, var(--ms-img) 28%, #FFFFFF), color-mix(in srgb, var(--ms-img) 55%, #FFFFFF)); margin-bottom: 5px; }
+.wf-team .member { display: grid; justify-items: center; gap: 4px; width: 100%; }
+.wf-contact { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 10px; }
+.wf-form { display: grid; gap: 5px; }
+.wf-input { height: 13px; border-radius: 4px; background: #FFFFFF; border: 1px solid var(--ms-line); }
+.wf-input.ta { height: 28px; }
+.wf-form .ms-btn { justify-self: start; padding: 4px 10px; font-size: 7.5px; }
+.wf-map { position: relative; border-radius: max(4px, calc(var(--ms-r) - 3px)); min-height: 88px; background: repeating-linear-gradient(45deg, #E8ECF1 0 6px, #F5F7FA 6px 12px); border: 1px solid var(--ms-line); }
+.wf-map::after { content: ""; position: absolute; left: 50%; top: 44%; width: 11px; height: 11px; border-radius: 50% 50% 50% 0; transform: translate(-50%, -50%) rotate(-45deg); background: var(--ms-accent); box-shadow: 0 2px 4px rgba(0, 0, 0, .2); }
+.ms-empty { margin: 4px 10px 10px; padding: 28px 16px; border: 1.5px dashed #CDD4DE; border-radius: var(--ms-r); text-align: center; color: #8A94A6; font-size: 10px; }
+.ms-foot { margin: 6px 10px 0; padding: 12px 6px; border-top: 1px solid var(--ms-line); display: flex; justify-content: space-between; align-items: center; }
+
+.pv-block { margin-top: 4px; padding: 0 6px; }
+.pv-feats { display: flex; flex-wrap: wrap; gap: 6px; min-height: 26px; align-items: center; }
+.pv-feat { padding: 4px 10px; border-radius: 999px; background: var(--surface); border: 1px solid var(--line); font-size: 12.5px; font-weight: 500; }
+.pv-feat.more { font-family: var(--font-mono); font-size: 11.5px; color: var(--muted); }
+.pv-feats-empty { font-size: 13px; color: var(--muted); }
+.gauge { margin-top: 20px; padding: 16px 18px; border-radius: 16px; background: var(--surface); border: 1px solid var(--line); }
+.gauge-top { display: flex; align-items: baseline; gap: 8px; }
+.gauge-num { font-family: var(--font-display); font-weight: 700; font-size: 26px; letter-spacing: -.02em; line-height: 1; font-variant-numeric: tabular-nums; }
+.gauge-lbl { font-size: 13.5px; color: var(--muted); }
+.gauge-track { margin-top: 12px; height: 6px; border-radius: 999px; background: var(--line); overflow: hidden; }
+.gauge-fill { height: 100%; width: 0; border-radius: inherit; background: var(--accent); transition: width .6s var(--ease); }
+.gauge-msg { margin: 12px 0 0; font-size: 13.5px; color: var(--muted); line-height: 1.5; }
+
+/* Toast */
+.toast {
+  position: fixed; left: 50%; bottom: max(20px, env(safe-area-inset-bottom)); z-index: 60;
+  transform: translate(-50%, 16px); opacity: 0; pointer-events: none;
+  max-width: calc(100vw - 32px);
+  padding: 11px 18px; border-radius: 999px; background: var(--ink); color: var(--bg);
+  font-size: 14.5px; font-weight: 500; box-shadow: 0 12px 30px -10px rgba(0, 0, 0, .35);
+  transition: opacity .25s, transform .35s var(--ease);
+}
+.toast.is-on { opacity: 1; transform: translate(-50%, 0); }
+
+.site-foot { max-width: 1280px; margin: 0 auto; padding: 0 16px 40px; color: var(--muted); font-size: 13px; }
+@media (min-width: 700px) { .site-foot { padding: 0 32px 48px; } }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .001ms !important; animation-delay: 0s !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; scroll-behavior: auto !important; }
+  .browser { transform: none !important; }
+  .live-dot { animation: none; }
+}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="top-in">
+    <div class="brand">
+      <span class="logo" aria-label="MJAGENCY">MJ<span class="dot">.</span></span>
+      <span class="brand-sep" aria-hidden="true"></span>
+      <span class="brand-title">Brief de création de site web</span>
+    </div>
+    <div class="step-count" id="step-count" aria-live="polite">Étape <b>1</b> / 8</div>
+  </div>
+  <div class="progress" aria-hidden="true"><div class="progress-bar" id="progress-bar"></div></div>
+</header>
+
+<main class="layout">
+  <div class="form-col">
+    <nav class="rail" aria-label="Étapes du brief"><ol id="rail"></ol></nav>
+    <form class="card" id="brief" novalidate autocomplete="on"></form>
+  </div>
+
+  <aside class="preview" aria-label="Aperçu de votre futur site">
+    <div class="preview-head">
+      <span>VOTRE FUTUR SITE</span>
+      <span class="live"><span class="live-dot" aria-hidden="true"></span>SE CONSTRUIT EN DIRECT</span>
+    </div>
+    <div class="stage" id="stage">
+      <div class="browser" id="browser" aria-hidden="true">
+        <div class="chrome">
+          <div class="dots"><i></i><i></i><i></i></div>
+          <div class="url"><svg viewBox="0 0 10 12" fill="currentColor"><path d="M5 0a3 3 0 0 0-3 3v2H1.5A1.5 1.5 0 0 0 0 6.5v4A1.5 1.5 0 0 0 1.5 12h7a1.5 1.5 0 0 0 1.5-1.5v-4A1.5 1.5 0 0 0 8.5 5H8V3a3 3 0 0 0-3-3Zm-1.6 5V3a1.6 1.6 0 1 1 3.2 0v2Z"/></svg><span id="ms-url">www.votre-entreprise.fr</span></div>
+          <div class="dots-spacer"></div>
+        </div>
+        <div class="viewport-wrap">
+          <div class="viewport" id="viewport">
+            <div class="ms" id="ms">
+              <div class="ms-nav" id="ms-nav"></div>
+              <div class="ms-hero" id="ms-hero"></div>
+              <div class="ms-secs" id="ms-secs"></div>
+              <div class="ms-empty" id="ms-empty">Les pages que vous choisirez apparaîtront ici</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="pv-block">
+      <div class="pv-feats" id="pv-feats"></div>
+      <div class="gauge">
+        <div class="gauge-top"><span class="gauge-num" id="gauge-num">0 %</span><span class="gauge-lbl">du brief complété</span></div>
+        <div class="gauge-track" role="progressbar" aria-label="Brief complété" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="gauge-track"><div class="gauge-fill" id="gauge-fill"></div></div>
+        <p class="gauge-msg" id="gauge-msg"></p>
+      </div>
+    </div>
+  </aside>
+</main>
+
+<footer class="site-foot">MJAGENCY · Agence web à Sète · Bassin de Thau</footer>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
+<script>
+(function () {
+  'use strict';
+
+  /* =========================================================
+     Données : les 8 étapes
+     ========================================================= */
+  var STEPS = [
+    {
+      short: 'Entreprise', pdf: 'Entreprise',
+      title: 'Parlez-nous de votre entreprise',
+      intro: 'Quelques minutes pour poser les bases. Plus vos réponses sont précises, plus votre site vous ressemblera.',
+      fields: [
+        { id: 'company', label: "Nom de l'entreprise ou de l'enseigne", type: 'text', required: true, placeholder: 'Boulangerie du Port', autocomplete: 'organization' },
+        { id: 'sector', label: "Secteur d'activité", type: 'single', options: ['Restaurant / bar', 'Boulangerie / pâtisserie', 'Commerce de détail', 'Beauté / coiffure / bien-être', 'Artisan / BTP', 'Santé / paramédical', 'Profession libérale / conseil', 'Immobilier', 'Tourisme / hébergement', 'Sport / loisirs', 'Autre'] },
+        { id: 'activity', label: 'Votre activité en quelques phrases', type: 'textarea', rows: 3 },
+        { id: 'contactName', label: 'Nom et prénom du contact', type: 'text', required: true, half: true, autocomplete: 'name' },
+        { id: 'contactRole', label: 'Fonction', type: 'text', half: true, autocomplete: 'organization-title' },
+        { id: 'phone', label: 'Téléphone', type: 'tel', half: true, help: "Téléphone ou e-mail : au moins l'un des deux.", autocomplete: 'tel' },
+        { id: 'email', label: 'E-mail', type: 'email', half: true, autocomplete: 'email' },
+        { id: 'address', label: "Adresse de l'établissement", type: 'text', half: true, autocomplete: 'street-address' },
+        { id: 'city', label: 'Code postal et ville', type: 'text', half: true, placeholder: '34200 Sète' },
+        { id: 'founded', label: 'Année de création', type: 'text', half: true, inputmode: 'numeric' },
+        { id: 'siret', label: 'SIRET (facultatif)', type: 'text', half: true, inputmode: 'numeric' },
+        { id: 'hours', label: "Horaires d'ouverture", type: 'textarea', rows: 2 }
+      ]
+    },
+    {
+      short: 'Projet', pdf: 'Projet',
+      title: 'Ce que votre site doit accomplir',
+      intro: "Un bon site a un objectif clair. Dites-nous ce qu'il doit vous rapporter, et à qui il s'adresse.",
+      fields: [
+        { id: 'siteType', label: 'Type de site', type: 'single', options: ['Site vitrine', 'Site e-commerce', 'Site avec réservation ou prise de RDV', 'Page unique (landing page)', "Refonte d'un site existant"] },
+        { id: 'currentUrl', label: 'Adresse de votre site actuel', type: 'url', autocomplete: 'url' },
+        { id: 'currentIssues', label: 'Ce qui ne vous convient plus dans votre site actuel', type: 'textarea', rows: 3 },
+        { id: 'goals', label: 'Vos objectifs principaux', type: 'multi', options: ['Être trouvé sur Google', 'Attirer de nouveaux clients', 'Rassurer et paraître plus pro', 'Recevoir des demandes de devis', 'Prendre des réservations ou des RDV', 'Vendre en ligne', 'Présenter la carte ou les produits', 'Recruter'] },
+        { id: 'mainAction', label: "L'action n°1 que doit faire un visiteur", type: 'text', placeholder: 'Réserver une table, appeler, demander un devis…' },
+        { id: 'audience', label: 'Qui sont vos clients ?', type: 'textarea', rows: 3 },
+        { id: 'differentiators', label: 'Ce qui vous distingue de vos concurrents', type: 'textarea', rows: 3 },
+        { id: 'competitors', label: 'Vos principaux concurrents', type: 'textarea', rows: 2 }
+      ]
+    },
+    {
+      short: 'Pages', pdf: 'Pages et contenus',
+      title: 'Les pages et les contenus',
+      intro: 'Sélectionnez les pages qui vous semblent utiles. Regardez la maquette : elle se remplit au fur et à mesure.',
+      fields: [
+        { id: 'pages', label: 'Pages souhaitées', type: 'multi', options: ['Accueil', 'À propos / Notre histoire', 'Prestations / Services', 'Carte / Menu', 'Boutique en ligne', 'Réalisations / Galerie', 'Tarifs', 'Avis clients', 'Actualités / Blog', 'FAQ', 'Équipe', 'Recrutement', 'Contact'] },
+        { id: 'productCount', label: 'Nombre de produits à vendre', type: 'text', half: true, inputmode: 'numeric' },
+        { id: 'languages', label: 'Langues du site', type: 'multi', half: true, options: ['Français', 'Anglais', 'Espagnol', 'Italien', 'Allemand'] },
+        { id: 'texts', label: 'Les textes du site', type: 'single', options: ['Je fournis les textes', 'MJAGENCY rédige les textes', 'Un mélange des deux'] },
+        { id: 'photos', label: 'Les photos', type: 'single', options: ["J'ai des photos professionnelles", "J'ai des photos amateurs", "Je n'ai pas de photos", 'Je souhaite un shooting photo'] },
+        { id: 'highlights', label: "Ce qu'il faut absolument mettre en avant", type: 'textarea', rows: 3 }
+      ]
+    },
+    {
+      short: 'Identité', pdf: 'Identité visuelle',
+      title: 'Votre identité visuelle',
+      intro: "Couleurs, style, ambiance. Pas besoin d'être graphiste : dites ce que vous aimez, on s'occupe du reste.",
+      fields: [
+        { id: 'logo', label: 'Logo', type: 'single', options: ["Oui, j'ai un logo", 'Oui, mais à moderniser', 'Non, il faut en créer un'] },
+        { id: 'colors', label: 'Couleurs de votre marque', type: 'colors', help: "Jusqu'à 4 couleurs. La première devient la couleur principale de la maquette." },
+        { id: 'mood', label: "L'ambiance recherchée", type: 'multi', max: 3, help: '3 choix maximum.', options: ['Minimaliste', 'Premium / luxe', 'Chaleureux', 'Moderne / tech', 'Artisanal / authentique', 'Coloré / fun', 'Méditerranéen', 'Nature / organique'] },
+        { id: 'inspirations', label: 'Des sites que vous aimez, et pourquoi', type: 'textarea', rows: 3 },
+        { id: 'avoid', label: 'Ce que vous ne voulez surtout pas', type: 'textarea', rows: 2 }
+      ]
+    },
+    {
+      short: 'Fonctionnalités', pdf: 'Fonctionnalités',
+      title: 'Les fonctionnalités utiles',
+      intro: 'Ce que votre site doit savoir faire pour vous faire gagner du temps et des clients.',
+      fields: [
+        { id: 'features', label: 'Fonctionnalités souhaitées', type: 'multi', options: ['Formulaire de contact', "Bouton d'appel / WhatsApp", 'Réservation en ligne', 'Prise de rendez-vous', 'Paiement en ligne', 'Click & collect', 'Demande de devis en ligne', 'Avis Google affichés', 'Plan Google Maps', 'Galerie photo', 'Fil Instagram', 'Newsletter', 'Espace client', 'Carte cadeau', 'Programme de fidélité', 'Site multilingue'] },
+        { id: 'tools', label: 'Outils que vous utilisez déjà', type: 'text', placeholder: 'Planity, TheFork, Doctolib, Shopify, logiciel de caisse…' },
+        { id: 'otherFeature', label: 'Une autre fonctionnalité en tête ?', type: 'textarea', rows: 2 }
+      ]
+    },
+    {
+      short: 'Visibilité', pdf: 'Domaine et visibilité',
+      title: 'Domaine et visibilité sur Google',
+      intro: 'Pour que vos futurs clients vous trouvent au bon moment, là où ils cherchent.',
+      fields: [
+        { id: 'domain', label: 'Nom de domaine', type: 'single', options: ["J'en ai déjà un", "Je n'en ai pas encore", 'Je ne sais pas'] },
+        { id: 'domainName', label: 'Nom de domaine actuel ou souhaité', type: 'text', half: true },
+        { id: 'host', label: 'Hébergeur actuel', type: 'text', half: true },
+        { id: 'emails', label: 'Adresses e-mail professionnelles', type: 'single', options: ["J'en ai déjà", "J'en voudrais", 'Pas besoin'] },
+        { id: 'gbp', label: 'Fiche Google (Google Business Profile)', type: 'single', options: ['Oui, elle est à jour', 'Oui, mais pas à jour', 'Non', 'Je ne sais pas'] },
+        { id: 'socials', label: 'Vos réseaux sociaux', type: 'textarea', rows: 2 },
+        { id: 'keywords', label: 'Sur quelles recherches Google voulez-vous apparaître ?', type: 'textarea', rows: 2, placeholder: 'boulangerie Sète, pain au levain Frontignan…' },
+        { id: 'area', label: 'Zone géographique visée', type: 'text', placeholder: 'Sète et bassin de Thau' }
+      ]
+    },
+    {
+      short: 'Budget', pdf: 'Budget et calendrier',
+      title: 'Budget et calendrier',
+      intro: 'Ces informations restent entre nous. Elles servent à vous proposer la formule la plus juste.',
+      fields: [
+        { id: 'budget', label: 'Budget envisagé', type: 'single', options: ['Moins de 500 €', '500 à 1 000 €', '1 000 à 2 000 €', '2 000 à 5 000 €', '5 000 à 10 000 €', 'Plus de 10 000 €', 'À définir ensemble'] },
+        { id: 'payment', label: 'Formule de paiement préférée', type: 'single', options: ['En une fois', 'En plusieurs fois', 'Abonnement mensuel tout compris', 'À discuter'] },
+        { id: 'maintenance', label: 'Suivi et mises à jour après la mise en ligne', type: 'single', options: ["MJAGENCY s'en occupe", 'Je gère moi-même', 'À discuter'] },
+        { id: 'launchDate', label: 'Mise en ligne souhaitée', type: 'date', half: true },
+        { id: 'approver', label: 'Qui valide le projet de votre côté ?', type: 'text', half: true },
+        { id: 'keyDate', label: 'Un événement ou une date à ne pas manquer ?', type: 'textarea', rows: 2 },
+        { id: 'other', label: 'Autre chose à nous dire ?', type: 'textarea', rows: 3 }
+      ]
+    },
+    {
+      short: 'Validation', pdf: 'Validation',
+      title: "Relisez, signez, c'est parti",
+      intro: "Vérifiez vos réponses. Vous pouvez revenir sur n'importe quelle étape. Une fois validé, le brief est prêt à être téléchargé en PDF.",
+      fields: []
+    }
+  ];
+
+  var CONSENT_TEXT = "J'accepte que MJAGENCY utilise ces informations pour préparer ma proposition et la création de mon site. Elles ne sont transmises à aucun tiers.";
+  var CONTACT = { name: 'Jérémy Vatuone', email: 'jeremyvatuonepro@gmail.com', phone: '06 11 71 83 68', tel: '+33611718368' };
+  var STORAGE_KEY = 'mjBriefDraft_v1';
+
+  var PAGE_SHORT = {
+    'Accueil': 'Accueil', 'À propos / Notre histoire': 'À propos', 'Prestations / Services': 'Services',
+    'Carte / Menu': 'Carte', 'Boutique en ligne': 'Boutique', 'Réalisations / Galerie': 'Galerie',
+    'Tarifs': 'Tarifs', 'Avis clients': 'Avis', 'Actualités / Blog': 'Blog', 'FAQ': 'FAQ',
+    'Équipe': 'Équipe', 'Recrutement': 'Recrutement', 'Contact': 'Contact'
+  };
+  var SECTOR_SHORT = {
+    'Restaurant / bar': 'Restaurant', 'Boulangerie / pâtisserie': 'Boulangerie', 'Commerce de détail': 'Commerce',
+    'Beauté / coiffure / bien-être': 'Beauté', 'Artisan / BTP': 'Artisan', 'Santé / paramédical': 'Santé',
+    'Profession libérale / conseil': 'Conseil', 'Immobilier': 'Immobilier', 'Tourisme / hébergement': 'Tourisme',
+    'Sport / loisirs': 'Sport', 'Autre': ''
+  };
+
+  var FIELD_BY_ID = {};
+  var STEP_OF = {};
+  STEPS.forEach(function (s, i) { s.fields.forEach(function (f) { FIELD_BY_ID[f.id] = f; STEP_OF[f.id] = i; }); });
+  var COUNTED = STEPS.slice(0, 7).reduce(function (acc, s) { return acc.concat(s.fields); }, []);
+
+  /* =========================================================
+     État + brouillon
+     ========================================================= */
+  var state = { step: 0, answers: {}, validated: false, ref: null, validatedAt: null };
+
+  function loadDraft() {
+    try {
+      var raw = window.localStorage.getItem(STORAGE_KEY);
+      if (!raw) return;
+      var d = JSON.parse(raw);
+      if (!d || typeof d !== 'object') return;
+      if (d.answers && typeof d.answers === 'object') state.answers = d.answers;
+      if (typeof d.step === 'number' && d.step >= 0 && d.step < STEPS.length) state.step = d.step;
+      state.validated = !!d.validated && !!d.ref;
+      state.ref = d.ref || null;
+      state.validatedAt = d.validatedAt || null;
+    } catch (e) { /* stockage indisponible : on repart de zéro */ }
+  }
+  function saveDraft() {
+    try {
+      window.localStorage.setItem(STORAGE_KEY, JSON.stringify({
+        v: 1, step: state.step, answers: state.answers,
+        validated: state.validated, ref: state.ref, validatedAt: state.validatedAt, savedAt: new Date().toISOString()
+      }));
+    } catch (e) { /* quota ou navigation privée : le formulaire fonctionne quand même */ }
+  }
+  function clearDraft() {
+    try { window.localStorage.removeItem(STORAGE_KEY); } catch (e) { /* rien */ }
+  }
+
+  /* =========================================================
+     Utilitaires
+     ========================================================= */
+  function $(id) { return document.getElementById(id); }
+  function esc(s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  }
+  // Espaces insécables avant ? ! : ; (typographie française)
+  function fr(s) { return String(s).replace(/ ([?!:;])/g, '\u00A0$1'); }
+  function pad2(n) { return (n < 10 ? '0' : '') + n; }
+  function isFilled(v) {
+    if (Array.isArray(v)) return v.length > 0;
+    if (typeof v === 'boolean') return v;
+    return typeof v === 'string' && v.trim() !== '';
+  }
+  function val(id) { var v = state.answers[id]; return typeof v === 'string' ? v.trim() : v; }
+  function list(id) { var v = state.answers[id]; return Array.isArray(v) ? v : []; }
+  function slugify(s) {
+    return String(s || '').normalize('NFD').replace(/[\u0300-\u036F]/g, '')
+      .replace(/œ/gi, 'oe').replace(/æ/gi, 'ae').toLowerCase()
+      .replace(/\(exemple\)/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 48).replace(/-+$/, '');
+  }
+  function fmtDate(iso) {
+    var m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso || '');
+    return m ? m[3] + '/' + m[2] + '/' + m[1] : (iso || '');
+  }
+  function longDate(d) {
+    try { return new Intl.DateTimeFormat('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' }).format(d); }
+    catch (e) { return pad2(d.getDate()) + '/' + pad2(d.getMonth() + 1) + '/' + d.getFullYear(); }
+  }
+  function isEmail(s) { return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(s); }
+  function hexToRgb(hex) {
+    var m = /^#?([0-9a-f]{6})$/i.exec(hex || '');
+    if (!m) return null;
+    var n = parseInt(m[1], 16);
+    return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
+  }
+  function luminance(rgb) {
+    var c = rgb.map(function (v) { v /= 255; return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); });
+    return 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2];
+  }
+  // Texte noir ou blanc selon le meilleur contraste
+  function inkOn(hex) {
+    var rgb = hexToRgb(hex);
+    if (!rgb) return '#FFFFFF';
+    var L = luminance(rgb);
+    return (L + 0.05) / 0.05 > 1.05 / (L + 0.05) ? '#0B1220' : '#FFFFFF';
+  }
+  var reduceMotion = window.matchMedia ? window.matchMedia('(prefers-reduced-motion: reduce)') : { matches: false };
+
+  /* =========================================================
+     Toast
+     ========================================================= */
+  var toastTimer = 0;
+  function toast(msg) {
+    var t = $('toast');
+    t.textContent = msg;
+    t.classList.add('is-on');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { t.classList.remove('is-on'); }, 2600);
+  }
+
+  /* =========================================================
+     Construction du formulaire
+     ========================================================= */
+  var CHECK_SVG = '<svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 6.3l2.3 2.3 4.7-5"/></svg>';
+  var X_SVG = '<svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M3.5 3.5l7 7M10.5 3.5l-7 7"/></svg>';
+
+  function fieldHTML(f) {
+    var id = 'f-' + f.id;
+    var cls = 'field' + (f.half ? ' half' : '');
+    var req = f.required ? '<span class="req" aria-hidden="true">*</span><span class="sr-only"> (obligatoire)</span>' : '';
+    var help = f.help ? '<p class="help" id="' + id + '-help">' + esc(fr(f.help)) + '</p>' : '';
+    var err = '<p class="err" id="' + id + '-err" hidden></p>';
+    var describedby = [f.help ? id + '-help' : '', id + '-err'].filter(Boolean).join(' ');
+    var h = '';
+    if (f.type === 'single' || f.type === 'multi') {
+      h += '<div class="' + cls + '" data-field="' + f.id + '">';
+      h += '<p class="label" id="' + id + '-label">' + esc(fr(f.label)) + req + '</p>';
+      h += '<div class="chips" id="' + id + '" role="group" aria-labelledby="' + id + '-label" aria-describedby="' + describedby + '" data-kind="' + f.type + '" data-id="' + f.id + '">';
+      f.options.forEach(function (o, i) {
+        h += '<button type="button" class="chip" id="' + id + '-' + i + '" data-value="' + esc(o) + '" aria-pressed="false">' + esc(o) + '</button>';
+      });
+      h += '</div>' + help + '<p class="help limit-msg" id="' + id + '-limit" aria-live="polite" hidden></p>' + err + '</div>';
+    } else if (f.type === 'colors') {
+      h += '<div class="' + cls + '" data-field="' + f.id + '">';
+      h += '<p class="label" id="' + id + '-label">' + esc(fr(f.label)) + '</p>';
+      h += '<div class="colors" id="' + id + '" role="group" aria-labelledby="' + id + '-label" aria-describedby="' + id + '-help"></div>';
+      h += help + '</div>';
+    } else {
+      h += '<div class="' + cls + '" data-field="' + f.id + '">';
+      h += '<label class="label" for="' + id + '">' + esc(fr(f.label)) + req + '</label>';
+      var common = ' id="' + id + '" name="' + f.id + '" class="input" data-id="' + f.id + '" aria-describedby="' + describedby + '"' +
+        (f.placeholder ? ' placeholder="' + esc('ex. ' + f.placeholder) + '"' : '') +
+        (f.required ? ' aria-required="true"' : '') +
+        (f.autocomplete ? ' autocomplete="' + f.autocomplete + '"' : '') +
+        (f.inputmode ? ' inputmode="' + f.inputmode + '"' : '');
+      if (f.type === 'textarea') {
+        h += '<textarea' + common + ' rows="' + (f.rows || 3) + '"></textarea>';
+      } else {
+        h += '<input' + common + ' type="' + f.type + '"' + (f.type === 'url' ? ' placeholder="https://"' : '') + '>';
+      }
+      h += help + err + '</div>';
+    }
+    return h;
+  }
+
+  function stepHead(i) {
+    var s = STEPS[i];
+    return '<p class="eyebrow">ÉTAPE ' + pad2(i + 1) + ' / 08</p>' +
+      '<h1 class="step-title" id="step-title-' + i + '" tabindex="-1">' + esc(fr(s.title)) + '</h1>' +
+      '<p class="step-intro">' + esc(fr(s.intro)) + '</p>';
+  }
+  function stepFoot(i) {
+    var left = i === 0
+      ? '<p class="foot-note">Vos réponses sont gardées sur cet appareil.</p>'
+      : '<button type="button" class="btn btn-ghost" data-action="prev"><span aria-hidden="true">←</span> Retour</button>';
+    var right = i === 6
+      ? '<button type="button" class="btn btn-primary" data-action="next">Relire et valider <span class="arrow" aria-hidden="true">→</span></button>'
+      : '<button type="button" class="btn btn-primary" data-action="next">Continuer <span class="arrow" aria-hidden="true">→</span></button>';
+    return '<div class="step-foot">' + left + right + '</div>';
+  }
+
+  function buildForm() {
+    var html = '';
+    STEPS.forEach(function (s, i) {
+      html += '<section class="step" id="step-' + (i + 1) + '" data-step="' + i + '" aria-labelledby="step-title-' + i + '" hidden>';
+      html += '<div class="step-head">' + stepHead(i) + '</div>';
+      if (i < 7) {
+        html += '<div class="fields">' + s.fields.map(fieldHTML).join('') + '</div>';
+        html += stepFoot(i);
+      } else {
+        html += '<div id="review">' +
+          '<ol class="recap" id="recap" aria-label="Récapitulatif des étapes"></ol>' +
+          '<h2 class="sub-h">Signature</h2>' +
+          '<div class="field"><label class="label" for="f-place">Fait à</label><input class="input" id="f-place" name="place" data-id="place" type="text" placeholder="Sète" autocomplete="address-level2"></div>' +
+          '<div class="sig-wrap">' +
+            '<p class="label" id="f-signature-label">Votre signature <span style="font-weight:400;color:var(--muted)">(facultatif)</span></p>' +
+            '<div class="sig-sheet"><div class="sig-base"></div><span class="sig-x" aria-hidden="true">×</span><span class="sig-hint" id="sig-hint">Signez avec le doigt ou la souris</span>' +
+            '<canvas id="f-signature" role="img" aria-labelledby="f-signature-label"></canvas></div>' +
+            '<div class="sig-tools"><span class="help" style="margin:0" id="sig-status"></span><button type="button" class="link-btn" id="sig-clear">Effacer la signature</button></div>' +
+          '</div>' +
+          '<label class="check" for="f-consent"><input type="checkbox" id="f-consent" data-id="consent" aria-describedby="f-consent-err"><span>' + esc(CONSENT_TEXT) + '</span></label>' +
+          '<p class="err" id="f-consent-err" hidden></p>' +
+          '<div id="final-errors" class="alert" role="alert" tabindex="-1" hidden></div>' +
+          '<div class="validate-row"><button type="button" class="btn btn-primary" id="validate">Valider mon brief <span class="arrow" aria-hidden="true">→</span></button></div>' +
+          '<div class="step-foot"><button type="button" class="btn btn-ghost" data-action="prev"><span aria-hidden="true">←</span> Retour</button><span></span></div>' +
+        '</div>' +
+        '<div id="success" hidden></div>';
+      }
+      html += '</section>';
+    });
+    $('brief').innerHTML = html;
+
+    var rail = '';
+    STEPS.forEach(function (s, i) {
+      rail += '<li><button type="button" class="rail-btn" id="rail-' + (i + 1) + '" data-goto="' + i + '">' +
+        '<span class="rail-num">' + pad2(i + 1) + '</span>' + esc(s.short) +
+        '<span class="rail-check" aria-hidden="true">' + CHECK_SVG + '</span><span class="sr-only rail-sr"></span></button></li>';
+    });
+    $('rail').innerHTML = rail;
+  }
+
+  /* ---------- Remplissage des champs depuis l'état ---------- */
+  function syncField(f) {
+    var v = state.answers[f.id];
+    if (f.type === 'single' || f.type === 'multi') {
+      var arr = f.type === 'multi' ? (Array.isArray(v) ? v : []) : [v];
+      var group = $('f-' + f.id);
+      Array.prototype.forEach.call(group.children, function (b) {
+        b.setAttribute('aria-pressed', arr.indexOf(b.getAttribute('data-value')) > -1 ? 'true' : 'false');
+      });
+    } else if (f.type === 'colors') {
+      renderColors();
+    } else {
+      var el = $('f-' + f.id);
+      if (el && el.value !== (v || '')) el.value = typeof v === 'string' ? v : '';
+    }
+  }
+  function syncAll() {
+    STEPS.forEach(function (s) { s.fields.forEach(syncField); });
+    $('f-place').value = typeof state.answers.place === 'string' ? state.answers.place : '';
+    $('f-consent').checked = !!state.answers.consent;
+  }
+
+  /* ---------- Mise à jour d'une réponse ---------- */
+  function setAnswer(id, v) {
+    state.answers[id] = v;
+    if (state.validated) { state.validated = false; state.ref = null; state.validatedAt = null; }
+    clearError(id);
+    if (id === 'phone' || id === 'email') { clearError('phone'); clearError('email'); }
+    lastChanged = id;
+    schedule();
+  }
+
+  /* ---------- Couleurs ---------- */
+  var COLOR_DEFAULTS = ['#0071E3', '#1F2A37', '#E0A43A', '#2F7D5B', '#C2410C', '#7A8B99'];
+  function renderColors() {
+    var box = $('f-colors');
+    var cols = list('colors');
+    var h = '';
+    cols.forEach(function (c, i) {
+      h += '<div class="swatch">' +
+        '<label class="swatch-pick" style="background:' + esc(c) + '"><span class="sr-only">Couleur ' + (i + 1) + '</span>' +
+        '<input type="color" id="f-colors-' + i + '" data-color-index="' + i + '" value="' + esc(c) + '"></label>' +
+        '<span class="swatch-hex">' + esc(c.toUpperCase()) + '</span>' +
+        '<button type="button" class="swatch-rm" data-color-remove="' + i + '" aria-label="Retirer la couleur ' + esc(c.toUpperCase()) + '">' + X_SVG + '</button></div>';
+    });
+    if (cols.length < 4) {
+      h += '<button type="button" class="add-color" id="f-colors-add">+ ' + (cols.length ? 'Ajouter une couleur' : 'Choisir une couleur') + '</button>';
+    }
+    box.innerHTML = h;
+  }
+
+  /* =========================================================
+     Navigation
+     ========================================================= */
+  function goTo(i, opts) {
+    opts = opts || {};
+    i = Math.max(0, Math.min(STEPS.length - 1, i));
+    var prev = state.step;
+    state.step = i;
+    Array.prototype.forEach.call(document.querySelectorAll('.step'), function (sec) {
+      var on = +sec.getAttribute('data-step') === i;
+      sec.hidden = !on;
+      if (on) {
+        sec.removeAttribute('data-enter');
+        void sec.offsetWidth;
+        if (prev !== i || opts.force) sec.setAttribute('data-enter', '');
+      }
+    });
+    if (i === 7) renderStep8();
+    updateChrome(true);
+    saveDraft();
+    if (opts.scroll !== false) scrollToForm();
+    if (opts.focusField) {
+      var el = $(opts.focusField);
+      if (el) setTimeout(function () { el.focus({ preventScroll: true }); el.scrollIntoView({ block: 'center', behavior: reduceMotion.matches ? 'auto' : 'smooth' }); }, 60);
+    } else if (opts.focusTitle) {
+      var t = $('step-title-' + i);
+      if (t) t.focus({ preventScroll: true });
+    }
+  }
+  function scrollToForm() {
+    var card = $('brief');
+    var top = card.getBoundingClientRect().top + window.pageYOffset - (document.querySelector('.top').offsetHeight + 16);
+    var railTop = $('rail').getBoundingClientRect().top + window.pageYOffset - (document.querySelector('.top').offsetHeight + 12);
+    var target = Math.max(0, Math.min(top, railTop));
+    if (window.pageYOffset > target + 4) {
+      window.scrollTo({ top: target, behavior: reduceMotion.matches ? 'auto' : 'smooth' });
+    }
+  }
+  function updateChrome(scrollRail) {
+    var i = state.step;
+    $('step-count').innerHTML = 'Étape <b>' + (i + 1) + '</b> / 8';
+    $('progress-bar').style.width = ((i + 1) / 8 * 100) + '%';
+    STEPS.forEach(function (s, k) {
+      var b = $('rail-' + (k + 1));
+      if (k === i) b.setAttribute('aria-current', 'step'); else b.removeAttribute('aria-current');
+      var done = stepHasAnswers(k);
+      b.classList.toggle('is-done', done);
+      b.querySelector('.rail-sr').textContent = done ? ' (des réponses)' : '';
+    });
+    // Rendre l'étape courante visible dans le rail défilant (mobile)
+    var ol = $('rail'), cur = $('rail-' + (i + 1));
+    if (scrollRail && ol.scrollWidth > ol.clientWidth + 2) {
+      var li = cur.parentNode;
+      var left = li.offsetLeft - 16;
+      ol.scrollTo({ left: Math.max(0, left - (ol.clientWidth - li.offsetWidth) / 2 + 16), behavior: reduceMotion.matches ? 'auto' : 'smooth' });
+    }
+  }
+  function stepHasAnswers(k) {
+    if (k === 7) return !!state.validated || isFilled(state.answers.signature) || !!state.answers.consent || isFilled(state.answers.place);
+    return STEPS[k].fields.some(function (f) { return isFilled(state.answers[f.id]); });
+  }
+
+  /* =========================================================
+     Validation
+     ========================================================= */
+  function checkRequired() {
+    var a = state.answers, errs = [];
+    if (!isFilled(a.company)) errs.push({ id: 'company', msg: "Indiquez le nom de votre entreprise ou de votre enseigne.", label: "Nom de l'entreprise" });
+    if (!isFilled(a.contactName)) errs.push({ id: 'contactName', msg: 'Indiquez le nom de la personne à contacter.', label: 'Nom du contact' });
+    var hasPhone = isFilled(a.phone), hasEmail = isFilled(a.email);
+    if (!hasPhone && !hasEmail) errs.push({ id: 'phone', msg: 'Indiquez un téléphone ou un e-mail pour que l\'on puisse vous répondre.', label: 'Téléphone ou e-mail' });
+    if (hasEmail && !isEmail(a.email.trim())) errs.push({ id: 'email', msg: 'Cette adresse e-mail semble incomplète (ex. nom@domaine.fr).', label: 'E-mail valide' });
+    return errs;
+  }
+  function showError(id, msg) {
+    var e = $('f-' + id + '-err'), el = $('f-' + id);
+    if (e) { e.textContent = msg; e.hidden = false; }
+    if (el) el.setAttribute('aria-invalid', 'true');
+    if (id === 'phone' && $('f-email')) $('f-email').setAttribute('aria-invalid', 'true');
+  }
+  function clearError(id) {
+    var e = $('f-' + id + '-err'), el = $('f-' + id);
+    if (e && !e.hidden) { e.hidden = true; e.textContent = ''; }
+    if (el) el.removeAttribute('aria-invalid');
+  }
+  function showStep1Errors(errs) {
+    ['company', 'contactName', 'phone', 'email'].forEach(clearError);
+    errs.forEach(function (er) { showError(er.id, er.msg); });
+  }
+  function validateStep1() {
+    var errs = checkRequired();
+    showStep1Errors(errs);
+    if (errs.length) {
+      var first = $('f-' + errs[0].id);
+      first.focus({ preventScroll: true });
+      first.scrollIntoView({ block: 'center', behavior: reduceMotion.matches ? 'auto' : 'smooth' });
+      return false;
+    }
+    return true;
+  }
+
+  function validateFinal() {
+    var errs = checkRequired();
+    if (!state.answers.consent) errs.push({ id: 'consent', msg: "Cochez la case d'accord pour valider votre brief.", label: "Accord d'utilisation des informations" });
+    var box = $('final-errors');
+    if (errs.length) {
+      var h = '<p class="alert-title">' + (errs.length > 1 ? 'Il manque ' + errs.length + ' informations' : 'Il manque une information') + ' avant de valider :</p><ul>';
+      errs.forEach(function (er) {
+        h += '<li><span>' + esc(er.label) + '</span><button type="button" class="link-btn" data-fix="' + er.id + '">Compléter</button></li>';
+      });
+      box.innerHTML = h + '</ul>';
+      box.hidden = false;
+      if (!state.answers.consent) showError('consent', "Cochez la case d'accord pour valider votre brief.");
+      box.focus({ preventScroll: true });
+      box.scrollIntoView({ block: 'center', behavior: reduceMotion.matches ? 'auto' : 'smooth' });
+      return;
+    }
+    box.hidden = true;
+    state.validated = true;
+    state.ref = makeRef();
+    state.validatedAt = new Date().toISOString();
+    saveDraft();
+    renderStep8();
+    updateChrome();
+    scrollToForm();
+    setTimeout(function () { var h = $('success-title'); if (h) h.focus({ preventScroll: true }); }, 80);
+  }
+  function makeRef() {
+    var chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+    var d = new Date(), out = '';
+    var rnd = new Uint32Array(4);
+    if (window.crypto && window.crypto.getRandomValues) window.crypto.getRandomValues(rnd);
+    else for (var k = 0; k < 4; k++) rnd[k] = Math.floor(Math.random() * 1e9);
+    for (var j = 0; j < 4; j++) out += chars[rnd[j] % chars.length];
+    return 'MJ-' + String(d.getFullYear()).slice(2) + pad2(d.getMonth() + 1) + pad2(d.getDate()) + '-' + out;
+  }
+
+  /* =========================================================
+     Étape 8 : récap, signature, succès
+     ========================================================= */
+  function renderStep8() {
+    var review = $('review'), success = $('success');
+    if (state.validated) {
+      review.hidden = true;
+      success.hidden = false;
+      renderSuccess();
+      return;
+    }
+    success.hidden = true;
+    review.hidden = false;
+    renderRecap();
+    $('f-place').value = typeof state.answers.place === 'string' ? state.answers.place : '';
+    $('f-consent').checked = !!state.answers.consent;
+    requestAnimationFrame(setupSignature);
+  }
+  function renderRecap() {
+    var h = '';
+    var missing = checkRequired().length > 0;
+    STEPS.slice(0, 7).forEach(function (s, i) {
+      var n = s.fields.filter(function (f) { return isFilled(state.answers[f.id]); }).length;
+      var meta = n + ' réponse' + (n > 1 ? 's' : '') + ' sur ' + s.fields.length;
+      var miss = i === 0 && missing;
+      h += '<li><span class="recap-num">' + pad2(i + 1) + '</span>' +
+        '<span class="recap-title">' + esc(fr(s.title)) + '<span class="recap-meta' + (miss ? ' is-missing' : '') + '">' +
+        (miss ? 'Informations obligatoires manquantes' : meta) + '</span></span>' +
+        '<button type="button" class="link-btn" data-goto="' + i + '" aria-label="Modifier l\'étape ' + (i + 1) + ' : ' + esc(s.short) + '">Modifier</button></li>';
+    });
+    $('recap').innerHTML = h;
+  }
+  function renderSuccess() {
+    var s = $('success');
+    s.innerHTML =
+      '<div class="success">' +
+        '<div class="success-mark" aria-hidden="true"><svg viewBox="0 0 40 40" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><path d="M11 20.5l6.5 6.5L30 14"/></svg></div>' +
+        '<h2 id="success-title" tabindex="-1">Brief validé</h2>' +
+        '<div class="ref">Réf. ' + esc(state.ref) + '</div>' +
+        '<p class="lead">Merci ! Téléchargez votre brief en PDF puis envoyez-le à MJAGENCY. Nous revenons vers vous avec une proposition sur mesure.</p>' +
+        '<div class="success-actions">' +
+          '<button type="button" class="btn btn-primary" id="dl-pdf">Télécharger le PDF</button>' +
+          '<button type="button" class="btn btn-secondary" id="copy-recap">Copier le récapitulatif</button>' +
+        '</div>' +
+        '<div class="contact-box">' +
+          '<p class="k">ENVOYEZ VOTRE BRIEF À</p>' +
+          '<div class="contact-row"><a href="mailto:' + CONTACT.email + '">' + CONTACT.email + '</a><button type="button" class="btn btn-secondary btn-sm" id="copy-email">Copier l\'adresse</button></div>' +
+          '<div class="contact-row"><a href="tel:' + CONTACT.tel + '">' + CONTACT.phone + '</a><span class="help" style="margin:0">' + esc(CONTACT.name) + '</span></div>' +
+        '</div>' +
+        '<div class="success-more" id="success-more">' +
+          '<span id="reset-slot"><button type="button" class="link-btn" id="reset-ask">Commencer un nouveau brief</button></span>' +
+          '<button type="button" class="link-btn" data-goto="0" id="edit-answers">Modifier mes réponses</button>' +
+        '</div>' +
+      '</div>';
+  }
+  function askReset() {
+    $('reset-slot').innerHTML =
+      '<span class="confirm-inline" role="group" aria-label="Confirmer">' +
+        '<span>Effacer toutes les réponses ?</span>' +
+        '<button type="button" class="link-btn link-danger" id="reset-yes">Oui, tout effacer</button>' +
+        '<button type="button" class="link-btn" id="reset-no">Annuler</button>' +
+      '</span>';
+    $('reset-no').focus();
+  }
+  function cancelReset() {
+    $('reset-slot').innerHTML = '<button type="button" class="link-btn" id="reset-ask">Commencer un nouveau brief</button>';
+    $('reset-ask').focus();
+  }
+  function doReset() {
+    state = { step: 0, answers: {}, validated: false, ref: null, validatedAt: null };
+    clearDraft();
+    seenSections = { __init: true };
+    syncAll();
+    ['company', 'contactName', 'phone', 'email', 'consent'].forEach(clearError);
+    $('final-errors').hidden = true;
+    renderPreview();
+    goTo(0, { focusTitle: true });
+    toast('Nouveau brief prêt');
+  }
+
+  /* ---------- Pad de signature ---------- */
+  var sig = { canvas: null, ctx: null, drawing: false, pts: [], w: 0, h: 0, bound: false };
+  function setupSignature() {
+    var c = $('f-signature');
+    if (!c || !c.offsetWidth) return;
+    var dpr = Math.max(1, Math.min(3, window.devicePixelRatio || 1));
+    var w = c.offsetWidth, h = c.offsetHeight;
+    sig.canvas = c; sig.w = w; sig.h = h;
+    c.width = Math.round(w * dpr); c.height = Math.round(h * dpr);
+    var ctx = c.getContext('2d');
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.lineCap = 'round'; ctx.lineJoin = 'round'; ctx.strokeStyle = '#0B1220'; ctx.lineWidth = 2.3;
+    sig.ctx = ctx;
+    ctx.clearRect(0, 0, w, h);
+    var data = state.answers.signature;
+    if (data) {
+      var img = new Image();
+      img.onload = function () {
+        var r = img.naturalWidth / img.naturalHeight, dw = w, dh = w / r;
+        if (dh > h) { dh = h; dw = h * r; }
+        ctx.drawImage(img, (w - dw) / 2, (h - dh) / 2, dw, dh);
+      };
+      img.src = data;
+    }
+    updateSigUI();
+    if (!sig.bound) bindSignature(c);
+  }
+  function updateSigUI() {
+    var has = isFilled(state.answers.signature);
+    $('sig-hint').hidden = has;
+    $('sig-status').textContent = has ? 'Signature enregistrée.' : '';
+    $('sig-clear').hidden = !has;
+  }
+  function bindSignature(c) {
+    sig.bound = true;
+    function pos(e) { var r = c.getBoundingClientRect(); return { x: e.clientX - r.left, y: e.clientY - r.top }; }
+    c.addEventListener('pointerdown', function (e) {
+      if (e.button !== undefined && e.button !== 0) return;
+      e.preventDefault();
+      try { c.setPointerCapture(e.pointerId); } catch (er) { /* ignoré */ }
+      sig.drawing = true;
+      var p = pos(e);
+      sig.pts = [p];
+      var ctx = sig.ctx;
+      ctx.beginPath(); ctx.arc(p.x, p.y, ctx.lineWidth / 2, 0, Math.PI * 2); ctx.fillStyle = '#0B1220'; ctx.fill();
+      $('sig-hint').hidden = true;
+    });
+    c.addEventListener('pointermove', function (e) {
+      if (!sig.drawing) return;
+      e.preventDefault();
+      var evs = e.getCoalescedEvents ? e.getCoalescedEvents() : [e];
+      if (!evs.length) evs = [e];
+      var ctx = sig.ctx;
+      evs.forEach(function (ev) {
+        var p = pos(ev), pts = sig.pts;
+        pts.push(p);
+        var n = pts.length;
+        if (n < 3) { ctx.beginPath(); ctx.moveTo(pts[0].x, pts[0].y); ctx.lineTo(p.x, p.y); ctx.stroke(); return; }
+        var a = pts[n - 3], b = pts[n - 2];
+        var m1 = { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 }, m2 = { x: (b.x + p.x) / 2, y: (b.y + p.y) / 2 };
+        ctx.beginPath(); ctx.moveTo(m1.x, m1.y); ctx.quadraticCurveTo(b.x, b.y, m2.x, m2.y); ctx.stroke();
+      });
+    });
+    function end() {
+      if (!sig.drawing) return;
+      sig.drawing = false;
+      sig.pts = [];
+      setAnswer('signature', c.toDataURL('image/png'));
+      updateSigUI();
+    }
+    c.addEventListener('pointerup', end);
+    c.addEventListener('pointercancel', end);
+    c.addEventListener('lostpointercapture', end);
+    $('sig-clear').addEventListener('click', function () {
+      sig.ctx.clearRect(0, 0, sig.w, sig.h);
+      setAnswer('signature', '');
+      updateSigUI();
+      toast('Signature effacée');
+    });
+    var rt = 0;
+    window.addEventListener('resize', function () {
+      clearTimeout(rt);
+      rt = setTimeout(function () { if (state.step === 7 && !state.validated && sig.canvas && sig.canvas.offsetWidth !== sig.w) setupSignature(); }, 150);
+    });
+  }
+
+  /* =========================================================
+     Aperçu en direct
+     ========================================================= */
+  var rafId = 0, lastChanged = null, seenSections = {};
+  function schedule() {
+    if (rafId) return;
+    rafId = requestAnimationFrame(function () {
+      rafId = 0;
+      renderPreview();
+      updateChrome();
+      saveDraft();
+    });
+  }
+
+  function wireframe(page) {
+    var L = function (w, dk) { return '<span class="ln w' + w + (dk ? ' dk' : '') + '"></span>'; };
+    switch (page) {
+      case 'À propos / Notre histoire':
+      case 'Recrutement':
+        return '<div class="wf-split"><span class="img"></span><div class="ms-lines" style="margin:0">' + L(70, 1) + L(90) + L(80) + L(90) + L(50) + '</div></div>';
+      case 'Prestations / Services':
+      case 'Actualités / Blog':
+        var card = function () { return '<div class="wf-card"><span class="img"></span>' + (page === 'Actualités / Blog' ? L(40) : '') + L(80, 1) + L(60) + '</div>'; };
+        return '<div class="wf-3">' + card() + card() + card() + '</div>';
+      case 'Carte / Menu':
+        return '<div class="wf-rows">' + [['50', '4,50 €'], ['40', '6,90 €'], ['60', '12 €'], ['30', '3,20 €']].map(function (r) {
+          return '<div class="wf-row">' + L(r[0], 1) + '<span class="fill"></span><span class="wf-price">' + r[1] + '</span></div>';
+        }).join('') + '</div>';
+      case 'Boutique en ligne':
+        var prod = function (p) { return '<div class="wf-card"><span class="img sq"></span>' + L(80, 1) + '<span class="wf-price">' + p + '</span><span class="wf-mini-btn"></span></div>'; };
+        return '<div class="wf-3">' + prod('24 €') + prod('39 €') + prod('18 €') + '</div>';
+      case 'Réalisations / Galerie':
+        return '<div class="wf-grid">' + '<span class="img"></span>'.repeat(6) + '</div>';
+      case 'Tarifs':
+        var tier = function (hi) { return '<div class="tier' + (hi ? ' hi' : '') + '">' + L(50) + '<span class="big"></span>' + L(90) + L(70) + L(80) + '</div>'; };
+        return '<div class="wf-tiers">' + tier() + tier(1) + tier() + '</div>';
+      case 'Avis clients':
+        var rev = function () { return '<div class="review"><span class="stars">★★★★★</span>' + L(90) + L(80) + L(60) + L(30, 1) + '</div>'; };
+        return '<div class="wf-reviews">' + rev() + rev() + '</div>';
+      case 'FAQ':
+        return '<div class="wf-rows wf-faq">' + [70, 60, 80, 50].map(function (w) { return '<div class="wf-row">' + L(w, 1) + '<span class="plus">+</span></div>'; }).join('') + '</div>';
+      case 'Équipe':
+        var mem = function () { return '<div class="member"><span class="avatar"></span>' + L(70, 1) + L(50) + '</div>'; };
+        return '<div class="wf-team">' + mem() + mem() + mem() + '</div>';
+      case 'Contact':
+        return '<div class="wf-contact"><div class="wf-form"><span class="wf-input"></span><span class="wf-input"></span><span class="wf-input ta"></span><span class="ms-btn">Envoyer</span></div><div class="wf-map"></div></div>';
+      default:
+        return '<div class="ms-lines" style="margin:0">' + L(90) + L(70) + '</div>';
+    }
+  }
+
+  function renderPreview() {
+    var a = state.answers;
+    var company = val('company') || '';
+    var pages = list('pages');
+    var sub = pages.filter(function (p) { return p !== 'Accueil'; });
+    var colors = list('colors');
+    var mood = list('mood');
+    var ms = $('ms');
+
+    // URL
+    var dom = (val('domainName') || '').toLowerCase().replace(/^https?:\/\//, '').replace(/^www\./, '').replace(/\/.*$/, '').replace(/\s+/g, '');
+    var url = dom ? 'www.' + dom : (slugify(company) ? 'www.' + slugify(company) + '.fr' : 'www.votre-entreprise.fr');
+    $('ms-url').textContent = url;
+
+    // Couleurs
+    var accent = colors[0] && hexToRgb(colors[0]) ? colors[0] : '#0071E3';
+    var img = colors[1] && hexToRgb(colors[1]) ? colors[1] : accent;
+    ms.style.setProperty('--ms-accent', accent);
+    ms.style.setProperty('--ms-on', inkOn(accent));
+    ms.style.setProperty('--ms-img', img);
+
+    // Ambiance
+    var has = function (m) { return mood.indexOf(m) > -1; };
+    ms.classList.toggle('minimal', has('Minimaliste') && !has('Premium / luxe'));
+    ms.classList.toggle('round', has('Chaleureux') || has('Coloré / fun'));
+    ms.classList.toggle('colore', has('Coloré / fun'));
+    var heroCls = 'ms-hero';
+    if (has('Premium / luxe')) heroCls += ' dark';
+    else if (has('Minimaliste')) heroCls += ' minimal';
+    else if (has('Nature / organique')) heroCls += ' sage';
+    else if (!colors.length && (has('Chaleureux') || has('Méditerranéen') || has('Artisanal / authentique'))) heroCls += ' sand';
+    $('ms-hero').className = heroCls;
+
+    // Nav
+    var links = sub.slice(0, 3).map(function (p) { return '<span>' + esc(PAGE_SHORT[p] || p) + '</span>'; }).join('');
+    if (sub.length > 3) links += '<span class="more">+' + (sub.length - 3) + '</span>';
+    if (!sub.length) links = '<span>Accueil</span><span class="cta-dot"></span>';
+    $('ms-nav').innerHTML = '<span class="ms-brand' + (company ? '' : ' is-empty') + '">' + esc(company || 'Votre entreprise') + '</span><span class="ms-links">' + links + '</span>';
+
+    // Hero
+    var sector = SECTOR_SHORT.hasOwnProperty(val('sector') || '') ? SECTOR_SHORT[val('sector')] : (val('sector') || '');
+    var city = (val('city') || '').replace(/^\s*\d{4,5}\s*/, '').trim();
+    var kicker = [sector, city].filter(Boolean).join(' · ');
+    var action = val('mainAction') || 'Nous contacter';
+    if (action.length > 28) action = action.slice(0, 27).trim() + '…';
+    $('ms-hero').innerHTML =
+      '<div><div class="ms-kicker">' + esc(kicker || 'Votre activité · Votre ville') + '</div>' +
+      '<h3 class="ms-h' + (company ? '' : ' is-empty') + '">' + esc(company || 'Le nom de votre entreprise') + '</h3>' +
+      '<div class="ms-lines"><span class="ln w90"></span><span class="ln w70"></span></div>' +
+      '<span class="ms-btn">' + esc(action) + '</span></div><span class="img"></span>';
+
+    // Sections (réconciliation : on n'anime que les nouvelles)
+    var secs = $('ms-secs');
+    var existing = {};
+    Array.prototype.forEach.call(secs.children, function (el) { existing[el.getAttribute('data-page')] = el; });
+    var firstNew = null;
+    sub.forEach(function (p, idx) {
+      var el = existing[p];
+      if (!el) {
+        el = document.createElement('section');
+        el.className = 'ms-sec';
+        el.setAttribute('data-page', p);
+        el.innerHTML = '<h4>' + esc(PAGE_SHORT[p] || p) + '<small>' + pad2(PAGES_INDEX[p]) + '</small></h4>' + wireframe(p);
+        if (seenSections.__init) {
+          el.classList.add('is-new');
+          el.addEventListener('animationend', function () { el.classList.remove('is-new'); }, { once: true });
+          if (!firstNew) firstNew = el;
+        }
+      }
+      delete existing[p];
+      if (secs.children[idx] !== el) secs.insertBefore(el, secs.children[idx] || null);
+    });
+    Object.keys(existing).forEach(function (k) { secs.removeChild(existing[k]); });
+    seenSections.__init = true;
+    $('ms-empty').hidden = sub.length > 0;
+
+    // Garder en vue ce qui change dans la maquette
+    var vp = $('viewport');
+    if (firstNew) {
+      var target = firstNew.offsetTop - 60;
+      vp.scrollTo({ top: Math.max(0, target), behavior: reduceMotion.matches ? 'auto' : 'smooth' });
+    } else if (lastChanged && HERO_FIELDS[lastChanged] && vp.scrollTop > 0) {
+      vp.scrollTo({ top: 0, behavior: reduceMotion.matches ? 'auto' : 'smooth' });
+    }
+    lastChanged = null;
+
+    // Fonctionnalités
+    var feats = list('features');
+    var fh = '';
+    if (!feats.length) fh = '<span class="pv-feats-empty">Fonctionnalités : à choisir à l\'étape 05</span>';
+    else {
+      fh = feats.slice(0, 6).map(function (f) { return '<span class="pv-feat">' + esc(f) + '</span>'; }).join('');
+      if (feats.length > 6) fh += '<span class="pv-feat more">+' + (feats.length - 6) + '</span>';
+    }
+    $('pv-feats').innerHTML = fh;
+
+    // Jauge
+    var filled = COUNTED.filter(function (f) { return isFilled(a[f.id]); }).length;
+    var pct = Math.round(filled / COUNTED.length * 100);
+    $('gauge-num').textContent = pct + '\u00A0%';
+    $('gauge-fill').style.width = pct + '%';
+    $('gauge-track').setAttribute('aria-valuenow', pct);
+    $('gauge-msg').textContent = fr(pct < 25
+      ? 'Chaque réponse précise la maquette. Aucune question n\'est un piège : répondez comme vous le sentez.'
+      : pct < 60 ? 'Bien parti. Les pages et les couleurs changent le plus la maquette.'
+      : pct < 90 ? 'Votre site prend forme. Encore quelques détails et on a tout ce qu\'il faut.'
+      : 'Brief très complet : de quoi préparer une proposition précise.');
+  }
+  var HERO_FIELDS = { company: 1, sector: 1, city: 1, mainAction: 1, colors: 1, mood: 1 };
+  var PAGES_INDEX = {};
+  FIELD_BY_ID.pages.options.forEach(function (p, i) { PAGES_INDEX[p] = i + 1; });
+
+  /* Inclinaison 3D qui suit la souris (appareils avec survol uniquement) */
+  function bindTilt() {
+    var stage = $('stage'), br = $('browser');
+    if (!window.matchMedia || !window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
+    var raf = 0, rx = 5, ry = -9;
+    stage.addEventListener('pointermove', function (e) {
+      if (reduceMotion.matches) return;
+      var r = stage.getBoundingClientRect();
+      var x = (e.clientX - r.left) / r.width - 0.5, y = (e.clientY - r.top) / r.height - 0.5;
+      ry = -9 + x * 16; rx = 5 - y * 12;
+      br.classList.add('is-tracking');
+      if (!raf) raf = requestAnimationFrame(function () { raf = 0; br.style.transform = 'rotateX(' + rx.toFixed(2) + 'deg) rotateY(' + ry.toFixed(2) + 'deg)'; });
+    });
+    stage.addEventListener('pointerleave', function () {
+      br.classList.remove('is-tracking');
+      br.style.transform = '';
+    });
+  }
+
+  /* =========================================================
+     Événements du formulaire
+     ========================================================= */
+  function bindForm() {
+    var form = $('brief');
+    form.addEventListener('submit', function (e) { e.preventDefault(); });
+
+    form.addEventListener('input', function (e) {
+      var t = e.target;
+      if (t.matches('input[type="color"]')) {
+        var i = +t.getAttribute('data-color-index');
+        var cols = list('colors').slice();
+        cols[i] = t.value;
+        var sw = t.closest('.swatch');
+        sw.querySelector('.swatch-pick').style.background = t.value;
+        sw.querySelector('.swatch-hex').textContent = t.value.toUpperCase();
+        setAnswer('colors', cols);
+        return;
+      }
+      var id = t.getAttribute('data-id');
+      if (!id || t.type === 'checkbox') return;
+      setAnswer(id, t.value);
+    });
+    form.addEventListener('change', function (e) {
+      var t = e.target;
+      if (t.id === 'f-consent') {
+        setAnswer('consent', t.checked);
+        if (t.checked) { clearError('consent'); }
+      }
+    });
+    form.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter' && e.target.matches('input.input')) {
+        e.preventDefault();
+        var btn = e.target.closest('.step').querySelector('[data-action="next"]');
+        if (btn) btn.click();
+      }
+    });
+
+    form.addEventListener('click', function (e) {
+      var chip = e.target.closest('.chip');
+      if (chip) { onChip(chip); return; }
+
+      var rm = e.target.closest('[data-color-remove]');
+      if (rm) {
+        var cols = list('colors').slice();
+        cols.splice(+rm.getAttribute('data-color-remove'), 1);
+        setAnswer('colors', cols);
+        renderColors();
+        var next = $('f-colors-add') || $('f-colors-0');
+        if (next) next.focus();
+        return;
+      }
+      if (e.target.closest('#f-colors-add')) {
+        var c2 = list('colors').slice();
+        var pick = COLOR_DEFAULTS.filter(function (c) { return c2.map(function (x) { return x.toLowerCase(); }).indexOf(c.toLowerCase()) < 0; })[0] || '#0071E3';
+        c2.push(pick);
+        setAnswer('colors', c2);
+        renderColors();
+        var inp = $('f-colors-' + (c2.length - 1));
+        if (inp) { inp.focus(); try { inp.click(); } catch (er) { /* sélecteur natif indisponible */ } }
+        return;
+      }
+
+      var act = e.target.closest('[data-action]');
+      if (act) {
+        var a = act.getAttribute('data-action');
+        if (a === 'next') {
+          if (state.step === 0 && !validateStep1()) return;
+          goTo(state.step + 1, { focusTitle: true });
+        } else if (a === 'prev') {
+          goTo(state.step - 1, { focusTitle: true });
+        }
+        return;
+      }
+      var fix = e.target.closest('[data-fix]');
+      if (fix) {
+        var id = fix.getAttribute('data-fix');
+        if (id === 'consent') {
+          var cb = $('f-consent');
+          cb.focus({ preventScroll: true });
+          cb.scrollIntoView({ block: 'center', behavior: reduceMotion.matches ? 'auto' : 'smooth' });
+        } else {
+          showStep1Errors(checkRequired());
+          goTo(STEP_OF[id], { focusField: 'f-' + id, scroll: false });
+        }
+        return;
+      }
+      var g = e.target.closest('[data-goto]');
+      if (g) { goTo(+g.getAttribute('data-goto'), { focusTitle: true }); return; }
+
+      if (e.target.closest('#validate')) { validateFinal(); return; }
+      if (e.target.closest('#dl-pdf')) { downloadPdf(e.target.closest('#dl-pdf')); return; }
+      if (e.target.closest('#copy-recap')) { copyText(plainRecap(), 'Récapitulatif copié'); return; }
+      if (e.target.closest('#copy-email')) { copyText(CONTACT.email, 'Adresse copiée'); return; }
+      if (e.target.closest('#reset-ask')) { askReset(); return; }
+      if (e.target.closest('#reset-no')) { cancelReset(); return; }
+      if (e.target.closest('#reset-yes')) { doReset(); return; }
+    });
+
+    $('rail').addEventListener('click', function (e) {
+      var b = e.target.closest('[data-goto]');
+      if (b) goTo(+b.getAttribute('data-goto'), { focusTitle: false });
+    });
+  }
+
+  function onChip(chip) {
+    var group = chip.parentNode;
+    var id = group.getAttribute('data-id');
+    var f = FIELD_BY_ID[id];
+    var v = chip.getAttribute('data-value');
+    if (f.type === 'single') {
+      var cur = state.answers[id];
+      setAnswer(id, cur === v ? '' : v);
+    } else {
+      var arr = list(id).slice();
+      var at = arr.indexOf(v);
+      var limit = $('f-' + id + '-limit');
+      if (at > -1) {
+        arr.splice(at, 1);
+        if (id === 'pages' && v === 'Accueil' && arr.length) { /* on peut retirer l'accueil volontairement */ }
+        if (limit) limit.hidden = true;
+      } else {
+        if (f.max && arr.length >= f.max) {
+          limit.textContent = fr('3 ambiances maximum : retirez-en une pour en choisir une autre.');
+          limit.hidden = false;
+          return;
+        }
+        arr.push(v);
+        if (id === 'pages' && arr.indexOf('Accueil') < 0) arr.push('Accueil');
+      }
+      arr.sort(function (x, y) { return f.options.indexOf(x) - f.options.indexOf(y); });
+      setAnswer(id, arr);
+    }
+    syncField(f);
+  }
+
+  /* =========================================================
+     Presse-papier
+     ========================================================= */
+  function copyText(text, okMsg) {
+    function fallback() {
+      var ta = document.createElement('textarea');
+      ta.value = text; ta.setAttribute('readonly', '');
+      ta.style.position = 'fixed'; ta.style.top = '-1000px'; ta.style.opacity = '0';
+      document.body.appendChild(ta);
+      ta.select();
+      var ok = false;
+      try { ok = document.execCommand('copy'); } catch (e) { ok = false; }
+      document.body.removeChild(ta);
+      toast(ok ? okMsg : 'Copie impossible : sélectionnez le texte à la main');
+    }
+    if (navigator.clipboard && window.isSecureContext) {
+      navigator.clipboard.writeText(text).then(function () { toast(okMsg); }, fallback);
+    } else fallback();
+  }
+  function answerText(f) {
+    var v = state.answers[f.id];
+    if (!isFilled(v)) return '';
+    if (f.type === 'multi') return v.join(' · ');
+    if (f.type === 'colors') return v.map(function (c) { return c.toUpperCase(); }).join(', ');
+    if (f.type === 'date') return fmtDate(v);
+    return String(v).trim();
+  }
+  function plainRecap() {
+    var out = ['BRIEF DE CRÉATION DE SITE WEB · MJAGENCY', 'Réf. ' + (state.ref || '-') + ' · ' + longDate(state.validatedAt ? new Date(state.validatedAt) : new Date()), ''];
+    STEPS.slice(0, 7).forEach(function (s, i) {
+      out.push(pad2(i + 1) + ' ' + s.pdf.toUpperCase());
+      s.fields.forEach(function (f) {
+        var t = answerText(f);
+        out.push('- ' + f.label + ' : ' + (t ? t.replace(/\n+/g, ' / ') : 'Non renseigné'));
+      });
+      out.push('');
+    });
+    out.push('08 VALIDATION');
+    var place = val('place');
+    out.push('Fait ' + (place ? 'à ' + place + ', ' : '') + 'le ' + longDate(state.validatedAt ? new Date(state.validatedAt) : new Date()));
+    out.push((state.answers.consent ? '[x] ' : '[ ] ') + CONSENT_TEXT);
+    out.push('Signature : ' + (isFilled(state.answers.signature) ? 'oui (voir le PDF)' : 'non signé'));
+    out.push('', 'MJAGENCY · ' + CONTACT.email + ' · ' + CONTACT.phone);
+    return out.join('\n');
+  }
+
+  /* =========================================================
+     PDF (jsPDF)
+     ========================================================= */
+  // Les polices standard de jsPDF ne couvrent que le Latin-1 (+ €).
+  function clean(s) {
+    return String(s == null ? '' : s)
+      .normalize('NFC')
+      .replace(/\r\n?/g, '\n')
+      .replace(/[\u2018\u2019\u201A\u201B\u2032\u00B4]/g, "'")
+      .replace(/[\u201C\u201D\u201E\u201F\u2033]/g, '"')
+      .replace(/[\u2010\u2011\u2012\u2013\u2014\u2015\u2212]/g, '-')
+      .replace(/\u2026/g, '...')
+      .replace(/[\u00A0\u2000-\u200A\u202F\u205F\u3000\t]/g, ' ')
+      .replace(/\u0153/g, 'oe').replace(/\u0152/g, 'OE')
+      .replace(/[\u2022\u2023\u25CF]/g, '\u00B7')
+      .replace(/[\u200B-\u200D\u2060\uFEFF]/g, '')
+      .replace(/[^\n\x20-\x7E\u00A0-\u00FF\u20AC]/g, '')
+      .replace(/ {2,}/g, ' ');
+  }
+
+  function loadImage(src) {
+    return new Promise(function (res, rej) { var i = new Image(); i.onload = function () { res(i); }; i.onerror = rej; i.src = src; });
+  }
+  // Recadre la signature sur son tracé pour qu'elle remplisse le cadre du PDF
+  function cropSignature(dataUrl) {
+    return loadImage(dataUrl).then(function (img) {
+      var c = document.createElement('canvas');
+      c.width = img.naturalWidth; c.height = img.naturalHeight;
+      var ctx = c.getContext('2d');
+      ctx.drawImage(img, 0, 0);
+      var d = ctx.getImageData(0, 0, c.width, c.height).data;
+      var minX = c.width, minY = c.height, maxX = -1, maxY = -1;
+      for (var y = 0; y < c.height; y++) {
+        for (var x = 0; x < c.width; x++) {
+          if (d[(y * c.width + x) * 4 + 3] > 12) {
+            if (x < minX) minX = x; if (x > maxX) maxX = x;
+            if (y < minY) minY = y; if (y > maxY) maxY = y;
+          }
+        }
+      }
+      if (maxX < 0) return null;
+      var pad = Math.round(Math.max(c.width, c.height) * 0.02);
+      minX = Math.max(0, minX - pad); minY = Math.max(0, minY - pad);
+      maxX = Math.min(c.width - 1, maxX + pad); maxY = Math.min(c.height - 1, maxY + pad);
+      var w = maxX - minX + 1, h = maxY - minY + 1;
+      var out = document.createElement('canvas');
+      out.width = w; out.height = h;
+      var o = out.getContext('2d');
+      o.fillStyle = '#FFFFFF'; o.fillRect(0, 0, w, h);
+      o.drawImage(c, minX, minY, w, h, 0, 0, w, h);
+      return { data: out.toDataURL('image/png'), w: w, h: h };
+    }).catch(function () { return null; });
+  }
+
+  function buildPdf(sigImg) {
+    var jsPDF = window.jspdf.jsPDF;
+    var doc = new jsPDF({ unit: 'mm', format: 'a4', compress: true });
+    var W = 210, M = 18, CW = W - 2 * M, BOTTOM = 276;
+    var ACC = [0, 113, 227], INK = [11, 18, 32], MUT = [90, 100, 117], LIGHT = [160, 168, 180], LINE = [223, 228, 235], PALE = [236, 243, 253];
+    var a = state.answers;
+    var company = val('company') || 'Entreprise';
+    var ref = state.ref || '-';
+    var when = state.validatedAt ? new Date(state.validatedAt) : new Date();
+    var LH = 4.8, LBL = 4.3, GAP = 3.6;
+
+    function color(c) { doc.setTextColor(c[0], c[1], c[2]); }
+    function font(style, size) { doc.setFont('helvetica', style); doc.setFontSize(size); }
+    function text(s, x, y, opt) { doc.text(clean(s), x, y, opt || {}); }
+    function split(s, w) { return doc.splitTextToSize(clean(s), w); }
+    function truncate(s, w) {
+      s = clean(s);
+      if (doc.getTextWidth(s) <= w) return s;
+      while (s.length > 1 && doc.getTextWidth(s + '...') > w) s = s.slice(0, -1);
+      return s.trim() + '...';
+    }
+
+    var y = 0;
+    function contHeader() {
+      font('bold', 9); color(INK);
+      doc.text('MJ', M, 12.5);
+      var w = doc.getTextWidth('MJ');
+      color(ACC); doc.text('.', M + w, 12.5);
+      var x = M + w + doc.getTextWidth('.') + 1.5;
+      font('normal', 8.5); color(MUT);
+      var right = 'Réf. ' + ref;
+      var rw = doc.getTextWidth(clean(right));
+      doc.text(truncate('Brief site web · ' + company, W - M - x - rw - 8), x, 12.5);
+      text(right, W - M, 12.5, { align: 'right' });
+      doc.setDrawColor(LINE[0], LINE[1], LINE[2]); doc.setLineWidth(0.25);
+      doc.line(M, 16, W - M, 16);
+      y = 25;
+    }
+    function newPage() { doc.addPage(); contHeader(); }
+    function ensure(h) { if (y + h > BOTTOM) { newPage(); return true; } return false; }
+
+    /* --- Bandeau --- */
+    doc.setFillColor(ACC[0], ACC[1], ACC[2]);
+    doc.rect(0, 0, W, 50, 'F');
+    font('bold', 24); doc.setTextColor(255, 255, 255);
+    doc.text('MJ', M, 19);
+    var mjw = doc.getTextWidth('MJ');
+    doc.setFillColor(255, 255, 255);
+    doc.circle(M + mjw + 1.9, 18.1, 1.25, 'F');
+    font('normal', 7); doc.setTextColor(214, 231, 251);
+    doc.setCharSpace(0.55);
+    text('MJAGENCY · AGENCE WEB · SÈTE', M, 25.5);
+    doc.setCharSpace(0);
+    font('bold', 20); doc.setTextColor(255, 255, 255);
+    text('Brief de création de site web', M, 40.5);
+    font('bold', 9.5);
+    text('Réf. ' + ref, W - M, 19, { align: 'right' });
+    font('normal', 9); doc.setTextColor(214, 231, 251);
+    text(longDate(when), W - M, 24.5, { align: 'right' });
+    y = 60;
+
+    /* --- Carte client --- */
+    var LX = M + 7, LW = 100, RX = M + 120, RW = CW - 120 - 7;
+    font('bold', 16);
+    var coLines = split(company, LW);
+    font('normal', 10);
+    var who = [val('contactName'), val('contactRole')].filter(Boolean).join(', ');
+    var reach = [val('phone'), val('email')].filter(Boolean).join(' · ');
+    var where = [val('address'), val('city')].filter(Boolean).join(', ');
+    var infoLines = [];
+    [who, reach, where].forEach(function (s) { if (s) infoLines = infoLines.concat(split(s, LW)); });
+    var leftH = 5 + coLines.length * 6.6 + 1.5 + infoLines.length * 4.9;
+    font('bold', 10.5);
+    var projLines = split(val('siteType') || 'Non renseigné', RW);
+    var budLines = split(val('budget') || 'Non renseigné', RW);
+    var rightH = 5 + projLines.length * 4.9 + 5 + 5 + budLines.length * 4.9;
+    var cardH = Math.max(leftH, rightH) + 14;
+    doc.setFillColor(PALE[0], PALE[1], PALE[2]);
+    doc.roundedRect(M, y, CW, cardH, 3.5, 3.5, 'F');
+    var cy = y + 9;
+    font('bold', 7); color(ACC); doc.setCharSpace(0.4);
+    doc.text('CLIENT', LX, cy);
+    doc.text('PROJET', RX, cy);
+    doc.setCharSpace(0);
+    var ly = cy + 7.2;
+    font('bold', 16); color(INK);
+    coLines.forEach(function (l) { doc.text(l, LX, ly); ly += 6.6; });
+    ly += 0.2;
+    font('normal', 10); color(MUT);
+    infoLines.forEach(function (l) { doc.text(l, LX, ly); ly += 4.9; });
+    var ry = cy + 5.6;
+    font('bold', 10.5); color(val('siteType') ? INK : LIGHT);
+    projLines.forEach(function (l) { doc.text(l, RX, ry); ry += 4.9; });
+    ry += 4.2;
+    font('bold', 7); color(ACC); doc.setCharSpace(0.4);
+    doc.text('BUDGET', RX, ry);
+    doc.setCharSpace(0);
+    ry += 5.6;
+    font('bold', 10.5); color(val('budget') ? INK : LIGHT);
+    budLines.forEach(function (l) { doc.text(l, RX, ry); ry += 4.9; });
+    y += cardH + 11;
+
+    /* --- Sections --- */
+    function sectionTitle(num, title) {
+      ensure(24);
+      font('bold', 13); color(ACC);
+      doc.text(num, M, y + 4.5);
+      color(INK);
+      text(title, M + 9.5, y + 4.5);
+      doc.setDrawColor(LINE[0], LINE[1], LINE[2]); doc.setLineWidth(0.3);
+      doc.line(M, y + 8, W - M, y + 8);
+      y += 14;
+    }
+    function fieldModel(f, width) {
+      var v = a[f.id];
+      font('bold', 7);
+      var label = split(f.label.toLocaleUpperCase('fr-FR'), width);
+      var m = { label: label, kind: 'text', lines: [] };
+      if (!isFilled(v)) { m.kind = 'empty'; m.lines = ['Non renseigné']; }
+      else if (f.type === 'colors') { m.kind = 'colors'; m.colors = v.filter(function (c) { return hexToRgb(c); }); m.rows = Math.ceil(m.colors.length / Math.max(1, Math.floor(width / 30))); }
+      else { font('normal', 10); m.lines = split(answerText(f), width); }
+      m.h = label.length * 3.3 + (LBL - 3.3) + (m.kind === 'colors' ? m.rows * 7 : m.lines.length * LH);
+      return m;
+    }
+    function drawLabel(m, x) {
+      font('bold', 7); color(MUT); doc.setCharSpace(0.25);
+      m.label.forEach(function (l, k) { doc.text(l, x, y + 2.6 + k * 3.3); });
+      doc.setCharSpace(0);
+      y += m.label.length * 3.3 + (LBL - 3.3);
+    }
+    function drawColors(m, x, width) {
+      var per = Math.max(1, Math.floor(width / 30));
+      m.colors.forEach(function (c, k) {
+        var col = k % per, row = Math.floor(k / per);
+        var cx = x + col * 30, cyy = y + row * 7;
+        var rgb = hexToRgb(c);
+        doc.setFillColor(rgb[0], rgb[1], rgb[2]);
+        doc.setDrawColor(LINE[0], LINE[1], LINE[2]); doc.setLineWidth(0.2);
+        doc.circle(cx + 2.6, cyy + 2.5, 2.6, 'FD');
+        font('normal', 9.5); color(INK);
+        doc.text(c.toUpperCase(), cx + 7, cyy + 3.7);
+      });
+      y += m.rows * 7;
+    }
+    function valueStyle(m) {
+      if (m.kind === 'empty') { font('italic', 10); color(LIGHT); }
+      else { font('normal', 10); color(INK); }
+    }
+    // Champ pleine largeur, coupé ligne par ligne si besoin
+    function drawFull(f, x, width) {
+      var m = fieldModel(f, width);
+      ensure(m.label.length * 3.3 + LBL + (m.kind === 'colors' ? 7 : LH));
+      drawLabel(m, x);
+      if (m.kind === 'colors') { drawColors(m, x, width); }
+      else {
+        m.lines.forEach(function (l) {
+          if (y + LH > BOTTOM) { newPage(); }
+          valueStyle(m);
+          doc.text(l, x, y + 3.6);
+          y += LH;
+        });
+      }
+      y += GAP;
+    }
+    function drawPair(f1, f2) {
+      var cw = (CW - 8) / 2;
+      var m1 = fieldModel(f1, cw), m2 = fieldModel(f2, cw);
+      var h = Math.max(m1.h, m2.h);
+      if (h > BOTTOM - 25) { drawFull(f1, M, CW); drawFull(f2, M, CW); return; }
+      ensure(h);
+      var y0 = y;
+      [[m1, M], [m2, M + cw + 8]].forEach(function (pair) {
+        var m = pair[0], x = pair[1];
+        y = y0;
+        drawLabel(m, x);
+        if (m.kind === 'colors') drawColors(m, x, cw);
+        else { valueStyle(m); m.lines.forEach(function (l) { doc.text(l, x, y + 3.6); y += LH; }); }
+      });
+      y = y0 + h + GAP;
+    }
+
+    STEPS.slice(0, 7).forEach(function (s, i) {
+      sectionTitle(pad2(i + 1), s.pdf);
+      var fs = s.fields;
+      for (var k = 0; k < fs.length; k++) {
+        if (fs[k].half && fs[k + 1] && fs[k + 1].half) { drawPair(fs[k], fs[k + 1]); k++; }
+        else drawFull(fs[k], M, CW);
+      }
+      y += 4;
+    });
+
+    /* --- 08 Validation --- */
+    font('normal', 10);
+    var consentLines = split((a.consent ? '[x] ' : '[ ] ') + CONSENT_TEXT, CW);
+    var boxH = 44;
+    ensure(14 + 7 + consentLines.length * LH + 6 + boxH);
+    sectionTitle('08', 'Validation');
+    var place = val('place');
+    font('normal', 10); color(INK);
+    text('Fait ' + (place ? 'à ' + place + ', ' : '') + 'le ' + longDate(when), M, y + 3.6);
+    y += 8;
+    color(a.consent ? INK : MUT);
+    consentLines.forEach(function (l) { doc.text(l, M, y + 3.6); y += LH; });
+    y += 5;
+    var bw = (CW - 8) / 2;
+    doc.setDrawColor(LINE[0], LINE[1], LINE[2]); doc.setLineWidth(0.3);
+    doc.roundedRect(M, y, bw, boxH, 2.5, 2.5, 'S');
+    doc.setFillColor(PALE[0], PALE[1], PALE[2]);
+    doc.roundedRect(M + bw + 8, y, bw, boxH, 2.5, 2.5, 'F');
+    font('bold', 7); color(MUT); doc.setCharSpace(0.25);
+    doc.text('SIGNATURE DU CLIENT', M + 5, y + 6.5);
+    color(ACC);
+    doc.text('POUR MJAGENCY', M + bw + 13, y + 6.5);
+    doc.setCharSpace(0);
+    if (sigImg) {
+      var aw = bw - 10, ah = boxH - 14;
+      var ratio = sigImg.w / sigImg.h;
+      var iw = aw, ih = aw / ratio;
+      if (ih > ah) { ih = ah; iw = ah * ratio; }
+      doc.addImage(sigImg.data, 'PNG', M + 5 + (aw - iw) / 2, y + 10 + (ah - ih) / 2, iw, ih);
+    } else {
+      font('italic', 10); color(LIGHT);
+      doc.text(clean('Non signé'), M + 5, y + boxH / 2 + 3);
+    }
+    var rx = M + bw + 13;
+    font('bold', 11); color(INK);
+    text(CONTACT.name, rx, y + 16);
+    font('normal', 9.5); color(MUT);
+    text('MJAGENCY · Agence web à Sète', rx, y + 21.5);
+    color(INK);
+    text(CONTACT.email, rx, y + 29);
+    text(CONTACT.phone, rx, y + 34.5);
+    y += boxH;
+
+    /* --- Pieds de page --- */
+    var total = doc.getNumberOfPages();
+    for (var p = 1; p <= total; p++) {
+      doc.setPage(p);
+      doc.setDrawColor(LINE[0], LINE[1], LINE[2]); doc.setLineWidth(0.25);
+      doc.line(M, 283, W - M, 283);
+      font('normal', 6.5); color(MUT);
+      text('MJAGENCY · 54 rue Marceau, 34200 Sète · SIRET 992 328 120 00017 · jeremyvatuonepro@gmail.com · 06 11 71 83 68', M, 287.5);
+      text(p + ' / ' + total, W - M, 287.5, { align: 'right' });
+    }
+    return doc;
+  }
+
+  function waitForJsPDF(timeout) {
+    return new Promise(function (res, rej) {
+      var t0 = Date.now();
+      (function check() {
+        if (window.jspdf && window.jspdf.jsPDF) return res();
+        if (Date.now() - t0 > timeout) return rej(new Error('jsPDF indisponible'));
+        setTimeout(check, 120);
+      })();
+    });
+  }
+
+  var busy = false;
+  function downloadPdf(btn) {
+    if (busy) return;
+    busy = true;
+    var label = btn.textContent;
+    btn.textContent = 'Préparation…';
+    btn.setAttribute('aria-busy', 'true');
+    var sigP = isFilled(state.answers.signature) ? cropSignature(state.answers.signature) : Promise.resolve(null);
+    Promise.all([waitForJsPDF(8000), sigP]).then(function (r) {
+      var doc = buildPdf(r[1]);
+      var blob = doc.output('blob');
+      var name = 'Brief-MJAGENCY-' + (slugify(val('company')) || 'client') + '-' + (state.ref || 'brouillon') + '.pdf';
+      var url = URL.createObjectURL(blob);
+      var link = document.createElement('a');
+      link.href = url; link.download = name; link.rel = 'noopener';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      setTimeout(function () { URL.revokeObjectURL(url); }, 4000);
+      toast('PDF téléchargé');
+    }).catch(function (err) {
+      if (window.console) console.warn(err);
+      toast('Le PDF n\'a pas pu être créé. Vérifiez votre connexion et réessayez.');
+    }).then(function () {
+      busy = false;
+      btn.textContent = label;
+      btn.removeAttribute('aria-busy');
+    });
+  }
+
+  /* =========================================================
+     Mode test : #exemple
+     ========================================================= */
+  function sampleSignature() {
+    var c = document.createElement('canvas');
+    c.width = 900; c.height = 300;
+    var ctx = c.getContext('2d');
+    ctx.strokeStyle = '#0B1220'; ctx.lineWidth = 6; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+    ctx.beginPath();
+    ctx.moveTo(90, 190);
+    ctx.bezierCurveTo(120, 60, 200, 60, 170, 170);
+    ctx.bezierCurveTo(150, 240, 240, 220, 270, 150);
+    ctx.bezierCurveTo(290, 100, 320, 110, 310, 170);
+    ctx.bezierCurveTo(300, 230, 380, 200, 400, 140);
+    ctx.bezierCurveTo(420, 90, 450, 120, 440, 170);
+    ctx.bezierCurveTo(430, 220, 520, 210, 560, 130);
+    ctx.bezierCurveTo(590, 80, 620, 170, 660, 160);
+    ctx.bezierCurveTo(700, 150, 740, 120, 800, 140);
+    ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(150, 215); ctx.bezierCurveTo(350, 240, 600, 225, 780, 205); ctx.stroke();
+    return c.toDataURL('image/png');
+  }
+  function loadExample() {
+    state.answers = {
+      company: 'Maison Levain (exemple)',
+      sector: 'Boulangerie / pâtisserie',
+      activity: 'Boulangerie artisanale au levain naturel : pains, viennoiseries pur beurre et pâtisseries de saison. Tout est pétri et cuit sur place, chaque matin dès 4 h.',
+      contactName: 'Claire Martin',
+      contactRole: 'Gérante',
+      phone: '06 00 00 00 00',
+      email: 'claire.martin@exemple.fr',
+      address: '12 avenue des Tilleuls',
+      city: '34110 Frontignan',
+      founded: '2019',
+      siret: '',
+      hours: 'Du mardi au samedi : 6 h 30 – 13 h 30 et 15 h 30 – 19 h 30\nDimanche : 7 h – 13 h',
+      siteType: 'Site vitrine',
+      currentUrl: '',
+      currentIssues: '',
+      goals: ['Être trouvé sur Google', 'Attirer de nouveaux clients', 'Présenter la carte ou les produits'],
+      mainAction: 'Commander pour le week-end',
+      audience: 'Habitants de Frontignan et des alentours, familles, vacanciers l’été, et quelques restaurants du coin qui nous commandent du pain.',
+      differentiators: 'Levain naturel entretenu depuis 2019, farines bio de meuniers d’Occitanie, un « pain du jour » différent chaque matin.',
+      competitors: 'Deux boulangeries du centre-ville et les rayons pain des supermarchés.',
+      pages: ['Accueil', 'À propos / Notre histoire', 'Carte / Menu', 'Réalisations / Galerie', 'Avis clients', 'Contact'],
+      productCount: '',
+      languages: ['Français', 'Anglais'],
+      texts: 'Un mélange des deux',
+      photos: 'Je souhaite un shooting photo',
+      highlights: 'Le pain au levain, la fougasse aux olives et les commandes pour les fêtes. Baguette tradition à 1,30 €, bûches à partir de 24 €.',
+      logo: 'Oui, mais à moderniser',
+      colors: ['#B5651D', '#2F3A2F'],
+      mood: ['Chaleureux', 'Artisanal / authentique'],
+      inspirations: 'Des sites sobres avec de grandes photos de pain, où l’on trouve les horaires en un coup d’œil.',
+      avoid: 'Pas de fond noir, pas de musique, pas d’effets qui clignotent 🙏',
+      features: ["Bouton d'appel / WhatsApp", 'Click & collect', 'Avis Google affichés', 'Plan Google Maps', 'Galerie photo', 'Fil Instagram', 'Carte cadeau'],
+      tools: 'SumUp (caisse), Instagram',
+      otherFeature: '',
+      domain: "Je n'en ai pas encore",
+      domainName: 'maison-levain.fr',
+      host: '',
+      emails: "J'en voudrais",
+      gbp: 'Oui, mais pas à jour',
+      socials: 'Instagram : @maisonlevain.exemple\nFacebook : Maison Levain',
+      keywords: 'boulangerie Frontignan, pain au levain Frontignan, fougasse Sète…',
+      area: 'Frontignan, Sète et bassin de Thau',
+      budget: '1 000 à 2 000 €',
+      payment: 'En plusieurs fois',
+      maintenance: "MJAGENCY s'en occupe",
+      launchDate: '2026-12-01',
+      approver: 'Claire Martin',
+      keyDate: 'Les fêtes de fin d’année : le site doit être en ligne pour les commandes de bûches.',
+      other: '',
+      place: 'Frontignan',
+      consent: true,
+      signature: sampleSignature()
+    };
+    state.validated = false; state.ref = null; state.validatedAt = null;
+    state.step = 0;
+  }
+
+  /* =========================================================
+     Démarrage
+     ========================================================= */
+  function init() {
+    loadDraft();
+    var example = /^#exemple$/i.test(window.location.hash);
+    if (example) {
+      loadExample();
+      try { history.replaceState(null, '', window.location.pathname + window.location.search); } catch (e) { /* ignoré */ }
+    }
+    buildForm();
+    syncAll();
+    renderPreview();
+    bindForm();
+    bindTilt();
+    goTo(state.step, { scroll: false });
+    if (example) { saveDraft(); toast('Exemple chargé : Maison Levain'); }
+  }
+  init();
+})();
+</script>
+</body>
+</html>
