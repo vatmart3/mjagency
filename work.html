@@ -67,17 +67,18 @@
   <section class="container" style="padding-top:clamp(130px,18vh,200px);padding-bottom:clamp(36px,5vw,60px)">
     <div class="stack">
       <span class="eyebrow reveal">Portfolio · 2026</span>
-      <h1 class="display reveal">Notre réalisation.</h1>
-      <p class="lead reveal">Nous sommes un jeune studio&nbsp;: nous n’affichons que ce qui est réellement en ligne, pas des maquettes. Un projet livré, consultable — et le vôtre peut être le prochain.</p>
+      <h1 class="display reveal">Nos réalisations.</h1>
+      <p class="lead reveal">Nous sommes un jeune studio&nbsp;: nous n’affichons que ce qui est réellement en ligne, pas des maquettes. Un site livré pour un client, une vitrine que nous avons construite pour montrer ce qu’on sait faire — les deux consultables, et le vôtre peut être le prochain.</p>
     </div>
   </section>
 
   <section class="container sep" style="padding-top:var(--sec);padding-bottom:var(--sec)">
     <div class="grid-cards reveal">
 
-      <!-- Dernier projet livré, consultable en ligne : carte pleine largeur. -->
+      <!-- Deux projets : une carte chacun, côte à côte sur grand écran,
+           empilées sous 860 px par la règle des colonnes. -->
       <a href="https://boucherievatuonefidelite.fr" target="_blank" rel="noopener"
-         class="card card--large col-12" data-cat="web product" data-cursor="Voir le site">
+         class="card col-6" data-cat="web product" data-cursor="Voir le site">
         <div class="thumb">
           <div class="ph ph-fidelite"></div>
           <div class="fid" aria-hidden="true">
@@ -101,12 +102,37 @@
         </div>
       </a>
 
-
-
-
-
-
-
+      <!-- Dégradé : vitrine que nous avons construite de bout en bout pour
+           montrer ce qu'on sait faire. La marque est inventée, le site est
+           réellement en ligne — le libellé le dit, il n'y a pas de client
+           derrière et on ne va pas laisser croire le contraire. -->
+      <a href="https://barbier-5cs3.vercel.app/" target="_blank" rel="noopener"
+         class="card col-6" data-cat="web brand" data-cursor="Voir le site">
+        <div class="thumb">
+          <div class="ph ph-barbier"></div>
+          <div class="barb" aria-hidden="true">
+            <div class="barb__enseigne"><i></i></div>
+            <div class="barb__carte">
+              <div class="barb__tete">
+                <span class="barb__nom">Dégradé</span>
+                <span class="barb__lieu">Sète</span>
+              </div>
+              <div class="barb__ligne"><em>Dégradé américain</em><b>28 €</b></div>
+              <div class="barb__ligne"><em>Barbe au coupe-chou</em><b>22 €</b></div>
+              <div class="barb__creneaux">
+                <span>9:30</span><span class="pris">10:15</span><span class="libre">11:00</span><span>14:00</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="card__body">
+          <div>
+            <div class="card__meta">Barbier · Site de démonstration — 2026 · en ligne</div>
+            <h3 class="card__title">Dégradé — barbier à Sète</h3>
+          </div>
+          <span class="card__go">↗</span>
+        </div>
+      </a>
 
     </div>
   </section>
