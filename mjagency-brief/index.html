@@ -328,6 +328,12 @@ input[type="date"].input::-webkit-date-and-time-value { text-align: left; }
 .success p.lead { margin: 18px auto 0; max-width: 46ch; color: var(--muted); font-size: 16.5px; text-wrap: pretty; }
 .success-actions { margin-top: 26px; display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; }
 @media (max-width: 520px) { .success-actions .btn { width: 100%; } }
+.sent-badge { display: inline-flex; align-items: center; gap: 8px; margin: 16px auto 0; padding: 7px 14px; border-radius: 999px; background: color-mix(in srgb, var(--ok) 12%, transparent); color: var(--ok); font-weight: 600; font-size: 14.5px; }
+.sent-badge svg { width: 14px; height: 14px; }
+.sent-badge:focus { outline: none; }
+#send-fallback { max-width: 520px; margin-left: auto; margin-right: auto; text-align: left; }
+.fb-text { margin: 0; font-size: 14.5px; overflow-wrap: anywhere; }
+.fb-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
 .contact-box { margin: 30px auto 0; max-width: 460px; text-align: left; border: 1px solid var(--line); border-radius: 16px; padding: 16px 18px; }
 .contact-box .k { font-family: var(--font-mono); font-size: 11px; letter-spacing: .1em; color: var(--muted); margin: 0 0 10px; }
 .contact-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 8px 0; border-top: 1px solid var(--line); flex-wrap: wrap; }
@@ -668,6 +674,7 @@ input[type="date"].input::-webkit-date-and-time-value { text-align: left; }
   ];
 
   var CONSENT_TEXT = "J'accepte que MJAGENCY utilise ces informations pour préparer ma proposition et la création de mon site. Elles ne sont transmises à aucun tiers.";
+  var BRIEF_TO = 'mjagency.officiel@gmail.com';
   var CONTACT = { name: 'Jérémy Vatuone', email: 'jeremyvatuonepro@gmail.com', phone: '06 11 71 83 68', tel: '+33611718368' };
   var STORAGE_KEY = 'mjBriefDraft_v1';
 
@@ -692,7 +699,7 @@ input[type="date"].input::-webkit-date-and-time-value { text-align: left; }
   /* =========================================================
      État + brouillon
      ========================================================= */
-  var state = { step: 0, answers: {}, validated: false, ref: null, validatedAt: null };
+  var state = { step: 0, answers: {}, validated: false, ref: null, validatedAt: null, sentAt: null };
 
   function loadDraft() {
     try {
@@ -705,13 +712,14 @@ input[type="date"].input::-webkit-date-and-time-value { text-align: left; }
       state.validated = !!d.validated && !!d.ref;
       state.ref = d.ref || null;
       state.validatedAt = d.validatedAt || null;
+      state.sentAt = state.validated && d.sentAt ? d.sentAt : null;
     } catch (e) { /* stockage indisponible : on repart de zéro */ }
   }
   function saveDraft() {
     try {
       window.localStorage.setItem(STORAGE_KEY, JSON.stringify({
         v: 1, step: state.step, answers: state.answers,
-        validated: state.validated, ref: state.ref, validatedAt: state.validatedAt, savedAt: new Date().toISOString()
+        validated: state.validated, ref: state.ref, validatedAt: state.validatedAt, sentAt: state.sentAt, savedAt: new Date().toISOString()
       }));
     } catch (e) { /* quota ou navigation privée : le formulaire fonctionne quand même */ }
   }
@@ -909,7 +917,7 @@ input[type="date"].input::-webkit-date-and-time-value { text-align: left; }
   /* ---------- Mise à jour d'une réponse ---------- */
   function setAnswer(id, v) {
     state.answers[id] = v;
-    if (state.validated) { state.validated = false; state.ref = null; state.validatedAt = null; }
+    if (state.validated) { state.validated = false; state.ref = null; state.validatedAt = null; state.sentAt = null; }
     clearError(id);
     if (id === 'phone' || id === 'email') { clearError('phone'); clearError('email'); }
     lastChanged = id;
@@ -1056,6 +1064,7 @@ input[type="date"].input::-webkit-date-and-time-value { text-align: left; }
     state.validated = true;
     state.ref = makeRef();
     state.validatedAt = new Date().toISOString();
+    state.sentAt = null;
     saveDraft();
     renderStep8();
     updateChrome();
@@ -1106,19 +1115,26 @@ input[type="date"].input::-webkit-date-and-time-value { text-align: left; }
   }
   function renderSuccess() {
     var s = $('success');
+    var sent = !!state.sentAt;
+    var sentDate = sent ? longDate(new Date(state.sentAt)) + ' à ' + pad2(new Date(state.sentAt).getHours()) + ' h ' + pad2(new Date(state.sentAt).getMinutes()) : '';
     s.innerHTML =
       '<div class="success">' +
         '<div class="success-mark" aria-hidden="true"><svg viewBox="0 0 40 40" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><path d="M11 20.5l6.5 6.5L30 14"/></svg></div>' +
         '<h2 id="success-title" tabindex="-1">Brief validé</h2>' +
         '<div class="ref">Réf. ' + esc(state.ref) + '</div>' +
-        '<p class="lead">Merci ! Téléchargez votre brief en PDF puis envoyez-le à MJAGENCY. Nous revenons vers vous avec une proposition sur mesure.</p>' +
+        (sent
+          ? '<p class="lead">Merci ! Votre brief et son PDF sont bien arrivés chez MJAGENCY. Nous revenons vers vous avec une proposition sur mesure.</p>' +
+            '<p class="sent-badge" id="send-status" tabindex="-1">' + CHECK_SVG + 'Envoyé le ' + esc(sentDate) + '</p>'
+          : '<p class="lead">Merci ! Envoyez votre brief à MJAGENCY en un clic : le PDF part en pièce jointe. Nous revenons vers vous avec une proposition sur mesure.</p>') +
         '<div class="success-actions">' +
-          '<button type="button" class="btn btn-primary" id="dl-pdf">Télécharger le PDF</button>' +
+          (sent ? '' : '<button type="button" class="btn btn-primary" id="send-brief">Envoyer à MJAGENCY <span class="arrow" aria-hidden="true">→</span></button>') +
+          '<button type="button" class="btn ' + (sent ? 'btn-primary' : 'btn-secondary') + '" id="dl-pdf">Télécharger le PDF</button>' +
           '<button type="button" class="btn btn-secondary" id="copy-recap">Copier le récapitulatif</button>' +
         '</div>' +
+        '<div id="send-fallback" class="alert" role="alert" tabindex="-1" hidden></div>' +
         '<div class="contact-box">' +
-          '<p class="k">ENVOYEZ VOTRE BRIEF À</p>' +
-          '<div class="contact-row"><a href="mailto:' + CONTACT.email + '">' + CONTACT.email + '</a><button type="button" class="btn btn-secondary btn-sm" id="copy-email">Copier l\'adresse</button></div>' +
+          '<p class="k">' + (sent ? 'UNE QUESTION ? ÉCRIVEZ-NOUS' : 'OU ENVOYEZ-LE VOUS-MÊME À') + '</p>' +
+          '<div class="contact-row"><a href="mailto:' + BRIEF_TO + '">' + BRIEF_TO + '</a><button type="button" class="btn btn-secondary btn-sm" id="copy-email">Copier l\'adresse</button></div>' +
           '<div class="contact-row"><a href="tel:' + CONTACT.tel + '">' + CONTACT.phone + '</a><span class="help" style="margin:0">' + esc(CONTACT.name) + '</span></div>' +
         '</div>' +
         '<div class="success-more" id="success-more">' +
@@ -1141,7 +1157,7 @@ input[type="date"].input::-webkit-date-and-time-value { text-align: left; }
     $('reset-ask').focus();
   }
   function doReset() {
-    state = { step: 0, answers: {}, validated: false, ref: null, validatedAt: null };
+    state = { step: 0, answers: {}, validated: false, ref: null, validatedAt: null, sentAt: null };
     clearDraft();
     seenSections = { __init: true };
     syncAll();
@@ -1511,9 +1527,11 @@ input[type="date"].input::-webkit-date-and-time-value { text-align: left; }
       if (g) { goTo(+g.getAttribute('data-goto'), { focusTitle: true }); return; }
 
       if (e.target.closest('#validate')) { validateFinal(); return; }
+      if (e.target.closest('#send-brief')) { sendBrief(e.target.closest('#send-brief')); return; }
+      if (e.target.closest('[data-retry-send]')) { var sb = $('send-brief'); if (sb) sendBrief(sb); return; }
       if (e.target.closest('#dl-pdf')) { downloadPdf(e.target.closest('#dl-pdf')); return; }
       if (e.target.closest('#copy-recap')) { copyText(plainRecap(), 'Récapitulatif copié'); return; }
-      if (e.target.closest('#copy-email')) { copyText(CONTACT.email, 'Adresse copiée'); return; }
+      if (e.target.closest('#copy-email')) { copyText(BRIEF_TO, 'Adresse copiée'); return; }
       if (e.target.closest('#reset-ask')) { askReset(); return; }
       if (e.target.closest('#reset-no')) { cancelReset(); return; }
       if (e.target.closest('#reset-yes')) { doReset(); return; }
@@ -1598,7 +1616,7 @@ input[type="date"].input::-webkit-date-and-time-value { text-align: left; }
     out.push('Fait ' + (place ? 'à ' + place + ', ' : '') + 'le ' + longDate(state.validatedAt ? new Date(state.validatedAt) : new Date()));
     out.push((state.answers.consent ? '[x] ' : '[ ] ') + CONSENT_TEXT);
     out.push('Signature : ' + (isFilled(state.answers.signature) ? 'oui (voir le PDF)' : 'non signé'));
-    out.push('', 'MJAGENCY · ' + CONTACT.email + ' · ' + CONTACT.phone);
+    out.push('', 'MJAGENCY · ' + BRIEF_TO + ' · ' + CONTACT.phone);
     return out.join('\n');
   }
 
@@ -1890,15 +1908,23 @@ input[type="date"].input::-webkit-date-and-time-value { text-align: left; }
     text(CONTACT.phone, rx, y + 34.5);
     y += boxH;
 
-    /* --- Pieds de page --- */
+    /* --- Pieds de page : le logo en petit et le nom, rien d'autre --- */
     var total = doc.getNumberOfPages();
+    var S = 4.6, GAPL = 1.8, FY = 284;
+    font('bold', 7.5);
+    var nameW = doc.getTextWidth('MJAGENCY') + 0.3 * 7;
+    var fx = (W - (S + GAPL + nameW)) / 2;
     for (var p = 1; p <= total; p++) {
       doc.setPage(p);
-      doc.setDrawColor(LINE[0], LINE[1], LINE[2]); doc.setLineWidth(0.25);
-      doc.line(M, 283, W - M, 283);
-      font('normal', 6.5); color(MUT);
-      text('MJAGENCY · 54 rue Marceau, 34200 Sète · SIRET 992 328 120 00017 · jeremyvatuonepro@gmail.com · 06 11 71 83 68', M, 287.5);
-      text(p + ' / ' + total, W - M, 287.5, { align: 'right' });
+      doc.setFillColor(INK[0], INK[1], INK[2]);
+      doc.roundedRect(fx, FY, S, S, 1.1, 1.1, 'F');
+      font('bold', 5.6); doc.setTextColor(255, 255, 255);
+      doc.text('MJ', fx + 0.75, FY + 3.05);
+      doc.setFillColor(ACC[0], ACC[1], ACC[2]);
+      doc.circle(fx + S - 0.95, FY + 2.75, 0.36, 'F');
+      font('bold', 7.5); color(INK); doc.setCharSpace(0.3);
+      doc.text('MJAGENCY', fx + S + GAPL, FY + 3.2);
+      doc.setCharSpace(0);
     }
     return doc;
   }
@@ -1914,34 +1940,113 @@ input[type="date"].input::-webkit-date-and-time-value { text-align: left; }
     });
   }
 
+  function makePdf() {
+    var sigP = isFilled(state.answers.signature) ? cropSignature(state.answers.signature) : Promise.resolve(null);
+    return Promise.all([waitForJsPDF(8000), sigP]).then(function (r) {
+      var doc = buildPdf(r[1]);
+      return {
+        doc: doc,
+        name: 'Brief-MJAGENCY-' + (slugify(val('company')) || 'client') + '-' + (state.ref || 'brouillon') + '.pdf'
+      };
+    });
+  }
+  function saveBlob(blob, name) {
+    var url = URL.createObjectURL(blob);
+    var link = document.createElement('a');
+    link.href = url; link.download = name; link.rel = 'noopener';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    setTimeout(function () { URL.revokeObjectURL(url); }, 4000);
+  }
+  function setBusy(btn, text) {
+    var label = btn.innerHTML;
+    btn.textContent = text;
+    btn.setAttribute('aria-busy', 'true');
+    btn.disabled = true;
+    return function () { btn.innerHTML = label; btn.removeAttribute('aria-busy'); btn.disabled = false; };
+  }
+
   var busy = false;
   function downloadPdf(btn) {
     if (busy) return;
     busy = true;
-    var label = btn.textContent;
-    btn.textContent = 'Préparation…';
-    btn.setAttribute('aria-busy', 'true');
-    var sigP = isFilled(state.answers.signature) ? cropSignature(state.answers.signature) : Promise.resolve(null);
-    Promise.all([waitForJsPDF(8000), sigP]).then(function (r) {
-      var doc = buildPdf(r[1]);
-      var blob = doc.output('blob');
-      var name = 'Brief-MJAGENCY-' + (slugify(val('company')) || 'client') + '-' + (state.ref || 'brouillon') + '.pdf';
-      var url = URL.createObjectURL(blob);
-      var link = document.createElement('a');
-      link.href = url; link.download = name; link.rel = 'noopener';
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      setTimeout(function () { URL.revokeObjectURL(url); }, 4000);
+    var done = setBusy(btn, 'Préparation…');
+    makePdf().then(function (pdf) {
+      saveBlob(pdf.doc.output('blob'), pdf.name);
       toast('PDF téléchargé');
     }).catch(function (err) {
       if (window.console) console.warn(err);
       toast('Le PDF n\'a pas pu être créé. Vérifiez votre connexion et réessayez.');
+    }).then(function () { busy = false; done(); });
+  }
+
+  /* ---------- Envoi à MJAGENCY ----------
+     La page poste le PDF à /api/send-brief (fonction Vercel), qui l'envoie
+     en pièce jointe via Resend. Si l'envoi échoue (hors ligne, service non
+     configuré, page ouverte en local), le PDF est téléchargé et la
+     messagerie du client s'ouvre, déjà adressée. */
+  function mailtoHref() {
+    var subject = 'Brief site web - ' + (val('company') || 'nouveau client') + (state.ref ? ' (' + state.ref + ')' : '');
+    var body = 'Bonjour,\n\nVoici mon brief de création de site web' + (state.ref ? ' (réf. ' + state.ref + ')' : '') +
+      '. Le PDF est joint à ce message.\n\n' + (val('contactName') || '') + (val('phone') ? '\n' + val('phone') : '');
+    return 'mailto:' + BRIEF_TO + '?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
+  }
+  function sendBrief(btn) {
+    if (busy) return;
+    busy = true;
+    var done = setBusy(btn, 'Envoi en cours…');
+    $('send-fallback').hidden = true;
+    var pdfName = '';
+    var pdfBlob = null;
+    makePdf().then(function (pdf) {
+      pdfName = pdf.name;
+      pdfBlob = pdf.doc.output('blob');
+      var b64 = pdf.doc.output('datauristring').split(',')[1];
+      var ctrl = window.AbortController ? new AbortController() : null;
+      var timer = ctrl ? setTimeout(function () { ctrl.abort(); }, 25000) : 0;
+      return fetch('/api/send-brief', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        signal: ctrl ? ctrl.signal : undefined,
+        body: JSON.stringify({
+          ref: state.ref,
+          company: val('company') || '',
+          contactName: val('contactName') || '',
+          phone: val('phone') || '',
+          email: val('email') || '',
+          siteType: val('siteType') || '',
+          budget: val('budget') || '',
+          recap: plainRecap(),
+          filename: pdf.name,
+          pdf: b64
+        })
+      }).then(function (r) {
+        clearTimeout(timer);
+        return r.json().catch(function () { return {}; }).then(function (j) {
+          if (!r.ok || !j.ok) throw new Error('envoi ' + r.status + ' ' + (j.code || ''));
+        });
+      });
     }).then(function () {
-      busy = false;
-      btn.textContent = label;
-      btn.removeAttribute('aria-busy');
-    });
+      state.sentAt = new Date().toISOString();
+      saveDraft();
+      renderSuccess();
+      toast('Brief envoyé à MJAGENCY');
+      var s = $('send-status');
+      if (s) s.focus({ preventScroll: true });
+    }).catch(function (err) {
+      if (window.console) console.warn(err);
+      done();
+      if (pdfBlob) saveBlob(pdfBlob, pdfName);
+      var fb = $('send-fallback');
+      fb.innerHTML = '<p class="alert-title">L\'envoi automatique n\'a pas fonctionné.</p>' +
+        '<p class="fb-text">' + (pdfBlob ? 'Votre PDF vient d\'être téléchargé. ' : '') +
+        'Envoyez-le par e-mail à <b>' + BRIEF_TO + '</b> : il suffit de le joindre au message.</p>' +
+        '<div class="fb-actions"><a class="btn btn-primary btn-sm" href="' + esc(mailtoHref()) + '">Ouvrir ma messagerie</a>' +
+        '<button type="button" class="btn btn-secondary btn-sm" data-retry-send>Réessayer l\'envoi</button></div>';
+      fb.hidden = false;
+      fb.focus({ preventScroll: true });
+    }).then(function () { busy = false; });
   }
 
   /* =========================================================
@@ -2021,7 +2126,7 @@ input[type="date"].input::-webkit-date-and-time-value { text-align: left; }
       consent: true,
       signature: sampleSignature()
     };
-    state.validated = false; state.ref = null; state.validatedAt = null;
+    state.validated = false; state.ref = null; state.validatedAt = null; state.sentAt = null;
     state.step = 0;
   }
 
