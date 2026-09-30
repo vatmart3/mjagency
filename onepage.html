@@ -1780,27 +1780,38 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
        commerciale trompeuse, et l'article L111-7-2 du Code de la
        consommation oblige à dire comment ils sont recueillis.
 
-       1) La note Google — remplacer le bloc .note par :
-          <a class="note reveal" href="VOTRE-LIEN-FICHE-GOOGLE" target="_blank" rel="noopener">
-            <span class="note__eto" aria-hidden="true">★★★★★</span>
-            <span class="note__txt"><b>4,9</b> sur 5 · 12 avis Google</span>
-          </a>
+       Fait : la note Google (4,8 sur 5, 11 avis) et le nom du premier
+       client, Mathis Vatuone.
 
-       2) Pour chaque avis — remplacer la puce .aremplir par la phrase du
-          client, et renseigner son nom, son activité et l'adresse de son
-          site. La palette de la maquette se règle sur deux variables,
-          --t1 et --t2, à accorder aux couleurs du site du client.
+       Reste :
+       1) Les trois phrases, à obtenir des clients eux-mêmes. Elles ne
+          peuvent pas être écrites à leur place : la mention en bas de
+          section affirme qu'elles sont recueillies auprès d'eux et
+          publiées avec leur accord, et un avis inventé signé d'une
+          personne réelle l'expose autant qu'il nous expose.
 
-       3) Garder la mention en bas de section à jour : elle doit décrire
-          la réalité de la collecte.
+       2) Deux clients à nommer parmi les onze sites livrés, avec
+          l'adresse de leur site — puis accorder --t1 et --t2 de leur
+          maquette aux couleurs de ce site.
+
+          À NE PAS UTILISER ICI : Dégradé et Brume. Ce sont nos propres
+          vitrines de démonstration, à marque fictive ; il n'y a aucune
+          cliente à citer derrière, et les cartes du portfolio le disent
+          déjà. Les avis viennent des vrais clients, pas des démos.
+
+       3) Rendre la note cliquable vers la fiche Google (voir plus bas).
        ============================================================ -->
   <section class="container pad-y sep" id="avis">
     <div class="sec-head reveal">
       <span class="eyebrow">Ce qu'ils en disent</span>
       <h2 class="h2">Le site, et ce que<br>le client en dit.</h2>
+      <!-- Pour rendre la note cliquable, envelopper ce bloc :
+           <a class="note reveal" href="VOTRE-LIEN-FICHE-GOOGLE" target="_blank" rel="noopener"> … </a>
+           Un visiteur qui peut vérifier la note la croit ; sans lien, elle
+           ne vaut que votre parole. -->
       <div class="note reveal">
         <span class="note__eto" aria-hidden="true">★★★★★</span>
-        <span class="note__txt"><span class="aremplir">Note Google et nombre d'avis</span></span>
+        <span class="note__txt"><b>4,8</b> sur 5 · 11 avis Google</span>
       </div>
     </div>
 
@@ -1821,7 +1832,7 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
         <blockquote class="tem__mot">
           <p class="tem__cite"><span class="aremplir">Témoignage à recueillir</span></p>
           <footer class="tem__qui">
-            <b class="tem__nom"><span class="aremplir">Prénom, fonction</span></b>
+            <b class="tem__nom">Mathis Vatuone</b>
             <span class="tem__ou">Boucherie Vatuone — Sète</span>
             <a href="https://boucherievatuonefidelite.fr" target="_blank" rel="noopener" class="link-t">Voir le site <span class="arw" aria-hidden="true">↗</span></a>
           </footer>
