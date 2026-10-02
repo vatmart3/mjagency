@@ -119,11 +119,12 @@
     <!-- Un portrait par personne, aux mêmes dimensions (1086x1448) pour que
          les deux cadres se répondent.
 
-         Celle de Jérémy est arrivée en JPEG de 456 Ko, prise de plus loin :
-         ré-encodée en WebP à 96 Ko et resserrée d'un quart, pour que sa tête
-         occupe le cadre comme celle de Matheis. Le recadrage est fait dans
-         le fichier et pas en CSS — la parallaxe écrit un transform en ligne
-         sur l'image et écraserait un scale() posé en style. -->
+         Les deux photos sont recadrées pour que les visages soient à la
+         même taille et au même niveau : yeux à la même hauteur (y = 522)
+         et au centre (x = 543), largeur du visage égale à 2 % près. Le
+         recadrage est fait dans le fichier et pas en CSS — la parallaxe
+         écrit un transform en ligne sur l'image et écraserait un scale()
+         posé en style. -->
     <div class="duo">
       <article class="membre reveal">
         <div class="membre__photo">
