@@ -420,6 +420,79 @@
      obtient son masque et son léger retard. Pas de mesure des lignes
      réelles, donc rien ne se casse au changement de largeur.
      ========================================================= */
+  /* =========================================================
+     OCTOBRE ROSE
+
+     Posé par le script et non dans le HTML, pour deux raisons : la ligne
+     n'a de sens qu'en octobre — écrite en dur, elle resterait au mois de
+     mars — et elle se met ainsi sur toutes les pages sans toucher aux dix
+     fichiers.
+
+     Rien n'est affirmé qui ne soit vrai : on dit soutenir, on ne dit pas
+     reverser. Un pourcentage annoncé est un engagement, pas un visuel.
+     ========================================================= */
+  (function octobreRose() {
+    // À VÉRIFIER avant la mise en ligne, et à remplacer par le lien de
+    // l'association que vous choisissez de mettre en avant.
+    const LIEN = 'https://www.cancerdusein.org/';
+
+    const d = new Date();
+    if (d.getMonth() !== 9) return;              // 9 = octobre
+    const CLE = 'mj-octobre-' + d.getFullYear(); // le bandeau revient chaque année
+
+    let vu = null;
+    try { vu = localStorage.getItem(CLE); } catch { /* navigation privée */ }
+
+    const RUBAN = `
+      <svg viewBox="0 0 32 32" fill="none" stroke="currentColor"
+           stroke-width="3" stroke-linecap="round" aria-hidden="true">
+        <path d="M21 30c-3-6-5-8.9-5-11 0-4-5-4.6-5-9.3A5 5 0 0 1 16 5"/>
+        <path d="M11 30c3-6 5-8.9 5-11 0-4 5-4.6 5-9.3A5 5 0 0 0 16 5"/>
+      </svg>`;
+
+    /* La mention du pied de page, elle, ne se ferme pas : c'est elle qui
+       porte le soutien une fois le bandeau écarté. */
+    const pied = document.querySelector('.footer__bottom');
+    if (pied) {
+      const l = document.createElement('div');
+      l.className = 'oct-pied';
+      l.innerHTML = RUBAN +
+        '<span>Octobre Rose — <a href="' + LIEN + '" target="_blank" rel="noopener">soutenir la recherche</a></span>';
+      pied.appendChild(l);
+    }
+
+    document.documentElement.setAttribute('data-octobre', '');
+    if (vu) return;                              // bandeau déjà écarté cette année
+
+    const b = document.createElement('div');
+    b.className = 'oct';
+    b.setAttribute('role', 'region');
+    b.setAttribute('aria-label', 'Octobre Rose');
+    b.innerHTML = RUBAN.replace('<svg ', '<svg class="oct__ruban" ') +
+      '<p class="oct__txt">Octobre Rose — nous soutenons la lutte contre le cancer du sein. ' +
+      '<a href="' + LIEN + '" target="_blank" rel="noopener">En savoir plus</a></p>' +
+      '<button type="button" class="oct__fermer" aria-label="Masquer le bandeau Octobre Rose">\u2715</button>';
+    document.body.insertBefore(b, document.body.firstChild);
+
+    /* La hauteur est mesurée, pas devinée : la phrase passe sur deux lignes
+       sous 620 px, et une valeur en dur ferait passer le titre du hero sous
+       la barre de navigation. */
+    // Hauteur exacte, pas arrondie : arrondie au pixel supérieur, la barre
+    // descendait un pixel trop bas et laissait voir la page par-dessous.
+    const poser = () => document.documentElement.style
+      .setProperty('--bandeau-h', b.getBoundingClientRect().height.toFixed(2) + 'px');
+    poser();
+    let t = null;
+    addEventListener('resize', () => { clearTimeout(t); t = setTimeout(poser, 150); }, { passive: true });
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(poser);
+
+    b.querySelector('.oct__fermer').addEventListener('click', () => {
+      b.remove();
+      document.documentElement.style.setProperty('--bandeau-h', '0px');
+      try { localStorage.setItem(CLE, '1'); } catch {}
+    });
+  })();
+
   /* ---------------- Bandeau d'avis ----------------
      On duplique la liste pour que le raccord soit invisible, et on mesure
      la largeur réelle d'un exemplaire plus une gouttière : c'est de cette

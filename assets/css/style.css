@@ -18,6 +18,10 @@
   --blue:       #0071E3;
   --blue-dark:  #0058B0;
 
+  /* Hauteur du bandeau saisonnier en tête de page, 0 le reste de l'année.
+     main.js y pose la hauteur mesurée ; la barre et le hero s'y décalent. */
+  --bandeau-h: 0px;
+
   --rule:  rgba(0,0,0,.08);
   --rule-2:rgba(0,0,0,.14);
 
@@ -164,8 +168,11 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
 
 /* ---------- Hero ---------- */
 .hero{
-  min-height:min(92svh,860px);display:flex;flex-direction:column;justify-content:center;
-  align-items:center;text-align:center;padding-top:120px;padding-bottom:var(--s8);
+  min-height:min(92svh,860px);display:flex;flex-direction:column;
+  align-items:center;text-align:center;
+  padding-top:calc(120px + var(--bandeau-h));padding-bottom:var(--s8);
+
+  justify-content:center;
 }
 .hero__eyebrow{margin-bottom:var(--s2)}
 .hero__title .line{display:block}
@@ -1053,7 +1060,7 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
    premier écran tienne encore le titre, le chapô, les boutons et les
    chiffres — sans quoi ces derniers passent sous le pli. */
 @media (max-width:900px) and (max-height:800px){
-  .hero{padding-top:88px}
+  .hero{padding-top:calc(88px + var(--bandeau-h))}
   .hero__meta{gap:var(--s2)}
   .hero .trust{padding-bottom:clamp(56px,9vh,110px);margin-top:var(--s4)}
   .hero .trust{gap:10px var(--s4)}
@@ -1075,7 +1082,7 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
      gagne la cascade, inutile d'en écrire une autre plus haut.) */
   .hero{
     min-height:100svh;justify-content:flex-start;
-    padding-top:108px;padding-bottom:0;
+    padding-top:calc(108px + var(--bandeau-h));padding-bottom:0;
   }
   /* Les chiffres remontent pour dégager le bas de l'écran : c'est la scène
      de l'objet, qu'on laisse volontairement mordre sur le bord — une forme
@@ -1108,6 +1115,64 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
   html{scroll-behavior:auto}
 }
 
+
+/* =========================================================
+   OCTOBRE ROSE
+
+   Le site garde sa charte : on ne repeint rien en rose. Un bandeau en
+   tête, la pastille du logo qui change de couleur, une ligne au pied —
+   assez pour qu'on voie le soutien, pas assez pour que la marque se
+   dissolve dedans. Tout est posé par main.js, et seulement en octobre :
+   un ruban rose au mois de mars ne soutient plus rien, il traîne.
+
+   Rose profond sur rose très clair : 7,2:1. Le symbole doit se voir,
+   mais la phrase doit d'abord se lire.
+   ========================================================= */
+.oct{
+  position:fixed;top:0;left:0;right:0;z-index:520;
+  background:#FDEEF4;border-bottom:1px solid rgba(156,16,73,.16);
+  color:#9C1049;
+  display:flex;align-items:center;justify-content:center;gap:10px;
+  padding:9px max(14px, env(safe-area-inset-left, 0px));
+  padding-top:max(9px, env(safe-area-inset-top, 0px));
+  font-size:14px;line-height:1.35;text-align:center;
+}
+.oct__ruban{width:19px;height:19px;flex:none;color:#D81B60}
+.oct__txt{text-wrap:balance}
+.oct__txt a{color:inherit;text-decoration:underline;text-underline-offset:2px;white-space:nowrap}
+.oct__fermer{
+  position:absolute;right:4px;top:50%;translate:0 -50%;
+  width:44px;height:44px;border-radius:50%;
+  display:grid;place-items:center;color:#9C1049;font-size:15px;line-height:1;
+  transition:background .2s var(--ease);
+}
+
+/* La barre descend d'exactement la hauteur mesurée du bandeau, et le hero
+   avec elle : sans ça, le titre passait sous la barre sur les écrans
+   courts, là où la marge n'était déjà que de quelques pixels. */
+.nav{ top:var(--bandeau-h); }
+
+/* La pastille du logo passe au rose — c'est le détail que les habitués
+   du site remarquent en premier. */
+:root[data-octobre] .nav__logo .dot{background:#D81B60}
+
+.oct-pied{
+  display:inline-flex;align-items:center;gap:7px;
+  margin-top:6px;font-size:13px;color:#AD1457;
+}
+.oct-pied svg{width:15px;height:15px;flex:none}
+/* Le lien mène à un don : il doit se viser au doigt comme le reste du
+   site. Sans hauteur imposée il tombait à 15 px — le creux est pris sur
+   la marge du bloc, la ligne ne grandit donc pas de 44 px pour autant. */
+.oct-pied a{
+  color:inherit;text-decoration:underline;text-underline-offset:2px;
+  display:inline-flex;align-items:center;min-height:44px;
+}
+
+@media (max-width:620px){
+  .oct{font-size:13px;gap:8px;padding-right:46px}
+  .oct__ruban{width:17px;height:17px}
+}
 
 /* =========================================================
    BANDEAU D'AVIS GOOGLE
