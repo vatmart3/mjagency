@@ -116,12 +116,14 @@
       <p class="lead">Nous sommes deux créatifs basés à Sète. Nous associons stratégie, design et création web pour construire une présence en ligne qui vous ressemble — et qui donne confiance à vos futurs clients.</p>
     </div>
 
-    <!-- Un portrait par personne. La photo de Jérémy manque encore : sa
-         carte garde l'initiale, qui tient la place sans laisser un cadre
-         vide. Dès qu'elle arrive, déposer assets/img/jeremy.webp et
-         remplacer le bloc .membre__attente par :
-           <img src="assets/img/jeremy.webp" alt="Jérémy, direction artistique et design chez MJ Agency"
-                width="1086" height="1448" loading="lazy" decoding="async"> -->
+    <!-- Un portrait par personne, aux mêmes dimensions (1086x1448) pour que
+         les deux cadres se répondent.
+
+         Celle de Jérémy est arrivée en JPEG de 456 Ko, prise de plus loin :
+         ré-encodée en WebP à 96 Ko et resserrée d'un quart, pour que sa tête
+         occupe le cadre comme celle de Matheis. Le recadrage est fait dans
+         le fichier et pas en CSS — la parallaxe écrit un transform en ligne
+         sur l'image et écraserait un scale() posé en style. -->
     <div class="duo">
       <article class="membre reveal">
         <div class="membre__photo">
@@ -138,7 +140,9 @@
 
       <article class="membre reveal">
         <div class="membre__photo">
-          <div class="membre__attente" aria-hidden="true"><span>J</span></div>
+          <img src="assets/img/jeremy.webp"
+               alt="Jérémy, direction artistique et design chez MJ Agency"
+               width="1086" height="1448" loading="lazy" decoding="async">
         </div>
         <div class="membre__texte">
           <h3 class="membre__nom">Jérémy</h3>

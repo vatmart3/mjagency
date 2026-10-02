@@ -583,25 +583,20 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
   position:absolute;left:0;top:-10%;
   width:100%;height:120%;object-fit:cover;object-position:50% 18%;display:block;
 }
-/* L'initiale tient la place d'une photo qui manque encore : un cadre vide
-   dirait au visiteur que quelque chose ne charge pas. */
-.membre__attente{
-  font-size:clamp(56px,9vw,104px);font-weight:700;letter-spacing:-.04em;
-  color:rgba(255,255,255,.92);line-height:1;
-}
 .membre__texte{padding:var(--s3) var(--s3) var(--s4)}
 .membre__nom{font-size:20px;font-weight:600;letter-spacing:-.018em;color:var(--black)}
 .membre__role{font-size:14px;font-weight:600;color:var(--blue);margin-top:2px}
 .membre__desc{margin-top:10px;color:var(--gray);font-size:16px;line-height:1.55}
 
 @media (max-width:860px){
-  /* Deux portraits 4/5 côte à côte sur un téléphone, ce sont deux timbres.
-     Une colonne, et le cadre s'élargit pour ne pas manger tout l'écran. */
+  /* Deux portraits 4/5 côte à côte sur un téléphone, ce sont deux timbres :
+     on passe à une colonne. Le cadre devient carré et non paysage — un
+     cadre large se bat contre une photo verticale, et en 3/2 il ne restait
+     que la moitié de la hauteur : Jérémy était coupé au menton.
+     (object-position se pose sur l'image, pas sur son cadre : écrit ici,
+     il ne faisait rien du tout.) */
   .duo{grid-template-columns:1fr;gap:var(--s3)}
-  .membre__photo{aspect-ratio:3/2;object-position:50% 20%}
-}
-@media (max-width:420px){
-  .membre__photo{aspect-ratio:4/3}
+  .membre__photo{aspect-ratio:1}
 }
 
 /* ---------- Révélation par masque ----------
