@@ -312,6 +312,60 @@
     </div>
   </section>
 
+  <!-- AVIS GOOGLE — bandeau défilant
+       ============================================================
+       Les avis sont reproduits MOT POUR MOT, fautes comprises. On ne les
+       corrige pas : un avis Google est public et vérifiable d'un clic, un
+       texte retouché se repère tout de suite — et l'article L111-7-2 du
+       Code de la consommation interdit d'en modifier le contenu.
+
+       Pour en ajouter un : copier un <li class="ruban__avis"> et coller le
+       texte tel qu'il apparaît sur la fiche. Le bandeau se remesure tout
+       seul, rien d'autre à toucher. Penser à mettre le compte à jour dans
+       .ruban__note juste au-dessus.
+       ============================================================ -->
+  <section class="pad-y sep" id="avis" aria-labelledby="avis-t">
+    <div class="container">
+      <div class="sec-head reveal">
+        <span class="eyebrow">Avis clients</span>
+        <h2 class="h2" id="avis-t">Ce qu’ils en disent.</h2>
+        <!-- Rendre cliquable vers la fiche :
+             <a class="ruban__note" href="VOTRE-LIEN-FICHE-GOOGLE" target="_blank" rel="noopener"> … </a> -->
+        <div class="ruban__note">
+          <span class="ruban__eto" aria-hidden="true">★★★★★</span>
+          <span class="ruban__chiffre"><b>5,0</b> sur 5 · 4 avis Google</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="ruban" data-ruban>
+      <div class="ruban__defile">
+        <ul class="ruban__piste">
+          <li class="ruban__avis">
+            <span class="ruban__eto" aria-label="5 sur 5">★★★★★</span>
+            <p class="ruban__txt">«&nbsp;Je leurs est demandé de crée mon identité visuel pour ma marque de vêtement. J’en suis très content.&nbsp;»</p>
+            <div class="ruban__qui">powerebook <span>· Google</span></div>
+          </li>
+          <li class="ruban__avis">
+            <span class="ruban__eto" aria-label="5 sur 5">★★★★★</span>
+            <p class="ruban__txt">«&nbsp;J’ai fait appel à la MJ AGENCY, pour un événement. Tout s’est très bien passé, je recommande fortement. Équipe professionnelle et à l’écoute.&nbsp;»</p>
+            <div class="ruban__qui">valentin <span>· Google</span></div>
+          </li>
+          <li class="ruban__avis">
+            <span class="ruban__eto" aria-label="5 sur 5">★★★★★</span>
+            <p class="ruban__txt">«&nbsp;J’ai choisi de leurs faire confiance, et cela n’a pas loupé. Ont va pas ce mentir ce qui m’a attiré ces leurs prix très variable. Merci encore&nbsp;»</p>
+            <div class="ruban__qui">jerom <span>· Google</span></div>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="container">
+      <p class="ruban__mention">Avis publiés sur notre fiche Google et reproduits ici
+      mot pour mot, sans correction. Nous n’en modifions ni le contenu ni l’ordre.</p>
+    </div>
+  </section>
+
   <!-- MÉTHODE -->
   <section class="container pad-y sep">
     <div class="sec-head reveal">

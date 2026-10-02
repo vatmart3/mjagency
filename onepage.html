@@ -1144,6 +1144,81 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
 }
 
 
+/* =========================================================
+   BANDEAU D'AVIS GOOGLE
+
+   Le défilement est continu et sans couture : main.js duplique la liste
+   et mesure la largeur réelle d'un exemplaire, puis fait glisser la piste
+   d'exactement cette largeur. Un translateX(-50%) aurait été faux d'une
+   demi-gouttière, et le raccord aurait sauté à chaque tour.
+
+   Il s'arrête au survol et au focus clavier : un texte qui défile ne se
+   lit pas, et sans arrêt au focus un visiteur au clavier ne pourrait
+   jamais lire la carte qu'il vient d'atteindre.
+   ========================================================= */
+.ruban__note{
+  display:inline-flex;align-items:center;gap:10px;
+  padding:9px 16px;border-radius:980px;min-height:44px;
+  background:var(--white);border:1px solid var(--rule-2);box-shadow:var(--shadow-s);
+  transition:background .25s var(--ease);
+}
+.ruban__eto{color:#F5A623;font-size:14px;letter-spacing:.1em;flex:none;line-height:1}
+.ruban__chiffre{font-size:15px;color:var(--dark-gray)}
+.ruban__chiffre b{font-weight:600;color:var(--black);font-variant-numeric:tabular-nums}
+
+/* Pleine largeur, hors de la colonne de texte : un bandeau qui s'arrête
+   aux marges n'a plus l'air de traverser la page. Les bords s'effacent
+   pour que les cartes n'apparaissent pas d'un coup au ras du cadre. */
+.ruban{
+  position:relative;overflow:hidden;margin-top:var(--s4);
+  -webkit-mask-image:linear-gradient(90deg,transparent 0,#000 6%,#000 94%,transparent 100%);
+          mask-image:linear-gradient(90deg,transparent 0,#000 6%,#000 94%,transparent 100%);
+}
+.ruban__defile{
+  display:flex;gap:var(--gutter);width:max-content;
+  animation:ruban-glisse var(--duree,42s) linear infinite;
+  will-change:transform;
+}
+.ruban:hover .ruban__defile,
+.ruban:focus-within .ruban__defile{animation-play-state:paused}
+@keyframes ruban-glisse{
+  from{transform:translate3d(0,0,0)}
+  to  {transform:translate3d(calc(-1 * var(--decalage,100%)),0,0)}
+}
+.ruban__piste{
+  display:flex;gap:var(--gutter);list-style:none;margin:0;padding:0;
+}
+.ruban__avis{
+  flex:none;width:min(78vw,380px);
+  background:var(--white);border:1px solid var(--rule);border-radius:var(--radius);
+  box-shadow:var(--shadow-s);padding:var(--s3);
+  display:flex;flex-direction:column;gap:12px;
+}
+.ruban__txt{
+  font-size:16px;line-height:1.55;color:var(--dark-gray);
+  text-wrap:pretty;flex:1;
+}
+.ruban__qui{font-size:14px;font-weight:600;color:var(--black)}
+.ruban__qui span{font-weight:400;color:var(--gray)}
+.ruban__mention{
+  margin-top:var(--s3);max-width:74ch;
+  font-size:13px;line-height:1.55;color:var(--gray);
+}
+
+/* Moins d'animations : le bandeau ne bouge plus et devient une rangée que
+   l'on fait défiler soi-même. Le doublon est retiré par main.js, sinon on
+   lirait deux fois les mêmes avis. */
+@media (prefers-reduced-motion:reduce){
+  .ruban{overflow-x:auto;overscroll-behavior-x:contain;
+    -webkit-mask-image:none;mask-image:none}
+  .ruban__defile{animation:none}
+}
+
+@media (max-width:520px){
+  .ruban__avis{padding:var(--s2);width:min(84vw,320px)}
+  .ruban__txt{font-size:15px}
+}
+
 /* ---------- Vignette « Brume » (institut de soins) ----------
    Palette exacte du site présenté : lait, sable, argile et sauge. Elle est
    claire là où les deux autres vignettes sont sombres — les trois cartes se
@@ -1640,6 +1715,60 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
         <span class="work-item__title">Brume — institut à Balaruc-les-Bains</span>
         <span class="work-item__meta">Site de démonstration — 2026</span>
       </a>
+    </div>
+  </section>
+
+  <!-- AVIS GOOGLE — bandeau défilant
+       ============================================================
+       Les avis sont reproduits MOT POUR MOT, fautes comprises. On ne les
+       corrige pas : un avis Google est public et vérifiable d'un clic, un
+       texte retouché se repère tout de suite — et l'article L111-7-2 du
+       Code de la consommation interdit d'en modifier le contenu.
+
+       Pour en ajouter un : copier un <li class="ruban__avis"> et coller le
+       texte tel qu'il apparaît sur la fiche. Le bandeau se remesure tout
+       seul, rien d'autre à toucher. Penser à mettre le compte à jour dans
+       .ruban__note juste au-dessus.
+       ============================================================ -->
+  <section class="pad-y sep" id="avis" aria-labelledby="avis-t">
+    <div class="container">
+      <div class="sec-head reveal">
+        <span class="eyebrow">Avis clients</span>
+        <h2 class="h2" id="avis-t">Ce qu’ils en disent.</h2>
+        <!-- Rendre cliquable vers la fiche :
+             <a class="ruban__note" href="VOTRE-LIEN-FICHE-GOOGLE" target="_blank" rel="noopener"> … </a> -->
+        <div class="ruban__note">
+          <span class="ruban__eto" aria-hidden="true">★★★★★</span>
+          <span class="ruban__chiffre"><b>5,0</b> sur 5 · 4 avis Google</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="ruban" data-ruban>
+      <div class="ruban__defile">
+        <ul class="ruban__piste">
+          <li class="ruban__avis">
+            <span class="ruban__eto" aria-label="5 sur 5">★★★★★</span>
+            <p class="ruban__txt">«&nbsp;Je leurs est demandé de crée mon identité visuel pour ma marque de vêtement. J’en suis très content.&nbsp;»</p>
+            <div class="ruban__qui">powerebook <span>· Google</span></div>
+          </li>
+          <li class="ruban__avis">
+            <span class="ruban__eto" aria-label="5 sur 5">★★★★★</span>
+            <p class="ruban__txt">«&nbsp;J’ai fait appel à la MJ AGENCY, pour un événement. Tout s’est très bien passé, je recommande fortement. Équipe professionnelle et à l’écoute.&nbsp;»</p>
+            <div class="ruban__qui">valentin <span>· Google</span></div>
+          </li>
+          <li class="ruban__avis">
+            <span class="ruban__eto" aria-label="5 sur 5">★★★★★</span>
+            <p class="ruban__txt">«&nbsp;J’ai choisi de leurs faire confiance, et cela n’a pas loupé. Ont va pas ce mentir ce qui m’a attiré ces leurs prix très variable. Merci encore&nbsp;»</p>
+            <div class="ruban__qui">jerom <span>· Google</span></div>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="container">
+      <p class="ruban__mention">Avis publiés sur notre fiche Google et reproduits ici
+      mot pour mot, sans correction. Nous n’en modifions ni le contenu ni l’ordre.</p>
     </div>
   </section>
 
@@ -2868,6 +2997,53 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
      obtient son masque et son léger retard. Pas de mesure des lignes
      réelles, donc rien ne se casse au changement de largeur.
      ========================================================= */
+  /* ---------------- Bandeau d'avis ----------------
+     On duplique la liste pour que le raccord soit invisible, et on mesure
+     la largeur réelle d'un exemplaire plus une gouttière : c'est de cette
+     distance exacte que la piste doit glisser. Un pourcentage serait faux
+     d'une demi-gouttière et le raccord sauterait à chaque tour.
+
+     La durée se déduit de la distance, pas l'inverse : ajouter un avis
+     allonge le bandeau sans accélérer la lecture. */
+  (function ruban() {
+    const boite = document.querySelector('[data-ruban]');
+    if (!boite) return;
+    const defile = boite.querySelector('.ruban__defile');
+    const piste  = boite.querySelector('.ruban__piste');
+    if (!defile || !piste || !piste.children.length) return;
+
+    const VITESSE = 55;                      // pixels par seconde
+
+    if (reduced) {
+      // Pas de duplication : on lirait deux fois les mêmes avis, et le
+      // doublon serait annoncé aux lecteurs d'écran.
+      defile.style.animation = 'none';
+      return;
+    }
+
+    const copie = piste.cloneNode(true);
+    copie.setAttribute('aria-hidden', 'true');
+    // Le doublon n'est là que pour l'œil : il ne doit pas être atteignable
+    // au clavier, sinon la tabulation traverse deux fois les mêmes liens.
+    copie.querySelectorAll('a, button').forEach(n => n.setAttribute('tabindex', '-1'));
+    defile.appendChild(copie);
+
+    function mesurer() {
+      const gouttiere = parseFloat(getComputedStyle(defile).columnGap) || 0;
+      const d = piste.getBoundingClientRect().width + gouttiere;
+      if (!d) return;
+      defile.style.setProperty('--decalage', d.toFixed(2) + 'px');
+      defile.style.setProperty('--duree', (d / VITESSE).toFixed(2) + 's');
+    }
+    mesurer();
+
+    // Les largeurs bougent au redimensionnement et quand la police système
+    // remplace celle du rendu initial : on remesure dans les deux cas.
+    let t = null;
+    addEventListener('resize', () => { clearTimeout(t); t = setTimeout(mesurer, 150); }, { passive: true });
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(mesurer);
+  })();
+
   (function revelerTitres() {
     // Les intertitres des pages légales restent des intertitres.
     const titres = [...document.querySelectorAll('.h2')]

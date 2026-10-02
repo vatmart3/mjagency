@@ -1109,6 +1109,81 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
 }
 
 
+/* =========================================================
+   BANDEAU D'AVIS GOOGLE
+
+   Le défilement est continu et sans couture : main.js duplique la liste
+   et mesure la largeur réelle d'un exemplaire, puis fait glisser la piste
+   d'exactement cette largeur. Un translateX(-50%) aurait été faux d'une
+   demi-gouttière, et le raccord aurait sauté à chaque tour.
+
+   Il s'arrête au survol et au focus clavier : un texte qui défile ne se
+   lit pas, et sans arrêt au focus un visiteur au clavier ne pourrait
+   jamais lire la carte qu'il vient d'atteindre.
+   ========================================================= */
+.ruban__note{
+  display:inline-flex;align-items:center;gap:10px;
+  padding:9px 16px;border-radius:980px;min-height:44px;
+  background:var(--white);border:1px solid var(--rule-2);box-shadow:var(--shadow-s);
+  transition:background .25s var(--ease);
+}
+.ruban__eto{color:#F5A623;font-size:14px;letter-spacing:.1em;flex:none;line-height:1}
+.ruban__chiffre{font-size:15px;color:var(--dark-gray)}
+.ruban__chiffre b{font-weight:600;color:var(--black);font-variant-numeric:tabular-nums}
+
+/* Pleine largeur, hors de la colonne de texte : un bandeau qui s'arrête
+   aux marges n'a plus l'air de traverser la page. Les bords s'effacent
+   pour que les cartes n'apparaissent pas d'un coup au ras du cadre. */
+.ruban{
+  position:relative;overflow:hidden;margin-top:var(--s4);
+  -webkit-mask-image:linear-gradient(90deg,transparent 0,#000 6%,#000 94%,transparent 100%);
+          mask-image:linear-gradient(90deg,transparent 0,#000 6%,#000 94%,transparent 100%);
+}
+.ruban__defile{
+  display:flex;gap:var(--gutter);width:max-content;
+  animation:ruban-glisse var(--duree,42s) linear infinite;
+  will-change:transform;
+}
+.ruban:hover .ruban__defile,
+.ruban:focus-within .ruban__defile{animation-play-state:paused}
+@keyframes ruban-glisse{
+  from{transform:translate3d(0,0,0)}
+  to  {transform:translate3d(calc(-1 * var(--decalage,100%)),0,0)}
+}
+.ruban__piste{
+  display:flex;gap:var(--gutter);list-style:none;margin:0;padding:0;
+}
+.ruban__avis{
+  flex:none;width:min(78vw,380px);
+  background:var(--white);border:1px solid var(--rule);border-radius:var(--radius);
+  box-shadow:var(--shadow-s);padding:var(--s3);
+  display:flex;flex-direction:column;gap:12px;
+}
+.ruban__txt{
+  font-size:16px;line-height:1.55;color:var(--dark-gray);
+  text-wrap:pretty;flex:1;
+}
+.ruban__qui{font-size:14px;font-weight:600;color:var(--black)}
+.ruban__qui span{font-weight:400;color:var(--gray)}
+.ruban__mention{
+  margin-top:var(--s3);max-width:74ch;
+  font-size:13px;line-height:1.55;color:var(--gray);
+}
+
+/* Moins d'animations : le bandeau ne bouge plus et devient une rangée que
+   l'on fait défiler soi-même. Le doublon est retiré par main.js, sinon on
+   lirait deux fois les mêmes avis. */
+@media (prefers-reduced-motion:reduce){
+  .ruban{overflow-x:auto;overscroll-behavior-x:contain;
+    -webkit-mask-image:none;mask-image:none}
+  .ruban__defile{animation:none}
+}
+
+@media (max-width:520px){
+  .ruban__avis{padding:var(--s2);width:min(84vw,320px)}
+  .ruban__txt{font-size:15px}
+}
+
 /* ---------- Vignette « Brume » (institut de soins) ----------
    Palette exacte du site présenté : lait, sable, argile et sauge. Elle est
    claire là où les deux autres vignettes sont sombres — les trois cartes se

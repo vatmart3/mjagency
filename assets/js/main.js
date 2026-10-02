@@ -420,6 +420,53 @@
      obtient son masque et son léger retard. Pas de mesure des lignes
      réelles, donc rien ne se casse au changement de largeur.
      ========================================================= */
+  /* ---------------- Bandeau d'avis ----------------
+     On duplique la liste pour que le raccord soit invisible, et on mesure
+     la largeur réelle d'un exemplaire plus une gouttière : c'est de cette
+     distance exacte que la piste doit glisser. Un pourcentage serait faux
+     d'une demi-gouttière et le raccord sauterait à chaque tour.
+
+     La durée se déduit de la distance, pas l'inverse : ajouter un avis
+     allonge le bandeau sans accélérer la lecture. */
+  (function ruban() {
+    const boite = document.querySelector('[data-ruban]');
+    if (!boite) return;
+    const defile = boite.querySelector('.ruban__defile');
+    const piste  = boite.querySelector('.ruban__piste');
+    if (!defile || !piste || !piste.children.length) return;
+
+    const VITESSE = 55;                      // pixels par seconde
+
+    if (reduced) {
+      // Pas de duplication : on lirait deux fois les mêmes avis, et le
+      // doublon serait annoncé aux lecteurs d'écran.
+      defile.style.animation = 'none';
+      return;
+    }
+
+    const copie = piste.cloneNode(true);
+    copie.setAttribute('aria-hidden', 'true');
+    // Le doublon n'est là que pour l'œil : il ne doit pas être atteignable
+    // au clavier, sinon la tabulation traverse deux fois les mêmes liens.
+    copie.querySelectorAll('a, button').forEach(n => n.setAttribute('tabindex', '-1'));
+    defile.appendChild(copie);
+
+    function mesurer() {
+      const gouttiere = parseFloat(getComputedStyle(defile).columnGap) || 0;
+      const d = piste.getBoundingClientRect().width + gouttiere;
+      if (!d) return;
+      defile.style.setProperty('--decalage', d.toFixed(2) + 'px');
+      defile.style.setProperty('--duree', (d / VITESSE).toFixed(2) + 's');
+    }
+    mesurer();
+
+    // Les largeurs bougent au redimensionnement et quand la police système
+    // remplace celle du rendu initial : on remesure dans les deux cas.
+    let t = null;
+    addEventListener('resize', () => { clearTimeout(t); t = setTimeout(mesurer, 150); }, { passive: true });
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(mesurer);
+  })();
+
   (function revelerTitres() {
     // Les intertitres des pages légales restent des intertitres.
     const titres = [...document.querySelectorAll('.h2')]
