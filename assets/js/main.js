@@ -370,7 +370,7 @@
     if (reduced) return;
     const cibles = [...document.querySelectorAll(
       '.feature__viz--nav .nave, .feature__viz--board .board, .feature__viz--3d .gyro,'
-      + '.card--large .fid, .duo__portrait, .coherence'
+      + '.card--large .fid, .membre__photo img, .coherence'
     )];
     if (!cibles.length) return;
 

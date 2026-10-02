@@ -592,43 +592,51 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
 /* ---------- Le duo ----------
    Deux membres, un objectif. La photo est le point fort du studio — en
    attendant, un panneau typographique tient la place sans faire vide. */
-.duo{display:grid;grid-template-columns:1fr 1fr;gap:var(--s6);align-items:center;max-width:1180px;margin-inline:auto}
-.duo__portrait{
-  aspect-ratio:4/5;border-radius:var(--radius);overflow:hidden;
-  box-shadow:var(--shadow-m);position:relative;
+/* ---------- Le duo ----------
+   Un portrait par personne, deux cartes côte à côte. Le portrait occupe
+   toute la largeur de sa carte, bords arrondis compris : une photo
+   encadrée de blanc à l'intérieur d'une carte blanche fait doublon. */
+.duo{
+  display:grid;grid-template-columns:1fr 1fr;gap:var(--gutter);
+  max-width:1180px;margin-inline:auto;align-items:stretch;
+}
+.membre{
+  background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow-s);
+  overflow:hidden;display:flex;flex-direction:column;
+}
+.membre__photo{
+  aspect-ratio:4/5;position:relative;overflow:hidden;
   background:linear-gradient(160deg,#1A1A1E 0%,#0D0D0F 60%,#16161A 100%);
   display:grid;place-items:center;
 }
-.duo__portrait img{width:100%;height:100%;object-fit:cover;display:block}
-/* Les deux initiales tiennent la place de la photo. Un temps retournées
-   pour évoquer le dos à dos : un J en miroir ne se lit plus, la lisibilité
-   passe devant l'idée. Un filet les sépare — deux personnes, une marque. */
-.duo__initiales{
-  display:flex;align-items:center;gap:clamp(14px,2.4vw,30px);
-  font-size:clamp(52px,8.5vw,96px);font-weight:700;letter-spacing:-.04em;
-  color:rgba(255,255,255,.94);line-height:1;
+/* La photo est cadrée sur le haut : un portrait coupé au milieu du front
+   est le défaut le plus courant d'un cadre plus large que l'original. */
+/* La photo déborde de 20 % en hauteur et le cadre la rogne. C'est ce qui
+   donne à la parallaxe de quoi la déplacer : appliquée au cadre lui-même,
+   elle l'aurait décollé de la carte en laissant une bande blanche. */
+.membre__photo img{
+  position:absolute;left:0;top:-10%;
+  width:100%;height:120%;object-fit:cover;object-position:50% 18%;display:block;
 }
-.duo__initiales::after{
-  content:"";position:absolute;left:50%;top:50%;translate:-50% -50%;
-  width:1px;height:clamp(58px,10vw,110px);background:rgba(255,255,255,.22);
+/* L'initiale tient la place d'une photo qui manque encore : un cadre vide
+   dirait au visiteur que quelque chose ne charge pas. */
+.membre__attente{
+  font-size:clamp(56px,9vw,104px);font-weight:700;letter-spacing:-.04em;
+  color:rgba(255,255,255,.92);line-height:1;
 }
-.duo__legende{
-  position:absolute;left:0;right:0;bottom:0;padding:16px 18px;
-  font-size:13px;color:rgba(255,255,255,.62);text-align:center;
-  background:linear-gradient(to top, rgba(0,0,0,.45), transparent);
-}
-.membres{display:flex;flex-direction:column;gap:var(--s3)}
-.membre{
-  background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow-s);
-  padding:var(--s3) var(--s3) var(--s4);
-}
+.membre__texte{padding:var(--s3) var(--s3) var(--s4)}
 .membre__nom{font-size:20px;font-weight:600;letter-spacing:-.018em;color:var(--black)}
 .membre__role{font-size:14px;font-weight:600;color:var(--blue);margin-top:2px}
 .membre__desc{margin-top:10px;color:var(--gray);font-size:16px;line-height:1.55}
 
 @media (max-width:860px){
-  .duo{grid-template-columns:1fr;gap:var(--s4)}
-  .duo__portrait{aspect-ratio:3/2}
+  /* Deux portraits 4/5 côte à côte sur un téléphone, ce sont deux timbres.
+     Une colonne, et le cadre s'élargit pour ne pas manger tout l'écran. */
+  .duo{grid-template-columns:1fr;gap:var(--s3)}
+  .membre__photo{aspect-ratio:3/2;object-position:50% 20%}
+}
+@media (max-width:420px){
+  .membre__photo{aspect-ratio:4/3}
 }
 
 /* ---------- Révélation par masque ----------
@@ -1900,31 +1908,36 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
       <p class="lead">Nous sommes deux créatifs basés à Sète. Nous associons stratégie, design et création web pour construire une présence en ligne qui vous ressemble — et qui donne confiance à vos futurs clients.</p>
     </div>
 
+    <!-- Un portrait par personne. La photo de Jérémy manque encore : sa
+         carte garde l'initiale, qui tient la place sans laisser un cadre
+         vide. Dès qu'elle arrive, déposer assets/img/jeremy.webp et
+         remplacer le bloc .membre__attente par :
+           <img src="assets/img/jeremy.webp" alt="Jérémy, direction artistique et design chez MJ Agency"
+                width="1086" height="1448" loading="lazy" decoding="async"> -->
     <div class="duo">
-      <!-- PHOTO À VENIR — tous les deux en chemise blanche, dos à dos, bras
-           croisés, regard légèrement vers l'objectif, sourire.
-           Une fois la photo prise, la déposer dans assets/img/duo.jpg et
-           remplacer tout le contenu de .duo__portrait par :
-             <img src="assets/img/duo.jpg" alt="Matheis et Jérémy, fondateurs de MJ Agency, à Sète" width="1200" height="1500">
-           En attendant, les deux initiales dos à dos tiennent la place et
-           annoncent la composition, plutôt que de laisser un cadre vide. -->
-      <div class="duo__portrait reveal">
-        <div class="duo__initiales" aria-hidden="true"><span>M</span><span>J</span></div>
-        <p class="duo__legende">Matheis &amp; Jérémy — Sète, Hérault</p>
-      </div>
-
-      <div class="membres rs">
-        <article class="membre">
+      <article class="membre reveal">
+        <div class="membre__photo">
+          <img src="assets/img/matheis.webp"
+               alt="Matheis, stratégie et développement chez MJ Agency"
+               width="1086" height="1448" loading="lazy" decoding="async">
+        </div>
+        <div class="membre__texte">
           <h3 class="membre__nom">Matheis</h3>
           <div class="membre__role">Stratégie &amp; développement</div>
           <p class="membre__desc">Il transforme vos objectifs en un site rapide, clair et simple à utiliser.</p>
-        </article>
-        <article class="membre">
+        </div>
+      </article>
+
+      <article class="membre reveal">
+        <div class="membre__photo">
+          <div class="membre__attente" aria-hidden="true"><span>J</span></div>
+        </div>
+        <div class="membre__texte">
           <h3 class="membre__nom">Jérémy</h3>
           <div class="membre__role">Direction artistique &amp; design</div>
           <p class="membre__desc">Il donne à votre marque une identité reconnaissable et une expérience qui marque les esprits.</p>
-        </article>
-      </div>
+        </div>
+      </article>
     </div>
   </section>
 
@@ -2805,7 +2818,7 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
     if (reduced) return;
     const cibles = [...document.querySelectorAll(
       '.feature__viz--nav .nave, .feature__viz--board .board, .feature__viz--3d .gyro,'
-      + '.card--large .fid, .duo__portrait, .coherence'
+      + '.card--large .fid, .membre__photo img, .coherence'
     )];
     if (!cibles.length) return;
 

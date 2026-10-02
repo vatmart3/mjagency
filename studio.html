@@ -116,31 +116,36 @@
       <p class="lead">Nous sommes deux créatifs basés à Sète. Nous associons stratégie, design et création web pour construire une présence en ligne qui vous ressemble — et qui donne confiance à vos futurs clients.</p>
     </div>
 
+    <!-- Un portrait par personne. La photo de Jérémy manque encore : sa
+         carte garde l'initiale, qui tient la place sans laisser un cadre
+         vide. Dès qu'elle arrive, déposer assets/img/jeremy.webp et
+         remplacer le bloc .membre__attente par :
+           <img src="assets/img/jeremy.webp" alt="Jérémy, direction artistique et design chez MJ Agency"
+                width="1086" height="1448" loading="lazy" decoding="async"> -->
     <div class="duo">
-      <!-- PHOTO À VENIR — tous les deux en chemise blanche, dos à dos, bras
-           croisés, regard légèrement vers l'objectif, sourire.
-           Une fois la photo prise, la déposer dans assets/img/duo.jpg et
-           remplacer tout le contenu de .duo__portrait par :
-             <img src="assets/img/duo.jpg" alt="Matheis et Jérémy, fondateurs de MJ Agency, à Sète" width="1200" height="1500">
-           En attendant, les deux initiales dos à dos tiennent la place et
-           annoncent la composition, plutôt que de laisser un cadre vide. -->
-      <div class="duo__portrait reveal">
-        <div class="duo__initiales" aria-hidden="true"><span>M</span><span>J</span></div>
-        <p class="duo__legende">Matheis &amp; Jérémy — Sète, Hérault</p>
-      </div>
-
-      <div class="membres rs">
-        <article class="membre">
+      <article class="membre reveal">
+        <div class="membre__photo">
+          <img src="assets/img/matheis.webp"
+               alt="Matheis, stratégie et développement chez MJ Agency"
+               width="1086" height="1448" loading="lazy" decoding="async">
+        </div>
+        <div class="membre__texte">
           <h3 class="membre__nom">Matheis</h3>
           <div class="membre__role">Stratégie &amp; développement</div>
           <p class="membre__desc">Il transforme vos objectifs en un site rapide, clair et simple à utiliser.</p>
-        </article>
-        <article class="membre">
+        </div>
+      </article>
+
+      <article class="membre reveal">
+        <div class="membre__photo">
+          <div class="membre__attente" aria-hidden="true"><span>J</span></div>
+        </div>
+        <div class="membre__texte">
           <h3 class="membre__nom">Jérémy</h3>
           <div class="membre__role">Direction artistique &amp; design</div>
           <p class="membre__desc">Il donne à votre marque une identité reconnaissable et une expérience qui marque les esprits.</p>
-        </article>
-      </div>
+        </div>
+      </article>
     </div>
   </section>
 
