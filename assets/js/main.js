@@ -271,7 +271,7 @@
         const code = err.code || 'RESEAU';
         afficher(null, 'erreur',
           `L'envoi a échoué. <a href="${lien}">Envoyez-la depuis votre messagerie</a> ` +
-          `— tout est déjà rempli — ou appelez le <a href="tel:+33611718368">06 11 71 83 68</a>. ` +
+          `— tout est déjà rempli — ou appelez le <a href="tel:+33647571370">06 47 57 13 70</a>. ` +
           `<small class="form-msg__ref">réf. ${code}</small>`);
         console.warn('Formulaire :', code, err);
       } finally {

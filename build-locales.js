@@ -17,8 +17,8 @@ const fs = require('fs');
 const path = require('path');
 
 const SITE = 'https://www.mjagency.eu';
-const TEL_AFF = '06 11 71 83 68';
-const TEL_URI = '+33611718368';
+const TEL_AFF = '06 47 57 13 70';
+const TEL_URI = '+33647571370';
 const MAIL = 'mjagency.officiel@gmail.com';
 
 const VILLES = [
@@ -157,13 +157,21 @@ const VILLES = [
    ========================================================= */
 const IDENTITE = {
   denomination: 'MJ Agency',
-  forme:        null,   // ex. 'Entreprise individuelle (EI)', 'SAS', 'SASU'
-  capital:      null,   // ex. '1 000 €' — uniquement pour une société
-  siege:        null,   // adresse postale complète du siège
-  siret:        null,   // 14 chiffres
-  rcs:          null,   // ex. 'RCS Montpellier 123 456 789' — si société
-  tva:          null,   // ex. 'FR12345678901' — ou 'Non assujetti à la TVA'
-  publication:  null,   // nom du responsable de la publication
+  forme:        'Micro-entreprise (entrepreneur individuel)',
+  // Une micro-entreprise n'a pas de capital social : la ligne ne s'affiche
+  // pas du tout plutôt que d'annoncer « néant », qui laisserait croire à
+  // une société sans capital.
+  capital:      null,
+  siege:        '28 rue Condorcet, 34110 Frontignan',
+  siret:        '104 629 019 00019',
+  // Depuis 2023 toute entreprise française est inscrite au Registre
+  // national des entreprises ; le SIREN est le SIRET sans son numéro
+  // d'établissement.
+  rcs:          'SIREN 104 629 019 — inscrite au Registre national des entreprises (RNE)',
+  // Mention exacte exigée par l'article 293 B du CGI pour la franchise
+  // en base : « non assujetti » seul ne suffit pas sur une facture.
+  tva:          'TVA non applicable, article 293 B du CGI',
+  publication:  'Mathéïs Farrieux',
   mail:         MAIL,
   telAff:       TEL_AFF,
   telUri:       TEL_URI,
@@ -263,7 +271,7 @@ const MENTIONS = [
       <ul>
         <li><b>Dénomination</b> : ${IDENTITE.denomination}</li>
         <li><b>Forme juridique</b> : ${aRemplir(IDENTITE.forme, 'Forme juridique')}</li>
-        <li><b>Capital social</b> : ${aRemplir(IDENTITE.capital, 'Capital social (si société)')}</li>
+        ${IDENTITE.capital ? `<li><b>Capital social</b> : ${IDENTITE.capital}</li>` : ''}
         <li><b>Siège social</b> : ${aRemplir(IDENTITE.siege, 'Adresse du siège')}</li>
         <li><b>SIRET</b> : ${aRemplir(IDENTITE.siret, 'SIRET')}</li>
         <li><b>Immatriculation</b> : ${aRemplir(IDENTITE.rcs, 'RCS ou répertoire des métiers')}</li>
