@@ -1,0 +1,3 @@
+# FRIPE est une app Next.js à part, déployée comme un projet Vercel distinct
+# (Root Directory = fripe). Le site statique de l'agence ne doit pas la servir.
+fripe/

@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>FRIPE — hors ligne</title>
+    <style>
+      :root { --papier: #f3efe6; --encre: #17150f; --encre-2: #5d574b; --accent: #ff5b2e; color-scheme: light dark; }
+      @media (prefers-color-scheme: dark) { :root { --papier: #12110e; --encre: #f3efe6; --encre-2: #b3ab9b; --accent: #ff6a3d; } }
+      html, body { margin: 0; height: 100%; background: var(--papier); color: var(--encre); }
+      body { display: grid; place-items: center; padding: 24px; font-family: ui-sans-serif, system-ui, -apple-system, sans-serif; text-align: center; }
+      h1 { font-family: ui-serif, Georgia, serif; font-size: 44px; letter-spacing: -0.02em; margin: 0 0 8px; }
+      h1 span { color: var(--accent); }
+      p { color: var(--encre-2); max-width: 30ch; margin: 0 auto 24px; line-height: 1.5; }
+      button { font: inherit; font-weight: 600; border: 0; border-radius: 999px; padding: 14px 24px; background: var(--encre); color: var(--papier); }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>FRIPE<span>.</span></h1>
+      <p>Pas de réseau pour l'instant. L'analyse des photos a besoin d'internet ; reviens dès que ça capte.</p>
+      <button onclick="location.reload()">Réessayer</button>
+    </main>
+  </body>
+</html>

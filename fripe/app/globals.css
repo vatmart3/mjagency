@@ -1,0 +1,150 @@
+@import "tailwindcss";
+
+/* --------------------------------------------------------------------------
+   FRIPE — papier ivoire, encre chaude, une étiquette orange.
+   Les couleurs sont des variables : le thème sombre les redéfinit, les
+   composants n'en savent rien.
+   -------------------------------------------------------------------------- */
+
+:root {
+  --papier: #f3efe6;
+  --carte: #fffdf8;
+  --creux: #ebe5d8;
+  --encre: #17150f;
+  --encre-2: #5d574b;
+  --encre-3: #8f887a;
+  --ligne: rgb(23 21 15 / 0.1);
+  --ligne-forte: rgb(23 21 15 / 0.2);
+  --accent: #ff5b2e;
+  --accent-fonce: #e2441a;
+  --sur-accent: #fffaf3;
+  --kraft: #d6b27f;
+  --ok: #2f7d4f;
+  --alerte: #a8501a;
+  --alerte-fond: #fbe9d7;
+  --ombre: 0 1px 0 rgb(23 21 15 / 0.04), 0 8px 24px -12px rgb(23 21 15 / 0.18);
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --papier: #12110e;
+    --carte: #1c1a16;
+    --creux: #26231d;
+    --encre: #f3efe6;
+    --encre-2: #b3ab9b;
+    --encre-3: #7d7668;
+    --ligne: rgb(243 239 230 / 0.1);
+    --ligne-forte: rgb(243 239 230 / 0.2);
+    --accent: #ff6a3d;
+    --accent-fonce: #ff8458;
+    --sur-accent: #1a0d07;
+    --kraft: #b08d5c;
+    --ok: #6fc28f;
+    --alerte: #f0a36b;
+    --alerte-fond: #3a2416;
+    --ombre: 0 1px 0 rgb(0 0 0 / 0.2), 0 10px 30px -14px rgb(0 0 0 / 0.6);
+    color-scheme: dark;
+  }
+}
+
+@theme inline {
+  --color-papier: var(--papier);
+  --color-carte: var(--carte);
+  --color-creux: var(--creux);
+  --color-encre: var(--encre);
+  --color-encre-2: var(--encre-2);
+  --color-encre-3: var(--encre-3);
+  --color-ligne: var(--ligne);
+  --color-ligne-forte: var(--ligne-forte);
+  --color-accent: var(--accent);
+  --color-accent-fonce: var(--accent-fonce);
+  --color-sur-accent: var(--sur-accent);
+  --color-kraft: var(--kraft);
+  --color-ok: var(--ok);
+  --color-alerte: var(--alerte);
+  --color-alerte-fond: var(--alerte-fond);
+  --shadow-carte: var(--ombre);
+  --font-display: var(--font-fraunces), ui-serif, Georgia, serif;
+  --font-sans: var(--font-instrument), ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --radius-carte: 1.25rem;
+}
+
+/* Dans la couche « base » : les utilitaires Tailwind passent devant. */
+@layer base {
+  html {
+    background: var(--papier);
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+
+  body {
+    background: var(--papier);
+    color: var(--encre);
+    font-family: var(--font-sans);
+    min-height: 100dvh;
+    overscroll-behavior-y: none;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-font-smoothing: antialiased;
+    font-feature-settings: "ss01", "cv11";
+  }
+
+  /* Pas de zoom automatique d'iOS sur les champs : 16 px minimum. */
+  input,
+  textarea,
+  select {
+    font-size: max(16px, 1em);
+  }
+
+  button {
+    cursor: pointer;
+    touch-action: manipulation;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+
+  /* Grain de papier très léger, pour que l'ivoire ne fasse pas « aplat ». */
+  .grain::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.35;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .05 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+}
+
+.pb-safe {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+.pt-safe {
+  padding-top: env(safe-area-inset-top);
+}
+
+.no-scrollbar {
+  scrollbar-width: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+@media (hover: hover) {
+  .hover-lift:hover {
+    transform: translateY(-1px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

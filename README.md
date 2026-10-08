@@ -14,6 +14,7 @@ serverless, pour l'envoi du formulaire.
 | `contact.html` | Calendrier de réservation + formulaire |
 | `creation-site-internet-sete.html` *et 3 autres* | Pages locales, générées |
 | `au-bon-pain/` | Site client, servi depuis `/au-bon-pain` |
+| `fripe/` | FRIPE, app Next.js indépendante (annonces Vinted) — voir `fripe/README.md`, projet Vercel séparé |
 
 ## Direction artistique
 
