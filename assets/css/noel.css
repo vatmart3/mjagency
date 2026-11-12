@@ -98,15 +98,13 @@
 .theme-noel .cap,
 .theme-noel .step,
 .theme-noel .membre,
-.theme-noel .ruban__avis,
-.theme-noel .noel-carte{ position:relative; }
+.theme-noel .ruban__avis{ position:relative; }
 
 .theme-noel .card::before,
 .theme-noel .cap::before,
 .theme-noel .step::before,
 .theme-noel .membre::before,
-.theme-noel .ruban__avis::before,
-.theme-noel .noel-carte::before{
+.theme-noel .ruban__avis::before{
   content:"";position:absolute;left:-1px;right:-1px;top:-1px;height:13px;
   z-index:3;pointer-events:none;
   border-radius:var(--radius) var(--radius) 0 0;
@@ -149,7 +147,6 @@
   .theme-noel .step:hover::before,
   .theme-noel .membre:hover::before,
   .theme-noel .ruban__avis:hover::before,
-  .theme-noel .noel-carte:hover::before,
   .theme-noel .btn--glow:hover::before,
   .theme-noel .nav__cta:hover::before{
     transform:translateY(18px) scaleY(.4);opacity:0;
@@ -542,7 +539,6 @@
 @media (prefers-reduced-motion:reduce){
   .theme-noel .card::before,.theme-noel .cap::before,.theme-noel .step::before,
   .theme-noel .membre::before,.theme-noel .ruban__avis::before,
-  .theme-noel .noel-carte::before,
   .theme-noel .btn--glow::before,.theme-noel .nav__cta::before,
   .avent__volet,.coffret__couvercle,.coffret__noeud,.coffret__lueur,
   .cadeau,.cadeau::after,.avent-vue,.avent-vue__boite{transition:none}

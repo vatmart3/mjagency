@@ -205,7 +205,7 @@
      qui s'en détachent. Trois par survol : au-delà c'est de la confettis.
      ========================================================= */
   if (!reduit && matchMedia('(hover: hover) and (pointer: fine)').matches) {
-    var SEL = '.card, .cap, .step, .membre, .ruban__avis, .noel-carte, .btn--glow, .nav__cta';
+    var SEL = '.card, .cap, .step, .membre, .ruban__avis, .btn--glow, .nav__cta';
     var dernierGrain = 0;
     document.addEventListener('pointerover', function (e) {
       var c = e.target.closest && e.target.closest(SEL);
