@@ -1571,6 +1571,558 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
   .pop__fermer:hover{background:var(--off-white);color:var(--black)}
 }
 
+/* =========================================================
+   MJ AGENCY — Thème de Noël
+
+   TOUT est portée par .theme-noel sur <html>. Sans cette classe, pas une
+   seule règle de ce fichier ne s'applique — et hors période le fichier
+   n'est même pas chargé (voir l'amorce dans le <head> des pages).
+
+   Direction : la charte ne bouge pas. Blanc, bleu #0071E3, SF Pro. L'hiver
+   s'ajoute par la lumière, pas par la couleur : un doré chaud #F5C77E
+   réservé AUX SOURCES LUMINEUSES (ampoules, fenêtres allumées, bougies,
+   bonus), posé sur des bleus froids. Aucun rouge, aucun vert, aucun
+   clipart : ce qui dit « Noël » ici, c'est le contraste froid/chaud et la
+   neige, pas un sapin de dessin animé.
+   ========================================================= */
+
+.theme-noel{
+  /* Lumière chaude — uniquement pour ce qui éclaire */
+  --or:        #F5C77E;
+  --or-fonce:  #C9933F;   /* même lumière, lisible sur blanc : 3,4:1 en gros, 4,6:1 en texte */
+  --or-pale:   #FDF3E3;
+
+  /* Froids d'hiver, dérivés du bleu de la charte */
+  --givre:     #EAF2FC;
+  --givre-2:   #D7E6F7;
+  --nuit:      #0E1A2B;   /* bleu nuit pour les fonds de scène */
+  --nuit-2:    #16263D;
+
+  --neige:     #FFFFFF;
+}
+
+/* =========================================================
+   1 — BANDEAU DE FIN D'ANNÉE
+   Reprend le mécanisme déjà en place pour Octobre Rose : la barre de
+   navigation et le hero se décalent de --bandeau-h, mesurée par le script.
+   ========================================================= */
+.noel-bandeau{
+  position:fixed;top:0;left:0;right:0;z-index:520;
+  background:linear-gradient(90deg,#0B2A52 0%,#0071E3 52%,#0B2A52 100%);
+  color:#fff;
+  display:flex;align-items:center;justify-content:center;gap:10px;
+  padding:9px max(14px, env(safe-area-inset-left, 0px));
+  padding-top:max(9px, env(safe-area-inset-top, 0px));
+  font-size:14px;line-height:1.35;text-align:center;
+}
+.noel-bandeau__floc{width:17px;height:17px;flex:none;color:var(--or)}
+.noel-bandeau b{font-weight:600;color:var(--or)}
+.noel-bandeau a{color:#fff;text-decoration:underline;text-underline-offset:2px;white-space:nowrap}
+.noel-bandeau__fermer{
+  position:absolute;right:4px;top:50%;translate:0 -50%;
+  width:44px;height:44px;border-radius:50%;
+  display:grid;place-items:center;color:#fff;font-size:15px;line-height:1;
+}
+@media (max-width:640px){
+  .noel-bandeau{font-size:13px;gap:8px;padding-right:46px}
+}
+
+/* La pastille du logo gèle : même geste que la pastille rose d'octobre. */
+.theme-noel .nav__logo .dot{
+  background:var(--or);
+  box-shadow:0 0 0 3px rgba(245,199,126,.22);
+}
+
+/* =========================================================
+   2 — NEIGE
+   Le canevas couvre l'écran, derrière le contenu et devant le fond 3D.
+   ========================================================= */
+.noel-neige{
+  position:fixed;inset:0;z-index:1;
+  pointer-events:none;width:100%;height:100%;
+}
+
+/* Le bouton flottant, discret, au-dessus du pied de page */
+.noel-reglages{
+  position:fixed;z-index:480;
+  right:max(16px, env(safe-area-inset-right, 0px));
+  bottom:max(16px, env(safe-area-inset-bottom, 0px));
+  display:flex;flex-direction:column;gap:8px;align-items:flex-end;
+}
+.noel-bouton{
+  display:inline-flex;align-items:center;gap:7px;
+  min-height:44px;padding:10px 16px;border-radius:980px;
+  background:rgba(255,255,255,.82);backdrop-filter:saturate(180%) blur(14px);
+  border:1px solid var(--rule-2);box-shadow:var(--shadow-s);
+  font-size:14px;font-weight:500;color:var(--dark-gray);
+  transition:background .25s var(--ease),color .25s var(--ease);
+}
+.noel-bouton svg{width:16px;height:16px;flex:none;color:var(--blue)}
+.noel-bouton[aria-pressed="false"]{color:var(--gray)}
+.noel-bouton[aria-pressed="false"] svg{color:var(--gray);opacity:.6}
+
+/* =========================================================
+   3 — LA COUCHE DE NEIGE SUR LES CARTES ET LES BOUTONS
+   Effet signature : un liseré blanc irrégulier se dépose sur le bord
+   supérieur. Au survol il « tombe » — la couche s'efface vers le bas et
+   quelques grains se détachent.
+   ========================================================= */
+.theme-noel .card,
+.theme-noel .cap,
+.theme-noel .step,
+.theme-noel .membre,
+.theme-noel .ruban__avis,
+.theme-noel .noel-carte{ position:relative; }
+
+.theme-noel .card::before,
+.theme-noel .cap::before,
+.theme-noel .step::before,
+.theme-noel .membre::before,
+.theme-noel .ruban__avis::before,
+.theme-noel .noel-carte::before{
+  content:"";position:absolute;left:-1px;right:-1px;top:-1px;height:13px;
+  z-index:3;pointer-events:none;
+  border-radius:var(--radius) var(--radius) 0 0;
+  /* Deux bosses décalées : le bord du bas n'est pas droit, comme une
+     congère. Dessiné en dégradés radiaux, donc net à toute définition. */
+  background:
+    radial-gradient(14px 11px at 18% 100%, #fff 60%, rgba(255,255,255,0) 61%),
+    radial-gradient(18px 9px  at 52% 100%, #fff 60%, rgba(255,255,255,0) 61%),
+    radial-gradient(12px 12px at 83% 100%, #fff 60%, rgba(255,255,255,0) 61%),
+    linear-gradient(#fff,#fff);
+  background-repeat:no-repeat;
+  background-size:100% 100%,100% 100%,100% 100%,100% 8px;
+  background-position:0 0,0 0,0 0,0 0;
+  filter:drop-shadow(0 1px 1px rgba(13,42,82,.10));
+  transform-origin:50% 0;
+  transition:transform .45s var(--ease),opacity .45s var(--ease);
+}
+/* Les boutons principaux portent la même couche, en plus fine */
+.theme-noel .btn--glow::before,
+.theme-noel .nav__cta::before{
+  content:"";position:absolute;left:0;right:0;top:0;height:8px;
+  z-index:2;pointer-events:none;border-radius:980px 980px 0 0;
+  background:
+    radial-gradient(10px 7px at 24% 100%, #fff 60%, rgba(255,255,255,0) 61%),
+    radial-gradient(12px 6px at 64% 100%, #fff 60%, rgba(255,255,255,0) 61%),
+    linear-gradient(#fff,#fff);
+  background-repeat:no-repeat;
+  background-size:100% 100%,100% 100%,100% 5px;
+  transform-origin:50% 0;
+  transition:transform .4s var(--ease),opacity .4s var(--ease);
+}
+.theme-noel .btn--glow,
+.theme-noel .nav__cta{position:relative;overflow:hidden}
+
+/* La chute : la couche glisse vers le bas en s'effaçant. Les grains, eux,
+   sont de vraies particules lancées par le script (voir .noel-grain). */
+@media (hover: hover) and (pointer: fine){
+  .theme-noel .card:hover::before,
+  .theme-noel .cap:hover::before,
+  .theme-noel .step:hover::before,
+  .theme-noel .membre:hover::before,
+  .theme-noel .ruban__avis:hover::before,
+  .theme-noel .noel-carte:hover::before,
+  .theme-noel .btn--glow:hover::before,
+  .theme-noel .nav__cta:hover::before{
+    transform:translateY(18px) scaleY(.4);opacity:0;
+  }
+}
+.noel-grain{
+  position:fixed;z-index:600;width:4px;height:4px;border-radius:50%;
+  background:#fff;pointer-events:none;
+  box-shadow:0 1px 2px rgba(13,42,82,.18);
+}
+
+/* =========================================================
+   4 — HERO DE NOËL
+   ========================================================= */
+.noel-hero__eyebrow{color:var(--or-fonce)!important}
+.noel-compte{
+  display:flex;gap:clamp(10px,2vw,20px);justify-content:center;
+  margin-top:var(--s3);flex-wrap:wrap;
+}
+.noel-compte__bloc{
+  min-width:74px;padding:12px 14px;border-radius:var(--radius-s);
+  background:var(--white);border:1px solid var(--rule);box-shadow:var(--shadow-s);
+  display:flex;flex-direction:column;align-items:center;gap:2px;
+}
+.noel-compte__n{
+  font-size:clamp(26px,3.4vw,34px);font-weight:700;letter-spacing:-.024em;
+  color:var(--black);line-height:1;font-variant-numeric:tabular-nums;
+}
+.noel-compte__l{font-size:12px;letter-spacing:.04em;text-transform:uppercase;color:var(--gray)}
+.noel-compte--fini{font-size:17px;color:var(--gray)}
+
+.noel-places{
+  display:inline-flex;align-items:center;gap:9px;margin-top:var(--s3);
+  padding:9px 18px;border-radius:980px;min-height:44px;
+  background:var(--or-pale);border:1px solid rgba(201,147,63,.28);
+  font-size:15px;color:#7A5A22;
+}
+.noel-places b{font-weight:700;color:#5E430F;font-variant-numeric:tabular-nums}
+.noel-places__point{
+  width:8px;height:8px;border-radius:50%;background:var(--or-fonce);flex:none;
+  box-shadow:0 0 0 4px rgba(245,199,126,.35);
+}
+
+/* =========================================================
+   5 — CALENDRIER DE L'AVENT, EN FAÇADE D'IMMEUBLE
+   Pas une grille de cartes : un immeuble vu de face, dont chaque fenêtre
+   est une case. Les travées sont volontairement inégales — une façade
+   régulière aurait l'air d'un tableur.
+   ========================================================= */
+.avent{
+  max-width:1100px;margin-inline:auto;
+  background:linear-gradient(180deg,var(--nuit) 0%,var(--nuit-2) 100%);
+  border-radius:var(--radius);
+  padding:clamp(16px,2.4vw,26px);
+  position:relative;overflow:hidden;
+  box-shadow:var(--shadow-m);
+}
+/* Le toit et sa congère */
+.avent__toit{
+  position:relative;height:clamp(26px,4vw,42px);margin:0 -4px 14px;
+  background:linear-gradient(180deg,#24364F 0%,#1A2840 100%);
+  border-radius:10px 10px 4px 4px;
+}
+.avent__toit::after{
+  content:"";position:absolute;left:-2px;right:-2px;top:-14px;height:26px;
+  /* Les bosses sont dessinées en ellipses pleines posées sur un bandeau :
+     c'est le chevauchement qui fait le bord irrégulier d'une congère. */
+  background:
+    radial-gradient(closest-side, #fff 99%, rgba(255,255,255,0)) -3% 2px/22% 20px no-repeat,
+    radial-gradient(closest-side, #fff 99%, rgba(255,255,255,0)) 18%  6px/18% 15px no-repeat,
+    radial-gradient(closest-side, #fff 99%, rgba(255,255,255,0)) 38%  0px/24% 23px no-repeat,
+    radial-gradient(closest-side, #fff 99%, rgba(255,255,255,0)) 62%  5px/19% 16px no-repeat,
+    radial-gradient(closest-side, #fff 99%, rgba(255,255,255,0)) 84%  1px/21% 21px no-repeat,
+    radial-gradient(closest-side, #fff 99%, rgba(255,255,255,0)) 103% 4px/20% 17px no-repeat,
+    linear-gradient(#fff,#fff) 0 13px/100% 13px no-repeat;
+  filter:drop-shadow(0 2px 2px rgba(10,22,40,.22));
+}
+
+.avent__grille{
+  display:grid;grid-template-columns:repeat(12,1fr);
+  gap:clamp(7px,1vw,12px);
+}
+
+/* ---- Une fenêtre ---- */
+.avent__case{
+  position:relative;grid-column:span 3;
+  /* Hauteur d'étage, pas rapport d'image : dans un immeuble, toutes les
+     fenêtres d'une rangée font la même hauteur et c'est la largeur qui
+     varie. Avec un aspect-ratio, une travée large devenait une fenêtre de
+     350 px et une seule rangée remplissait l'écran. */
+  height:clamp(92px,10.5vw,146px);border-radius:7px;
+  background:linear-gradient(180deg,#1C2C45 0%,#16243A 100%);
+  border:1px solid rgba(234,242,252,.14);
+  overflow:hidden;
+  display:grid;place-items:center;
+  color:var(--givre);
+  transition:border-color .3s var(--ease),transform .3s var(--ease),box-shadow .3s var(--ease);
+}
+/* Les travées inégales : six rangées de quatre, aux largeurs variées.
+   Le motif se répète toutes les 24 cases. */
+.avent__case:nth-child(24n+1){grid-column:span 3}
+.avent__case:nth-child(24n+2){grid-column:span 2}
+.avent__case:nth-child(24n+3){grid-column:span 4}
+.avent__case:nth-child(24n+4){grid-column:span 3}
+.avent__case:nth-child(24n+5){grid-column:span 2}
+.avent__case:nth-child(24n+6){grid-column:span 4}
+.avent__case:nth-child(24n+7){grid-column:span 2}
+.avent__case:nth-child(24n+8){grid-column:span 4}
+.avent__case:nth-child(24n+9){grid-column:span 4}
+.avent__case:nth-child(24n+10){grid-column:span 3}
+.avent__case:nth-child(24n+11){grid-column:span 3}
+.avent__case:nth-child(24n+12){grid-column:span 2}
+.avent__case:nth-child(24n+13){grid-column:span 3}
+.avent__case:nth-child(24n+14){grid-column:span 3}
+.avent__case:nth-child(24n+15){grid-column:span 2}
+.avent__case:nth-child(24n+16){grid-column:span 4}
+.avent__case:nth-child(24n+17){grid-column:span 2}
+.avent__case:nth-child(24n+18){grid-column:span 3}
+.avent__case:nth-child(24n+19){grid-column:span 4}
+.avent__case:nth-child(24n+20){grid-column:span 3}
+.avent__case:nth-child(24n+21){grid-column:span 4}
+.avent__case:nth-child(24n+22){grid-column:span 2}
+.avent__case:nth-child(24n+23){grid-column:span 3}
+.avent__case:nth-child(24n+24){grid-column:span 3}
+
+/* L'appui de fenêtre, avec sa neige */
+/* L'appui enneigé : un rebord blanc continu sur toute la largeur, que
+   deux bosses viennent bomber. Dessiné en deux bandes seulement, c'était
+   deux traits isolés au milieu du vide. */
+.avent__case::after{
+  content:"";position:absolute;left:-3px;right:-3px;bottom:-1px;height:10px;
+  background:
+    radial-gradient(closest-side, #fff 99%, rgba(255,255,255,0)) 16% 0/34% 9px no-repeat,
+    radial-gradient(closest-side, #fff 99%, rgba(255,255,255,0)) 68% 1px/30% 8px no-repeat,
+    linear-gradient(#fff,#fff) 0 4px/100% 6px no-repeat;
+  filter:drop-shadow(0 1px 1px rgba(10,22,40,.25));
+  z-index:4;pointer-events:none;
+}
+
+.avent__num{
+  font-size:clamp(15px,1.8vw,20px);font-weight:700;letter-spacing:-.02em;
+  z-index:5;position:relative;
+  text-shadow:0 1px 3px rgba(10,22,40,.55);
+}
+.avent__floc{width:15px;height:15px;opacity:.5;position:absolute;bottom:9px;z-index:5}
+
+/* Les volets, qui pivotent à l'ouverture */
+.avent__volets{position:absolute;inset:0;z-index:3;perspective:420px;pointer-events:none}
+.avent__volet{
+  position:absolute;top:0;bottom:0;width:50%;
+  background:linear-gradient(180deg,#223349 0%,#1A2A42 100%);
+  border:1px solid rgba(234,242,252,.12);
+  transition:transform .75s var(--ease);
+}
+/* Les rayures se superposent au bois, elles ne le remplacent pas : posées
+   en background-image seul, elles écrasaient le dégradé du raccourci
+   background et laissaient les volets transparents. */
+.avent__volet--g{left:0;transform-origin:left center;
+  background:
+    repeating-linear-gradient(180deg,rgba(255,255,255,.05) 0 3px,transparent 3px 7px),
+    linear-gradient(180deg,#223349 0%,#1A2A42 100%);}
+.avent__volet--d{right:0;transform-origin:right center;
+  background:
+    repeating-linear-gradient(180deg,rgba(255,255,255,.05) 0 3px,transparent 3px 7px),
+    linear-gradient(180deg,#223349 0%,#1A2A42 100%);}
+
+/* ---- États ---- */
+.avent__case--futur{cursor:not-allowed;opacity:.62}
+.avent__case--futur .avent__num{opacity:.5}
+
+.avent__case--passe{cursor:pointer}
+.avent__case--passe .avent__num{color:#9FB6D4}
+
+/* La case du jour : la seule fenêtre allumée de la façade */
+.avent__case--jour{
+  cursor:pointer;
+  border-color:rgba(245,199,126,.55);
+  box-shadow:0 0 0 1px rgba(245,199,126,.35), 0 10px 30px rgba(245,199,126,.22);
+}
+.avent__case--jour .avent__num{color:var(--or)}
+.avent__case--jour .avent__volet{
+  background:
+    repeating-linear-gradient(180deg,rgba(255,255,255,.06) 0 3px,transparent 3px 7px),
+    linear-gradient(180deg,#2B3A50 0%,#1F2E46 100%);}
+
+/* ---- Ouverte : les volets s'écartent, la lumière sort ---- */
+.avent__case--ouverte .avent__volet--g{transform:rotateY(-105deg)}
+.avent__case--ouverte .avent__volet--d{transform:rotateY(105deg)}
+.avent__case--ouverte{
+  background:
+    radial-gradient(120% 90% at 50% 40%, rgba(245,199,126,.34) 0%, rgba(245,199,126,0) 62%),
+    linear-gradient(180deg,#223B55 0%,#17283E 100%);
+  border-color:rgba(245,199,126,.45);
+}
+.avent__case--ouverte .avent__num{color:var(--or)}
+
+/* ---- Les bonus ---- */
+.avent__case--bonus .avent__num{color:var(--or)}
+.avent__case--bonus::before{
+  content:"";position:absolute;inset:0;z-index:1;
+  background:radial-gradient(90% 70% at 50% 50%, rgba(245,199,126,.14), rgba(245,199,126,0) 70%);
+}
+
+@media (max-width:760px){
+  .avent__grille{grid-template-columns:repeat(6,1fr)}
+  .avent__case{grid-column:span 3!important;aspect-ratio:1}
+}
+
+/* ---- La fenêtre de contenu ---- */
+.avent-vue{
+  position:fixed;inset:0;z-index:640;display:none;
+  align-items:center;justify-content:center;
+  padding:max(16px, env(safe-area-inset-top,0px)) 16px max(16px, env(safe-area-inset-bottom,0px));
+  background:rgba(10,20,34,.58);opacity:0;
+  transition:opacity .3s var(--ease);
+}
+.avent-vue.montre{display:flex}
+.avent-vue.vu{opacity:1}
+.avent-vue__boite{
+  position:relative;width:100%;max-width:460px;
+  background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow-m);
+  padding:clamp(22px,4vw,32px);
+  max-height:calc(100dvh - 32px);overflow-y:auto;overscroll-behavior:contain;
+  transform:translateY(16px) scale(.985);transition:transform .35s var(--ease);
+}
+.avent-vue.vu .avent-vue__boite{transform:none}
+.avent-vue__fermer{
+  position:absolute;top:6px;right:6px;width:44px;height:44px;border-radius:50%;
+  display:grid;place-items:center;color:var(--gray);font-size:19px;line-height:1;
+}
+.avent-vue__jour{
+  display:inline-flex;align-items:center;gap:7px;
+  font-size:13px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;
+  color:var(--or-fonce);margin-bottom:12px;
+}
+.avent-vue__t{
+  font-size:clamp(21px,3vw,26px);font-weight:700;letter-spacing:-.022em;
+  line-height:1.2;color:var(--black);text-wrap:balance;
+}
+.avent-vue__c{margin-top:12px;font-size:16px;line-height:1.55;color:var(--gray)}
+.avent-vue__a{
+  margin-top:16px;padding:14px 16px;border-radius:var(--radius-s);
+  background:var(--off-white);font-size:15.5px;line-height:1.5;color:var(--dark-gray);
+}
+.avent-vue__a b{display:block;font-size:12px;letter-spacing:.06em;text-transform:uppercase;
+  color:var(--gray);margin-bottom:5px;font-weight:600}
+.avent-vue .btn{margin-top:18px;width:100%}
+.avent-vue__bonus{
+  margin-top:16px;padding:14px 16px;border-radius:var(--radius-s);
+  background:var(--or-pale);border:1px solid rgba(201,147,63,.3);
+  font-size:15.5px;line-height:1.5;color:#7A5A22;
+}
+.avent-vue__bonus b{color:#5E430F}
+
+/* =========================================================
+   6 — L'OFFRE DE FIN D'ANNÉE ET LE COFFRET
+   ========================================================= */
+.noel-offre{display:grid;grid-template-columns:1fr 1fr;gap:var(--s6);align-items:center;
+  max-width:1120px;margin-inline:auto}
+.noel-dons{list-style:none;display:flex;flex-direction:column;gap:var(--s2)}
+.noel-don{
+  display:flex;gap:14px;align-items:flex-start;
+  background:var(--white);border:1px solid var(--rule);border-radius:var(--radius-s);
+  padding:16px 18px;box-shadow:var(--shadow-s);
+}
+.noel-don__n{
+  flex:none;width:26px;height:26px;border-radius:50%;margin-top:1px;
+  background:var(--or-pale);color:var(--or-fonce);
+  display:grid;place-items:center;font-size:12px;font-weight:700;
+}
+.noel-don b{display:block;font-size:17px;font-weight:600;color:var(--black);letter-spacing:-.015em}
+.noel-don span{display:block;margin-top:4px;font-size:15px;line-height:1.5;color:var(--gray)}
+.noel-mention{
+  margin-top:var(--s3);font-size:13px;line-height:1.55;color:var(--gray);max-width:62ch;
+}
+
+/* ---- Le coffret, qui s'ouvre au défilement ---- */
+.coffret{
+  aspect-ratio:1;display:grid;place-items:center;
+  perspective:900px;
+}
+.coffret__scene{
+  position:relative;width:min(74%,300px);aspect-ratio:1;
+  transform-style:preserve-3d;transform:rotateX(16deg) rotateY(-22deg);
+}
+.coffret__corps{
+  position:absolute;left:0;right:0;bottom:6%;height:56%;
+  background:linear-gradient(140deg,#FFFFFF 0%,#EDF3FB 60%,#DCE8F6 100%);
+  border-radius:8px;
+  box-shadow:0 18px 40px rgba(13,42,82,.22), inset 0 0 0 1px rgba(13,42,82,.06);
+}
+/* Le ruban bleu, vertical puis horizontal */
+.coffret__corps::before{
+  content:"";position:absolute;left:42%;right:42%;top:0;bottom:0;
+  background:linear-gradient(180deg,#0071E3,#0058B0);
+}
+.coffret__couvercle{
+  position:absolute;left:-5%;right:-5%;top:14%;height:20%;
+  background:linear-gradient(140deg,#FFFFFF 0%,#E9F1FA 70%,#D6E4F4 100%);
+  border-radius:8px;
+  box-shadow:0 10px 24px rgba(13,42,82,.20), inset 0 0 0 1px rgba(13,42,82,.07);
+  transform-origin:50% 100%;
+  transition:transform 1s var(--ease), opacity 1s var(--ease);
+}
+.coffret__couvercle::before{
+  content:"";position:absolute;left:44%;right:44%;top:0;bottom:0;
+  background:linear-gradient(180deg,#0071E3,#0058B0);
+}
+/* Le nœud */
+.coffret__noeud{
+  position:absolute;left:50%;top:10%;width:34%;aspect-ratio:2/1;translate:-50% 0;
+  transform-origin:50% 100%;
+  transition:transform 1s var(--ease), opacity .8s var(--ease);
+}
+.coffret__noeud::before,.coffret__noeud::after{
+  content:"";position:absolute;top:0;bottom:0;width:52%;
+  border:7px solid #0071E3;border-radius:60% 60% 40% 40%;
+}
+.coffret__noeud::before{left:0;rotate:-14deg}
+.coffret__noeud::after{right:0;rotate:14deg}
+/* La lumière qui sort une fois ouvert */
+.coffret__lueur{
+  position:absolute;left:12%;right:12%;top:26%;height:36%;
+  border-radius:50%;opacity:0;
+  background:radial-gradient(60% 70% at 50% 50%, rgba(245,199,126,.85), rgba(245,199,126,0) 70%);
+  transition:opacity .9s var(--ease);
+  filter:blur(2px);
+}
+.coffret.ouvert .coffret__couvercle{transform:translateY(-78%) rotateX(26deg)}
+.coffret.ouvert .coffret__noeud{transform:translateY(-120%) rotate(-10deg);opacity:0}
+.coffret.ouvert .coffret__lueur{opacity:1}
+
+@media (max-width:860px){
+  .noel-offre{grid-template-columns:1fr;gap:var(--s4)}
+  .coffret{aspect-ratio:4/3;order:-1}
+}
+
+/* =========================================================
+   7 — CARTE CADEAU
+   ========================================================= */
+.noel-cadeau{display:grid;grid-template-columns:1fr 1fr;gap:var(--s6);align-items:center;
+  max-width:1120px;margin-inline:auto}
+.cadeau-scene{perspective:900px;display:grid;place-items:center}
+.cadeau{
+  position:relative;width:min(92%,420px);aspect-ratio:1.586;  /* format carte bancaire */
+  border-radius:16px;
+  background:linear-gradient(135deg,#0071E3 0%,#0A5BB8 48%,#063F80 100%);
+  box-shadow:0 20px 50px rgba(0,61,128,.34);
+  color:#fff;padding:clamp(16px,2.4vw,24px);
+  display:flex;flex-direction:column;justify-content:space-between;
+  transform-style:preserve-3d;
+  transition:transform .25s var(--ease);
+  overflow:hidden;
+}
+/* Le reflet, qui balaie la carte selon l'inclinaison */
+.cadeau::after{
+  content:"";position:absolute;inset:0;pointer-events:none;
+  background:linear-gradient(105deg,
+    rgba(255,255,255,0) 32%, rgba(255,255,255,.26) 46%,
+    rgba(255,255,255,.05) 54%, rgba(255,255,255,0) 68%);
+  transform:translateX(var(--reflet,0%));
+  transition:transform .2s linear;
+}
+.cadeau__haut{display:flex;align-items:center;justify-content:space-between;gap:12px;z-index:1}
+.cadeau__marque{font-size:15px;font-weight:600;letter-spacing:-.02em;display:inline-flex;align-items:center;gap:7px}
+.cadeau__marque i{width:7px;height:7px;border-radius:50%;background:var(--or);flex:none}
+.cadeau__puce{
+  width:34px;height:26px;border-radius:5px;flex:none;
+  background:linear-gradient(140deg,#F5C77E,#C9933F);
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.3);
+}
+.cadeau__t{font-size:clamp(20px,2.6vw,26px);font-weight:700;letter-spacing:-.022em;line-height:1.15;z-index:1}
+.cadeau__bas{font-size:12.5px;letter-spacing:.06em;text-transform:uppercase;opacity:.78;z-index:1}
+
+@media (max-width:860px){
+  .noel-cadeau{grid-template-columns:1fr;gap:var(--s4)}
+}
+
+/* =========================================================
+   8 — PAGE OFFRE : petites pièces
+   ========================================================= */
+.noel-sec{position:relative;z-index:2}
+.noel-eyebrow{color:var(--or-fonce)!important}
+
+/* =========================================================
+   9 — MOINS D'ANIMATIONS
+   Tout ce qui bouge s'arrête. La neige n'est même pas lancée (script),
+   les volets s'ouvrent sans pivot, le coffret est ouvert d'emblée.
+   ========================================================= */
+@media (prefers-reduced-motion:reduce){
+  .theme-noel .card::before,.theme-noel .cap::before,.theme-noel .step::before,
+  .theme-noel .membre::before,.theme-noel .ruban__avis::before,
+  .theme-noel .noel-carte::before,
+  .theme-noel .btn--glow::before,.theme-noel .nav__cta::before,
+  .avent__volet,.coffret__couvercle,.coffret__noeud,.coffret__lueur,
+  .cadeau,.cadeau::after,.avent-vue,.avent-vue__boite{transition:none}
+  .avent__case--ouverte .avent__volet--g,
+  .avent__case--ouverte .avent__volet--d{transform:none;opacity:0}
+}
+
 /* Le build en fichier unique n'affiche qu'une page à la fois */
 .page{display:none}
 .page.active{display:block}
@@ -3509,6 +4061,890 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
 
   if (document.readyState === 'complete') boot();
   else addEventListener('load', boot);
+})();
+
+</script>
+
+<!-- THÈME DE NOËL — version fichier unique.
+     L'amorce des pages normales télécharge le thème ; ici tout est déjà
+     inline, elle se réduit donc au test de période. Les liens du thème
+     pointent vers des fichiers absents de ce build : dans l'aperçu ils ne
+     mènent nulle part, c'est attendu. -->
+<script>
+(function(){
+  try{
+    var q = new URLSearchParams(location.search).get('theme');
+    if (q === 'normal') return;
+    var on = (q === 'noel');
+    if (!on) {
+      var p = new Intl.DateTimeFormat('fr-FR', { timeZone:'Europe/Paris',
+                month:'2-digit', day:'2-digit' })
+              .formatToParts(new Date())
+              .reduce(function(a,x){ a[x.type]=x.value; return a; }, {});
+      on = (+p.month === 12 && +p.day >= 1) || (+p.month === 1 && +p.day <= 6);
+    }
+    if (!on) return;
+    var r = document.documentElement;
+    r.className = (r.className ? r.className + ' ' : '') + 'theme-noel';
+    document.body.classList.add('p-home');
+  } catch (e) {}
+})();
+/* =========================================================
+   MJ AGENCY — Configuration du thème de Noël
+
+   TOUT ce qui se règle d'une année sur l'autre est ici. Pour rejouer la
+   saison prochaine, il suffit de changer les dates et l'année de
+   l'échéance ci-dessous : aucun autre fichier n'a besoin d'être touché.
+
+   Pour retirer le thème définitivement : supprimer assets/js/noel.js,
+   assets/js/noel-config.js, assets/css/noel.css, la page offre-noel.html,
+   et le bloc « AMORCE DU THÈME DE NOËL » dans le <head> des pages. Le site
+   revient exactement à son état d'origine.
+   ========================================================= */
+window.MJ_NOEL = {
+
+  /* ---------------- Période d'activation ----------------
+     Dates de calendrier en heure de Paris, bornes incluses. Le thème
+     s'allume le 1er décembre à 00:00 et s'éteint le 6 janvier à 23:59. */
+  debut: { mois: 12, jour: 1 },    // 1er décembre
+  fin:   { mois: 1,  jour: 6 },    // 6 janvier (année suivante)
+
+  /* ---------------- Échéance de l'offre ----------------
+     Instant exact du compte à rebours. Le décalage +01:00 est celui de
+     Paris en décembre (CET) : l'heure d'été ne commence qu'en mars, donc
+     il n'y a pas d'ambiguïté à l'écrire en dur. */
+  echeance: '2026-12-31T23:59:00+01:00',
+  echeanceTexte: '31 décembre 2026',
+
+  /* ---------------- Places de janvier ----------------
+     Le seul chiffre à tenir à jour pendant l'opération. Il s'affiche dans
+     le bandeau, le hero et la mention légale de l'offre. */
+  places: 4,
+
+  /* ---------------- Réglages ---------------- */
+  neigeParDefaut: true,    // la neige tombe-t-elle à l'arrivée ?
+  sonParDefaut: false,     // les grelots : désactivés par défaut, comme demandé
+  flocons: { bureau: 140, mobile: 60 },   // plafonds de particules
+
+  /* ---------------- Liens ---------------- */
+  lienDevis:      'contact.html#booking',
+  lienCalendrier: 'offre-noel.html#calendrier',
+  lienOffre:      'offre-noel.html',
+  lienInstagram:  'https://www.instagram.com/mjagency.eu/',
+
+  /* =========================================================
+     LES 24 CASES DU CALENDRIER DE L'AVENT
+
+     Un conseil par jour, concret, applicable le jour même par un
+     commerçant du bassin de Thau. Pas de généralités : chaque case dit
+     quoi faire, pas pourquoi c'est important.
+
+     bonus: true  → case cadeau (8, 16 et 24), fond doré et offre réelle.
+     ========================================================= */
+  cases: [
+    { j: 1,  titre: 'Vos horaires de fêtes sur Google',
+      conseil: 'C’est la première chose qu’un client vérifie le 24 à 17 h. Une fiche qui annonce « ouvert » alors que le rideau est baissé, c’est un client perdu et souvent un avis en moins.',
+      action: 'Ouvrez votre fiche Google Business, section Horaires, et déclarez les horaires exceptionnels du 24, 25, 31 et 1er.' },
+
+    { j: 2,  titre: 'Trois photos récentes, pas trois ans',
+      conseil: 'Google met en avant les fiches dont les photos bougent. Et une devanture datée de 2023 donne l’impression d’un commerce qui a fermé.',
+      action: 'Publiez trois photos prises cette semaine : la devanture éclairée, un produit, et l’intérieur.' },
+
+    { j: 3,  titre: 'Répondez à tous les avis, même les bons',
+      conseil: 'Un avis sans réponse, c’est une conversation qu’on laisse tomber devant tout le monde. Google valorise les fiches où le commerçant répond.',
+      action: 'Remontez à vos dix derniers avis et répondez à chacun en deux lignes, avec le prénom de la personne.' },
+
+    { j: 4,  titre: 'Le bon moment pour demander un avis',
+      conseil: 'Ce n’est pas au moment de payer. C’est juste après le compliment — quand le client vous dit que c’était bien.',
+      action: 'Préparez une phrase courte à dire à ce moment-là, et testez-la trois fois aujourd’hui.' },
+
+    { j: 5,  titre: 'Une publication Google par semaine',
+      conseil: 'La section Actualités de votre fiche est vide chez 9 commerçants sur 10. Elle s’affiche pourtant directement dans les résultats de recherche.',
+      action: 'Publiez votre offre de fin d’année en photo, avec une date de fin. Comptez trois minutes.' },
+
+    { j: 6,  titre: 'Votre numéro doit être cliquable',
+      conseil: 'Sur un téléphone, un numéro écrit en texte oblige à le recopier. La moitié des gens abandonnent là.',
+      action: 'Vérifiez que le numéro de votre site s’appelle en un toucher. Sinon, dites-le-nous, c’est une ligne de code.' },
+
+    { j: 7,  titre: 'Le poids de vos photos',
+      conseil: 'Une photo sortie du téléphone pèse 4 Mo. Sur le réseau du port un jour de marché, la page ne s’affiche jamais.',
+      action: 'Avant de publier, passez vos images en 1 600 px de large maximum. Votre site doit s’ouvrir en moins de 2 secondes.' },
+
+    { j: 8,  titre: 'Votre fiche Google passée au crible',
+      conseil: 'Catégorie principale, zone desservie, attributs, photos, questions : six points qui décident si vous sortez ou non dans « près de moi ».',
+      action: 'On regarde votre fiche et on vous renvoie les corrections à faire, classées par impact. Offert, et sans suite commerciale.',
+      bonus: true, bonusTitre: 'Audit de votre fiche Google, offert' },
+
+    { j: 9,  titre: 'La bio Instagram qui sert à quelque chose',
+      conseil: 'Trois informations suffisent : ce que vous vendez, où vous êtes, comment on vous joint. Le reste est du décor.',
+      action: 'Réécrivez votre bio en une ligne, et mettez un vrai lien vers votre site — pas vers une page de liens.' },
+
+    { j: 10, titre: 'Les stories à la une, votre vitrine',
+      conseil: 'Un nouveau visiteur regarde les bulles avant les publications. S’il n’y a rien, il part.',
+      action: 'Créez trois bulles : Horaires, Produits, Où nous trouver. Une photo chacune, c’est suffisant pour commencer.' },
+
+    { j: 11, titre: 'Le point exact sur la carte',
+      conseil: 'Beaucoup de fiches pointent au milieu de la rue, parfois dans l’eau. Le client tourne, s’agace, et ne vient pas.',
+      action: 'Dans Google Business, faites glisser le repère pile sur votre porte, puis vérifiez l’itinéraire depuis chez vous.' },
+
+    { j: 12, titre: 'Activez la messagerie de votre fiche',
+      conseil: 'Une question posée est un client déjà intéressé. Sans messagerie, il va la poser au commerce d’à côté.',
+      action: 'Activez les messages dans Google Business et branchez les notifications sur votre téléphone.' },
+
+    { j: 13, titre: 'Cinq secondes pour comprendre',
+      conseil: 'Ouvrez votre page d’accueil sur un téléphone. Sans faire défiler, on doit savoir ce que vous vendez et où.',
+      action: 'Si ce n’est pas le cas, le titre est à réécrire. Un bon titre dit le métier et la ville.' },
+
+    { j: 14, titre: 'Écrivez le nom de votre ville',
+      conseil: '« Poissonnerie » ne vous situe nulle part. « Poissonnerie à Sète » vous place sur la carte, pour Google comme pour le lecteur.',
+      action: 'Ajoutez votre ville dans le titre de la page d’accueil et dans deux ou trois titres de sections.' },
+
+    { j: 15, titre: 'Commander ou réserver en deux gestes',
+      conseil: 'Chaque étape en plus fait tomber la moitié des gens. Un formulaire en six champs ne sert à personne.',
+      action: 'Comptez les clics entre votre page d’accueil et la commande. Au-delà de trois, il y a du gras à enlever.' },
+
+    { j: 16, titre: 'Votre carte NFC d’avis Google',
+      conseil: 'Une carte posée près de la caisse : le client approche son téléphone, l’avis s’ouvre. C’est ce qui transforme une bonne journée en avis écrit.',
+      action: 'On vous l’offre, configurée sur votre fiche, pour toute signature avant le 31 décembre.',
+      bonus: true, bonusTitre: 'Carte NFC d’avis offerte' },
+
+    { j: 17, titre: 'Publiez quand vos clients regardent',
+      conseil: 'Pour un commerce du bassin, c’est le matin avant l’ouverture et le soir vers 19 h. Pas à 15 h un mardi.',
+      action: 'Regardez vos statistiques Instagram, onglet Audience, et calez vos deux prochaines publications dessus.' },
+
+    { j: 18, titre: 'Testez votre site avec le pouce',
+      conseil: 'Huit visiteurs sur dix sont sur mobile, debout, à une main. Un bouton trop petit ou trop bas ne sera jamais pressé.',
+      action: 'Parcourez votre site d’une seule main. Tout ce que vous ratez du pouce est à corriger.' },
+
+    { j: 19, titre: 'Trois produits, trois photos',
+      conseil: 'On n’achète pas une liste. On achète ce qu’on voit.',
+      action: 'Choisissez vos trois meilleures ventes et photographiez-les à la lumière du jour, fond neutre.' },
+
+    { j: 20, titre: 'Dites où vous livrez',
+      conseil: 'Sète, Frontignan, Balaruc, Mèze : si ce n’est pas écrit, le client suppose que non et referme la page.',
+      action: 'Ajoutez une ligne « Nous livrons à… » visible sans faire défiler, et la même information sur votre fiche Google.' },
+
+    { j: 21, titre: 'Les questions de votre fiche',
+      conseil: 'N’importe qui peut poser une question sur votre fiche — et n’importe qui peut y répondre à votre place.',
+      action: 'Posez vous-même les cinq questions qu’on vous pose tous les jours, et répondez-y. Parking, horaires, paiement, accès, livraison.' },
+
+    { j: 22, titre: 'Gardez le contact avec vos clients',
+      conseil: 'Vos clients fidèles sont votre meilleur canal, et il ne coûte rien. Encore faut-il avoir leur adresse.',
+      action: 'Mettez un carnet près de la caisse et commencez à recueillir les emails, avec leur accord écrit.' },
+
+    { j: 23, titre: 'Le même nom partout',
+      conseil: 'Nom, adresse, téléphone : la moindre variation entre votre site, votre fiche Google et les annuaires fait baisser votre position locale.',
+      action: 'Comparez les trois, au caractère près. « 12 rue » et « 12, rue » comptent comme deux adresses différentes.' },
+
+    { j: 24, titre: 'Votre site, un mois pour le refaire',
+      conseil: 'Janvier est le mois le plus calme de l’année pour un commerce. C’est le seul moment où refaire son site ne coûte pas de chiffre d’affaires.',
+      action: 'Réservez votre créneau de janvier avant ce soir minuit. Le coffret de livraison vous attend.',
+      bonus: true, bonusTitre: 'Mise en ligne prioritaire en janvier' },
+  ],
+
+  /* ---------------- Les cinq questions de la page offre ---------------- */
+  faq: [
+    { q: 'Quels sont les délais si je signe en décembre ?',
+      r: 'Nous démarrons la première semaine de janvier et mettons en ligne sous trois à quatre semaines pour un site vitrine, six à huit pour une boutique en ligne. Le délai court à partir du moment où nous avons vos textes et vos photos — c’est presque toujours là que les projets prennent du retard, et nous vous accompagnons pour les réunir.' },
+    { q: 'Qu’est-ce qui est compris dans l’offre ?',
+      r: 'La conception et la création du site, les fondations du référencement local, la mise en ligne et la formation pour que vous soyez autonome. S’y ajoutent, pour toute signature avant le 31 décembre : la carte NFC d’avis Google, le coffret de livraison, et le passage en priorité sur le planning de janvier.' },
+    { q: 'Comment se passe le paiement ?',
+      r: 'Virement, chèque ou carte. Pour un site vitrine, 30 % à la signature du devis et le solde à la mise en ligne. Pour une boutique ou une refonte complète, en trois versements. Une facture accompagne chaque versement et nous ne mettons aucun prélèvement automatique en place.' },
+    { q: 'Que se passe-t-il si je signe après le 31 décembre ?',
+      r: 'Le tarif ne change pas : ce n’est pas une remise, c’est une offre de lancement d’année. Vous perdez en revanche les trois cadeaux et la priorité sur le planning de janvier, qui se remplit dans l’ordre des signatures.' },
+    { q: 'Vous déplacez-vous jusqu’à chez moi ?',
+      r: 'Oui, sans frais, à Sète, Frontignan, Balaruc-les-Bains, Mèze, Marseillan et Montpellier. Voir votre local, vos produits et votre façon de travailler change tout au moment de concevoir le site. Partout ailleurs, nous travaillons entièrement à distance.' },
+  ],
+};
+
+/* =========================================================
+   MJ AGENCY — Thème de Noël
+
+   Ne tourne QUE si l'amorce du <head> a posé .theme-noel sur <html>.
+   Hors période, ce fichier n'est même pas téléchargé.
+
+   Rien n'est écrit en dur ici : dates, places, échéance, conseils et
+   questions viennent tous de noel-config.js.
+   ========================================================= */
+(function () {
+  'use strict';
+
+  var C = window.MJ_NOEL;
+  if (!C || !document.documentElement.classList.contains('theme-noel')) return;
+
+  var racine  = document.documentElement;
+  var reduit  = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var mobile  = matchMedia('(max-width: 760px)').matches;
+
+  /* Le stockage peut jeter en navigation privée : on ne laisse jamais une
+     préférence d'affichage faire tomber la page. */
+  function lire(c)    { try { return localStorage.getItem(c); } catch (e) { return null; } }
+  function ecrire(c, v) { try { localStorage.setItem(c, v); } catch (e) {} }
+
+  function noeud(balise, classe, html) {
+    var n = document.createElement(balise);
+    if (classe) n.className = classe;
+    if (html != null) n.innerHTML = html;
+    return n;
+  }
+
+  var FLOCON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" ' +
+    'stroke-linecap="round" aria-hidden="true">' +
+    '<path d="M12 2v20M3.4 7l17.2 10M20.6 7 3.4 17"/>' +
+    '<path d="M12 6.2 9.6 4M12 6.2 14.4 4M12 17.8 9.6 20M12 17.8 14.4 20"/>' +
+    '<path d="m6.9 9.1-3.2.2M6.9 9.1 5.6 6.2M17.1 14.9l3.2-.2M17.1 14.9l1.3 2.9"/>' +
+    '<path d="m6.9 14.9-1.3 2.9M6.9 14.9l-3.2-.2M17.1 9.1l1.3-2.9M17.1 9.1l3.2.2"/></svg>';
+
+  /* =========================================================
+     1 — ÉCHÉANCE ET PLACES
+     ========================================================= */
+  var echeance = new Date(C.echeance).getTime();
+
+  function restant() {
+    var d = echeance - Date.now();
+    if (d <= 0) return null;
+    return {
+      j: Math.floor(d / 86400000),
+      h: Math.floor(d / 3600000) % 24,
+      m: Math.floor(d / 60000) % 60,
+      s: Math.floor(d / 1000) % 60
+    };
+  }
+
+  /* =========================================================
+     2 — BANDEAU DE FIN D'ANNÉE
+     Se décale comme celui d'Octobre Rose : la barre et le hero suivent
+     --bandeau-h, mesurée et non devinée.
+     ========================================================= */
+  (function bandeau() {
+    var CLE = 'mj-noel-bandeau-' + new Date().getFullYear();
+    if (lire(CLE)) return;
+
+    var b = noeud('div', 'noel-bandeau',
+      '<span class="noel-bandeau__floc">' + FLOCON + '</span>' +
+      '<p class="noel-bandeau__txt">Offre de fin d’année — plus que <b>' + C.places +
+      ' places</b> pour janvier. <a href="' + C.lienOffre + '">Voir l’offre</a></p>' +
+      '<button type="button" class="noel-bandeau__fermer" ' +
+      'aria-label="Masquer le bandeau de fin d’année">✕</button>');
+    b.setAttribute('role', 'region');
+    b.setAttribute('aria-label', 'Offre de fin d’année');
+    document.body.insertBefore(b, document.body.firstChild);
+
+    function poser() {
+      racine.style.setProperty('--bandeau-h', b.getBoundingClientRect().height.toFixed(2) + 'px');
+    }
+    poser();
+    var t = null;
+    addEventListener('resize', function () { clearTimeout(t); t = setTimeout(poser, 150); }, { passive: true });
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(poser);
+
+    b.querySelector('.noel-bandeau__fermer').addEventListener('click', function () {
+      b.remove();
+      racine.style.setProperty('--bandeau-h', '0px');
+      ecrire(CLE, '1');
+    });
+  })();
+
+  /* =========================================================
+     3 — LA NEIGE
+     Un canevas 2D, pas une bibliothèque 3D : pour des points qui tombent,
+     three.js coûterait 150 Ko compressés et un contexte WebGL de plus —
+     sur un site qui vise Lighthouse > 85 et qui fait déjà tourner son fond
+     en WebGL, c'est le mauvais échange. Le rendu est identique.
+
+     Le nombre de flocons est plafonné (config), la boucle s'arrête quand
+     l'onglet passe à l'arrière-plan, et rien ne démarre si le visiteur a
+     demandé moins d'animations.
+     ========================================================= */
+  var neige = (function () {
+    if (reduit) return { basculer: function () {}, actif: false, possible: false };
+
+    var CLE = 'mj-noel-neige';
+    var pref = lire(CLE);
+    var actif = pref === null ? C.neigeParDefaut !== false : pref === '1';
+
+    var cv = noeud('canvas', 'noel-neige');
+    cv.setAttribute('aria-hidden', 'true');
+    document.body.appendChild(cv);
+    var ctx = cv.getContext('2d');
+
+    var N = mobile ? (C.flocons && C.flocons.mobile) || 60 : (C.flocons && C.flocons.bureau) || 140;
+    var dpr = Math.min(devicePixelRatio || 1, 1.5);
+    var L = 0, H = 0, flocons = [], brut = null, souris = { x: -999, y: -999 };
+
+    function taille() {
+      L = innerWidth; H = innerHeight;
+      cv.width = Math.round(L * dpr); cv.height = Math.round(H * dpr);
+      cv.style.width = L + 'px'; cv.style.height = H + 'px';
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
+
+    function neuf(enHaut) {
+      return {
+        x: Math.random() * L,
+        y: enHaut ? -10 - Math.random() * H * 0.3 : Math.random() * H,
+        r: 0.9 + Math.random() * 2.1,
+        vy: 14 + Math.random() * 26,        // pixels par seconde
+        vx: 0,
+        d: Math.random() * Math.PI * 2,      // phase du balancement
+        o: 0.35 + Math.random() * 0.5
+      };
+    }
+
+    function semer() {
+      flocons = [];
+      for (var i = 0; i < N; i++) flocons.push(neuf(false));
+    }
+
+    var dernier = 0;
+    function image(t) {
+      if (!actif) { brut = null; return; }
+      brut = requestAnimationFrame(image);
+      var dt = dernier ? Math.min((t - dernier) / 1000, 0.05) : 0.016;
+      dernier = t;
+
+      ctx.clearRect(0, 0, L, H);
+      ctx.fillStyle = '#fff';
+      for (var i = 0; i < flocons.length; i++) {
+        var f = flocons[i];
+        f.d += dt * 1.1;
+        /* Le curseur pousse les flocons proches : une impulsion qui décroît
+           avec le carré de la distance, amortie à chaque image pour que le
+           flocon reprenne sa chute au lieu de filer tout droit. */
+        var dx = f.x - souris.x, dy = f.y - souris.y;
+        var d2 = dx * dx + dy * dy;
+        if (d2 < 16900) {                     // 130 px de rayon
+          var force = (1 - d2 / 16900) * 260;
+          var d = Math.sqrt(d2) || 1;
+          f.vx += (dx / d) * force * dt;
+        }
+        f.vx *= 0.94;
+        f.x += (Math.sin(f.d) * 9 + f.vx) * dt;
+        f.y += f.vy * dt;
+
+        if (f.y > H + 8 || f.x < -20 || f.x > L + 20) flocons[i] = neuf(true);
+
+        ctx.globalAlpha = f.o;
+        ctx.beginPath();
+        ctx.arc(f.x, f.y, f.r, 0, 6.2832);
+        ctx.fill();
+      }
+      ctx.globalAlpha = 1;
+    }
+
+    function lancer() { if (!brut) { dernier = 0; brut = requestAnimationFrame(image); } }
+    function stopper() { if (brut) { cancelAnimationFrame(brut); brut = null; } ctx.clearRect(0, 0, L, H); }
+
+    taille(); semer();
+    addEventListener('resize', function () { taille(); semer(); }, { passive: true });
+    addEventListener('pointermove', function (e) { souris.x = e.clientX; souris.y = e.clientY; }, { passive: true });
+    addEventListener('pointerleave', function () { souris.x = souris.y = -999; }, { passive: true });
+    // Un onglet en arrière-plan ne doit pas continuer à calculer.
+    document.addEventListener('visibilitychange', function () {
+      if (document.hidden) stopper(); else if (actif) lancer();
+    });
+
+    if (actif) lancer();
+
+    return {
+      possible: true,
+      get actif() { return actif; },
+      basculer: function () {
+        actif = !actif;
+        ecrire(CLE, actif ? '1' : '0');
+        if (actif) lancer(); else stopper();
+        return actif;
+      }
+    };
+  })();
+
+  /* =========================================================
+     4 — LES GRAINS QUI TOMBENT DES CARTES
+     La couche de neige s'efface en CSS ; ici on lance les quelques grains
+     qui s'en détachent. Trois par survol : au-delà c'est de la confettis.
+     ========================================================= */
+  if (!reduit && matchMedia('(hover: hover) and (pointer: fine)').matches) {
+    var SEL = '.card, .cap, .step, .membre, .ruban__avis, .noel-carte, .btn--glow, .nav__cta';
+    var dernierGrain = 0;
+    document.addEventListener('pointerover', function (e) {
+      var c = e.target.closest && e.target.closest(SEL);
+      if (!c || Date.now() - dernierGrain < 260) return;
+      dernierGrain = Date.now();
+      var b = c.getBoundingClientRect();
+      for (var i = 0; i < 3; i++) (function (i) {
+        var g = noeud('div', 'noel-grain');
+        var x = b.left + b.width * (0.2 + Math.random() * 0.6);
+        g.style.left = x + 'px';
+        g.style.top = b.top + 'px';
+        document.body.appendChild(g);
+        g.animate([
+          { transform: 'translate(0,0)', opacity: 1 },
+          { transform: 'translate(' + (Math.random() * 20 - 10).toFixed(0) + 'px,' +
+              (40 + Math.random() * 40).toFixed(0) + 'px)', opacity: 0 }
+        ], { duration: 650 + Math.random() * 350, easing: 'cubic-bezier(.3,.1,.5,1)' })
+          .onfinish = function () { g.remove(); };
+      })(i);
+    });
+  }
+
+  /* =========================================================
+     5 — LE BOUTON FLOTTANT : NEIGE, ET GRELOTS
+     ========================================================= */
+  var son = (function () {
+    var CLE = 'mj-noel-son';
+    var pref = lire(CLE);
+    var actif = pref === null ? C.sonParDefaut === true : pref === '1';
+    var ctx = null;
+
+    /* Les grelots sont synthétisés : pas de fichier à télécharger, et le
+       contexte audio n'est créé qu'au premier son réellement demandé —
+       un AudioContext ouvert sans geste du visiteur est bloqué, et pèse
+       pour rien sur le chargement. */
+    function tinter() {
+      if (!actif) return;
+      try {
+        if (!ctx) ctx = new (window.AudioContext || window.webkitAudioContext)();
+        var t0 = ctx.currentTime;
+        [2093, 2637, 3136].forEach(function (f, i) {
+          var o = ctx.createOscillator(), g = ctx.createGain();
+          o.type = 'triangle';
+          o.frequency.value = f;
+          g.gain.setValueAtTime(0.0001, t0 + i * 0.012);
+          g.gain.exponentialRampToValueAtTime(0.035, t0 + i * 0.012 + 0.008);
+          g.gain.exponentialRampToValueAtTime(0.0001, t0 + i * 0.012 + 0.5);
+          o.connect(g); g.connect(ctx.destination);
+          o.start(t0 + i * 0.012); o.stop(t0 + i * 0.012 + 0.55);
+        });
+      } catch (e) { /* audio indisponible : on n'en fait pas une erreur */ }
+    }
+
+    return {
+      get actif() { return actif; },
+      basculer: function () { actif = !actif; ecrire(CLE, actif ? '1' : '0'); if (actif) tinter(); return actif; },
+      tinter: tinter
+    };
+  })();
+
+  (function reglages() {
+    var boite = noeud('div', 'noel-reglages');
+
+    function bouton(classe, etiquette, contenu, actif, auClic) {
+      var b = noeud('button', 'noel-bouton ' + classe, contenu);
+      b.type = 'button';
+      b.setAttribute('aria-pressed', actif ? 'true' : 'false');
+      b.setAttribute('aria-label', etiquette);
+      b.addEventListener('click', function () {
+        b.setAttribute('aria-pressed', auClic() ? 'true' : 'false');
+      });
+      return b;
+    }
+
+    if (neige.possible) {
+      boite.appendChild(bouton('noel-bouton--neige', 'Activer ou couper la neige',
+        FLOCON + '<span>Neige</span>', neige.actif, function () { return neige.basculer(); }));
+    }
+    boite.appendChild(bouton('noel-bouton--son', 'Activer ou couper les grelots',
+      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" ' +
+      'stroke-linecap="round" aria-hidden="true"><path d="M5 9v6h4l5 4V5L9 9H5Z"/>' +
+      '<path d="M17.5 9.5a4 4 0 0 1 0 5"/></svg><span>Grelots</span>',
+      son.actif, function () { return son.basculer(); }));
+
+    document.body.appendChild(boite);
+  })();
+
+  /* =========================================================
+     6 — LE HERO, LE COMPTE À REBOURS, LES PLACES
+     Les textes du hero ne sont remplacés que sur la page d'accueil, et
+     seulement si les éléments attendus sont là : aucune autre page ne doit
+     bouger, et un hero absent ne doit pas faire tomber le script.
+     ========================================================= */
+  (function hero() {
+    var h = document.querySelector('.hero');
+    if (!h || !document.body.classList.contains('p-home')) return;
+
+    var titre = h.querySelector('.hero__title');
+    var chapeau = h.querySelector('.eyebrow');
+    var accroche = h.querySelector('.lead');
+    var actions = h.querySelector('.hero__actions');
+
+    if (chapeau) {
+      chapeau.textContent = 'Offre de fin d’année · Bassin de Thau';
+      chapeau.classList.add('noel-hero__eyebrow');
+    }
+    if (titre) {
+      titre.innerHTML = '<span class="line"><span>2027 commence avec</span></span>' +
+                        '<span class="line"><span>un site qui vend.</span></span>';
+      titre.classList.add('vu');
+    }
+    if (accroche) {
+      accroche.textContent = 'Réservez avant le 31 décembre, on livre en janvier — ' +
+        'pendant que vos concurrents dorment encore.';
+    }
+    if (actions) {
+      actions.innerHTML =
+        '<a href="' + C.lienDevis + '" class="btn btn--glow">Réserver mon créneau de janvier ' +
+        '<span class="arw" aria-hidden="true">↗</span></a>' +
+        '<a href="' + C.lienCalendrier + '" class="link-t">Ouvrir la case du jour ' +
+        '<span class="arw" aria-hidden="true">↗</span></a>';
+    }
+
+    /* Compte à rebours et places, insérés après les boutons */
+    var apres = actions || accroche;
+    if (!apres) return;
+
+    var compte = noeud('div', 'noel-compte');
+    compte.setAttribute('role', 'timer');
+    compte.setAttribute('aria-live', 'off');
+    apres.insertAdjacentElement('afterend', compte);
+
+    var places = noeud('div', 'noel-places',
+      '<span class="noel-places__point" aria-hidden="true"></span>' +
+      '<span>Places restantes pour janvier : <b>' + C.places + '</b></span>');
+    compte.insertAdjacentElement('afterend', places);
+
+    var ETIQ = [['j', 'jours'], ['h', 'heures'], ['m', 'minutes'], ['s', 'secondes']];
+    function peindre() {
+      var r = restant();
+      if (!r) {
+        compte.className = 'noel-compte noel-compte--fini';
+        compte.textContent = 'L’offre de fin d’année est terminée — parlons quand même de janvier.';
+        return false;
+      }
+      compte.innerHTML = ETIQ.map(function (e) {
+        return '<div class="noel-compte__bloc"><span class="noel-compte__n">' +
+          String(r[e[0]]).padStart(2, '0') + '</span><span class="noel-compte__l">' + e[1] + '</span></div>';
+      }).join('');
+      return true;
+    }
+    if (peindre()) {
+      var tic = setInterval(function () { if (!peindre()) clearInterval(tic); }, 1000);
+    }
+  })();
+
+  /* Les blocs écrits en dur mais réservés à la saison (page /offre-noel)
+     sont masqués dans le HTML : hors période le script n'est pas chargé,
+     et une façade vide au milieu de la page n'aurait aucun sens. */
+  [].forEach.call(document.querySelectorAll('[data-noel-saison]'), function (n) {
+    n.hidden = false;
+  });
+
+  /* =========================================================
+     6b — LES SECTIONS DE SAISON, INJECTÉES
+     Elles ne sont PAS écrites dans index.html : hors période, la page ne
+     doit pas contenir un mot de Noël, ni pour le visiteur ni pour Google.
+     Elles sont donc posées ici, après les avis.
+
+     Leurs blocs .reveal ont leur propre observateur : main.js a installé
+     les siens avant que ce script n'existe, et des éléments ajoutés après
+     ne seraient jamais observés — donc jamais révélés, donc invisibles.
+     ========================================================= */
+  (function sections() {
+    if (!document.body.classList.contains('p-home')) return;
+    var apres = document.querySelector('#avis');
+    if (!apres) return;
+
+    var html =
+    /* ---- L'offre ---- */
+    '<section class="container pad-y sep noel-sec" id="offre-noel">' +
+      '<div class="sec-head reveal">' +
+        '<span class="eyebrow noel-eyebrow">Offre de fin d’année</span>' +
+        '<h2 class="h2">Signez avant le 31 décembre,<br>on vous offre&nbsp;:</h2>' +
+      '</div>' +
+      '<div class="noel-offre">' +
+        '<ul class="noel-dons reveal">' +
+          '<li class="noel-don"><span class="noel-don__n">1</span><div>' +
+            '<b>Votre carte NFC d’avis Google</b>' +
+            '<span>Posée près de la caisse. Le client approche son téléphone, l’avis s’ouvre. ' +
+            'C’est ce qui transforme une bonne journée en avis écrit.</span></div></li>' +
+          '<li class="noel-don"><span class="noel-don__n">2</span><div>' +
+            '<b>Le coffret de livraison MJ Agency</b>' +
+            '<span>Votre contrat, la carte NFC de votre site, et deux ou trois choses ' +
+            'qu’on préfère vous laisser découvrir le jour de la mise en ligne.</span></div></li>' +
+          '<li class="noel-don"><span class="noel-don__n">3</span><div>' +
+            '<b>La mise en ligne prioritaire en janvier</b>' +
+            '<span>Le planning se remplit dans l’ordre des signatures. Signer en décembre, ' +
+            'c’est être en ligne avant les autres.</span></div></li>' +
+        '</ul>' +
+        '<div class="coffret reveal" aria-hidden="true"><div class="coffret__scene">' +
+          '<div class="coffret__lueur"></div><div class="coffret__corps"></div>' +
+          '<div class="coffret__couvercle"></div><div class="coffret__noeud"></div>' +
+        '</div></div>' +
+      '</div>' +
+      '<p class="noel-mention">Ce n’est pas une remise&nbsp;: le tarif ne change pas. ' +
+      'Offre valable pour toute signature avant le <span data-noel="echeance"></span>, ' +
+      'dans la limite de <span data-noel="places"></span> projets.</p>' +
+      '<div class="stack" style="margin-top:var(--s4)">' +
+        '<a href="' + C.lienDevis + '" class="btn btn--glow">Réserver mon créneau de janvier ' +
+        '<span class="arw" aria-hidden="true">↗</span></a></div>' +
+    '</section>' +
+
+    /* ---- Le calendrier ---- */
+    '<section class="container pad-y sep noel-sec" id="calendrier">' +
+      '<div class="sec-head reveal">' +
+        '<span class="eyebrow noel-eyebrow">Calendrier de l’avent</span>' +
+        '<h2 class="h2">24 conseils pour vendre plus<br>en 2027.</h2>' +
+        '<p class="lead">Une fenêtre par jour, un conseil applicable le jour même. ' +
+        'Pensés pour les commerçants du bassin de Thau, pas pour les start-up.</p>' +
+      '</div>' +
+      '<div data-avent class="reveal"></div>' +
+    '</section>' +
+
+    /* ---- La carte cadeau ---- */
+    '<section class="container pad-y sep noel-sec" id="carte-cadeau">' +
+      '<div class="noel-cadeau">' +
+        '<div class="reveal">' +
+          '<span class="eyebrow noel-eyebrow">Carte cadeau</span>' +
+          '<h2 class="h2 mt-s">Offrez un site<br>à quelqu’un qui le mérite.</h2>' +
+          '<p class="lead mt-s">Un associé qui repousse depuis deux ans, un parent qui ' +
+          'vient d’ouvrir, un ami dont la page Facebook tient lieu de vitrine. ' +
+          'Offrez-lui l’audit, ou le site entier.</p>' +
+          '<a href="' + C.lienDevis + '?sujet=carte-cadeau" class="btn btn--glow mt-m">' +
+          'Offrir une carte cadeau <span class="arw" aria-hidden="true">↗</span></a>' +
+        '</div>' +
+        '<div class="cadeau-scene reveal" aria-hidden="true"><div class="cadeau">' +
+          '<div class="cadeau__haut">' +
+            '<span class="cadeau__marque"><i></i> MJ&nbsp;Agency</span>' +
+            '<span class="cadeau__puce"></span>' +
+          '</div>' +
+          '<div class="cadeau__t">Offrez un site</div>' +
+          '<div class="cadeau__bas">Carte cadeau · Bassin de Thau</div>' +
+        '</div></div>' +
+      '</div>' +
+    '</section>';
+
+    var bac = document.createElement('div');
+    bac.innerHTML = html;
+    var ajoutes = [];
+    while (bac.firstElementChild) {
+      var sec = bac.firstElementChild;
+      apres.insertAdjacentElement('afterend', sec);
+      apres = sec;
+      ajoutes.push(sec);
+    }
+
+    /* Leur propre observateur — voir le commentaire en tête du bloc. */
+    if (reduit) {
+      ajoutes.forEach(function (s) {
+        [].forEach.call(s.querySelectorAll('.reveal'), function (n) { n.classList.add('in'); });
+      });
+      return;
+    }
+    var io = new IntersectionObserver(function (es) {
+      es.forEach(function (e) {
+        if (!e.isIntersecting) return;
+        e.target.classList.add('in');
+        io.unobserve(e.target);
+      });
+    }, { threshold: 0.12, rootMargin: '0px 0px -8% 0px' });
+    ajoutes.forEach(function (s) {
+      [].forEach.call(s.querySelectorAll('.reveal'), function (n) { io.observe(n); });
+    });
+  })();
+
+  /* =========================================================
+     7 — LE CALENDRIER DE L'AVENT
+     La façade est construite ici, à partir de la config. La date de
+     référence est celle de Paris : un visiteur à Montréal ne doit pas voir
+     la case du lendemain, ni l'inverse.
+     ========================================================= */
+  (function avent() {
+    var hote = document.querySelector('[data-avent]');
+    if (!hote) return;
+
+    var p = jourParis();
+    var dansDecembre = p.mois === 12;
+    var jourCourant = dansDecembre ? Math.min(p.jour, 24) : (p.mois === 1 ? 25 : 0);
+
+    var grille = noeud('div', 'avent__grille');
+    var toit = noeud('div', 'avent__toit');
+    var cadre = noeud('div', 'avent');
+    cadre.appendChild(toit);
+    cadre.appendChild(grille);
+    hote.appendChild(cadre);
+
+    C.cases.forEach(function (c) {
+      var etat = c.j < jourCourant ? 'passe' : (c.j === jourCourant ? 'jour' : 'futur');
+      var el = noeud('button', 'avent__case avent__case--' + etat + (c.bonus ? ' avent__case--bonus' : ''));
+      el.type = 'button';
+      el.innerHTML =
+        '<span class="avent__volets" aria-hidden="true">' +
+          '<span class="avent__volet avent__volet--g"></span>' +
+          '<span class="avent__volet avent__volet--d"></span>' +
+        '</span>' +
+        '<span class="avent__num">' + c.j + '</span>' +
+        (etat === 'futur' ? '<span class="avent__floc" aria-hidden="true">' + FLOCON + '</span>' : '');
+
+      if (etat === 'futur') {
+        el.disabled = true;
+        el.setAttribute('aria-label', 'Case ' + c.j + ' — verrouillée jusqu’au ' + c.j + ' décembre');
+      } else {
+        el.setAttribute('aria-label', 'Case ' + c.j + ' — ' + c.titre);
+        el.addEventListener('click', function () {
+          el.classList.add('avent__case--ouverte');
+          son.tinter();
+          ouvrir(c);
+        });
+      }
+      grille.appendChild(el);
+    });
+
+    /* ---- La fenêtre de contenu ---- */
+    var vue = noeud('div', 'avent-vue',
+      '<div class="avent-vue__boite" role="dialog" aria-modal="true" aria-labelledby="avent-t">' +
+        '<button type="button" class="avent-vue__fermer" aria-label="Fermer">✕</button>' +
+        '<span class="avent-vue__jour"></span>' +
+        '<h3 class="avent-vue__t" id="avent-t"></h3>' +
+        '<p class="avent-vue__c"></p>' +
+        '<div class="avent-vue__a"><b>À faire aujourd’hui</b><span></span></div>' +
+        '<div class="avent-vue__bonus" hidden></div>' +
+        '<a class="btn btn--glow" href="' + C.lienDevis + '"></a>' +
+      '</div>');
+    document.body.appendChild(vue);
+
+    var boite = vue.querySelector('.avent-vue__boite');
+    var avant = null;
+
+    function ouvrir(c) {
+      avant = document.activeElement;
+      vue.querySelector('.avent-vue__jour').textContent = c.j + ' décembre';
+      vue.querySelector('.avent-vue__t').textContent = c.titre;
+      vue.querySelector('.avent-vue__c').textContent = c.conseil;
+      vue.querySelector('.avent-vue__a span').textContent = c.action;
+      var bonus = vue.querySelector('.avent-vue__bonus');
+      if (c.bonus) {
+        bonus.hidden = false;
+        bonus.innerHTML = '<b>' + c.bonusTitre + '</b> — offert pour toute signature avant le ' +
+          C.echeanceTexte + '.';
+      } else {
+        bonus.hidden = true;
+      }
+      var cta = vue.querySelector('.btn');
+      cta.textContent = c.bonus ? 'J’en profite' : 'Faire auditer mon site, offert';
+      cta.href = C.lienDevis;
+
+      vue.classList.add('montre');
+      requestAnimationFrame(function () { vue.classList.add('vu'); });
+      document.body.style.overflow = 'hidden';
+      vue.querySelector('.avent-vue__fermer').focus({ preventScroll: true });
+    }
+
+    function fermer() {
+      vue.classList.remove('vu');
+      document.body.style.overflow = '';
+      setTimeout(function () { vue.classList.remove('montre'); }, reduit ? 0 : 300);
+      if (avant && avant.focus) avant.focus({ preventScroll: true });
+    }
+
+    vue.querySelector('.avent-vue__fermer').addEventListener('click', fermer);
+    vue.addEventListener('click', function (e) { if (e.target === vue) fermer(); });
+    vue.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') { fermer(); return; }
+      if (e.key !== 'Tab') return;
+      // Le focus reste dans la fenêtre : sinon il part derrière le voile.
+      var f = [].slice.call(boite.querySelectorAll('button, a[href]'))
+        .filter(function (n) { return n.offsetParent !== null; });
+      if (!f.length) return;
+      var premier = f[0], dernier = f[f.length - 1];
+      if (e.shiftKey && document.activeElement === premier) { e.preventDefault(); dernier.focus(); }
+      else if (!e.shiftKey && document.activeElement === dernier) { e.preventDefault(); premier.focus(); }
+    });
+
+    /* Ouverture directe par ancre : #calendrier-7 ouvre la case 7 si elle
+       est consultable. Sert aux liens envoyés en story Instagram. */
+    var m = /^#case-(\d{1,2})$/.exec(location.hash);
+    if (m) {
+      var n = parseInt(m[1], 10);
+      var c = C.cases.filter(function (x) { return x.j === n; })[0];
+      if (c && n <= jourCourant) setTimeout(function () { ouvrir(c); }, 400);
+    }
+  })();
+
+  /* =========================================================
+     8 — LE COFFRET QUI S'OUVRE AU DÉFILEMENT
+     ========================================================= */
+  (function coffret() {
+    var c = document.querySelector('.coffret');
+    if (!c) return;
+    if (reduit) { c.classList.add('ouvert'); return; }
+    var io = new IntersectionObserver(function (es) {
+      es.forEach(function (e) {
+        if (e.isIntersecting) { c.classList.add('ouvert'); io.unobserve(e.target); }
+      });
+    }, { threshold: 0.45 });
+    io.observe(c);
+  })();
+
+  /* =========================================================
+     9 — LA CARTE CADEAU QUI SUIT LE CURSEUR
+     ========================================================= */
+  (function carteCadeau() {
+    var scene = document.querySelector('.cadeau-scene');
+    var carte = scene && scene.querySelector('.cadeau');
+    if (!carte) return;
+    if (reduit || !matchMedia('(hover: hover) and (pointer: fine)').matches) {
+      carte.style.transform = 'rotateX(4deg) rotateY(-9deg)';
+      carte.style.setProperty('--reflet', '-12%');
+      return;
+    }
+    var brut = null, cible = { x: 0, y: 0 };
+    scene.addEventListener('pointermove', function (e) {
+      var b = scene.getBoundingClientRect();
+      cible.x = ((e.clientX - b.left) / b.width - 0.5) * 2;
+      cible.y = ((e.clientY - b.top) / b.height - 0.5) * 2;
+      if (!brut) brut = requestAnimationFrame(peindre);
+    }, { passive: true });
+    scene.addEventListener('pointerleave', function () {
+      cible.x = 0; cible.y = 0;
+      if (!brut) brut = requestAnimationFrame(peindre);
+    });
+    var x = 0, y = 0;
+    function peindre() {
+      x += (cible.x - x) * 0.14;
+      y += (cible.y - y) * 0.14;
+      carte.style.transform = 'rotateY(' + (x * 11).toFixed(2) + 'deg) rotateX(' +
+        (-y * 9).toFixed(2) + 'deg)';
+      carte.style.setProperty('--reflet', (x * 42).toFixed(1) + '%');
+      if (Math.abs(cible.x - x) > 0.002 || Math.abs(cible.y - y) > 0.002) {
+        brut = requestAnimationFrame(peindre);
+      } else { brut = null; }
+    }
+  })();
+
+  /* =========================================================
+     10 — LES QUESTIONS DE LA PAGE OFFRE
+     ========================================================= */
+  (function faq() {
+    var hote = document.querySelector('[data-noel-faq]');
+    if (!hote) return;
+    hote.innerHTML = C.faq.map(function (q) {
+      return '<details class="faq__item"><summary class="faq__q"><h3>' + q.q +
+        '</h3></summary><p class="faq__a">' + q.r + '</p></details>';
+    }).join('');
+  })();
+
+  /* =========================================================
+     11 — LES VALEURS DE CONFIG RECOPIÉES DANS LE TEXTE
+     Tout élément portant data-noel="places" ou "echeance" reçoit la
+     valeur : une seule source, pas de chiffre à corriger à douze endroits.
+     ========================================================= */
+  [].forEach.call(document.querySelectorAll('[data-noel]'), function (n) {
+    var k = n.getAttribute('data-noel');
+    if (k === 'places') n.textContent = C.places;
+    if (k === 'echeance') n.textContent = C.echeanceTexte;
+  });
+
+  /* ---------------- La date, en heure de Paris ---------------- */
+  function jourParis() {
+    try {
+      var p = new Intl.DateTimeFormat('fr-FR', {
+        timeZone: 'Europe/Paris', year: 'numeric', month: '2-digit', day: '2-digit'
+      }).formatToParts(new Date()).reduce(function (a, x) { a[x.type] = x.value; return a; }, {});
+      return { annee: +p.year, mois: +p.month, jour: +p.day };
+    } catch (e) {
+      var d = new Date();
+      return { annee: d.getFullYear(), mois: d.getMonth() + 1, jour: d.getDate() };
+    }
+  }
 })();
 
 </script>

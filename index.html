@@ -27,6 +27,59 @@
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23FFFFFF'/%3E%3Ctext x='50' y='68' font-family='Arial' font-weight='700' font-size='54' fill='%230D0D0F' text-anchor='middle'%3EMJ%3C/text%3E%3C/svg%3E">
 <link rel="stylesheet" href="assets/css/fonts.css">
 <link rel="stylesheet" href="assets/css/style.css">
+
+<!-- AMORCE DU THÈME DE NOËL ===============================================
+     Décide, avant le premier pixel, si la saison est ouverte. Hors période
+     ce bloc ne fait rien et aucun fichier du thème n'est téléchargé : le
+     site est alors strictement identique à sa version normale.
+
+     ?theme=normal  force le site normal (demandé).
+     ?theme=noel    force le thème, pour le relire hors saison.
+
+     Les dates vivent dans assets/js/noel-config.js ; elles sont redites
+     ici parce que ce test doit tomber AVANT le chargement de la config —
+     sinon le thème s'appliquerait après l'affichage, en sautant à l'écran.
+     Une seule ligne à changer l'an prochain, et elle est commentée.
+     ====================================================================== -->
+<script>
+(function(){
+  try{
+    var q = new URLSearchParams(location.search).get('theme');
+    if (q === 'normal') return;
+    var on = (q === 'noel');
+    if (!on) {
+      /* Date de calendrier à Paris : un visiteur à Montréal ne doit pas
+         voir le thème un jour trop tôt, ni un jour trop tard. */
+      var p = new Intl.DateTimeFormat('fr-FR', { timeZone:'Europe/Paris',
+                month:'2-digit', day:'2-digit' })
+              .formatToParts(new Date())
+              .reduce(function(a,x){ a[x.type]=x.value; return a; }, {});
+      var m = +p.month, j = +p.day;
+      on = (m === 12 && j >= 1) || (m === 1 && j <= 6);   /* 1er déc. → 6 janv. */
+    }
+    if (!on) return;
+
+    var r = document.documentElement;
+    r.className = (r.className ? r.className + ' ' : '') + 'theme-noel';
+
+    var l = document.createElement('link');
+    l.rel = 'stylesheet'; l.href = 'assets/css/noel.css';
+    document.head.appendChild(l);
+
+    /* async=false garde l'ordre d'exécution pour des scripts injectés :
+       la config doit être lue avant le script qui s'en sert. */
+    ['assets/js/noel-config.js','assets/js/noel.js'].forEach(function(s){
+      var e = document.createElement('script');
+      e.src = s; e.async = false; document.head.appendChild(e);
+    });
+
+    var f = document.querySelector('link[rel="icon"]');
+    if (f) f.href = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' fill='%23FFFFFF'/%3E%3Cg fill='none' stroke='%230071E3' stroke-width='1.9' stroke-linecap='round'%3E%3Cpath d='M12 2.6v18.8M3.9 7.3l16.2 9.4M20.1 7.3 3.9 16.7'/%3E%3Cpath d='M12 6.6 9.9 4.5M12 6.6l2.1-2.1M12 17.4l-2.1 2.1M12 17.4l2.1 2.1'/%3E%3C/g%3E%3C/svg%3E";
+    var t = document.querySelector('meta[name="theme-color"]');
+    if (t) t.content = '#0071E3';
+  } catch (e) { /* le site normal reste la valeur sûre */ }
+})();
+</script>
 <noscript><style>
   /* Sans JavaScript, aucun observateur ne déclenche les apparitions :
      le contenu doit rester visible, pour le visiteur comme pour Google. */
@@ -112,7 +165,7 @@
 }
 </script>
 </head>
-<body>
+<body class="p-home">
 <canvas id="bg-canvas" aria-hidden="true"></canvas>
 
 <header class="nav">

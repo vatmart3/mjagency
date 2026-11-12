@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
+<title>Offre de fin d'année — Création de site à Sète | MJAGENCY</title>
+<meta name="description" content="Réservez votre créneau de janvier avant le 31 décembre 2026 : carte NFC d'avis Google, coffret de livraison et mise en ligne prioritaire offerts. Création de site internet à Sète, Frontignan, Balaruc-les-Bains et Montpellier.">
+<link rel="canonical" href="https://www.mjagency.eu/offre-noel">
+<meta name="theme-color" content="#FFFFFF">
+<meta name="color-scheme" content="light">
+<meta name="robots" content="index, follow">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Offre de fin d'année — Création de site à Sète | MJAGENCY">
+<meta property="og:description" content="Signez avant le 31 décembre 2026, on livre en janvier. Carte NFC d'avis Google, coffret de livraison et priorité sur le planning.">
+<meta property="og:url" content="https://www.mjagency.eu/offre-noel">
+<meta property="og:image" content="https://www.mjagency.eu/assets/img/og.png">
+<meta property="og:locale" content="fr_FR">
+<meta name="twitter:card" content="summary_large_image">
+
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23FFFFFF'/%3E%3Ctext x='50' y='68' font-family='Arial' font-weight='700' font-size='54' fill='%230D0D0F' text-anchor='middle'%3EMJ%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="assets/css/fonts.css">
+<link rel="stylesheet" href="assets/css/style.css">
+<!-- AMORCE DU THÈME DE NOËL ===============================================
+     Décide, avant le premier pixel, si la saison est ouverte. Hors période
+     ce bloc ne fait rien et aucun fichier du thème n'est téléchargé : le
+     site est alors strictement identique à sa version normale.
+
+     ?theme=normal  force le site normal (demandé).
+     ?theme=noel    force le thème, pour le relire hors saison.
+
+     Les dates vivent dans assets/js/noel-config.js ; elles sont redites
+     ici parce que ce test doit tomber AVANT le chargement de la config —
+     sinon le thème s'appliquerait après l'affichage, en sautant à l'écran.
+     Une seule ligne à changer l'an prochain, et elle est commentée.
+     ====================================================================== -->
+<script>
+(function(){
+  try{
+    var q = new URLSearchParams(location.search).get('theme');
+    if (q === 'normal') return;
+    var on = (q === 'noel');
+    if (!on) {
+      /* Date de calendrier à Paris : un visiteur à Montréal ne doit pas
+         voir le thème un jour trop tôt, ni un jour trop tard. */
+      var p = new Intl.DateTimeFormat('fr-FR', { timeZone:'Europe/Paris',
+                month:'2-digit', day:'2-digit' })
+              .formatToParts(new Date())
+              .reduce(function(a,x){ a[x.type]=x.value; return a; }, {});
+      var m = +p.month, j = +p.day;
+      on = (m === 12 && j >= 1) || (m === 1 && j <= 6);   /* 1er déc. → 6 janv. */
+    }
+    if (!on) return;
+
+    var r = document.documentElement;
+    r.className = (r.className ? r.className + ' ' : '') + 'theme-noel';
+
+    var l = document.createElement('link');
+    l.rel = 'stylesheet'; l.href = 'assets/css/noel.css';
+    document.head.appendChild(l);
+
+    /* async=false garde l'ordre d'exécution pour des scripts injectés :
+       la config doit être lue avant le script qui s'en sert. */
+    ['assets/js/noel-config.js','assets/js/noel.js'].forEach(function(s){
+      var e = document.createElement('script');
+      e.src = s; e.async = false; document.head.appendChild(e);
+    });
+
+    var f = document.querySelector('link[rel="icon"]');
+    if (f) f.href = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' fill='%23FFFFFF'/%3E%3Cg fill='none' stroke='%230071E3' stroke-width='1.9' stroke-linecap='round'%3E%3Cpath d='M12 2.6v18.8M3.9 7.3l16.2 9.4M20.1 7.3 3.9 16.7'/%3E%3Cpath d='M12 6.6 9.9 4.5M12 6.6l2.1-2.1M12 17.4l-2.1 2.1M12 17.4l2.1 2.1'/%3E%3C/g%3E%3C/svg%3E";
+    var t = document.querySelector('meta[name="theme-color"]');
+    if (t) t.content = '#0071E3';
+  } catch (e) { /* le site normal reste la valeur sûre */ }
+})();
+</script>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Offer",
+  "name": "Offre de fin d'année — création de site internet",
+  "description": "Pour toute signature avant le 31 décembre 2026 : carte NFC d'avis Google offerte, coffret de livraison MJ Agency, et mise en ligne prioritaire en janvier. Le tarif de la prestation reste inchangé.",
+  "url": "https://www.mjagency.eu/offre-noel",
+  "category": "Création de site internet",
+  "availability": "https://schema.org/LimitedAvailability",
+  "availabilityStarts": "2026-12-01",
+  "validFrom": "2026-12-01",
+  "validThrough": "2026-12-31",
+  "eligibleQuantity": { "@type": "QuantitativeValue", "value": 4, "unitText": "projets" },
+  "seller": {
+    "@type": "ProfessionalService",
+    "name": "MJAGENCY",
+    "url": "https://www.mjagency.eu/",
+    "telephone": "+33647571370",
+    "address": { "@type": "PostalAddress", "addressLocality": "Sète", "postalCode": "34200", "addressCountry": "FR" }
+  },
+  "areaServed": [
+    { "@type": "City", "name": "Sète" },
+    { "@type": "City", "name": "Frontignan" },
+    { "@type": "City", "name": "Balaruc-les-Bains" },
+    { "@type": "City", "name": "Montpellier" }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    { "@type": "Question", "name": "Quels sont les délais si je signe en décembre ?",
+      "acceptedAnswer": { "@type": "Answer", "text": "Nous démarrons la première semaine de janvier et mettons en ligne sous trois à quatre semaines pour un site vitrine, six à huit pour une boutique en ligne. Le délai court à partir du moment où nous avons vos textes et vos photos — c’est presque toujours là que les projets prennent du retard, et nous vous accompagnons pour les réunir." } },
+    { "@type": "Question", "name": "Qu’est-ce qui est compris dans l’offre ?",
+      "acceptedAnswer": { "@type": "Answer", "text": "La conception et la création du site, les fondations du référencement local, la mise en ligne et la formation pour que vous soyez autonome. S’y ajoutent, pour toute signature avant le 31 décembre : la carte NFC d’avis Google, le coffret de livraison, et le passage en priorité sur le planning de janvier." } },
+    { "@type": "Question", "name": "Comment se passe le paiement ?",
+      "acceptedAnswer": { "@type": "Answer", "text": "Virement, chèque ou carte. Pour un site vitrine, 30 % à la signature du devis et le solde à la mise en ligne. Pour une boutique ou une refonte complète, en trois versements. Une facture accompagne chaque versement et nous ne mettons aucun prélèvement automatique en place." } },
+    { "@type": "Question", "name": "Que se passe-t-il si je signe après le 31 décembre ?",
+      "acceptedAnswer": { "@type": "Answer", "text": "Le tarif ne change pas : ce n’est pas une remise, c’est une offre de lancement d’année. Vous perdez en revanche les trois cadeaux et la priorité sur le planning de janvier, qui se remplit dans l’ordre des signatures." } },
+    { "@type": "Question", "name": "Vous déplacez-vous jusqu’à chez moi ?",
+      "acceptedAnswer": { "@type": "Answer", "text": "Oui, sans frais, à Sète, Frontignan, Balaruc-les-Bains, Mèze, Marseillan et Montpellier. Voir votre local, vos produits et votre façon de travailler change tout au moment de concevoir le site. Partout ailleurs, nous travaillons entièrement à distance." } }
+  ]
+}
+</script>
+
+<noscript><style>
+  .reveal,.rs>*{opacity:1!important;transform:none!important}
+</style></noscript>
+</head>
+<body class="p-offre">
+
+<canvas id="bg-canvas" aria-hidden="true"></canvas>
+
+<header class="nav">
+  <a href="index.html" class="nav__logo"><span class="dot"></span> MJ <em>Agency</em></a>
+  <nav class="nav__links" aria-label="Navigation principale">
+    <a href="work.html">Réalisations</a>
+    <a href="studio.html">Le studio</a>
+    <a href="contact.html">Contact</a>
+  </nav>
+  <a href="contact.html" class="nav__cta" data-magnetic="0.3">Parlons de votre projet <span aria-hidden="true">↗</span></a>
+  <button class="nav__burger" aria-label="Ouvrir le menu" aria-expanded="false"><span></span><span></span><span></span></button>
+</header>
+
+<nav class="mobile-menu" aria-label="Menu mobile">
+  <a href="work.html"><small>01</small>Réalisations</a>
+  <a href="studio.html"><small>02</small>Le studio</a>
+  <a href="contact.html"><small>03</small>Contact</a>
+  <a href="contact.html" class="btn btn--glow mobile-menu__cta">Parlons de votre projet <span class="arw" aria-hidden="true">↗</span></a>
+</nav>
+
+<main class="wrap">
+
+  <!-- HERO -->
+  <section class="hero container">
+    <span class="eyebrow noel-eyebrow reveal">Offre de fin d'année · Bassin de Thau</span>
+    <h1 class="display hero__title reveal">2027 commence avec<br>un site qui vend.</h1>
+    <div class="hero__meta">
+      <p class="lead reveal">Réservez avant le 31 décembre 2026, on livre en janvier — pendant que vos concurrents dorment encore.</p>
+      <div class="hero__actions reveal">
+        <a href="contact.html#booking" class="btn btn--glow">Réserver mon créneau de janvier <span class="arw" aria-hidden="true">↗</span></a>
+        <a href="#calendrier" class="link-t">Ouvrir la case du jour <span class="arw" aria-hidden="true">↗</span></a>
+      </div>
+    </div>
+  </section>
+
+  <!-- CE QUE NOUS OFFRONS -->
+  <section class="container pad-y sep noel-sec" id="offre">
+    <div class="sec-head reveal">
+      <span class="eyebrow noel-eyebrow">Ce qui est offert</span>
+      <h2 class="h2">Signez avant le 31 décembre,<br>on vous offre&nbsp;:</h2>
+    </div>
+    <div class="noel-offre">
+      <ul class="noel-dons reveal">
+        <li class="noel-don"><span class="noel-don__n">1</span><div>
+          <b>Votre carte NFC d'avis Google</b>
+          <span>Posée près de la caisse. Le client approche son téléphone, l'avis s'ouvre. C'est ce qui transforme une bonne journée en avis écrit.</span></div></li>
+        <li class="noel-don"><span class="noel-don__n">2</span><div>
+          <b>Le coffret de livraison MJ&nbsp;Agency</b>
+          <span>Votre contrat, la carte NFC de votre site, et deux ou trois choses qu'on préfère vous laisser découvrir le jour de la mise en ligne.</span></div></li>
+        <li class="noel-don"><span class="noel-don__n">3</span><div>
+          <b>La mise en ligne prioritaire en janvier</b>
+          <span>Le planning se remplit dans l'ordre des signatures. Signer en décembre, c'est être en ligne avant les autres.</span></div></li>
+      </ul>
+      <div class="coffret reveal" aria-hidden="true"><div class="coffret__scene">
+        <div class="coffret__lueur"></div><div class="coffret__corps"></div>
+        <div class="coffret__couvercle"></div><div class="coffret__noeud"></div>
+      </div></div>
+    </div>
+    <p class="noel-mention">Ce n'est pas une remise&nbsp;: le tarif de la prestation ne change pas. Offre valable pour toute signature avant le <span data-noel="echeance">31 décembre 2026</span>, dans la limite de <span data-noel="places">4</span> projets.</p>
+  </section>
+
+  <!-- CALENDRIER DE L'AVENT
+       Masqué par défaut : hors période le script du thème n'est pas chargé,
+       et une façade vide au milieu de la page n'aurait aucun sens. -->
+  <section class="container pad-y sep noel-sec" id="calendrier" data-noel-saison hidden>
+    <div class="sec-head reveal">
+      <span class="eyebrow noel-eyebrow">Calendrier de l'avent</span>
+      <h2 class="h2">24 conseils pour vendre plus<br>en 2027.</h2>
+      <p class="lead">Une fenêtre par jour, un conseil applicable le jour même. Pensés pour les commerçants du bassin de Thau, pas pour les start-up.</p>
+    </div>
+    <div data-avent class="reveal"></div>
+  </section>
+
+  <!-- QUESTIONS -->
+  <section class="container pad-y sep noel-sec" id="questions">
+    <div class="sec-head reveal">
+      <span class="eyebrow noel-eyebrow">Questions fréquentes</span>
+      <h2 class="h2">Ce qu'on nous demande<br>avant de signer.</h2>
+    </div>
+    <div class="faq reveal">
+      <details class="faq__item">
+        <summary class="faq__q"><h3>Quels sont les délais si je signe en décembre ?</h3></summary>
+        <p class="faq__a">Nous démarrons la première semaine de janvier et mettons en ligne sous trois à quatre semaines pour un site vitrine, six à huit pour une boutique en ligne. Le délai court à partir du moment où nous avons vos textes et vos photos — c’est presque toujours là que les projets prennent du retard, et nous vous accompagnons pour les réunir.</p>
+      </details>
+      <details class="faq__item">
+        <summary class="faq__q"><h3>Qu’est-ce qui est compris dans l’offre ?</h3></summary>
+        <p class="faq__a">La conception et la création du site, les fondations du référencement local, la mise en ligne et la formation pour que vous soyez autonome. S’y ajoutent, pour toute signature avant le 31 décembre : la carte NFC d’avis Google, le coffret de livraison, et le passage en priorité sur le planning de janvier.</p>
+      </details>
+      <details class="faq__item">
+        <summary class="faq__q"><h3>Comment se passe le paiement ?</h3></summary>
+        <p class="faq__a">Virement, chèque ou carte. Pour un site vitrine, 30 % à la signature du devis et le solde à la mise en ligne. Pour une boutique ou une refonte complète, en trois versements. Une facture accompagne chaque versement et nous ne mettons aucun prélèvement automatique en place.</p>
+      </details>
+      <details class="faq__item">
+        <summary class="faq__q"><h3>Que se passe-t-il si je signe après le 31 décembre ?</h3></summary>
+        <p class="faq__a">Le tarif ne change pas : ce n’est pas une remise, c’est une offre de lancement d’année. Vous perdez en revanche les trois cadeaux et la priorité sur le planning de janvier, qui se remplit dans l’ordre des signatures.</p>
+      </details>
+      <details class="faq__item">
+        <summary class="faq__q"><h3>Vous déplacez-vous jusqu’à chez moi ?</h3></summary>
+        <p class="faq__a">Oui, sans frais, à Sète, Frontignan, Balaruc-les-Bains, Mèze, Marseillan et Montpellier. Voir votre local, vos produits et votre façon de travailler change tout au moment de concevoir le site. Partout ailleurs, nous travaillons entièrement à distance.</p>
+      </details>
+    </div>
+  </section>
+
+  <!-- APPEL -->
+  <section class="container pad-y sep">
+    <div class="cta-band reveal">
+      <span class="eyebrow noel-eyebrow">Réponse sous 24&nbsp;h</span>
+      <h2 class="h2">Il reste <span data-noel="places">4</span> places<br>pour janvier.</h2>
+      <a href="contact.html#booking" class="btn btn--glow">Réserver mon créneau <span class="arw" aria-hidden="true">↗</span></a>
+    </div>
+  </section>
+
+</main>
+
+<footer class="footer container">
+  <div class="footer__big reveal"><a href="contact.html" data-cursor="Écrire">Parlons-en <span class="arw" aria-hidden="true">↗</span></a></div>
+
+  <div class="footer__cols">
+    <div class="footer__col">
+      <a href="index.html" class="nav__logo" style="margin-bottom:16px"><span class="dot"></span> MJ Agency</a>
+      <p class="dim" style="max-width:34ch">Agence web et studio créatif à Sète. Sites internet, identité de marque et design pour les entreprises de l'Hérault.</p>
+    </div>
+
+    <div class="footer__col">
+      <h4>Navigation</h4>
+      <a href="work.html">Réalisations</a>
+      <a href="studio.html">Le studio</a>
+      <a href="contact.html">Contact</a>
+      <a href="#zone">Zone d'intervention</a>
+    </div>
+
+    <div class="footer__col">
+      <h4>Nos zones</h4>
+      <a href="creation-site-internet-sete.html">Site internet à Sète</a>
+      <a href="agence-web-montpellier.html">Agence web Montpellier</a>
+      <a href="creation-site-internet-frontignan-bassin-de-thau.html">Frontignan &amp; bassin de Thau</a>
+      <a href="agence-web-agde-cap-d-agde.html">Agde &amp; Cap d'Agde</a>
+    </div>
+
+    <div class="footer__col">
+      <h4>Nous trouver</h4>
+      <address class="nap">
+        <span class="nap__line">34200 Sète, Hérault</span>
+        <a href="tel:+33647571370">06 47 57 13 70</a>
+        <a href="mailto:mjagency.officiel@gmail.com">mjagency.officiel@gmail.com</a>
+      </address>
+      <p class="dim nap__horaires">Lun — Ven · 9 h à 18 h</p>
+    </div>
+  </div>
+
+  <div class="footer__bottom">
+    <span>© 2026 MJ Agency — Sète, Hérault</span>
+    <span class="footer__legal"><a href="mentions-legales.html">Mentions légales</a><a href="confidentialite.html">Confidentialité</a></span>
+  </div>
+</footer>
+
+<script src="assets/js/bg.js"></script>
+<script src="assets/js/main.js"></script>
+</body>
+</html>

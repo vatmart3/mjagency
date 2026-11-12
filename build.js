@@ -79,6 +79,7 @@ const out = `<title>MJ Agency — Studio créatif digital</title>
 <style>
 ${read('assets/css/fonts.css')}
 ${read('assets/css/style.css')}
+${read('assets/css/noel.css')}
 /* Le build en fichier unique n'affiche qu'une page à la fois */
 .page{display:none}
 .page.active{display:block}
@@ -108,6 +109,34 @@ ${read('assets/js/bg.js')}
 </script>
 <script>
 ${read('assets/js/main.js')}
+</script>
+
+<!-- THÈME DE NOËL — version fichier unique.
+     L'amorce des pages normales télécharge le thème ; ici tout est déjà
+     inline, elle se réduit donc au test de période. Les liens du thème
+     pointent vers des fichiers absents de ce build : dans l'aperçu ils ne
+     mènent nulle part, c'est attendu. -->
+<script>
+(function(){
+  try{
+    var q = new URLSearchParams(location.search).get('theme');
+    if (q === 'normal') return;
+    var on = (q === 'noel');
+    if (!on) {
+      var p = new Intl.DateTimeFormat('fr-FR', { timeZone:'Europe/Paris',
+                month:'2-digit', day:'2-digit' })
+              .formatToParts(new Date())
+              .reduce(function(a,x){ a[x.type]=x.value; return a; }, {});
+      on = (+p.month === 12 && +p.day >= 1) || (+p.month === 1 && +p.day <= 6);
+    }
+    if (!on) return;
+    var r = document.documentElement;
+    r.className = (r.className ? r.className + ' ' : '') + 'theme-noel';
+    document.body.classList.add('p-home');
+  } catch (e) {}
+})();
+${read('assets/js/noel-config.js')}
+${read('assets/js/noel.js')}
 </script>
 `;
 

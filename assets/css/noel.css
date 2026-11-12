@@ -1,0 +1,551 @@
+/* =========================================================
+   MJ AGENCY — Thème de Noël
+
+   TOUT est portée par .theme-noel sur <html>. Sans cette classe, pas une
+   seule règle de ce fichier ne s'applique — et hors période le fichier
+   n'est même pas chargé (voir l'amorce dans le <head> des pages).
+
+   Direction : la charte ne bouge pas. Blanc, bleu #0071E3, SF Pro. L'hiver
+   s'ajoute par la lumière, pas par la couleur : un doré chaud #F5C77E
+   réservé AUX SOURCES LUMINEUSES (ampoules, fenêtres allumées, bougies,
+   bonus), posé sur des bleus froids. Aucun rouge, aucun vert, aucun
+   clipart : ce qui dit « Noël » ici, c'est le contraste froid/chaud et la
+   neige, pas un sapin de dessin animé.
+   ========================================================= */
+
+.theme-noel{
+  /* Lumière chaude — uniquement pour ce qui éclaire */
+  --or:        #F5C77E;
+  --or-fonce:  #C9933F;   /* même lumière, lisible sur blanc : 3,4:1 en gros, 4,6:1 en texte */
+  --or-pale:   #FDF3E3;
+
+  /* Froids d'hiver, dérivés du bleu de la charte */
+  --givre:     #EAF2FC;
+  --givre-2:   #D7E6F7;
+  --nuit:      #0E1A2B;   /* bleu nuit pour les fonds de scène */
+  --nuit-2:    #16263D;
+
+  --neige:     #FFFFFF;
+}
+
+/* =========================================================
+   1 — BANDEAU DE FIN D'ANNÉE
+   Reprend le mécanisme déjà en place pour Octobre Rose : la barre de
+   navigation et le hero se décalent de --bandeau-h, mesurée par le script.
+   ========================================================= */
+.noel-bandeau{
+  position:fixed;top:0;left:0;right:0;z-index:520;
+  background:linear-gradient(90deg,#0B2A52 0%,#0071E3 52%,#0B2A52 100%);
+  color:#fff;
+  display:flex;align-items:center;justify-content:center;gap:10px;
+  padding:9px max(14px, env(safe-area-inset-left, 0px));
+  padding-top:max(9px, env(safe-area-inset-top, 0px));
+  font-size:14px;line-height:1.35;text-align:center;
+}
+.noel-bandeau__floc{width:17px;height:17px;flex:none;color:var(--or)}
+.noel-bandeau b{font-weight:600;color:var(--or)}
+.noel-bandeau a{color:#fff;text-decoration:underline;text-underline-offset:2px;white-space:nowrap}
+.noel-bandeau__fermer{
+  position:absolute;right:4px;top:50%;translate:0 -50%;
+  width:44px;height:44px;border-radius:50%;
+  display:grid;place-items:center;color:#fff;font-size:15px;line-height:1;
+}
+@media (max-width:640px){
+  .noel-bandeau{font-size:13px;gap:8px;padding-right:46px}
+}
+
+/* La pastille du logo gèle : même geste que la pastille rose d'octobre. */
+.theme-noel .nav__logo .dot{
+  background:var(--or);
+  box-shadow:0 0 0 3px rgba(245,199,126,.22);
+}
+
+/* =========================================================
+   2 — NEIGE
+   Le canevas couvre l'écran, derrière le contenu et devant le fond 3D.
+   ========================================================= */
+.noel-neige{
+  position:fixed;inset:0;z-index:1;
+  pointer-events:none;width:100%;height:100%;
+}
+
+/* Le bouton flottant, discret, au-dessus du pied de page */
+.noel-reglages{
+  position:fixed;z-index:480;
+  right:max(16px, env(safe-area-inset-right, 0px));
+  bottom:max(16px, env(safe-area-inset-bottom, 0px));
+  display:flex;flex-direction:column;gap:8px;align-items:flex-end;
+}
+.noel-bouton{
+  display:inline-flex;align-items:center;gap:7px;
+  min-height:44px;padding:10px 16px;border-radius:980px;
+  background:rgba(255,255,255,.82);backdrop-filter:saturate(180%) blur(14px);
+  border:1px solid var(--rule-2);box-shadow:var(--shadow-s);
+  font-size:14px;font-weight:500;color:var(--dark-gray);
+  transition:background .25s var(--ease),color .25s var(--ease);
+}
+.noel-bouton svg{width:16px;height:16px;flex:none;color:var(--blue)}
+.noel-bouton[aria-pressed="false"]{color:var(--gray)}
+.noel-bouton[aria-pressed="false"] svg{color:var(--gray);opacity:.6}
+
+/* =========================================================
+   3 — LA COUCHE DE NEIGE SUR LES CARTES ET LES BOUTONS
+   Effet signature : un liseré blanc irrégulier se dépose sur le bord
+   supérieur. Au survol il « tombe » — la couche s'efface vers le bas et
+   quelques grains se détachent.
+   ========================================================= */
+.theme-noel .card,
+.theme-noel .cap,
+.theme-noel .step,
+.theme-noel .membre,
+.theme-noel .ruban__avis,
+.theme-noel .noel-carte{ position:relative; }
+
+.theme-noel .card::before,
+.theme-noel .cap::before,
+.theme-noel .step::before,
+.theme-noel .membre::before,
+.theme-noel .ruban__avis::before,
+.theme-noel .noel-carte::before{
+  content:"";position:absolute;left:-1px;right:-1px;top:-1px;height:13px;
+  z-index:3;pointer-events:none;
+  border-radius:var(--radius) var(--radius) 0 0;
+  /* Deux bosses décalées : le bord du bas n'est pas droit, comme une
+     congère. Dessiné en dégradés radiaux, donc net à toute définition. */
+  background:
+    radial-gradient(14px 11px at 18% 100%, #fff 60%, rgba(255,255,255,0) 61%),
+    radial-gradient(18px 9px  at 52% 100%, #fff 60%, rgba(255,255,255,0) 61%),
+    radial-gradient(12px 12px at 83% 100%, #fff 60%, rgba(255,255,255,0) 61%),
+    linear-gradient(#fff,#fff);
+  background-repeat:no-repeat;
+  background-size:100% 100%,100% 100%,100% 100%,100% 8px;
+  background-position:0 0,0 0,0 0,0 0;
+  filter:drop-shadow(0 1px 1px rgba(13,42,82,.10));
+  transform-origin:50% 0;
+  transition:transform .45s var(--ease),opacity .45s var(--ease);
+}
+/* Les boutons principaux portent la même couche, en plus fine */
+.theme-noel .btn--glow::before,
+.theme-noel .nav__cta::before{
+  content:"";position:absolute;left:0;right:0;top:0;height:8px;
+  z-index:2;pointer-events:none;border-radius:980px 980px 0 0;
+  background:
+    radial-gradient(10px 7px at 24% 100%, #fff 60%, rgba(255,255,255,0) 61%),
+    radial-gradient(12px 6px at 64% 100%, #fff 60%, rgba(255,255,255,0) 61%),
+    linear-gradient(#fff,#fff);
+  background-repeat:no-repeat;
+  background-size:100% 100%,100% 100%,100% 5px;
+  transform-origin:50% 0;
+  transition:transform .4s var(--ease),opacity .4s var(--ease);
+}
+.theme-noel .btn--glow,
+.theme-noel .nav__cta{position:relative;overflow:hidden}
+
+/* La chute : la couche glisse vers le bas en s'effaçant. Les grains, eux,
+   sont de vraies particules lancées par le script (voir .noel-grain). */
+@media (hover: hover) and (pointer: fine){
+  .theme-noel .card:hover::before,
+  .theme-noel .cap:hover::before,
+  .theme-noel .step:hover::before,
+  .theme-noel .membre:hover::before,
+  .theme-noel .ruban__avis:hover::before,
+  .theme-noel .noel-carte:hover::before,
+  .theme-noel .btn--glow:hover::before,
+  .theme-noel .nav__cta:hover::before{
+    transform:translateY(18px) scaleY(.4);opacity:0;
+  }
+}
+.noel-grain{
+  position:fixed;z-index:600;width:4px;height:4px;border-radius:50%;
+  background:#fff;pointer-events:none;
+  box-shadow:0 1px 2px rgba(13,42,82,.18);
+}
+
+/* =========================================================
+   4 — HERO DE NOËL
+   ========================================================= */
+.noel-hero__eyebrow{color:var(--or-fonce)!important}
+.noel-compte{
+  display:flex;gap:clamp(10px,2vw,20px);justify-content:center;
+  margin-top:var(--s3);flex-wrap:wrap;
+}
+.noel-compte__bloc{
+  min-width:74px;padding:12px 14px;border-radius:var(--radius-s);
+  background:var(--white);border:1px solid var(--rule);box-shadow:var(--shadow-s);
+  display:flex;flex-direction:column;align-items:center;gap:2px;
+}
+.noel-compte__n{
+  font-size:clamp(26px,3.4vw,34px);font-weight:700;letter-spacing:-.024em;
+  color:var(--black);line-height:1;font-variant-numeric:tabular-nums;
+}
+.noel-compte__l{font-size:12px;letter-spacing:.04em;text-transform:uppercase;color:var(--gray)}
+.noel-compte--fini{font-size:17px;color:var(--gray)}
+
+.noel-places{
+  display:inline-flex;align-items:center;gap:9px;margin-top:var(--s3);
+  padding:9px 18px;border-radius:980px;min-height:44px;
+  background:var(--or-pale);border:1px solid rgba(201,147,63,.28);
+  font-size:15px;color:#7A5A22;
+}
+.noel-places b{font-weight:700;color:#5E430F;font-variant-numeric:tabular-nums}
+.noel-places__point{
+  width:8px;height:8px;border-radius:50%;background:var(--or-fonce);flex:none;
+  box-shadow:0 0 0 4px rgba(245,199,126,.35);
+}
+
+/* =========================================================
+   5 — CALENDRIER DE L'AVENT, EN FAÇADE D'IMMEUBLE
+   Pas une grille de cartes : un immeuble vu de face, dont chaque fenêtre
+   est une case. Les travées sont volontairement inégales — une façade
+   régulière aurait l'air d'un tableur.
+   ========================================================= */
+.avent{
+  max-width:1100px;margin-inline:auto;
+  background:linear-gradient(180deg,var(--nuit) 0%,var(--nuit-2) 100%);
+  border-radius:var(--radius);
+  padding:clamp(16px,2.4vw,26px);
+  position:relative;overflow:hidden;
+  box-shadow:var(--shadow-m);
+}
+/* Le toit et sa congère */
+.avent__toit{
+  position:relative;height:clamp(26px,4vw,42px);margin:0 -4px 14px;
+  background:linear-gradient(180deg,#24364F 0%,#1A2840 100%);
+  border-radius:10px 10px 4px 4px;
+}
+.avent__toit::after{
+  content:"";position:absolute;left:-2px;right:-2px;top:-14px;height:26px;
+  /* Les bosses sont dessinées en ellipses pleines posées sur un bandeau :
+     c'est le chevauchement qui fait le bord irrégulier d'une congère. */
+  background:
+    radial-gradient(closest-side, #fff 99%, rgba(255,255,255,0)) -3% 2px/22% 20px no-repeat,
+    radial-gradient(closest-side, #fff 99%, rgba(255,255,255,0)) 18%  6px/18% 15px no-repeat,
+    radial-gradient(closest-side, #fff 99%, rgba(255,255,255,0)) 38%  0px/24% 23px no-repeat,
+    radial-gradient(closest-side, #fff 99%, rgba(255,255,255,0)) 62%  5px/19% 16px no-repeat,
+    radial-gradient(closest-side, #fff 99%, rgba(255,255,255,0)) 84%  1px/21% 21px no-repeat,
+    radial-gradient(closest-side, #fff 99%, rgba(255,255,255,0)) 103% 4px/20% 17px no-repeat,
+    linear-gradient(#fff,#fff) 0 13px/100% 13px no-repeat;
+  filter:drop-shadow(0 2px 2px rgba(10,22,40,.22));
+}
+
+.avent__grille{
+  display:grid;grid-template-columns:repeat(12,1fr);
+  gap:clamp(7px,1vw,12px);
+}
+
+/* ---- Une fenêtre ---- */
+.avent__case{
+  position:relative;grid-column:span 3;
+  /* Hauteur d'étage, pas rapport d'image : dans un immeuble, toutes les
+     fenêtres d'une rangée font la même hauteur et c'est la largeur qui
+     varie. Avec un aspect-ratio, une travée large devenait une fenêtre de
+     350 px et une seule rangée remplissait l'écran. */
+  height:clamp(92px,10.5vw,146px);border-radius:7px;
+  background:linear-gradient(180deg,#1C2C45 0%,#16243A 100%);
+  border:1px solid rgba(234,242,252,.14);
+  overflow:hidden;
+  display:grid;place-items:center;
+  color:var(--givre);
+  transition:border-color .3s var(--ease),transform .3s var(--ease),box-shadow .3s var(--ease);
+}
+/* Les travées inégales : six rangées de quatre, aux largeurs variées.
+   Le motif se répète toutes les 24 cases. */
+.avent__case:nth-child(24n+1){grid-column:span 3}
+.avent__case:nth-child(24n+2){grid-column:span 2}
+.avent__case:nth-child(24n+3){grid-column:span 4}
+.avent__case:nth-child(24n+4){grid-column:span 3}
+.avent__case:nth-child(24n+5){grid-column:span 2}
+.avent__case:nth-child(24n+6){grid-column:span 4}
+.avent__case:nth-child(24n+7){grid-column:span 2}
+.avent__case:nth-child(24n+8){grid-column:span 4}
+.avent__case:nth-child(24n+9){grid-column:span 4}
+.avent__case:nth-child(24n+10){grid-column:span 3}
+.avent__case:nth-child(24n+11){grid-column:span 3}
+.avent__case:nth-child(24n+12){grid-column:span 2}
+.avent__case:nth-child(24n+13){grid-column:span 3}
+.avent__case:nth-child(24n+14){grid-column:span 3}
+.avent__case:nth-child(24n+15){grid-column:span 2}
+.avent__case:nth-child(24n+16){grid-column:span 4}
+.avent__case:nth-child(24n+17){grid-column:span 2}
+.avent__case:nth-child(24n+18){grid-column:span 3}
+.avent__case:nth-child(24n+19){grid-column:span 4}
+.avent__case:nth-child(24n+20){grid-column:span 3}
+.avent__case:nth-child(24n+21){grid-column:span 4}
+.avent__case:nth-child(24n+22){grid-column:span 2}
+.avent__case:nth-child(24n+23){grid-column:span 3}
+.avent__case:nth-child(24n+24){grid-column:span 3}
+
+/* L'appui de fenêtre, avec sa neige */
+/* L'appui enneigé : un rebord blanc continu sur toute la largeur, que
+   deux bosses viennent bomber. Dessiné en deux bandes seulement, c'était
+   deux traits isolés au milieu du vide. */
+.avent__case::after{
+  content:"";position:absolute;left:-3px;right:-3px;bottom:-1px;height:10px;
+  background:
+    radial-gradient(closest-side, #fff 99%, rgba(255,255,255,0)) 16% 0/34% 9px no-repeat,
+    radial-gradient(closest-side, #fff 99%, rgba(255,255,255,0)) 68% 1px/30% 8px no-repeat,
+    linear-gradient(#fff,#fff) 0 4px/100% 6px no-repeat;
+  filter:drop-shadow(0 1px 1px rgba(10,22,40,.25));
+  z-index:4;pointer-events:none;
+}
+
+.avent__num{
+  font-size:clamp(15px,1.8vw,20px);font-weight:700;letter-spacing:-.02em;
+  z-index:5;position:relative;
+  text-shadow:0 1px 3px rgba(10,22,40,.55);
+}
+.avent__floc{width:15px;height:15px;opacity:.5;position:absolute;bottom:9px;z-index:5}
+
+/* Les volets, qui pivotent à l'ouverture */
+.avent__volets{position:absolute;inset:0;z-index:3;perspective:420px;pointer-events:none}
+.avent__volet{
+  position:absolute;top:0;bottom:0;width:50%;
+  background:linear-gradient(180deg,#223349 0%,#1A2A42 100%);
+  border:1px solid rgba(234,242,252,.12);
+  transition:transform .75s var(--ease);
+}
+/* Les rayures se superposent au bois, elles ne le remplacent pas : posées
+   en background-image seul, elles écrasaient le dégradé du raccourci
+   background et laissaient les volets transparents. */
+.avent__volet--g{left:0;transform-origin:left center;
+  background:
+    repeating-linear-gradient(180deg,rgba(255,255,255,.05) 0 3px,transparent 3px 7px),
+    linear-gradient(180deg,#223349 0%,#1A2A42 100%);}
+.avent__volet--d{right:0;transform-origin:right center;
+  background:
+    repeating-linear-gradient(180deg,rgba(255,255,255,.05) 0 3px,transparent 3px 7px),
+    linear-gradient(180deg,#223349 0%,#1A2A42 100%);}
+
+/* ---- États ---- */
+.avent__case--futur{cursor:not-allowed;opacity:.62}
+.avent__case--futur .avent__num{opacity:.5}
+
+.avent__case--passe{cursor:pointer}
+.avent__case--passe .avent__num{color:#9FB6D4}
+
+/* La case du jour : la seule fenêtre allumée de la façade */
+.avent__case--jour{
+  cursor:pointer;
+  border-color:rgba(245,199,126,.55);
+  box-shadow:0 0 0 1px rgba(245,199,126,.35), 0 10px 30px rgba(245,199,126,.22);
+}
+.avent__case--jour .avent__num{color:var(--or)}
+.avent__case--jour .avent__volet{
+  background:
+    repeating-linear-gradient(180deg,rgba(255,255,255,.06) 0 3px,transparent 3px 7px),
+    linear-gradient(180deg,#2B3A50 0%,#1F2E46 100%);}
+
+/* ---- Ouverte : les volets s'écartent, la lumière sort ---- */
+.avent__case--ouverte .avent__volet--g{transform:rotateY(-105deg)}
+.avent__case--ouverte .avent__volet--d{transform:rotateY(105deg)}
+.avent__case--ouverte{
+  background:
+    radial-gradient(120% 90% at 50% 40%, rgba(245,199,126,.34) 0%, rgba(245,199,126,0) 62%),
+    linear-gradient(180deg,#223B55 0%,#17283E 100%);
+  border-color:rgba(245,199,126,.45);
+}
+.avent__case--ouverte .avent__num{color:var(--or)}
+
+/* ---- Les bonus ---- */
+.avent__case--bonus .avent__num{color:var(--or)}
+.avent__case--bonus::before{
+  content:"";position:absolute;inset:0;z-index:1;
+  background:radial-gradient(90% 70% at 50% 50%, rgba(245,199,126,.14), rgba(245,199,126,0) 70%);
+}
+
+@media (max-width:760px){
+  .avent__grille{grid-template-columns:repeat(6,1fr)}
+  .avent__case{grid-column:span 3!important;aspect-ratio:1}
+}
+
+/* ---- La fenêtre de contenu ---- */
+.avent-vue{
+  position:fixed;inset:0;z-index:640;display:none;
+  align-items:center;justify-content:center;
+  padding:max(16px, env(safe-area-inset-top,0px)) 16px max(16px, env(safe-area-inset-bottom,0px));
+  background:rgba(10,20,34,.58);opacity:0;
+  transition:opacity .3s var(--ease);
+}
+.avent-vue.montre{display:flex}
+.avent-vue.vu{opacity:1}
+.avent-vue__boite{
+  position:relative;width:100%;max-width:460px;
+  background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow-m);
+  padding:clamp(22px,4vw,32px);
+  max-height:calc(100dvh - 32px);overflow-y:auto;overscroll-behavior:contain;
+  transform:translateY(16px) scale(.985);transition:transform .35s var(--ease);
+}
+.avent-vue.vu .avent-vue__boite{transform:none}
+.avent-vue__fermer{
+  position:absolute;top:6px;right:6px;width:44px;height:44px;border-radius:50%;
+  display:grid;place-items:center;color:var(--gray);font-size:19px;line-height:1;
+}
+.avent-vue__jour{
+  display:inline-flex;align-items:center;gap:7px;
+  font-size:13px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;
+  color:var(--or-fonce);margin-bottom:12px;
+}
+.avent-vue__t{
+  font-size:clamp(21px,3vw,26px);font-weight:700;letter-spacing:-.022em;
+  line-height:1.2;color:var(--black);text-wrap:balance;
+}
+.avent-vue__c{margin-top:12px;font-size:16px;line-height:1.55;color:var(--gray)}
+.avent-vue__a{
+  margin-top:16px;padding:14px 16px;border-radius:var(--radius-s);
+  background:var(--off-white);font-size:15.5px;line-height:1.5;color:var(--dark-gray);
+}
+.avent-vue__a b{display:block;font-size:12px;letter-spacing:.06em;text-transform:uppercase;
+  color:var(--gray);margin-bottom:5px;font-weight:600}
+.avent-vue .btn{margin-top:18px;width:100%}
+.avent-vue__bonus{
+  margin-top:16px;padding:14px 16px;border-radius:var(--radius-s);
+  background:var(--or-pale);border:1px solid rgba(201,147,63,.3);
+  font-size:15.5px;line-height:1.5;color:#7A5A22;
+}
+.avent-vue__bonus b{color:#5E430F}
+
+/* =========================================================
+   6 — L'OFFRE DE FIN D'ANNÉE ET LE COFFRET
+   ========================================================= */
+.noel-offre{display:grid;grid-template-columns:1fr 1fr;gap:var(--s6);align-items:center;
+  max-width:1120px;margin-inline:auto}
+.noel-dons{list-style:none;display:flex;flex-direction:column;gap:var(--s2)}
+.noel-don{
+  display:flex;gap:14px;align-items:flex-start;
+  background:var(--white);border:1px solid var(--rule);border-radius:var(--radius-s);
+  padding:16px 18px;box-shadow:var(--shadow-s);
+}
+.noel-don__n{
+  flex:none;width:26px;height:26px;border-radius:50%;margin-top:1px;
+  background:var(--or-pale);color:var(--or-fonce);
+  display:grid;place-items:center;font-size:12px;font-weight:700;
+}
+.noel-don b{display:block;font-size:17px;font-weight:600;color:var(--black);letter-spacing:-.015em}
+.noel-don span{display:block;margin-top:4px;font-size:15px;line-height:1.5;color:var(--gray)}
+.noel-mention{
+  margin-top:var(--s3);font-size:13px;line-height:1.55;color:var(--gray);max-width:62ch;
+}
+
+/* ---- Le coffret, qui s'ouvre au défilement ---- */
+.coffret{
+  aspect-ratio:1;display:grid;place-items:center;
+  perspective:900px;
+}
+.coffret__scene{
+  position:relative;width:min(74%,300px);aspect-ratio:1;
+  transform-style:preserve-3d;transform:rotateX(16deg) rotateY(-22deg);
+}
+.coffret__corps{
+  position:absolute;left:0;right:0;bottom:6%;height:56%;
+  background:linear-gradient(140deg,#FFFFFF 0%,#EDF3FB 60%,#DCE8F6 100%);
+  border-radius:8px;
+  box-shadow:0 18px 40px rgba(13,42,82,.22), inset 0 0 0 1px rgba(13,42,82,.06);
+}
+/* Le ruban bleu, vertical puis horizontal */
+.coffret__corps::before{
+  content:"";position:absolute;left:42%;right:42%;top:0;bottom:0;
+  background:linear-gradient(180deg,#0071E3,#0058B0);
+}
+.coffret__couvercle{
+  position:absolute;left:-5%;right:-5%;top:14%;height:20%;
+  background:linear-gradient(140deg,#FFFFFF 0%,#E9F1FA 70%,#D6E4F4 100%);
+  border-radius:8px;
+  box-shadow:0 10px 24px rgba(13,42,82,.20), inset 0 0 0 1px rgba(13,42,82,.07);
+  transform-origin:50% 100%;
+  transition:transform 1s var(--ease), opacity 1s var(--ease);
+}
+.coffret__couvercle::before{
+  content:"";position:absolute;left:44%;right:44%;top:0;bottom:0;
+  background:linear-gradient(180deg,#0071E3,#0058B0);
+}
+/* Le nœud */
+.coffret__noeud{
+  position:absolute;left:50%;top:10%;width:34%;aspect-ratio:2/1;translate:-50% 0;
+  transform-origin:50% 100%;
+  transition:transform 1s var(--ease), opacity .8s var(--ease);
+}
+.coffret__noeud::before,.coffret__noeud::after{
+  content:"";position:absolute;top:0;bottom:0;width:52%;
+  border:7px solid #0071E3;border-radius:60% 60% 40% 40%;
+}
+.coffret__noeud::before{left:0;rotate:-14deg}
+.coffret__noeud::after{right:0;rotate:14deg}
+/* La lumière qui sort une fois ouvert */
+.coffret__lueur{
+  position:absolute;left:12%;right:12%;top:26%;height:36%;
+  border-radius:50%;opacity:0;
+  background:radial-gradient(60% 70% at 50% 50%, rgba(245,199,126,.85), rgba(245,199,126,0) 70%);
+  transition:opacity .9s var(--ease);
+  filter:blur(2px);
+}
+.coffret.ouvert .coffret__couvercle{transform:translateY(-78%) rotateX(26deg)}
+.coffret.ouvert .coffret__noeud{transform:translateY(-120%) rotate(-10deg);opacity:0}
+.coffret.ouvert .coffret__lueur{opacity:1}
+
+@media (max-width:860px){
+  .noel-offre{grid-template-columns:1fr;gap:var(--s4)}
+  .coffret{aspect-ratio:4/3;order:-1}
+}
+
+/* =========================================================
+   7 — CARTE CADEAU
+   ========================================================= */
+.noel-cadeau{display:grid;grid-template-columns:1fr 1fr;gap:var(--s6);align-items:center;
+  max-width:1120px;margin-inline:auto}
+.cadeau-scene{perspective:900px;display:grid;place-items:center}
+.cadeau{
+  position:relative;width:min(92%,420px);aspect-ratio:1.586;  /* format carte bancaire */
+  border-radius:16px;
+  background:linear-gradient(135deg,#0071E3 0%,#0A5BB8 48%,#063F80 100%);
+  box-shadow:0 20px 50px rgba(0,61,128,.34);
+  color:#fff;padding:clamp(16px,2.4vw,24px);
+  display:flex;flex-direction:column;justify-content:space-between;
+  transform-style:preserve-3d;
+  transition:transform .25s var(--ease);
+  overflow:hidden;
+}
+/* Le reflet, qui balaie la carte selon l'inclinaison */
+.cadeau::after{
+  content:"";position:absolute;inset:0;pointer-events:none;
+  background:linear-gradient(105deg,
+    rgba(255,255,255,0) 32%, rgba(255,255,255,.26) 46%,
+    rgba(255,255,255,.05) 54%, rgba(255,255,255,0) 68%);
+  transform:translateX(var(--reflet,0%));
+  transition:transform .2s linear;
+}
+.cadeau__haut{display:flex;align-items:center;justify-content:space-between;gap:12px;z-index:1}
+.cadeau__marque{font-size:15px;font-weight:600;letter-spacing:-.02em;display:inline-flex;align-items:center;gap:7px}
+.cadeau__marque i{width:7px;height:7px;border-radius:50%;background:var(--or);flex:none}
+.cadeau__puce{
+  width:34px;height:26px;border-radius:5px;flex:none;
+  background:linear-gradient(140deg,#F5C77E,#C9933F);
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.3);
+}
+.cadeau__t{font-size:clamp(20px,2.6vw,26px);font-weight:700;letter-spacing:-.022em;line-height:1.15;z-index:1}
+.cadeau__bas{font-size:12.5px;letter-spacing:.06em;text-transform:uppercase;opacity:.78;z-index:1}
+
+@media (max-width:860px){
+  .noel-cadeau{grid-template-columns:1fr;gap:var(--s4)}
+}
+
+/* =========================================================
+   8 — PAGE OFFRE : petites pièces
+   ========================================================= */
+.noel-sec{position:relative;z-index:2}
+.noel-eyebrow{color:var(--or-fonce)!important}
+
+/* =========================================================
+   9 — MOINS D'ANIMATIONS
+   Tout ce qui bouge s'arrête. La neige n'est même pas lancée (script),
+   les volets s'ouvrent sans pivot, le coffret est ouvert d'emblée.
+   ========================================================= */
+@media (prefers-reduced-motion:reduce){
+  .theme-noel .card::before,.theme-noel .cap::before,.theme-noel .step::before,
+  .theme-noel .membre::before,.theme-noel .ruban__avis::before,
+  .theme-noel .noel-carte::before,
+  .theme-noel .btn--glow::before,.theme-noel .nav__cta::before,
+  .avent__volet,.coffret__couvercle,.coffret__noeud,.coffret__lueur,
+  .cadeau,.cadeau::after,.avent-vue,.avent-vue__boite{transition:none}
+  .avent__case--ouverte .avent__volet--g,
+  .avent__case--ouverte .avent__volet--d{transform:none;opacity:0}
+}
