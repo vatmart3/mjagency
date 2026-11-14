@@ -3,6 +3,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { ComponentProps, MouseEvent } from "react";
 import { scrollToTarget } from "@/lib/lenis";
+import { STATIC_PREVIEW } from "@/components/providers/StaticPreview";
 
 type Props = ComponentProps<typeof Link> & { href: string };
 
@@ -30,5 +31,5 @@ export default function TransitionLink({ href, onClick, ...rest }: Props) {
     );
   };
 
-  return <Link href={href} onClick={handle} {...rest} />;
+  return <Link href={href} onClick={handle} prefetch={STATIC_PREVIEW ? false : undefined} {...rest} />;
 }

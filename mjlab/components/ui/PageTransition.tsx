@@ -28,8 +28,20 @@ export default function PageTransition() {
         onComplete: () => router.push(href),
       });
     };
+    const onStatic = (e: Event) => {
+      const d = (e as CustomEvent<{ href: string; x: number; y: number }>).detail;
+      const el = dot.current;
+      if (!el || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return void (location.href = d.href);
+      const r = Math.hypot(Math.max(d.x, innerWidth - d.x), Math.max(d.y, innerHeight - d.y));
+      gsap.set(el, { left: d.x, top: d.y, width: 12, height: 12, scale: 1, autoAlpha: 1 });
+      gsap.to(el, { scale: (r * 2) / 12 + 2, duration: 0.6, ease: "power3.inOut", onComplete: () => void (location.href = d.href) });
+    };
     window.addEventListener("mj:navigate", onNav);
-    return () => window.removeEventListener("mj:navigate", onNav);
+    window.addEventListener("mj:static-nav", onStatic);
+    return () => {
+      window.removeEventListener("mj:navigate", onNav);
+      window.removeEventListener("mj:static-nav", onStatic);
+    };
   }, [router]);
 
   useEffect(() => {

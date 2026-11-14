@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { activities, site } from "@/content/site";
 import Submark from "@/components/ui/Submark";
 import TransitionLink from "@/components/ui/TransitionLink";
@@ -48,8 +47,8 @@ export default function Footer() {
           <ul className="space-y-2 text-[0.95rem]">
             <li><a href={`mailto:${site.contact.email}`} className="text-creme/90 hover:text-bordeaux-light">E-mail</a></li>
             <li><a href={site.contact.phoneHref} className="text-creme/90 hover:text-bordeaux-light">Téléphone</a></li>
-            <li><Link href="/mentions-legales" className="text-creme/90 hover:text-bordeaux-light">Mentions légales</Link></li>
-            <li><Link href="/confidentialite" className="text-creme/90 hover:text-bordeaux-light">Confidentialité</Link></li>
+            <li><TransitionLink href="/mentions-legales" className="text-creme/90 hover:text-bordeaux-light">Mentions légales</TransitionLink></li>
+            <li><TransitionLink href="/confidentialite" className="text-creme/90 hover:text-bordeaux-light">Confidentialité</TransitionLink></li>
           </ul>
         </div>
       </div>

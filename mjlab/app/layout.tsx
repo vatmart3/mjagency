@@ -12,6 +12,7 @@ import StickyCTA from "@/components/ui/StickyCTA";
 import PageTransition from "@/components/ui/PageTransition";
 import ContactPanel from "@/components/contact/ContactPanel";
 import Footer from "@/components/sections/Footer";
+import StaticPreview from "@/components/providers/StaticPreview";
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -100,6 +101,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body>
         <Loader />
         <SmoothScroll />
+        <StaticPreview />
         <Header />
         <main id="contenu">{children}</main>
         <Footer />
