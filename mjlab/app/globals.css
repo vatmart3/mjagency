@@ -1,0 +1,255 @@
+@import "tailwindcss";
+
+/* =====================================================================
+   CHARTE MJ LAB — seules teintes autorisées (+ leurs opacités)
+   ===================================================================== */
+:root {
+  --bordeaux: #641e32;
+  --bordeaux-light: #8d3048;
+  --creme: #f5f0e9;
+  --beige: #d7c5b8;
+  --noir: #252326;
+  --blanc: #ffffff;
+
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --gutter: clamp(1rem, 3vw, 2.5rem);
+  --header-h: 4.5rem;
+}
+
+@theme inline {
+  --color-bordeaux: var(--bordeaux);
+  --color-bordeaux-light: var(--bordeaux-light);
+  --color-creme: var(--creme);
+  --color-beige: var(--beige);
+  --color-noir: var(--noir);
+  --color-blanc: var(--blanc);
+
+  --font-display: var(--font-poppins), system-ui, sans-serif;
+  --font-sans: var(--font-inter), system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+
+  --ease-lab: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* ---------------------------------------------------------------------
+   BASE
+   --------------------------------------------------------------------- */
+html {
+  background: var(--creme);
+  color: var(--noir);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+body {
+  font-family: var(--font-sans);
+  background: var(--creme);
+  overflow-x: clip;
+}
+
+::selection {
+  background: var(--bordeaux);
+  color: var(--blanc);
+}
+
+/* Focus visible en bordeaux, partout */
+:focus-visible {
+  outline: 2px solid var(--bordeaux);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+.on-dark :focus-visible,
+.on-dark:focus-visible {
+  outline-color: var(--creme);
+}
+
+/* Curseur natif masqué uniquement quand le curseur custom est actif */
+html.has-cursor,
+html.has-cursor * {
+  cursor: none !important;
+}
+
+/* ---------------------------------------------------------------------
+   TYPOGRAPHIE
+   --------------------------------------------------------------------- */
+.font-display {
+  font-family: var(--font-display);
+}
+.display-tight {
+  font-family: var(--font-display);
+  font-weight: 800;
+  letter-spacing: -0.055em;
+  line-height: 0.9;
+}
+.mono {
+  font-family: var(--font-mono);
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  font-size: 0.6875rem;
+  line-height: 1.4;
+}
+.mono-md {
+  font-family: var(--font-mono);
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  font-size: 0.8125rem;
+}
+
+/* Le point de la marque */
+.dot {
+  color: var(--bordeaux);
+}
+.on-dark .dot,
+.dot-light {
+  color: var(--bordeaux-light);
+}
+
+/* Lignes masquées pour les révélations de texte */
+.line-mask {
+  display: block;
+  overflow: hidden;
+  /* marge pour les descendantes et les accents */
+  padding-bottom: 0.08em;
+  margin-bottom: -0.08em;
+}
+.line-mask > .line-inner {
+  display: block;
+  will-change: transform;
+}
+
+/* ---------------------------------------------------------------------
+   GRAIN — overlay SVG plein écran (≈ 5 %)
+   --------------------------------------------------------------------- */
+.grain {
+  position: fixed;
+  inset: -50%;
+  width: 200%;
+  height: 200%;
+  pointer-events: none;
+  z-index: 90;
+  opacity: 0.055;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.145 0 0 0 0 0.137 0 0 0 0 0.149 0 0 0 1 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  animation: grain 1.2s steps(6) infinite;
+}
+@keyframes grain {
+  0% { transform: translate(0, 0); }
+  20% { transform: translate(-3%, 2%); }
+  40% { transform: translate(2%, -4%); }
+  60% { transform: translate(-4%, -1%); }
+  80% { transform: translate(3%, 3%); }
+  100% { transform: translate(0, 0); }
+}
+
+/* ---------------------------------------------------------------------
+   GRILLE ÉDITORIALE — fines lignes beige
+   --------------------------------------------------------------------- */
+.editorial-grid {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  padding: 0 var(--gutter);
+}
+.editorial-grid > span {
+  border-left: 1px solid color-mix(in srgb, var(--beige) 60%, transparent);
+}
+.editorial-grid > span:last-child {
+  border-right: 1px solid color-mix(in srgb, var(--beige) 60%, transparent);
+}
+.on-dark .editorial-grid > span {
+  border-color: color-mix(in srgb, var(--creme) 7%, transparent);
+}
+
+.hairline {
+  height: 1px;
+  background: color-mix(in srgb, var(--beige) 80%, transparent);
+}
+
+/* ---------------------------------------------------------------------
+   SUBMARK — rotation lente du texte circulaire
+   --------------------------------------------------------------------- */
+.spin-slow {
+  animation: spin 28s linear infinite;
+  transform-origin: 50% 50%;
+}
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ---------------------------------------------------------------------
+   OUTLINE — logotype géant du footer
+   --------------------------------------------------------------------- */
+.outline-fill {
+  color: transparent;
+  -webkit-text-stroke: 1.5px var(--creme);
+  background-image: linear-gradient(var(--bordeaux-light), var(--bordeaux-light));
+  background-repeat: no-repeat;
+  background-size: 100% 0%;
+  background-position: 0 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  transition: background-size 0.9s var(--ease-out), -webkit-text-stroke-color 0.4s var(--ease-out);
+}
+.outline-fill:hover {
+  background-size: 100% 100%;
+  -webkit-text-stroke-color: var(--bordeaux-light);
+}
+
+/* ---------------------------------------------------------------------
+   UTILITAIRES
+   --------------------------------------------------------------------- */
+.gutter {
+  padding-left: var(--gutter);
+  padding-right: var(--gutter);
+}
+.sr-only-focusable:not(:focus) {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* ---------------------------------------------------------------------
+   MOINS D'ANIMATIONS : tout s'affiche directement
+   --------------------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+  .grain {
+    animation: none;
+  }
+  .line-mask > .line-inner,
+  [data-reveal] {
+    transform: none !important;
+    opacity: 1 !important;
+  }
+}
+
+/* Loader masqué avant hydratation pour un visiteur déjà venu */
+html[data-visited="1"] .mj-loader {
+  display: none;
+}
