@@ -12,11 +12,28 @@
   --white:      #FFFFFF;
   --off-white:  #F5F5F7;
   --light-gray: #F2F2F4;
-  --gray:       #86868B;
   --dark-gray:  #1D1D1F;
   --black:      #0D0D0F;
   --blue:       #0071E3;
   --blue-dark:  #0058B0;
+
+  /* --gray portait le #86868B de la charte : 3,62:1 sur blanc, sous le
+     minimum lisible de 4,5:1. Toute la prose secondaire du site passait par
+     lui — chapôs, descriptions, réponses de la FAQ, pied de page. Il prend
+     l'encre du corps de texte : 16,9:1. Le nom reste, il est appelé à
+     quarante-six endroits ; seule la valeur change. */
+  --gray:       #1D1D1F;
+
+  /* Le gris d'origine, gardé là où il ne porte pas de prose mais un signal,
+     et où du noir serait donc un défaut :
+       — les étiquettes des illustrations (fausse barre d'adresse, planche de
+         charte, grille de cohérence) : des dessins, pas du texte à lire ;
+       — le libellé flottant d'un champ vide, qui doit se lire comme un
+         emplacement libre et non comme un champ déjà rempli ;
+       — l'état éteint d'un bouton à bascule, qui doit se distinguer de
+         l'état allumé.
+     Toute vraie phrase, elle, est en noir. */
+  --gris-muet: #86868B;
 
   /* Hauteur du bandeau saisonnier en tête de page, 0 le reste de l'année.
      main.js y pose la hauteur mesurée ; la barre et le hero s'y décalent. */
@@ -426,7 +443,7 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
   transition:border-color .2s,background .2s;
 }
 .field textarea{resize:none;min-height:104px;padding-top:26px}
-.field label{position:absolute;left:16px;top:17px;color:var(--gray);font-size:17px;pointer-events:none;transition:transform .2s var(--ease),font-size .2s var(--ease)}
+.field label{position:absolute;left:16px;top:17px;color:var(--gris-muet);font-size:17px;pointer-events:none;transition:transform .2s var(--ease),font-size .2s var(--ease)}
 .field input:focus,.field textarea:focus,.field select:focus{outline:none;background:var(--white);border-color:var(--blue)}
 .field input:focus+label,.field input:not(:placeholder-shown)+label,
 .field textarea:focus+label,.field textarea:not(:placeholder-shown)+label{
@@ -525,7 +542,7 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
 }
 .coh__lab{
   font-size:9px;font-weight:600;letter-spacing:.09em;text-transform:uppercase;
-  color:var(--gray);
+  color:var(--gris-muet);
 }
 .coh__marque{display:flex;align-items:center;gap:5px}
 .coh__marque i{width:6px;height:6px;border-radius:50%;background:var(--blue);flex:none}
@@ -787,7 +804,7 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
 .nave__url{
   flex:1;height:15px;border-radius:999px;background:var(--white);
   border:1px solid var(--rule);display:flex;align-items:center;
-  padding:0 8px;font-size:8px;color:var(--gray);letter-spacing:.01em;
+  padding:0 8px;font-size:8px;color:var(--gris-muet);letter-spacing:.01em;
   white-space:nowrap;overflow:hidden;
 }
 /* La fenêtre est plus courte que sa page : c'est ce décalage qui permet
@@ -896,7 +913,7 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
 }
 .board__grid{display:grid;grid-template-columns:1fr 1fr;gap:var(--s2)}
 .board__cell{display:flex;flex-direction:column;gap:8px}
-.board__lab{font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--gray)}
+.board__lab{font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--gris-muet)}
 
 .board__swatches{display:flex;gap:5px}
 .board__swatches i{
@@ -905,7 +922,7 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
 }
 .board__type{display:flex;align-items:baseline;gap:8px}
 .board__type b{font-size:26px;font-weight:700;letter-spacing:-.02em;color:var(--black);line-height:1}
-.board__type small{font-size:10px;color:var(--gray)}
+.board__type small{font-size:10px;color:var(--gris-muet)}
 
 .board__btns{display:flex;flex-wrap:wrap;gap:6px}
 .board__btn{

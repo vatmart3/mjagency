@@ -85,8 +85,10 @@
   transition:background .25s var(--ease),color .25s var(--ease);
 }
 .noel-bouton svg{width:16px;height:16px;flex:none;color:var(--blue)}
-.noel-bouton[aria-pressed="false"]{color:var(--gray)}
-.noel-bouton[aria-pressed="false"] svg{color:var(--gray);opacity:.6}
+/* --gris-muet, pas --gray : depuis que le gris de prose est passé au noir,
+   --gray vaut l'encre du bouton allumé — éteint et allumé se ressembleraient. */
+.noel-bouton[aria-pressed="false"]{color:var(--gris-muet)}
+.noel-bouton[aria-pressed="false"] svg{color:var(--gris-muet);opacity:.6}
 
 /* =========================================================
    3 — LA COUCHE DE NEIGE SUR LES CARTES ET LES BOUTONS
